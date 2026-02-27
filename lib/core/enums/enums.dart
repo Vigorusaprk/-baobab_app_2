@@ -1,0 +1,1 @@
+//TODO: add enums here like this enum Status { loading, loaded, error, initial } 

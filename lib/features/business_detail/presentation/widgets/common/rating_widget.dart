@@ -1,0 +1,53 @@
+import 'package:flutter/material.dart';
+
+class RatingWidget extends StatelessWidget {
+  final double rating;
+  final int reviewCount;
+  final bool showReviewCount;
+  final double iconSize;
+
+  const RatingWidget({
+    super.key,
+    required this.rating,
+    this.reviewCount = 0,
+    this.showReviewCount = true,
+    this.iconSize = 18,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          decoration: BoxDecoration(
+            color: Colors.amber.withOpacity(0.15),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Row(
+            children: [
+              Icon(Icons.star_rounded, color: Colors.amber[800], size: iconSize),
+              const SizedBox(width: 4),
+              Text(
+                rating.toStringAsFixed(1),
+                style: TextStyle(
+                  fontWeight: FontWeight.w900,
+                  color: Colors.amber[900],
+                  fontSize: iconSize - 2,
+                ),
+              ),
+            ],
+          ),
+        ),
+        if (showReviewCount) ...[
+          const SizedBox(width: 8),
+          Text(
+            "$reviewCount avis",
+            style: TextStyle(color: Colors.grey[600], fontSize: 13, fontWeight: FontWeight.w500),
+          ),
+        ],
+      ],
+    );
+  }
+}
