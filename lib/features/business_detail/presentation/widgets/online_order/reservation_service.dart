@@ -38,6 +38,11 @@ class Reservation {
   final bool? includeInsurance;
   final bool? needDelivery;
 
+  // Agence de voyage
+  final String? destination;
+  final int? numberOfPassengers;
+  final String? departureTime;
+
   Reservation({
     required this.id,
     required this.establishmentName,
@@ -70,6 +75,12 @@ class Reservation {
     this.withDriver,
     this.includeInsurance,
     this.needDelivery,
+
+    //Agence de voyage
+    this.destination,
+    this.numberOfPassengers,
+    this.departureTime,
+
   });
 
   Map<String, dynamic> toMap() {
@@ -105,6 +116,12 @@ class Reservation {
       'withDriver': withDriver,
       'includeInsurance': includeInsurance,
       'needDelivery': needDelivery,
+
+      //agence de voyage par bus
+      'destination': destination,
+      'numberOfPassengers': numberOfPassengers,
+      'departureTime': departureTime,
+
     };
   }
 
@@ -148,6 +165,12 @@ class Reservation {
       withDriver: map['withDriver'],
       includeInsurance: map['includeInsurance'],
       needDelivery: map['needDelivery'],
+
+      //Agence de voyage
+      destination: map['destination'],
+      numberOfPassengers: map['numberOfPassengers'],
+      departureTime: map['departureTime'],
+
     );
   }
 
@@ -174,6 +197,7 @@ class Reservation {
     switch (reservationType) {
       case 'hotel': return Icons.hotel;
       case 'car_rental': return Icons.directions_car;
+      case 'travelAgency': return Icons.card_travel;
       default: return Icons.restaurant;
     }
   }
@@ -182,6 +206,7 @@ class Reservation {
     switch (reservationType) {
       case 'hotel': return Colors.purple;
       case 'car_rental': return Colors.teal;
+      case 'travelAgency': return Colors.deepPurpleAccent;
       default: return Colors.orange;
     }
   }
@@ -237,5 +262,10 @@ class ReservationService {
   static Future<List<Reservation>> getCarRentalReservations() async {
     final allReservations = await getReservations();
     return allReservations.where((r) => r.reservationType == 'car_rental').toList();
+  }
+
+  static Future<List<Reservation>> getTravelReservations() async {
+    final allReservations = await getReservations();
+    return allReservations.where((r) => r.reservationType == 'travelAgency').toList();
   }
 }

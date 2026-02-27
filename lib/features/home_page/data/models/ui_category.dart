@@ -25,6 +25,8 @@ class UICategory {
         return Icons.directions_car;
       case 'detente':
         return Icons.spa;
+      case 'travelAgency':
+        return Icons.card_travel;
       default:
         return Icons.business;
     }
@@ -48,6 +50,8 @@ class UICategory {
         return Colors.blueGrey;
       case 'detente':
         return Colors.green;
+      case 'travelAgency':
+        return Colors.indigoAccent;
       default:
         return Colors.grey;
     }

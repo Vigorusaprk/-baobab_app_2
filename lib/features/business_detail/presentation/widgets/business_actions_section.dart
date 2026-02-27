@@ -1,4 +1,5 @@
 import 'package:baobabe_0_2/features/business_detail/domain/entities/menu_restau.dart';
+import 'package:baobabe_0_2/features/business_detail/presentation/widgets/online_order/travel_agency_modal.dart';
 import 'package:baobabe_0_2/features/home_page/data/models/ui_business.dart';
 import 'package:baobabe_0_2/features/home_page/domain/entities/business_entity.dart';
 import 'package:flutter/material.dart';
@@ -90,6 +91,13 @@ class BusinessActionsSection extends StatelessWidget {
                     icon: "assets/icons/car-svgrepo-com.svg",
                     label: "Réserver véhicule",
                     onTap: () => showCarRentalModal(context, business),
+                  ),
+                if (business.type == BusinessType.travelAgency)
+                  _buildActionButton(
+                    context,
+                    icon: "assets/icons/car-svgrepo-com.svg",
+                    label: "Réserver véhicule",
+                    onTap: () => showTravelReservationModal(context, business),
                   ),
               ],
             ),

@@ -181,6 +181,8 @@ class BusinessModel {
         return BusinessType.carRental;
       case 'detente':
         return BusinessType.detente;
+      case 'travelAgency':
+        return BusinessType.travelAgency;
       default:
         return BusinessType.other;
     }
@@ -202,6 +204,8 @@ class BusinessModel {
         return 'carRental';
       case BusinessType.detente:
         return 'detente';
+      case BusinessType.travelAgency:
+        return 'travelAgency';
       default:
         return 'other';
     }

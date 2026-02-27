@@ -23,6 +23,8 @@ class UIBusiness {
         return Colors.indigo;
       case BusinessType.detente:
         return Colors.green;
+      case BusinessType.travelAgency:
+        return Colors.indigoAccent;
       default:
         return Colors.grey;
     }
@@ -44,6 +46,8 @@ class UIBusiness {
         return Icons.directions_car;
       case BusinessType.detente:
         return Icons.spa;
+      case BusinessType.travelAgency:
+        return Icons.card_travel;
       default:
         return Icons.business;
     }
