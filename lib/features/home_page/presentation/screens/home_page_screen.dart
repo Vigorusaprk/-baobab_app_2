@@ -23,43 +23,31 @@ class HomePageScreen extends StatelessWidget {
       ],
       child: Scaffold(
         backgroundColor: AppTheme.silvaTheme.scaffoldBackgroundColor,
-        body: SafeArea(
-          child: CustomScrollView(
-            physics: const BouncingScrollPhysics(),
-            slivers: [
-              // Header section (Location, Profile, Greeting, Categories)
-              SliverToBoxAdapter(
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: AppDimens.PADDING_16,
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const LocationAndProfile(),
-                      const SizedBox(height: AppDimens.PADDING_20),
-                      const HelloUserWidget(),
-                      const SizedBox(height: AppDimens.PADDING_20),
-                      const CategoryIcons(),
-                      const SizedBox(height: AppDimens.PADDING_30),
-                    ],
-                  ),
+        body: CustomScrollView(
+          physics: const BouncingScrollPhysics(),
+          slivers: [
+            // Header section (Location, Profile, Greeting, Categories)
+            SliverToBoxAdapter(
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  vertical: AppDimens.PADDING_40,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const LocationAndProfile(),
+                    const SizedBox(height: AppDimens.PADDING_20),
+                    const HelloUserWidget(),
+                    const SizedBox(height: AppDimens.PADDING_20),
+                    const CategoryIcons(),
+                    const SizedBox(height: AppDimens.PADDING_30),
+                    const BusinessCardsWidget(),
+                    const SizedBox(height: AppDimens.PADDING_40),
+                  ],
                 ),
               ),
-
-              // Business cards section
-              SliverToBoxAdapter(
-                child: Container(
-                  padding: EdgeInsets.only(
-                    left: AppDimens.PADDING_16,
-                    right: AppDimens.PADDING_16,
-                    bottom: AppDimens.PADDING_20,
-                  ),
-                  child: const BusinessCardsWidget(),
-                ),
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

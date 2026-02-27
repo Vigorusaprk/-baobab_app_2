@@ -1,4 +1,5 @@
 // lib/features/location/presentation/widgets/location_and_profile.dart
+import 'package:baobabe_0_2/core/themes/app_diemens.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
@@ -8,7 +9,7 @@ class LocationAndProfile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(top: 24, left: 4, right: 4),
+      padding: const EdgeInsets.only(left: AppDimens.PADDING_20, right: AppDimens.PADDING_20, top: AppDimens.PADDING_20),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
         decoration: BoxDecoration(

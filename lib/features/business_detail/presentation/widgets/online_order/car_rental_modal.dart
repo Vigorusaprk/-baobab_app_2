@@ -1,4 +1,5 @@
 import 'package:baobabe_0_2/core/themes/app_colors.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:baobabe_0_2/features/home_page/domain/entities/business_entity.dart';
 import 'package:flutter/material.dart';
 import 'reservation_service.dart';
@@ -51,7 +52,15 @@ void showCarRentalModal(BuildContext context, Business business) {
     isScrollControlled: true,
     backgroundColor: Colors.transparent,
     builder: (context) {
-      return CarRentalModal(business: business);
+      return Localizations(
+        locale: const Locale('fr', 'FR'),
+        delegates: [
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        child: CarRentalModal(business: business),
+      );
     },
   );
 }
