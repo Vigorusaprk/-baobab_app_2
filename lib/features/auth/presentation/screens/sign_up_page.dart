@@ -67,7 +67,7 @@ class _SignUpPageState extends State<SignUpPage> {
         }
       },
       child: Scaffold(
-        backgroundColor: const Color(0xFFF8F9FA),
+        backgroundColor: AppColors.primaryLight,
         body: SafeArea(
           child: Center(
             child: SingleChildScrollView(
@@ -81,7 +81,7 @@ class _SignUpPageState extends State<SignUpPage> {
                   Container(
                     padding: const EdgeInsets.all(24),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: AppColors.scaffoldBackground,
                       borderRadius: BorderRadius.circular(28),
                       boxShadow: [
                         BoxShadow(
@@ -132,7 +132,7 @@ class _SignUpPageState extends State<SignUpPage> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text("Déjà un compte ?", style: TextStyle(color: Colors.grey[600])),
+                      Text("Déjà un compte ?", style: TextStyle(color: AppColors.scaffoldBackground)),
                       TextButton(
                         onPressed: () {
                           Navigator.of(context).pushReplacement(
@@ -141,7 +141,7 @@ class _SignUpPageState extends State<SignUpPage> {
                         },
                         child: const Text(
                           'Connectez-vous',
-                          style: TextStyle(color: Color(0xFF254D32), fontWeight: FontWeight.bold),
+                          style: TextStyle(color: AppColors.scaffoldBackground, fontWeight: FontWeight.bold),
                         ),
                       ),
                     ],
@@ -162,7 +162,7 @@ class _SignUpPageState extends State<SignUpPage> {
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            color: AppColors.primary.withOpacity(0.1),
+            color: AppColors.scaffoldBackground,
           ),
           child: SvgPicture.asset(
             "assets/icons/olive-svgrepo-com.svg",
@@ -172,17 +172,17 @@ class _SignUpPageState extends State<SignUpPage> {
         ),
         const SizedBox(height: 16),
         const Text(
-          'Créer un compte',
-          style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, letterSpacing: -0.5),
+          'Bienvenue',
+          style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, letterSpacing: -0.5, color: AppColors.scaffoldBackground),
         ),
-        const SizedBox(height: 8),
         Text(
-          'Rejoignez-nous pour commencer',
+          'Crée vous un comptes',
           style: TextStyle(fontSize: 16, color: Colors.grey[500]),
         ),
       ],
     );
   }
+
 
   Widget _buildTextField({
     required TextEditingController controller,
@@ -254,7 +254,7 @@ class _SignUpPageState extends State<SignUpPage> {
         style: OutlinedButton.styleFrom(
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
           side: BorderSide(color: Colors.grey.withOpacity(0.2)),
-          backgroundColor: Colors.white,
+          backgroundColor: AppColors.scaffoldBackground,
         ),
         icon: SvgPicture.asset(icon, height: 20),
         label: Text(

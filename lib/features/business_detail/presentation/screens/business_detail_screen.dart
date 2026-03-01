@@ -73,7 +73,7 @@ class BusinessDetailScreen extends StatelessWidget {
 
       return CustomScrollView(
         slivers: [
-          BusinessDetailAppBar(business: state.business),
+          BusinessDetailAppBar(business: state.business, uiBusiness: uiBusiness,),
           SliverToBoxAdapter(
             child: ResponsiveContainer(
               child: Column(

@@ -197,7 +197,7 @@ class Reservation {
     switch (reservationType) {
       case 'hotel': return Icons.hotel;
       case 'car_rental': return Icons.directions_car;
-      case 'travelAgency': return Icons.card_travel;
+      case 'travel': return Icons.card_travel;
       default: return Icons.restaurant;
     }
   }
@@ -206,7 +206,7 @@ class Reservation {
     switch (reservationType) {
       case 'hotel': return Colors.purple;
       case 'car_rental': return Colors.teal;
-      case 'travelAgency': return Colors.deepPurpleAccent;
+      case 'travel': return Colors.deepPurpleAccent;
       default: return Colors.orange;
     }
   }
@@ -266,6 +266,6 @@ class ReservationService {
 
   static Future<List<Reservation>> getTravelReservations() async {
     final allReservations = await getReservations();
-    return allReservations.where((r) => r.reservationType == 'travelAgency').toList();
+    return allReservations.where((r) => r.reservationType == 'travel_agency').toList();
   }
 }

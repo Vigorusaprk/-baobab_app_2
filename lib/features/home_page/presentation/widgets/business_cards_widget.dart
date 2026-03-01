@@ -59,8 +59,34 @@ class _BusinessCardsWidgetState extends State<BusinessCardsWidget> {
   }
 
   Widget _buildStylizedScroll(List<UIBusiness> uiBusinesses) {
+    if (uiBusinesses.isEmpty) {
+      return SizedBox(
+        height: 400,
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.people_outline,
+                size: 60,
+                color: Colors.grey[400],
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'Aucun freelance disponible',
+                style: TextStyle(
+                  fontSize: 16,
+                  color: Colors.grey[600],
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
     return SizedBox(
-      height: 400,
+      height: 490,
       child: PageView.builder(
         controller: _pageController,
         itemCount: uiBusinesses.length,

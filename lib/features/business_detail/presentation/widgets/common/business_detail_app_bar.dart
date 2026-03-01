@@ -1,10 +1,12 @@
+import 'package:baobabe_0_2/features/home_page/data/models/ui_business.dart';
 import 'package:baobabe_0_2/features/home_page/domain/entities/business_entity.dart';
 import 'package:flutter/material.dart';
 
 class BusinessDetailAppBar extends StatelessWidget {
   final Business business;
+  final UIBusiness uiBusiness;
 
-  const BusinessDetailAppBar({super.key, required this.business});
+  const BusinessDetailAppBar({super.key, required this.uiBusiness,required this.business});
 
   @override
   Widget build(BuildContext context) {
@@ -44,7 +46,7 @@ class BusinessDetailAppBar extends StatelessWidget {
           children: [
             Hero(
               tag: 'business-image-${business.id}',
-              child: Image.asset(business.bgImg, fit: BoxFit.cover),
+              child: _buildBackGroudImage(),
             ),
             const DecoratedBox(
               decoration: BoxDecoration(
@@ -79,4 +81,51 @@ class BusinessDetailAppBar extends StatelessWidget {
       ),
     );
   }
+
+// Widget pour l'image de profil (grande zone)
+  Widget _buildBackGroudImage(){
+    final hasImage = business.bgImg != null && business.bgImg!.isNotEmpty;
+    final Color = uiBusiness.categoryColor;
+
+    return Container(
+        width: double.infinity,
+        height: 200,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(28),
+          color: hasImage ? null : uiBusiness.categoryColor, // Fond coloré si pas d'image
+        ),
+        child: hasImage ?
+        ClipRRect(
+          borderRadius: BorderRadius.circular(28),
+          child: Image.asset(
+            uiBusiness.business.bgImg!,
+            fit: BoxFit.cover,
+            errorBuilder: (context, error, stackTrace) {
+              // Si l'image ne se charge pas, afficher les initiales
+              return _buildInitialsContainer(Color);
+            },
+          ),
+        ) : _buildInitialsContainer(Color)
+    );
+  }
+
+  Widget _buildInitialsContainer(Color color) {
+    return Container(
+      decoration: BoxDecoration(
+          color: color,
+          borderRadius: BorderRadius.circular(28)
+      ),
+      width: double.infinity,
+      height: 200,
+      child: Center(
+          child: Icon(
+            uiBusiness.categoryIcon,
+            size: 80,
+            color: Colors.white,
+          )
+      ),
+    );
+  }
+
+
 }

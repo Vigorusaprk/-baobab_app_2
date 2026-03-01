@@ -1,3 +1,5 @@
+import 'package:baobabe_0_2/core/themes/app_colors.dart';
+import 'package:baobabe_0_2/core/themes/app_diemens.dart';
 import 'package:baobabe_0_2/features/home_page/data/models/ui_business.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -28,10 +30,7 @@ class BusinessCardWidget extends StatelessWidget {
           children: [
             // Image de fond
             Positioned.fill(
-              child: Image.asset(
-                uiBusiness.business.bgImg,
-                fit: BoxFit.cover,
-              ),
+              child: _buildBackGroudImage(),
             ),
 
             // Gradient protecteur
@@ -71,6 +70,51 @@ class BusinessCardWidget extends StatelessWidget {
     );
   }
 
+  // Widget pour l'image de profil (grande zone)
+  Widget _buildBackGroudImage(){
+    final hasImage = uiBusiness.business.bgImg != null && uiBusiness.business.bgImg!.isNotEmpty;
+    final Color = uiBusiness.categoryColor;
+
+    return Container(
+      width: double.infinity,
+      height: 200,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(28),
+        color: hasImage ? null : uiBusiness.categoryColor, // Fond coloré si pas d'image
+      ),
+      child: hasImage ?
+      ClipRRect(
+        borderRadius: BorderRadius.circular(28),
+        child: Image.asset(
+            uiBusiness.business.bgImg!,
+          fit: BoxFit.cover,
+          errorBuilder: (context, error, stackTrace) {
+            // Si l'image ne se charge pas, afficher les initiales
+            return _buildInitialsContainer(Color);
+          },
+        ),
+      ) : _buildInitialsContainer(Color)
+    );
+  }
+
+  Widget _buildInitialsContainer(Color color) {
+    return Container(
+      decoration: BoxDecoration(
+          color: color,
+          borderRadius: BorderRadius.circular(28)
+      ),
+      width: double.infinity,
+      height: 200,
+      child: Center(
+        child: Icon(
+          uiBusiness.categoryIcon,
+          size: 80,
+          color: Colors.white,
+        )
+      ),
+    );
+  }
+
   Widget _buildCategoryBadge() {
     return ClipRRect(
       borderRadius: BorderRadius.circular(16),
@@ -81,7 +125,7 @@ class BusinessCardWidget extends StatelessWidget {
           decoration: BoxDecoration(
             color: uiBusiness.categoryColor.withOpacity(0.8),
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: Colors.white.withOpacity(0.2)),
+            border: Border.all(color: Colors.white.withOpacity(0.5), width: 5),
           ),
           child: Icon(uiBusiness.categoryIcon, size: 20, color: Colors.white),
         ),

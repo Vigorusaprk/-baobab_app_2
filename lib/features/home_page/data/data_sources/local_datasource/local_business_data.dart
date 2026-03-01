@@ -58,6 +58,8 @@ class BusinessLocalDataSourceImpl implements BusinessLocalDataSource {
         return BusinessType.carRental;
       case 'Détente':
         return BusinessType.detente;
+      case 'Voyage' :
+        return BusinessType.travelAgency;
       default:
         return BusinessType.restaurant;
     }
@@ -262,6 +264,7 @@ class BusinessLocalDataSourceImpl implements BusinessLocalDataSource {
             ),
           ],
         },
+
         reviews: [],
         isFavorite: false,
         latitude: -4.4419,

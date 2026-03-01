@@ -16,7 +16,7 @@ class _FavoritesPageScreenState extends State<FavoritesPageScreen> {
   List<Reservation> _allReservations = [];
   List<Reservation> _displayedReservations = [];
   bool _isLoading = true;
-  String _selectedFilter = 'Tous'; // Filtre par défaut
+  String _selectedFilter = 'Tous';
 
   @override
   void initState() {
@@ -28,7 +28,7 @@ class _FavoritesPageScreenState extends State<FavoritesPageScreen> {
     final reservations = await ReservationService.getReservations();
     setState(() {
       _allReservations = reservations;
-      _displayedReservations = reservations; // Afficher toutes les réservations par défaut
+      _displayedReservations = reservations;
       _isLoading = false;
     });
   }
@@ -44,13 +44,15 @@ class _FavoritesPageScreenState extends State<FavoritesPageScreen> {
         _displayedReservations = _allReservations.where((r) => r.reservationType == 'restaurant').toList();
       } else if (type == 'Locations') {
         _displayedReservations = _allReservations.where((r) => r.reservationType == 'car_rental').toList();
+      } else if (type == 'Voyages') {
+        _displayedReservations = _allReservations.where((r) => r.reservationType == 'travel').toList();
       }
     });
   }
 
   Future<void> _deleteReservation(String id) async {
     await ReservationService.deleteReservation(id);
-    _loadReservations(); // Recharger toutes les réservations
+    _loadReservations();
   }
 
   void _showReservationDetails(Reservation reservation) {
@@ -116,7 +118,7 @@ class _FavoritesPageScreenState extends State<FavoritesPageScreen> {
             ),
           ),
 
-          // Section des filtres
+          // FILTRES
           if (_allReservations.isNotEmpty)
             Padding(
               padding: const EdgeInsets.symmetric(
@@ -134,12 +136,14 @@ class _FavoritesPageScreenState extends State<FavoritesPageScreen> {
                     _buildFilterChip('Restaurants', () => _filterReservations('Restaurants')),
                     const SizedBox(width: 8),
                     _buildFilterChip('Locations', () => _filterReservations('Locations')),
+                    const SizedBox(width: 8),
+                    _buildFilterChip('Voyages', () => _filterReservations('Voyages')),
                   ],
                 ),
               ),
             ),
 
-          // Contenu principal
+          // CONTENU PRINCIPAL
           Expanded(
             child: Container(
               decoration: BoxDecoration(
@@ -200,7 +204,7 @@ class _FavoritesPageScreenState extends State<FavoritesPageScreen> {
 
     return Column(
       children: [
-        // Statistiques
+        // STATISTIQUES
         Container(
           width: double.infinity,
           padding: const EdgeInsets.all(AppDimens.PADDING_16),
@@ -233,11 +237,15 @@ class _FavoritesPageScreenState extends State<FavoritesPageScreen> {
                 'Locations',
                 _allReservations.where((r) => r.reservationType == 'car_rental').length.toString(),
               ),
+              _buildStatItem(
+                'Voyages',
+                _allReservations.where((r) => r.reservationType == 'travel').length.toString(),
+              ),
             ],
           ),
         ),
 
-        // Indicateur de filtrage
+        // INDICATEUR DE FILTRE
         if (_selectedFilter != 'Tous' && _displayedReservations.isNotEmpty)
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: AppDimens.PADDING_16),
@@ -274,7 +282,7 @@ class _FavoritesPageScreenState extends State<FavoritesPageScreen> {
             ),
           ),
 
-        // Liste des réservations
+        // LISTE DES RÉSERVATIONS
         Expanded(
           child: RefreshIndicator(
             onRefresh: _loadReservations,
@@ -459,7 +467,6 @@ class _FavoritesPageScreenState extends State<FavoritesPageScreen> {
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Icône du type
                     Container(
                       width: 50,
                       height: 50,
@@ -579,7 +586,9 @@ class _FavoritesPageScreenState extends State<FavoritesPageScreen> {
                 else if (reservation.reservationType == 'restaurant')
                   _buildRestaurantReservationDetails(reservation)
                 else if (reservation.reservationType == 'car_rental')
-                    _buildCarRentalReservationDetails(reservation),
+                    _buildCarRentalReservationDetails(reservation)
+                  else if (reservation.reservationType == 'travel')
+                      _buildTravelReservationDetails(reservation),
 
                 const SizedBox(height: AppDimens.PADDING_12),
 
@@ -622,27 +631,25 @@ class _FavoritesPageScreenState extends State<FavoritesPageScreen> {
     );
   }
 
-  // Les méthodes restantes (_buildHotelReservationDetails, _buildRestaurantReservationDetails,
-  // _buildCarRentalReservationDetails, _buildDetailRow, _buildReservationDetailSheet, etc.)
-  // restent les mêmes que dans le code précédent, avec l'adaptation AppTheme
-
-  // ... [Le reste des méthodes reste inchangé, avec l'adaptation AppTheme]
-
   String _getReservationSubtitle(Reservation reservation) {
     if (reservation.reservationType == 'hotel') {
       return '${_formatDate(reservation.checkInDate!)} - ${_formatDate(reservation.checkOutDate!)}';
     } else if (reservation.reservationType == 'car_rental') {
       return '${_formatDate(reservation.rentalStartDate!)} - ${_formatDate(reservation.rentalEndDate!)}';
+    } else if (reservation.reservationType == 'travel') {
+      return '${reservation.destination ?? "Destination inconnue"} • ${_formatDate(reservation.displayDate)}';
     } else {
       return '${_formatDate(reservation.date!)} • ${_formatTime(reservation.time!)}';
     }
   }
 
+  // ========== DÉTAILS SPÉCIFIQUES ==========
+
   Widget _buildHotelReservationDetails(Reservation reservation) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildDetailRow(Icons.king_bed, '${reservation.roomType}'),
+        _buildDetailRow(Icons.king_bed, reservation.roomType ?? 'Non spécifié'),
         _buildDetailRow(Icons.person, reservation.customerName),
         _buildDetailRow(Icons.phone, reservation.phoneNumber),
         _buildDetailRow(
@@ -651,7 +658,7 @@ class _FavoritesPageScreenState extends State<FavoritesPageScreen> {
         ),
         _buildDetailRow(
           Icons.people,
-          '${reservation.numberOfGuests} invité${reservation.numberOfGuests! > 1 ? 's' : ''} • ${reservation.numberOfRooms} chambre${reservation.numberOfRooms! > 1 ? 's' : ''}',
+          '${reservation.numberOfGuests ?? 0} invité${reservation.numberOfGuests! > 1 ? 's' : ''} • ${reservation.numberOfRooms ?? 0} chambre${reservation.numberOfRooms! > 1 ? 's' : ''}',
         ),
         if (reservation.notes != null && reservation.notes!.isNotEmpty)
           _buildDetailRow(Icons.note, reservation.notes!),
@@ -671,11 +678,11 @@ class _FavoritesPageScreenState extends State<FavoritesPageScreen> {
         ),
         _buildDetailRow(
           Icons.people,
-          '${reservation.numberOfPeople} personne${reservation.numberOfPeople! > 1 ? 's' : ''}',
+          '${reservation.numberOfPeople ?? 0} personne${reservation.numberOfPeople! > 1 ? 's' : ''}',
         ),
         _buildDetailRow(
           Icons.table_restaurant,
-          'Table ${reservation.tableNumber} - ${reservation.floor}',
+          'Table ${reservation.tableNumber ?? '?'} - ${reservation.floor ?? '?'}',
         ),
         if (reservation.notes != null && reservation.notes!.isNotEmpty)
           _buildDetailRow(Icons.note, reservation.notes!),
@@ -687,7 +694,7 @@ class _FavoritesPageScreenState extends State<FavoritesPageScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildDetailRow(Icons.directions_car, '${reservation.vehicleType}'),
+        _buildDetailRow(Icons.directions_car, reservation.vehicleType ?? 'Non spécifié'),
         _buildDetailRow(Icons.person, reservation.customerName),
         _buildDetailRow(Icons.phone, reservation.phoneNumber),
         _buildDetailRow(
@@ -696,7 +703,7 @@ class _FavoritesPageScreenState extends State<FavoritesPageScreen> {
         ),
         _buildDetailRow(
           Icons.timer,
-          '${reservation.rentalDays} jour${reservation.rentalDays! > 1 ? 's' : ''} de location',
+          '${reservation.rentalDays ?? 0} jour${reservation.rentalDays! > 1 ? 's' : ''} de location',
         ),
         if (reservation.withDriver == true)
           _buildDetailRow(Icons.person_pin, 'Avec chauffeur'),
@@ -704,6 +711,31 @@ class _FavoritesPageScreenState extends State<FavoritesPageScreen> {
           _buildDetailRow(Icons.security, 'Assurance optionnelle'),
         if (reservation.needDelivery == true)
           _buildDetailRow(Icons.delivery_dining, 'Livraison incluse'),
+        if (reservation.notes != null && reservation.notes!.isNotEmpty)
+          _buildDetailRow(Icons.note, reservation.notes!),
+      ],
+    );
+  }
+
+  Widget _buildTravelReservationDetails(Reservation reservation) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildDetailRow(Icons.location_on, reservation.destination ?? 'Destination non spécifiée'),
+        _buildDetailRow(Icons.person, reservation.customerName),
+        _buildDetailRow(Icons.phone, reservation.phoneNumber),
+        _buildDetailRow(
+          Icons.calendar_today,
+          'Départ : ${_formatDate(reservation.displayDate)}',
+        ),
+        _buildDetailRow(
+          Icons.access_time,
+          reservation.departureTime ?? 'Heure non spécifiée',
+        ),
+        _buildDetailRow(
+          Icons.people,
+          '${reservation.numberOfPassengers ?? 1} passager${reservation.numberOfPassengers! > 1 ? 's' : ''}',
+        ),
         if (reservation.notes != null && reservation.notes!.isNotEmpty)
           _buildDetailRow(Icons.note, reservation.notes!),
       ],
@@ -737,6 +769,8 @@ class _FavoritesPageScreenState extends State<FavoritesPageScreen> {
       ),
     );
   }
+
+  // ========== BOTTOM SHEET DE DÉTAILS ==========
 
   Widget _buildReservationDetailSheet(Reservation reservation) {
     return Container(
@@ -791,46 +825,61 @@ class _FavoritesPageScreenState extends State<FavoritesPageScreen> {
             child: SingleChildScrollView(
               child: Column(
                 children: [
+                  // Carte informations générales
                   _buildDetailCard(
                     'Informations ${reservation.typeDisplayName}',
                     [
                       _buildDetailItem('Établissement', reservation.establishmentName),
-                      if (reservation.reservationType == 'restaurant')
-                        _buildDetailItem('Table', '${reservation.tableNumber} (${reservation.floor})')
-                      else if (reservation.reservationType == 'hotel')
-                        _buildDetailItem('Type de chambre', reservation.roomType!)
-                      else if (reservation.reservationType == 'car_rental')
-                          _buildDetailItem('Type de véhicule', reservation.vehicleType!),
+                      if (reservation.reservationType == 'restaurant') ...[
+                        _buildDetailItem('Table', '${reservation.tableNumber ?? '?'} (${reservation.floor ?? '?'})'),
+                      ] else if (reservation.reservationType == 'hotel') ...[
+                        _buildDetailItem('Type de chambre', reservation.roomType ?? 'Non spécifié'),
+                      ] else if (reservation.reservationType == 'car_rental') ...[
+                        _buildDetailItem('Type de véhicule', reservation.vehicleType ?? 'Non spécifié'),
+                      ] else if (reservation.reservationType == 'travel') ...[
+                        _buildDetailItem('Destination', reservation.destination ?? 'Non spécifiée'),
+                      ],
                     ],
                   ),
+
+                  // Carte informations client
                   _buildDetailCard('Informations Client', [
                     _buildDetailItem('Nom', reservation.customerName),
                     _buildDetailItem('Téléphone', reservation.phoneNumber),
                   ]),
+
+                  // Carte détails réservation
                   _buildDetailCard('Détails Réservation', [
                     if (reservation.reservationType == 'restaurant') ...[
                       _buildDetailItem('Date', _formatDate(reservation.date!)),
                       _buildDetailItem('Heure', _formatTime(reservation.time!)),
                       _buildDetailItem('Nombre de personnes', reservation.numberOfPeople.toString()),
                     ] else if (reservation.reservationType == 'hotel') ...[
-                      _buildDetailItem('Date d\'arrivée', _formatDate(reservation.checkInDate!)),
-                      _buildDetailItem('Date de départ', _formatDate(reservation.checkOutDate!)),
-                      _buildDetailItem('Nombre d\'invités', reservation.numberOfGuests.toString()),
-                      _buildDetailItem('Nombre de chambres', reservation.numberOfRooms.toString()),
+                      _buildDetailItem('Arrivée', _formatDate(reservation.checkInDate!)),
+                      _buildDetailItem('Départ', _formatDate(reservation.checkOutDate!)),
+                      _buildDetailItem('Invités', reservation.numberOfGuests.toString()),
+                      _buildDetailItem('Chambres', reservation.numberOfRooms.toString()),
                     ] else if (reservation.reservationType == 'car_rental') ...[
-                      _buildDetailItem('Date de début', _formatDate(reservation.rentalStartDate!)),
-                      _buildDetailItem('Date de fin', _formatDate(reservation.rentalEndDate!)),
-                      _buildDetailItem('Durée de location', '${reservation.rentalDays} jours'),
+                      _buildDetailItem('Début', _formatDate(reservation.rentalStartDate!)),
+                      _buildDetailItem('Fin', _formatDate(reservation.rentalEndDate!)),
+                      _buildDetailItem('Durée', '${reservation.rentalDays} jours'),
                       _buildDetailItem('Avec chauffeur', reservation.withDriver == true ? 'Oui' : 'Non'),
-                      _buildDetailItem('Assurance incluse', reservation.includeInsurance == true ? 'Oui' : 'Non'),
-                      _buildDetailItem('Livraison véhicule', reservation.needDelivery == true ? 'Oui' : 'Non'),
+                      _buildDetailItem('Assurance', reservation.includeInsurance == true ? 'Incluse' : 'Optionnelle'),
+                      _buildDetailItem('Livraison', reservation.needDelivery == true ? 'Oui' : 'Non'),
+                    ] else if (reservation.reservationType == 'travel') ...[
+                      _buildDetailItem('Date de départ', _formatDate(reservation.displayDate)),
+                      _buildDetailItem('Heure de départ', reservation.departureTime ?? 'Non spécifiée'),
+                      _buildDetailItem('Passagers', reservation.numberOfPassengers.toString()),
                     ],
                     _buildDetailItem('Statut', _getStatusText(reservation.displayDate)),
                   ]),
+
                   if (reservation.notes != null && reservation.notes!.isNotEmpty)
                     _buildDetailCard('Notes', [
                       _buildDetailItem('Commentaires', reservation.notes!),
                     ]),
+
+                  // Carte paiement
                   _buildDetailCard('Paiement', [
                     _buildDetailItem('Total', '\$${reservation.totalAmount.toStringAsFixed(2)}'),
                     _buildDetailItem('Réservé le', _formatDateTime(reservation.reservationDate)),
@@ -840,6 +889,8 @@ class _FavoritesPageScreenState extends State<FavoritesPageScreen> {
             ),
           ),
           const SizedBox(height: AppDimens.PADDING_20),
+
+          // Boutons
           Row(
             children: [
               Expanded(
@@ -992,6 +1043,8 @@ class _FavoritesPageScreenState extends State<FavoritesPageScreen> {
       ),
     );
   }
+
+  // ========== FORMATAGE ==========
 
   String _formatDate(DateTime date) {
     return '${date.day}/${date.month}/${date.year}';
