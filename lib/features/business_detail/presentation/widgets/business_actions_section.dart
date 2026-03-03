@@ -1,4 +1,5 @@
 import 'package:baobabe_0_2/features/business_detail/domain/entities/menu_restau.dart';
+import 'package:baobabe_0_2/features/business_detail/presentation/widgets/online_order/spa_reservation_modal.dart';
 import 'package:baobabe_0_2/features/business_detail/presentation/widgets/online_order/travel_agency_modal.dart';
 import 'package:baobabe_0_2/features/home_page/data/models/ui_business.dart';
 import 'package:baobabe_0_2/features/home_page/domain/entities/business_entity.dart';
@@ -99,6 +100,13 @@ class BusinessActionsSection extends StatelessWidget {
                     label: "Réserver véhicule",
                     onTap: () => showTravelReservationModal(context, business),
                   ),
+                if (business.type == BusinessType.spa)
+                  _buildActionButton(
+                    context,
+                    icon: "assets/icons/spa-svgrepo-com.svg", // ou Icons.spa
+                    label: "Réserver soin",
+                    onTap: () => showSpaReservationModal(context, business),
+                  ),
               ],
             ),
           ],
@@ -172,22 +180,34 @@ class BusinessActionsSection extends StatelessWidget {
     final menuItemsData = business.specificData['menuItems'];
 
     if (menuItemsData != null && menuItemsData is List) {
-      try {
-        final List<MenuItem> menuItems = _convertToMenuItemList(menuItemsData);
-
-        if (menuItems.isNotEmpty) {
-          Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (context) => MenuSection(menuItems: menuItems),
-            ),
-          );
-          return;
+      // Cas 1 : la liste contient déjà des objets MenuItem (données mockées)
+      if (menuItemsData.isNotEmpty && menuItemsData.first is MenuItem) {
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) => MenuSection(menuItems: menuItemsData.cast<MenuItem>()),
+          ),
+        );
+        return;
+      }
+      // Cas 2 : la liste contient des Maps (données venant d'une API par exemple)
+      else {
+        try {
+          final List<MenuItem> menuItems = _convertToMenuItemList(menuItemsData);
+          if (menuItems.isNotEmpty) {
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) => MenuSection(menuItems: menuItems),
+              ),
+            );
+            return;
+          }
+        } catch (e) {
+          print('Erreur de conversion des menuItems: $e');
         }
-      } catch (e) {
-        print('Erreur de conversion des menuItems: $e');
       }
     }
 
+    // Si aucun cas n'a fonctionné, afficher le message d'erreur
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
         content: Text('Menu non disponible pour ce restaurant'),

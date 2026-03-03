@@ -1,10 +1,8 @@
-// lib/features/business/presentation/widgets/category_icons.dart
 import 'package:baobabe_0_2/features/home_page/data/models/ui_category.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/bloc/business_bloc.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/bloc/category_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
 
 class CategoryIcons extends StatelessWidget {
   const CategoryIcons({super.key});
@@ -14,7 +12,6 @@ class CategoryIcons extends StatelessWidget {
     return BlocBuilder<CategoryBloc, CategoryState>(
       builder: (context, categoryState) {
         String selectedCategory = 'Tout';
-
         if (categoryState is CategoriesLoaded) {
           selectedCategory = categoryState.selectedCategory;
         }
@@ -44,11 +41,13 @@ class CategoryIcons extends StatelessWidget {
   }
 
   Widget _buildCategory(BuildContext context, UICategory uiCategory, String selectedCategory) {
-    bool isActive = selectedCategory == uiCategory.category.displayName;
+    final isActive = selectedCategory == uiCategory.category.displayName;
 
     return GestureDetector(
       onTap: () {
+        // Mettre à jour la catégorie sélectionnée dans le CategoryBloc
         context.read<CategoryBloc>().add(SelectCategory(uiCategory.category.displayName));
+        // Charger les établissements de cette catégorie via le BusinessBloc
         context.read<BusinessBloc>().add(LoadBusinessesByCategory(uiCategory.category.displayName));
       },
       child: AnimatedContainer(
@@ -57,13 +56,15 @@ class CategoryIcons extends StatelessWidget {
         decoration: BoxDecoration(
           color: isActive ? Colors.white : const Color(0xFFF5F7F9),
           borderRadius: BorderRadius.circular(24),
-          boxShadow: isActive ? [
+          boxShadow: isActive
+              ? [
             BoxShadow(
               color: uiCategory.color.withOpacity(0.2),
               blurRadius: 12,
               offset: const Offset(0, 6),
             )
-          ] : [],
+          ]
+              : [],
           border: Border.all(
             color: isActive ? uiCategory.color.withOpacity(0.5) : Colors.transparent,
             width: 1.5,

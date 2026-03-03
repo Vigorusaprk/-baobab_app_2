@@ -1,16 +1,20 @@
 // File: core/constants/injector.dart
+import 'package:baobabe_0_2/core/di/service_locator.dart';
 import 'package:baobabe_0_2/features/auth/domain/repositories/auth_repository_impl.dart';
 import 'package:baobabe_0_2/features/business_detail/domain/usecases/get_business_detail.dart';
 import 'package:baobabe_0_2/features/business_detail/presentation/bloc/business_detail_bloc.dart';
 import 'package:baobabe_0_2/features/home_page/data/repositories/business_remote_datasource_impl.dart';
 import 'package:baobabe_0_2/features/home_page/data/repositories/business_repository_impl.dart';
 import 'package:baobabe_0_2/features/home_page/data/repositories/category_repository_impl.dart';
+import 'package:baobabe_0_2/features/home_page/data/repositories/search_repository_impl.dart';
 import 'package:baobabe_0_2/features/home_page/domain/repositories/business_repository.dart';
 import 'package:baobabe_0_2/features/home_page/domain/repositories/category_repository.dart';
+import 'package:baobabe_0_2/features/home_page/domain/repositories/search_repository.dart';
 import 'package:baobabe_0_2/features/home_page/domain/usecases/get_businesses_by_category_use_case.dart';
 import 'package:baobabe_0_2/features/home_page/domain/usecases/toggle_favorite.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/bloc/business_bloc.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/bloc/category_bloc.dart';
+import 'package:baobabe_0_2/features/home_page/presentation/bloc/search_bloc.dart';
 import 'package:get_it/get_it.dart';
 
 // Domain - Entities
@@ -58,6 +62,7 @@ class Injector {
     getIt.registerLazySingleton<BusinessRemoteDataSource>(
           () => BusinessRemoteDataSourceImpl(),
     );
+
   }
 
   static void _registerRepositories() {
@@ -78,6 +83,10 @@ class Injector {
     getIt.registerLazySingleton<CategoryRepository>(
           () => CategoryRepositoryImpl(),
     );
+
+    getIt.registerFactory(() => SearchBloc(searchRepository: getIt()));
+    getIt.registerLazySingleton<SearchRepository>(() => SearchRepositoryImpl(localDataSource: sl()));
+
   }
 
   static void _registerUseCases() {
@@ -151,6 +160,8 @@ class Injector {
     getIt.registerFactory<MainScreenBloc>(
           () => MainScreenBloc(),
     );
+
+
   }
 
   static T get<T extends Object>() {

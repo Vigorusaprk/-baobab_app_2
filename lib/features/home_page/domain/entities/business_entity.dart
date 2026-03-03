@@ -9,6 +9,7 @@ enum BusinessType {
   carRental,
   detente,
   travelAgency,
+  spa,   // ← NOUVEAU
   other
 }
 

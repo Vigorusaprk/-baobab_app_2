@@ -46,6 +46,8 @@ class _FavoritesPageScreenState extends State<FavoritesPageScreen> {
         _displayedReservations = _allReservations.where((r) => r.reservationType == 'car_rental').toList();
       } else if (type == 'Voyages') {
         _displayedReservations = _allReservations.where((r) => r.reservationType == 'travel').toList();
+      } else if (type == 'Spas') {
+        _displayedReservations = _allReservations.where((r) => r.reservationType == 'spa').toList();
       }
     });
   }
@@ -138,6 +140,8 @@ class _FavoritesPageScreenState extends State<FavoritesPageScreen> {
                     _buildFilterChip('Locations', () => _filterReservations('Locations')),
                     const SizedBox(width: 8),
                     _buildFilterChip('Voyages', () => _filterReservations('Voyages')),
+                    const SizedBox(width: 8),
+                    _buildFilterChip('Spas', () => _filterReservations('Spas')),
                   ],
                 ),
               ),
@@ -240,6 +244,10 @@ class _FavoritesPageScreenState extends State<FavoritesPageScreen> {
               _buildStatItem(
                 'Voyages',
                 _allReservations.where((r) => r.reservationType == 'travel').length.toString(),
+              ),
+              _buildStatItem(
+                'Spas',
+                _allReservations.where((r) => r.reservationType == 'spa').length.toString(),
               ),
             ],
           ),
@@ -443,7 +451,7 @@ class _FavoritesPageScreenState extends State<FavoritesPageScreen> {
     return Container(
       margin: const EdgeInsets.only(bottom: AppDimens.PADDING_16),
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: AppColors.scaffoldBackground,
         borderRadius: BorderRadius.circular(AppDimens.BORDER_RADIUS_20),
         boxShadow: [
           BoxShadow(
@@ -588,7 +596,9 @@ class _FavoritesPageScreenState extends State<FavoritesPageScreen> {
                 else if (reservation.reservationType == 'car_rental')
                     _buildCarRentalReservationDetails(reservation)
                   else if (reservation.reservationType == 'travel')
-                      _buildTravelReservationDetails(reservation),
+                      _buildTravelReservationDetails(reservation)
+                    else if (reservation.reservationType == 'spa')
+                        _buildSpaReservationDetails(reservation),
 
                 const SizedBox(height: AppDimens.PADDING_12),
 
@@ -638,6 +648,8 @@ class _FavoritesPageScreenState extends State<FavoritesPageScreen> {
       return '${_formatDate(reservation.rentalStartDate!)} - ${_formatDate(reservation.rentalEndDate!)}';
     } else if (reservation.reservationType == 'travel') {
       return '${reservation.destination ?? "Destination inconnue"} • ${_formatDate(reservation.displayDate)}';
+    } else if (reservation.reservationType == 'spa') {
+      return '${reservation.treatmentType ?? "Soin"} • ${_formatDate(reservation.appointmentDate!)}';
     } else {
       return '${_formatDate(reservation.date!)} • ${_formatTime(reservation.time!)}';
     }
@@ -742,6 +754,29 @@ class _FavoritesPageScreenState extends State<FavoritesPageScreen> {
     );
   }
 
+  Widget _buildSpaReservationDetails(Reservation reservation) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildDetailRow(Icons.spa, reservation.treatmentType ?? 'Soin non spécifié'),
+        _buildDetailRow(Icons.person, reservation.customerName),
+        _buildDetailRow(Icons.phone, reservation.phoneNumber),
+        _buildDetailRow(
+          Icons.calendar_today,
+          _formatDate(reservation.appointmentDate!),
+        ),
+        _buildDetailRow(
+          Icons.access_time,
+          '${reservation.appointmentDate!.hour.toString().padLeft(2, '0')}:${reservation.appointmentDate!.minute.toString().padLeft(2, '0')}',
+        ),
+        if (reservation.therapistName != null)
+          _buildDetailRow(Icons.person_pin, 'Thérapeute: ${reservation.therapistName}'),
+        if (reservation.notes != null && reservation.notes!.isNotEmpty)
+          _buildDetailRow(Icons.note, reservation.notes!),
+      ],
+    );
+  }
+
   Widget _buildDetailRow(IconData icon, String text) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: AppDimens.PADDING_4),
@@ -838,6 +873,8 @@ class _FavoritesPageScreenState extends State<FavoritesPageScreen> {
                         _buildDetailItem('Type de véhicule', reservation.vehicleType ?? 'Non spécifié'),
                       ] else if (reservation.reservationType == 'travel') ...[
                         _buildDetailItem('Destination', reservation.destination ?? 'Non spécifiée'),
+                      ] else if (reservation.reservationType == 'spa') ...[
+                        _buildDetailItem('Soin', reservation.treatmentType ?? 'Non spécifié'),
                       ],
                     ],
                   ),
@@ -870,6 +907,12 @@ class _FavoritesPageScreenState extends State<FavoritesPageScreen> {
                       _buildDetailItem('Date de départ', _formatDate(reservation.displayDate)),
                       _buildDetailItem('Heure de départ', reservation.departureTime ?? 'Non spécifiée'),
                       _buildDetailItem('Passagers', reservation.numberOfPassengers.toString()),
+                    ] else if (reservation.reservationType == 'spa') ...[
+                      _buildDetailItem('Date', _formatDate(reservation.appointmentDate!)),
+                      _buildDetailItem('Heure',
+                          '${reservation.appointmentDate!.hour.toString().padLeft(2, '0')}:${reservation.appointmentDate!.minute.toString().padLeft(2, '0')}'),
+                      if (reservation.therapistName != null)
+                        _buildDetailItem('Thérapeute', reservation.therapistName!),
                     ],
                     _buildDetailItem('Statut', _getStatusText(reservation.displayDate)),
                   ]),

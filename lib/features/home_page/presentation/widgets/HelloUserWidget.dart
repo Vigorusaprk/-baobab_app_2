@@ -1,5 +1,8 @@
+import 'package:baobabe_0_2/core/constants/injector.dart';
 import 'package:baobabe_0_2/core/themes/app_diemens.dart';
 import 'package:baobabe_0_2/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:baobabe_0_2/features/home_page/presentation/bloc/search_bloc.dart';
+import 'package:baobabe_0_2/features/home_page/presentation/screens/search_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -17,7 +20,7 @@ class HelloUserWidget extends StatelessWidget {
         }
 
         return Padding(
-          padding: const EdgeInsets.only(left: AppDimens.PADDING_20, right: AppDimens.PADDING_20,),
+          padding: const EdgeInsets.only(left: AppDimens.PADDING_20, right: AppDimens.PADDING_20),
           child: Container(
             width: double.infinity,
             decoration: BoxDecoration(
@@ -75,7 +78,7 @@ class HelloUserWidget extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 24),
-                _buildSearchField(context),
+                _buildSearchField(context), // devient un bouton
               ],
             ),
           ),
@@ -86,44 +89,56 @@ class HelloUserWidget extends StatelessWidget {
 
   String _getCurrentDate() {
     final now = DateTime.now();
-    final days = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'];
-    final months = ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil', 'Aoû', 'Sep', 'Oct', 'Nov', 'Déc'];
+    const days = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'];
+    const months = ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil', 'Aoû', 'Sep', 'Oct', 'Nov', 'Déc'];
     return '${days[now.weekday - 1]}, ${now.day} ${months[now.month - 1]}';
   }
 
   Widget _buildSearchField(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(18),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 15,
-            offset: const Offset(0, 5),
-          ),
-        ],
-      ),
-      child: TextField(
-        decoration: InputDecoration(
-          hintText: "Où voulez-vous aller ?",
-          hintStyle: TextStyle(color: Colors.grey[400], fontSize: 14),
-          prefixIcon: const Icon(Icons.search_rounded, color: Color(0xFF254D32), size: 22),
-          suffixIcon: Container(
-            margin: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: const Color(0xFF254D32).withOpacity(0.1),
-              borderRadius: BorderRadius.circular(12),
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => BlocProvider(
+              create: (context) => getIt<SearchBloc>(),
+              child: const SearchPage(),
             ),
-            child: const Icon(Icons.tune_rounded, color: Color(0xFF254D32), size: 20),
           ),
-          filled: true,
-          fillColor: Colors.white,
-          contentPadding: const EdgeInsets.symmetric(vertical: 15),
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(18),
-            borderSide: BorderSide.none,
-          ),
+        );
+      },
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(18),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 15,
+              offset: const Offset(0, 5),
+            ),
+          ],
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        child: Row(
+          children: [
+            const Icon(Icons.search_rounded, color: Color(0xFF254D32), size: 22),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                "Où voulez-vous aller ?",
+                style: TextStyle(color: Colors.grey[400], fontSize: 14),
+              ),
+            ),
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: const Color(0xFF254D32).withOpacity(0.1),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: const Icon(Icons.tune_rounded, color: Color(0xFF254D32), size: 20),
+            ),
+          ],
         ),
       ),
     );

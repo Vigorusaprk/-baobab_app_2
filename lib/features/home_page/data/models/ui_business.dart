@@ -25,6 +25,8 @@ class UIBusiness {
         return Colors.green;
       case BusinessType.travelAgency:
         return Colors.indigoAccent;
+      case BusinessType.spa:
+        return Colors.purple; // ou une couleur de votre choix
       default:
         return Colors.grey;
     }
@@ -48,6 +50,8 @@ class UIBusiness {
         return Icons.spa;
       case BusinessType.travelAgency:
         return Icons.card_travel;
+      case BusinessType.spa:
+        return Icons.spa;
       default:
         return Icons.business;
     }

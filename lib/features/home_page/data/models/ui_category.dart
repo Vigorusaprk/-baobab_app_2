@@ -27,6 +27,8 @@ class UICategory {
         return Icons.spa;
       case 'travelAgency':
         return Icons.card_travel;
+      case 'spa':
+        return Icons.spa;
       default:
         return Icons.business;
     }
@@ -52,6 +54,8 @@ class UICategory {
         return Colors.green;
       case 'travelAgency':
         return Colors.indigoAccent;
+      case 'spa':
+        return Colors.purple;
       default:
         return Colors.grey;
     }

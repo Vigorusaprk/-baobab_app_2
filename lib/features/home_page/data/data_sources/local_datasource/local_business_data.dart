@@ -60,6 +60,8 @@ class BusinessLocalDataSourceImpl implements BusinessLocalDataSource {
         return BusinessType.detente;
       case 'Voyage' :
         return BusinessType.travelAgency;
+      case 'Spa' :
+        return BusinessType.spa;
       default:
         return BusinessType.restaurant;
     }
@@ -831,6 +833,43 @@ class BusinessLocalDataSourceImpl implements BusinessLocalDataSource {
         longitude: 15.2663,
         stores: null,
       ),
+
+      BusinessModel(
+        id: "12",
+        name: "Spa Détente & Bien-être",
+        address: "456 Avenue de la Relaxation, Kinshasa",
+        description: "Un havre de paix offrant des soins de qualité, massages, hammam et soins du visage dans un cadre apaisant.",
+        bgImg: "assets/spa_cover.jpg",
+        rating: 4.8,
+        reviewCount: 120,
+        openingHours: {"Lundi-Samedi": "09:00-20:00", "Dimanche": "10:00-18:00"},
+        type: BusinessType.spa,
+        phone: "+243 81 123 4567",
+        email: "contact@spa.cd",
+        website: "www.spa.cd",
+        images: ["assets/spa1.jpg", "assets/spa2.jpg"],
+        specificData: {
+          "canReserve": true,
+          "treatments": [
+            {"name": "Massage relaxant", "duration": 60, "price": 50.0, "description": "Massage aux huiles essentielles pour détendre les muscles."},
+            {"name": "Massage aux pierres chaudes", "duration": 90, "price": 80.0, "description": "Massage profond avec des pierres volcaniques chaudes."},
+            {"name": "Soin du visage", "duration": 45, "price": 40.0, "description": "Nettoyage, gommage et masque adapté à votre peau."},
+            {"name": "Hammam & Gommage", "duration": 60, "price": 55.0, "description": "Séance de hammam suivie d'un gommage au savon noir."},
+            {"name": "Forfait Bien-être", "duration": 120, "price": 130.0, "description": "Massage relaxant + soin du visage + accès hammam."},
+          ],
+          "therapists": [
+            {"name": "Sophie", "specialty": "Massages"},
+            {"name": "Marc", "specialty": "Soins du visage"},
+            {"name": "Julie", "specialty": "Hammam & Gommage"},
+          ],
+          "amenities": ["Hammam", "Sauna", "Jacuzzi", "Espace détente"],
+        },
+        reviews: [],
+        isFavorite: false,
+        latitude: -4.4419,
+        longitude: 15.2663,
+        stores: null,
+      )
     ];
   }
 }

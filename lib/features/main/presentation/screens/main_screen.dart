@@ -4,6 +4,7 @@ import 'package:baobabe_0_2/features/favorites_page/presentation/screens/favorit
 import 'package:baobabe_0_2/features/home_page/presentation/screens/home_page_screen.dart';
 import 'package:baobabe_0_2/features/main/presentation/bloc/main_scree_event.dart';
 import 'package:baobabe_0_2/features/main/presentation/bloc/main_screen_bloc.dart';
+import 'package:baobabe_0_2/features/order/presentation/screens/order_screen.dart';
 import 'package:baobabe_0_2/features/settings/presentation/screens/settings_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -13,7 +14,7 @@ class MainScreen extends StatelessWidget {
   final List<Widget> _pages = [
     const HomePageScreen(),
     const FavoritesPageScreen(),
-    Container(),
+    const OrderScreen(),
     SettingsScreen(),
   ];
 
@@ -22,14 +23,14 @@ class MainScreen extends StatelessWidget {
   final List<List<String>> _svgPaths = [
     ['assets/icons/home-angle-2-svgrepo-com (2).svg', 'assets/icons/home-angle-2-svgrepo-com (3).svg'],    // Home
     ['assets/icons/calendar-date-svgrepo-com.svg', 'assets/icons/calendar-date-svgrepo-com (1).svg'],  // Ma classe
-    ['assets/icons/phone-intercom-svgrepo-com.svg', 'assets/icons/phone-intercom-svgrepo-com.svg'], // Booking
+    ['assets/icons/order.svg', 'assets/icons/order-svgrepo.svg'], // Booking
     ['assets/icons/setting-gear-svgrepo-com.svg', 'assets/icons/setting-svgrepo-com.svg'],    // Parametre
   ];
 
   final List<String> _labels = [
     'Home',
     'Reservation',
-    'Coupon',
+    'Commende',
     'Parametre',
   ];
 

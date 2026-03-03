@@ -43,6 +43,12 @@ class Reservation {
   final int? numberOfPassengers;
   final String? departureTime;
 
+  // spa
+  final String? treatmentType;      // Type de soin choisi
+  final int? durationMinutes;        // Durée en minutes
+  final String? therapistName;       // Nom du thérapeute (optionnel)
+  final DateTime? appointmentDate;   // Date et heure du rendez-vous (on peut utiliser date et time)
+
   Reservation({
     required this.id,
     required this.establishmentName,
@@ -67,7 +73,7 @@ class Reservation {
     this.numberOfRooms,
     this.numberOfGuests,
 
-    // NOUVEAU: Location de véhicules
+    // Location de véhicules
     this.vehicleType,
     this.rentalStartDate,
     this.rentalEndDate,
@@ -81,6 +87,11 @@ class Reservation {
     this.numberOfPassengers,
     this.departureTime,
 
+    // spa
+    this.treatmentType,
+    this.durationMinutes,
+    this.therapistName,
+    this.appointmentDate,
   });
 
   Map<String, dynamic> toMap() {
@@ -121,6 +132,12 @@ class Reservation {
       'destination': destination,
       'numberOfPassengers': numberOfPassengers,
       'departureTime': departureTime,
+
+      // spa
+      'treatmentType': treatmentType,
+      'durationMinutes': durationMinutes,
+      'therapistName': therapistName,
+      'appointmentDate': appointmentDate?.toIso8601String(),
 
     };
   }
@@ -171,6 +188,12 @@ class Reservation {
       numberOfPassengers: map['numberOfPassengers'],
       departureTime: map['departureTime'],
 
+      // Spa
+      treatmentType: map['treatmentType'],
+      durationMinutes: map['durationMinutes'],
+      therapistName: map['therapistName'],
+      appointmentDate: map['appointmentDate'] != null ? DateTime.parse(map['appointmentDate']) : null,
+
     );
   }
 
@@ -189,6 +212,8 @@ class Reservation {
     switch (reservationType) {
       case 'hotel': return 'Hôtel';
       case 'car_rental': return 'Location de véhicule';
+      case 'travel': return 'Voyage en bus';
+      case 'spa': return 'Spa & Bien-être'; // Nouveau
       default: return 'Restaurant';
     }
   }
@@ -197,7 +222,8 @@ class Reservation {
     switch (reservationType) {
       case 'hotel': return Icons.hotel;
       case 'car_rental': return Icons.directions_car;
-      case 'travel': return Icons.card_travel;
+      case 'travel': return Icons.directions_bus;
+      case 'spa': return Icons.spa; // Nouveau
       default: return Icons.restaurant;
     }
   }
@@ -206,7 +232,8 @@ class Reservation {
     switch (reservationType) {
       case 'hotel': return Colors.purple;
       case 'car_rental': return Colors.teal;
-      case 'travel': return Colors.deepPurpleAccent;
+      case 'travel': return Colors.blue;
+      case 'spa': return Colors.pink; // Nouveau
       default: return Colors.orange;
     }
   }
