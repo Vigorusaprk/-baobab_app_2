@@ -110,7 +110,7 @@ class HelloUserWidget extends StatelessWidget {
       child: Container(
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(18),
+          borderRadius: BorderRadius.circular(25),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(0.05),
@@ -119,7 +119,7 @@ class HelloUserWidget extends StatelessWidget {
             ),
           ],
         ),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
         child: Row(
           children: [
             const Icon(Icons.search_rounded, color: Color(0xFF254D32), size: 22),

@@ -141,7 +141,7 @@ class BusinessCardWidget extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.15),
+            color: AppColors.primary.withOpacity(0.25),
             borderRadius: BorderRadius.circular(22),
             border: Border.all(color: Colors.white.withOpacity(0.2)),
           ),

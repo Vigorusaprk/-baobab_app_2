@@ -40,6 +40,11 @@ class AppDimens {
   static const double PADDING_30 = 30.0;
   static const double PADDING_32 = 30.0;
   static const double PADDING_40 = 40.0;
+  static const double PADDING_45 = 45.0;
+  static const double PADDING_50 = 50.0;
+  static const double PADDING_55 = 55.0;
+  static const double PADDING_60 = 60.0;
+  static const double PADDING_65 = 65.0;
 
 
 

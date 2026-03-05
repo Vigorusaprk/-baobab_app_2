@@ -64,6 +64,15 @@ class BusinessActionsSection extends StatelessWidget {
                     label: "Commander",
                     onTap: () => _orderFood(context, business),
                   ),
+                if (business.type == BusinessType.fastFood &&
+                    business.specificData['hasDelivery'] == true)
+                  _buildActionButton(
+                    context,
+                    icon: "assets/icons/delivery-svgrepo-com.svg",
+                    label: "Commander",
+                    onTap: () => _orderFood(context, business),
+                  ),
+
                 if (business.type == BusinessType.restaurant &&
                     business.specificData['canReserve'] == true)
                   _buildActionButton(
@@ -184,7 +193,12 @@ class BusinessActionsSection extends StatelessWidget {
       if (menuItemsData.isNotEmpty && menuItemsData.first is MenuItem) {
         Navigator.of(context).push(
           MaterialPageRoute(
-            builder: (context) => MenuSection(menuItems: menuItemsData.cast<MenuItem>()),
+            builder: (context) => MenuSection(
+              menuItems: menuItemsData.cast<MenuItem>(),
+              restaurantId: business.id,          // ← corrigé
+              restaurantName: business.name,
+              restaurantType: business.type,
+            ),
           ),
         );
         return;

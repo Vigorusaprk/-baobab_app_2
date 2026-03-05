@@ -1,4 +1,5 @@
 import 'package:baobabe_0_2/core/themes/app_colors.dart';
+import 'package:baobabe_0_2/core/themes/app_diemens.dart';
 import 'package:baobabe_0_2/features/home_page/domain/entities/business_entity.dart';
 import 'package:baobabe_0_2/features/business_detail/presentation/widgets/common/rating_widget.dart';
 import 'package:flutter/material.dart';
@@ -33,12 +34,13 @@ class BoutiqueDetial extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    SizedBox(height: AppDimens.PADDING_40,),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Expanded(
                           child: Text(businessModel.name,
-                              style: const TextStyle(fontSize: 26, fontWeight: FontWeight.w900, letterSpacing: -1)),
+                              style: const TextStyle(fontSize: 26, fontWeight: FontWeight.w700, letterSpacing: -1, fontFamily: 'Poppins')),
                         ),
                         RatingWidget(rating: businessModel.rating, reviewCount: businessModel.reviewCount),
                       ],
@@ -48,13 +50,13 @@ class BoutiqueDetial extends StatelessWidget {
                       children: [
                         const Icon(Icons.location_on, size: 16, color: Color(0xFF254D32)),
                         const SizedBox(width: 4),
-                        Text(businessModel.address, style: TextStyle(color: Colors.grey[600])),
+                        Text(businessModel.address, style: TextStyle(color: Colors.grey[600], fontFamily: 'Poppins')),
                       ],
                     ),
                     const Padding(padding: EdgeInsets.symmetric(vertical: 24), child: Divider()),
-                    const Text("À propos", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                    const Text("À propos", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, fontFamily: 'Poppins')),
                     const SizedBox(height: 12),
-                    Text(businessModel.description, style: TextStyle(fontSize: 15, color: Colors.grey[800], height: 1.6)),
+                    Text(businessModel.description, style: TextStyle(fontSize: 15, color: Colors.grey[800], height: 1.6, fontFamily: 'Poppins')),
                     const SizedBox(height: 100),
                   ],
                 ),

@@ -83,6 +83,7 @@ class _SearchFilterSheetState extends State<SearchFilterSheet> {
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.of(context).size.height;
     return Container(
+      color: AppColors.scaffoldBackground,
       padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -91,7 +92,6 @@ class _SearchFilterSheetState extends State<SearchFilterSheet> {
           Container(
             padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
             decoration: BoxDecoration(
-              color: Colors.white,
               border: Border(bottom: BorderSide(color: Colors.grey[200]!)),
             ),
             child: Row(
@@ -249,7 +249,7 @@ class _SearchFilterSheetState extends State<SearchFilterSheet> {
           Container(
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: AppColors.scaffoldBackground,
               border: Border(top: BorderSide(color: Colors.grey[200]!)),
               boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 10, offset: const Offset(0, -5))],
             ),
@@ -260,10 +260,10 @@ class _SearchFilterSheetState extends State<SearchFilterSheet> {
                     onPressed: () => Navigator.pop(context),
                     style: OutlinedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 16),
-                      side: BorderSide(color: Colors.grey[300]!),
+                      side: BorderSide(color: AppColors.primary,width: 3),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                     ),
-                    child: const Text('Annuler'),
+                    child: const Text('Annuler', style: TextStyle(color: AppColors.primary),),
                   ),
                 ),
                 const SizedBox(width: 16),

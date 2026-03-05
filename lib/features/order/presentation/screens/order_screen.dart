@@ -3,9 +3,7 @@ import 'package:baobabe_0_2/features/order/presentation/widgets/order_service.da
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:baobabe_0_2/core/themes/app_colors.dart';
-import 'package:baobabe_0_2/core/themes/app_diemens.dart';
-import 'package:baobabe_0_2/core/themes/app_fonts.dart';
-
+import 'package:baobabe_0_2/features/home_page/domain/entities/business_entity.dart';
 
 class OrderScreen extends StatefulWidget {
   const OrderScreen({super.key});
@@ -30,7 +28,6 @@ class _OrderScreenState extends State<OrderScreen> {
 
   Future<void> _loadOrders() async {
     final orders = await OrderService.getOrders();
-    // Trier par date décroissante
     orders.sort((a, b) => b.orderDate.compareTo(a.orderDate));
     setState(() {
       _allOrders = orders;
@@ -76,7 +73,6 @@ class _OrderScreenState extends State<OrderScreen> {
       ),
       body: Column(
         children: [
-          // Filtres par statut
           if (_allOrders.isNotEmpty)
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -191,10 +187,93 @@ class _OrderScreenState extends State<OrderScreen> {
     );
   }
 
+  // Méthodes pour obtenir l'icône, la couleur et le nom d'affichage
+  IconData _getTypeIcon(BusinessType? type) {
+    if (type == null) return Icons.business;
+    switch (type) {
+      case BusinessType.restaurant:
+        return Icons.restaurant;
+      case BusinessType.fastFood:
+        return Icons.fastfood;
+      case BusinessType.shopping:
+        return Icons.shopping_bag;
+      case BusinessType.mall:
+        return Icons.store_mall_directory;
+      case BusinessType.hotel:
+        return Icons.hotel;
+      case BusinessType.carRental:
+        return Icons.directions_car;
+      case BusinessType.detente:
+        return Icons.spa;
+      case BusinessType.travelAgency:
+        return Icons.card_travel;
+      case BusinessType.spa:
+        return Icons.spa;
+      default:
+        return Icons.business;
+    }
+  }
+
+  Color _getTypeColor(BusinessType? type) {
+    if (type == null) return Colors.grey;
+    switch (type) {
+      case BusinessType.restaurant:
+        return Colors.orange;
+      case BusinessType.fastFood:
+        return Colors.red;
+      case BusinessType.shopping:
+        return Colors.blue;
+      case BusinessType.mall:
+        return Colors.purple;
+      case BusinessType.hotel:
+        return Colors.teal;
+      case BusinessType.carRental:
+        return Colors.indigo;
+      case BusinessType.detente:
+        return Colors.green;
+      case BusinessType.travelAgency:
+        return Colors.indigoAccent;
+      case BusinessType.spa:
+        return Colors.pink;
+      default:
+        return Colors.grey;
+    }
+  }
+
+  String _getTypeDisplayName(BusinessType? type) {
+    if (type == null) return 'Autre';
+    switch (type) {
+      case BusinessType.restaurant:
+        return 'Restaurant';
+      case BusinessType.fastFood:
+        return 'Fast Food';
+      case BusinessType.shopping:
+        return 'Shopping';
+      case BusinessType.mall:
+        return 'Centre Commercial';
+      case BusinessType.hotel:
+        return 'Hôtel';
+      case BusinessType.carRental:
+        return 'Location Voiture';
+      case BusinessType.detente:
+        return 'Détente';
+      case BusinessType.travelAgency:
+        return 'Agence de voyages';
+      case BusinessType.spa:
+        return 'Spa';
+      default:
+        return 'Autre';
+    }
+  }
+
   Widget _buildOrderCard(Order order) {
     final dateFormat = DateFormat('dd/MM/yyyy HH:mm');
+    final type = order.establishmentType;
+    final typeIcon = _getTypeIcon(type);
+    final typeColor = _getTypeColor(type);
+    final typeName = _getTypeDisplayName(type);
+
     return Card(
-      color: AppColors.surface,
       margin: const EdgeInsets.only(bottom: 12),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: InkWell(
@@ -205,18 +284,47 @@ class _OrderScreenState extends State<OrderScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // En-tête avec icône, nom et statut
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  Container(
+                    width: 50,
+                    height: 50,
+                    decoration: BoxDecoration(
+                      color: typeColor.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Icon(typeIcon, color: typeColor, size: 24),
+                  ),
+                  const SizedBox(width: 12),
                   Expanded(
-                    child: Text(
-                      order.establishmentName,
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          order.establishmentName,
+                          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        const SizedBox(height: 4),
+                        Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                              decoration: BoxDecoration(
+                                color: typeColor.withOpacity(0.1),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Text(
+                                typeName,
+                                style: TextStyle(color: typeColor, fontSize: 12, fontWeight: FontWeight.w600),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
                     ),
                   ),
                   Container(
@@ -227,22 +335,17 @@ class _OrderScreenState extends State<OrderScreen> {
                     ),
                     child: Text(
                       order.status.displayName,
-                      style: TextStyle(
-                        color: order.status.color,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 12,
-                      ),
+                      style: TextStyle(color: order.status.color, fontWeight: FontWeight.bold, fontSize: 12),
                     ),
                   ),
                 ],
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 12),
               Text(
                 dateFormat.format(order.orderDate),
                 style: TextStyle(color: Colors.grey[600], fontSize: 14),
               ),
               const SizedBox(height: 12),
-              // Résumé des articles
               ...order.items.take(2).map((item) => Padding(
                 padding: const EdgeInsets.only(bottom: 4),
                 child: Row(
@@ -288,7 +391,7 @@ class _OrderScreenState extends State<OrderScreen> {
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: const BoxDecoration(
-        color: AppColors.scaffoldBackground,
+        color: Colors.white,
         borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
       ),
       child: Column(
@@ -321,6 +424,7 @@ class _OrderScreenState extends State<OrderScreen> {
                 children: [
                   _buildDetailSection('Restaurant', [
                     _buildDetailRow('Nom', order.establishmentName),
+                    _buildDetailRow('Type', _getTypeDisplayName(order.establishmentType)),
                   ]),
                   _buildDetailSection('Date et heure', [
                     _buildDetailRow('Passée le', dateFormat.format(order.orderDate)),
@@ -331,9 +435,7 @@ class _OrderScreenState extends State<OrderScreen> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Expanded(
-                            child: Text('${item.quantity}x ${item.name}'),
-                          ),
+                          Expanded(child: Text('${item.quantity}x ${item.name}')),
                           Text('${(item.price * item.quantity).toStringAsFixed(2)} \$'),
                         ],
                       ),
@@ -359,7 +461,7 @@ class _OrderScreenState extends State<OrderScreen> {
               Expanded(
                 child: OutlinedButton(
                   onPressed: () => Navigator.pop(context),
-                  child: const Text('Fermer', style: TextStyle(color: AppColors.primary),),
+                  child: const Text('Fermer'),
                 ),
               ),
               const SizedBox(width: 12),
@@ -367,15 +469,12 @@ class _OrderScreenState extends State<OrderScreen> {
                 child: ElevatedButton(
                   onPressed: () {
                     Navigator.pop(context);
-                    // Ici vous pouvez ajouter la logique pour recommander
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(content: Text('Fonctionnalité à implémenter')),
                     );
                   },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primary,
-                  ),
-                  child: const Text('Recommander', style: TextStyle(color: AppColors.scaffoldBackground)),
+                  style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary),
+                  child: const Text('Recommander'),
                 ),
               ),
             ],

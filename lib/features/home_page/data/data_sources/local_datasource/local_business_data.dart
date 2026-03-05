@@ -313,7 +313,21 @@ class BusinessLocalDataSourceImpl implements BusinessLocalDataSource {
         email: null,
         website: null,
         images: [],
-        specificData: {},
+        specificData: {
+          "hasDelivery": true,
+          "menuItems": [
+            MenuItem(
+              itemName: "Pizza Margherita",
+              itemCategory: "Pizza",
+              imageUrl: "assets/ceca445df991a3eeaa49861b7cd2db7c.jpg",
+              rating: 4.5,
+              price: 12.99,
+              description:
+              "Lorem ipsum dolor sit, amet consectetur adipisicing elit. Sunt vel illum, neque fugiat et temporibus deleniti sequi esse iusto repellat. Est eligendi aspernatur consequuntur officia quod recusandae consectetur aliquam sunt!",
+              ingredients: ["Tomate", "Mozzarella", "Basilic", "Huile d'olive"],
+            ),
+          ],
+        },
         reviews: [],
         isFavorite: true,
         latitude: null,

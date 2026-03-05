@@ -3,18 +3,21 @@ import 'package:baobabe_0_2/features/business_detail/domain/entities/menu_restau
 import 'package:baobabe_0_2/features/order/domain/entities/order.dart';
 import 'package:baobabe_0_2/features/order/presentation/screens/order_screen.dart';
 import 'package:baobabe_0_2/features/order/presentation/widgets/order_service.dart';
+import 'package:baobabe_0_2/features/home_page/domain/entities/business_entity.dart';
 import 'package:flutter/material.dart';
 
 class PlatDetail extends StatefulWidget {
   final MenuItem menuItem;
   final String? restaurantId;
   final String? restaurantName;
+  final BusinessType? restaurantType; // Type de l'établissement
 
   const PlatDetail({
     super.key,
     required this.menuItem,
     this.restaurantId,
     this.restaurantName,
+    this.restaurantType,
   });
 
   @override
@@ -234,7 +237,6 @@ class _PlatDetailState extends State<PlatDetail> {
   Future<void> _placeOrder() async {
     setState(() => _isLoading = true);
 
-    // Création d'un ID temporaire (à remplacer par un vrai ID si disponible)
     final String tempId = '${widget.menuItem.itemName}_${widget.menuItem.price}';
 
     final orderItem = OrderItem(
@@ -245,13 +247,14 @@ class _PlatDetailState extends State<PlatDetail> {
     );
 
     final subtotal = widget.menuItem.price * _quantity;
-    const tax = 0.0; // Adaptez selon votre logique
+    const tax = 0.0;
     final total = subtotal + tax;
 
     final order = Order(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
       establishmentId: widget.restaurantId ?? 'restaurant_inconnu',
       establishmentName: widget.restaurantName ?? 'Restaurant',
+      establishmentType: widget.restaurantType,
       orderDate: DateTime.now(),
       items: [orderItem],
       subtotal: subtotal,
@@ -275,7 +278,7 @@ class _PlatDetailState extends State<PlatDetail> {
         ),
       );
 
-      // Optionnel : remettre la quantité à 1 pour une nouvelle commande
+      // Remettre la quantité à 1 (optionnel)
       setState(() {
         _quantity = 1;
       });

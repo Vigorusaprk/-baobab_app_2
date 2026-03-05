@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:baobabe_0_2/features/home_page/domain/entities/business_entity.dart';
 
 enum OrderStatus {
   pending,    // En attente
@@ -83,6 +84,7 @@ class Order {
   final String id;
   final String establishmentId;
   final String establishmentName;
+  final BusinessType? establishmentType; // Type de l'établissement
   final DateTime orderDate;
   final List<OrderItem> items;
   final double subtotal;
@@ -95,6 +97,7 @@ class Order {
     required this.id,
     required this.establishmentId,
     required this.establishmentName,
+    this.establishmentType,
     required this.orderDate,
     required this.items,
     required this.subtotal,
@@ -109,6 +112,7 @@ class Order {
       'id': id,
       'establishmentId': establishmentId,
       'establishmentName': establishmentName,
+      'establishmentType': establishmentType?.index,
       'orderDate': orderDate.toIso8601String(),
       'items': items.map((item) => item.toMap()).toList(),
       'subtotal': subtotal,
@@ -124,6 +128,9 @@ class Order {
       id: map['id'],
       establishmentId: map['establishmentId'],
       establishmentName: map['establishmentName'],
+      establishmentType: map['establishmentType'] != null
+          ? BusinessType.values[map['establishmentType']]
+          : null,
       orderDate: DateTime.parse(map['orderDate']),
       items: (map['items'] as List)
           .map((item) => OrderItem.fromMap(Map<String, dynamic>.from(item)))

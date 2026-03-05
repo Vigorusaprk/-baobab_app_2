@@ -1,7 +1,11 @@
 import 'package:baobabe_0_2/core/themes/app_colors.dart';
+import 'package:baobabe_0_2/core/themes/app_diemens.dart';
 import 'package:baobabe_0_2/core/themes/app_fonts.dart';
+import 'package:baobabe_0_2/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:flutter/material.dart';
-import '../bloc/settings_bloc.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:share_plus/share_plus.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
@@ -10,24 +14,60 @@ class SettingsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.scaffoldBackground,
-      appBar: AppBar(elevation: 0, backgroundColor: Colors.transparent,
-        title: Text("Parmétre", style: AppFonts.headlineLarge),
+      appBar: AppBar(
+        elevation: 0,
+        backgroundColor: Colors.transparent,
+        title: Text("Paramètres", style: AppFonts.headlineLarge),
       ),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          // Section Genérale
+          // Section Générale
           DetailSection(
-            sectionTitle: "Genérale",
+            sectionTitle: "Générale",
             children: [
-              InfoTile(subtitle: "subtitle", icon: Icons.person),
-              Divider(color: Colors.grey),
-              InfoTile(subtitle: "subtitle", icon: Icons.money),
-              Divider(color: Colors.grey),
-              InfoTile(subtitle: "subtitle", icon: Icons.book),
-              Divider(color: Colors.grey),
-              InfoTile(subtitle: "subtitle", icon: Icons.link),
-              Divider(color: Colors.grey),
+              InfoTile(
+                subtitle: "Profil",
+                icon: Icons.person_outline,
+                onTap: () {
+                  // Naviguer vers la page de profil
+                  // Navigator.push(context, MaterialPageRoute(builder: (_) => ProfileScreen()));
+                },
+              ),
+              const Divider(color: Colors.grey),
+              InfoTile(
+                subtitle: "Notifications",
+                icon: Icons.notifications_none_outlined,
+                onTap: () {
+                  // Ouvrir les réglages de notification
+                },
+                trailing: Switch(
+                  value: true, // À remplacer par la valeur réelle du bloc
+                  onChanged: (value) {
+                    // Changer l'état
+                  },
+                ),
+              ),
+              const Divider(color: Colors.grey),
+              InfoTile(
+                subtitle: "Langue",
+                icon: Icons.language_outlined,
+                onTap: () => _showLanguageDialog(context),
+                trailing: Text(
+                  "Français",
+                  style: AppFonts.bodySmall?.copyWith(color: AppColors.primary),
+                ),
+              ),
+              const Divider(color: Colors.grey),
+              InfoTile(
+                subtitle: "Thème",
+                icon: Icons.brightness_6_outlined,
+                onTap: () => _showThemeDialog(context),
+                trailing: Text(
+                  "Clair", // À adapter selon le thème actuel
+                  style: AppFonts.bodySmall?.copyWith(color: AppColors.primary),
+                ),
+              ),
             ],
           ),
 
@@ -35,7 +75,28 @@ class SettingsScreen extends StatelessWidget {
           DetailSection(
             sectionTitle: "Compte",
             children: [
-
+              InfoTile(
+                subtitle: "Informations personnelles",
+                icon: Icons.account_circle_outlined,
+                onTap: () {
+                  // Naviguer vers la page d'édition du profil
+                },
+              ),
+              const Divider(color: Colors.grey),
+              InfoTile(
+                subtitle: "Sécurité",
+                icon: Icons.lock_outline,
+                onTap: () {
+                  // Naviguer vers la page de sécurité (changer mot de passe, etc.)
+                },
+              ),
+              const Divider(color: Colors.grey),
+              InfoTile(
+                subtitle: "Déconnexion",
+                icon: Icons.logout,
+                accentColor: AppColors.error,
+                onTap: () => _showLogoutDialog(context),
+              ),
             ],
           ),
 
@@ -43,23 +104,157 @@ class SettingsScreen extends StatelessWidget {
           DetailSection(
             sectionTitle: "FAQ & Aide",
             children: [
-
+              InfoTile(
+                subtitle: "Centre d'aide",
+                icon: Icons.help_outline,
+                onTap: () {
+                  // Ouvrir une page d'aide
+                },
+              ),
+              const Divider(color: Colors.grey),
+              InfoTile(
+                subtitle: "Contactez-nous",
+                icon: Icons.mail_outline,
+                onTap: () => _launchEmail(),
+              ),
+              const Divider(color: Colors.grey),
+              InfoTile(
+                subtitle: "Partager l'application",
+                icon: Icons.share_outlined,
+                onTap: () => _shareApp(),
+              ),
             ],
           ),
 
-          // Section App
+          // Section Application
           DetailSection(
-            sectionTitle: "Aplicaiton",
+            sectionTitle: "Application",
             children: [
-
+              InfoTile(
+                subtitle: "Version 1.0.0",
+                icon: Icons.info_outline,
+                onTap: () {},
+              ),
+              const Divider(color: Colors.grey),
+              InfoTile(
+                subtitle: "Confidentialité",
+                icon: Icons.privacy_tip_outlined,
+                onTap: () {
+                  // Ouvrir la politique de confidentialité
+                },
+              ),
+              const Divider(color: Colors.grey),
+              InfoTile(
+                subtitle: "Conditions d'utilisation",
+                icon: Icons.description_outlined,
+                onTap: () {
+                  // Ouvrir les conditions
+                },
+              ),
             ],
+          ),
+
+          SizedBox(height: 95,)
+        ],
+      ),
+    );
+  }
+
+  void _showLanguageDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text("Choisir la langue", style: AppFonts.titleMedium),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              title: Text("Français"),
+              trailing: Icon(Icons.check, color: AppColors.primary),
+              onTap: () => Navigator.pop(context),
+            ),
+            ListTile(
+              title: Text("English"),
+              onTap: () => Navigator.pop(context),
+            ),
+            ListTile(
+              title: Text("Lingala"),
+              onTap: () => Navigator.pop(context),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showThemeDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text("Choisir le thème", style: AppFonts.titleMedium),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              title: Text("Clair"),
+              trailing: Icon(Icons.check, color: AppColors.primary),
+              onTap: () => Navigator.pop(context),
+            ),
+            ListTile(
+              title: Text("Sombre"),
+              onTap: () => Navigator.pop(context),
+            ),
+            ListTile(
+              title: Text("Système"),
+              onTap: () => Navigator.pop(context),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showLogoutDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text("Déconnexion", style: AppFonts.titleMedium),
+        content: Text("Êtes-vous sûr de vouloir vous déconnecter ?"),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text("Annuler"),
+          ),
+          ElevatedButton(
+            onPressed: () {},
+            style: ElevatedButton.styleFrom(backgroundColor: AppColors.error),
+            child: Text("Se déconnecter"),
           ),
         ],
       ),
     );
   }
-}
 
+  Future<void> _launchEmail() async {
+    final Uri emailUri = Uri(
+      scheme: 'mailto',
+      path: 'support@baobabe.cd',
+      query: 'subject=Support Baobabe&body=Bonjour,',
+    );
+    if (await canLaunchUrl(emailUri)) {
+      await launchUrl(emailUri);
+    } else {
+      throw 'Impossible d\'ouvrir le client email';
+    }
+  }
+
+  Future<void> _shareApp() async {
+    await Share.share(
+      'Découvrez Baobabe, l\'application qui vous connecte aux meilleurs services !\nTéléchargez-la sur : https://baobabe.cd',
+      subject: 'Baobabe App',
+    );
+  }
+}
 
 class DetailSection extends StatelessWidget {
   final String sectionTitle;
@@ -81,7 +276,13 @@ class DetailSection extends StatelessWidget {
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(24),
-            boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 20, offset: const Offset(0, 8))],
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.03),
+                blurRadius: 20,
+                offset: const Offset(0, 8),
+              )
+            ],
           ),
           child: Column(children: children),
         ),
@@ -94,37 +295,41 @@ class InfoTile extends StatelessWidget {
   final String subtitle;
   final IconData icon;
   final Color accentColor;
+  final VoidCallback? onTap;
+  final Widget? trailing;
 
   const InfoTile({
     super.key,
     required this.subtitle,
     required this.icon,
-    this.accentColor = Colors.blueAccent,
+    this.accentColor = AppColors.primary,
+    this.onTap,
+    this.trailing,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 12.0),
-      child: Row(
-        children: [
-          IconBadge(icon: icon, color: accentColor),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SizedBox(height: 2),
-                Text(subtitle, style: AppFonts.bodyMedium),
-              ],
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8.0),
+        child: Row(
+          children: [
+            IconBadge(icon: icon, color: accentColor),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Text(subtitle, style: AppFonts.bodyMedium),
             ),
-          ),
-        ],
+            if (trailing != null) trailing!,
+            if (onTap != null && trailing == null)
+              Icon(Icons.chevron_right, color: Colors.grey[400]),
+          ],
+        ),
       ),
     );
   }
 }
-
 
 class IconBadge extends StatelessWidget {
   final IconData icon;
