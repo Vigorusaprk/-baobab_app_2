@@ -4,6 +4,7 @@ import 'package:baobabe_0_2/core/themes/app_fonts.dart';
 import 'package:baobabe_0_2/features/business_detail/presentation/widgets/online_order/reservation_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:go_router/go_router.dart';
 
 class FavoritesPageScreen extends StatefulWidget {
   const FavoritesPageScreen({super.key});
@@ -57,14 +58,6 @@ class _FavoritesPageScreenState extends State<FavoritesPageScreen> {
     _loadReservations();
   }
 
-  void _showReservationDetails(Reservation reservation) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: AppColors.transparent,
-      builder: (context) => _buildReservationDetailSheet(reservation),
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -75,7 +68,7 @@ class _FavoritesPageScreenState extends State<FavoritesPageScreen> {
         children: [
           // SECTION "MES RÉSERVATIONS"
           Padding(
-            padding: const EdgeInsets.fromLTRB(20, 40, 20, 20),
+            padding: const EdgeInsets.fromLTRB(20, 55, 20, 20),
             child: Row(
               children: [
                 SvgPicture.asset(
@@ -113,6 +106,7 @@ class _FavoritesPageScreenState extends State<FavoritesPageScreen> {
                         color: AppColors.primary,
                         fontWeight: AppFonts.semiBold,
                         fontSize: 14,
+                        fontFamily: 'Poppins'
                       ),
                     ),
                   ),
@@ -464,7 +458,7 @@ class _FavoritesPageScreenState extends State<FavoritesPageScreen> {
       child: Material(
         color: AppColors.transparent,
         child: InkWell(
-          onTap: () => _showReservationDetails(reservation),
+          onTap: () => context.pushNamed('reservationDetail', extra: reservation),
           borderRadius: BorderRadius.circular(AppDimens.BORDER_RADIUS_20),
           child: Padding(
             padding: const EdgeInsets.all(AppDimens.PADDING_16),
@@ -797,241 +791,6 @@ class _FavoritesPageScreenState extends State<FavoritesPageScreen> {
                 fontFamily: AppFonts.primaryFontFamily,
               ),
               maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  // ========== BOTTOM SHEET DE DÉTAILS ==========
-
-  Widget _buildReservationDetailSheet(Reservation reservation) {
-    return Container(
-      padding: const EdgeInsets.all(AppDimens.PADDING_24),
-      decoration: BoxDecoration(
-        color: AppColors.white,
-        borderRadius: const BorderRadius.only(
-          topLeft: Radius.circular(AppDimens.BORDER_RADIUS_30),
-          topRight: Radius.circular(AppDimens.BORDER_RADIUS_30),
-        ),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Center(
-            child: Container(
-              width: 40,
-              height: 4,
-              decoration: BoxDecoration(
-                color: AppColors.grey.withOpacity(0.3),
-                borderRadius: BorderRadius.circular(2),
-              ),
-            ),
-          ),
-          const SizedBox(height: AppDimens.PADDING_24),
-          Row(
-            children: [
-              Icon(
-                reservation.typeIcon,
-                color: reservation.typeColor,
-                size: 24,
-              ),
-              const SizedBox(width: AppDimens.PADDING_12),
-              Expanded(
-                child: Text(
-                  'Détails de la réservation - ${reservation.typeDisplayName}',
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: AppFonts.bold,
-                    color: reservation.typeColor,
-                    fontFamily: AppFonts.primaryFontFamily,
-                  ),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: AppDimens.PADDING_24),
-          Expanded(
-            child: SingleChildScrollView(
-              child: Column(
-                children: [
-                  // Carte informations générales
-                  _buildDetailCard(
-                    'Informations ${reservation.typeDisplayName}',
-                    [
-                      _buildDetailItem('Établissement', reservation.establishmentName),
-                      if (reservation.reservationType == 'restaurant') ...[
-                        _buildDetailItem('Table', '${reservation.tableNumber ?? '?'} (${reservation.floor ?? '?'})'),
-                      ] else if (reservation.reservationType == 'hotel') ...[
-                        _buildDetailItem('Type de chambre', reservation.roomType ?? 'Non spécifié'),
-                      ] else if (reservation.reservationType == 'car_rental') ...[
-                        _buildDetailItem('Type de véhicule', reservation.vehicleType ?? 'Non spécifié'),
-                      ] else if (reservation.reservationType == 'travel') ...[
-                        _buildDetailItem('Destination', reservation.destination ?? 'Non spécifiée'),
-                      ] else if (reservation.reservationType == 'spa') ...[
-                        _buildDetailItem('Soin', reservation.treatmentType ?? 'Non spécifié'),
-                      ],
-                    ],
-                  ),
-
-                  // Carte informations client
-                  _buildDetailCard('Informations Client', [
-                    _buildDetailItem('Nom', reservation.customerName),
-                    _buildDetailItem('Téléphone', reservation.phoneNumber),
-                  ]),
-
-                  // Carte détails réservation
-                  _buildDetailCard('Détails Réservation', [
-                    if (reservation.reservationType == 'restaurant') ...[
-                      _buildDetailItem('Date', _formatDate(reservation.date!)),
-                      _buildDetailItem('Heure', _formatTime(reservation.time!)),
-                      _buildDetailItem('Nombre de personnes', reservation.numberOfPeople.toString()),
-                    ] else if (reservation.reservationType == 'hotel') ...[
-                      _buildDetailItem('Arrivée', _formatDate(reservation.checkInDate!)),
-                      _buildDetailItem('Départ', _formatDate(reservation.checkOutDate!)),
-                      _buildDetailItem('Invités', reservation.numberOfGuests.toString()),
-                      _buildDetailItem('Chambres', reservation.numberOfRooms.toString()),
-                    ] else if (reservation.reservationType == 'car_rental') ...[
-                      _buildDetailItem('Début', _formatDate(reservation.rentalStartDate!)),
-                      _buildDetailItem('Fin', _formatDate(reservation.rentalEndDate!)),
-                      _buildDetailItem('Durée', '${reservation.rentalDays} jours'),
-                      _buildDetailItem('Avec chauffeur', reservation.withDriver == true ? 'Oui' : 'Non'),
-                      _buildDetailItem('Assurance', reservation.includeInsurance == true ? 'Incluse' : 'Optionnelle'),
-                      _buildDetailItem('Livraison', reservation.needDelivery == true ? 'Oui' : 'Non'),
-                    ] else if (reservation.reservationType == 'travel') ...[
-                      _buildDetailItem('Date de départ', _formatDate(reservation.displayDate)),
-                      _buildDetailItem('Heure de départ', reservation.departureTime ?? 'Non spécifiée'),
-                      _buildDetailItem('Passagers', reservation.numberOfPassengers.toString()),
-                    ] else if (reservation.reservationType == 'spa') ...[
-                      _buildDetailItem('Date', _formatDate(reservation.appointmentDate!)),
-                      _buildDetailItem('Heure',
-                          '${reservation.appointmentDate!.hour.toString().padLeft(2, '0')}:${reservation.appointmentDate!.minute.toString().padLeft(2, '0')}'),
-                      if (reservation.therapistName != null)
-                        _buildDetailItem('Thérapeute', reservation.therapistName!),
-                    ],
-                    _buildDetailItem('Statut', _getStatusText(reservation.displayDate)),
-                  ]),
-
-                  if (reservation.notes != null && reservation.notes!.isNotEmpty)
-                    _buildDetailCard('Notes', [
-                      _buildDetailItem('Commentaires', reservation.notes!),
-                    ]),
-
-                  // Carte paiement
-                  _buildDetailCard('Paiement', [
-                    _buildDetailItem('Total', '\$${reservation.totalAmount.toStringAsFixed(2)}'),
-                    _buildDetailItem('Réservé le', _formatDateTime(reservation.reservationDate)),
-                  ]),
-                ],
-              ),
-            ),
-          ),
-          const SizedBox(height: AppDimens.PADDING_20),
-
-          // Boutons
-          Row(
-            children: [
-              Expanded(
-                child: OutlinedButton(
-                  onPressed: () => Navigator.pop(context),
-                  style: OutlinedButton.styleFrom(
-                    side: BorderSide(color: AppColors.primary),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(AppDimens.BORDER_RADIUS_12),
-                    ),
-                  ),
-                  child: Text(
-                    'Fermer',
-                    style: TextStyle(color: AppColors.primary),
-                  ),
-                ),
-              ),
-              const SizedBox(width: AppDimens.PADDING_12),
-              Expanded(
-                child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                    _showDeleteDialog(reservation);
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.error,
-                    foregroundColor: AppColors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(AppDimens.BORDER_RADIUS_12),
-                    ),
-                  ),
-                  child: const Text('Annuler'),
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildDetailCard(String title, List<Widget> items) {
-    return Container(
-      width: double.infinity,
-      margin: const EdgeInsets.only(bottom: AppDimens.PADDING_16),
-      padding: const EdgeInsets.all(AppDimens.PADDING_16),
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(AppDimens.BORDER_RADIUS_16),
-        border: Border.all(color: AppColors.grey.withOpacity(0.2)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            title,
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: AppFonts.bold,
-              fontFamily: AppFonts.primaryFontFamily,
-              color: AppColors.textPrimary,
-            ),
-          ),
-          const SizedBox(height: AppDimens.PADDING_12),
-          ...items,
-        ],
-      ),
-    );
-  }
-
-  Widget _buildDetailItem(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: AppDimens.PADDING_6),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(
-            width: 140,
-            child: Text(
-              '$label :',
-              style: TextStyle(
-                fontWeight: AppFonts.medium,
-                color: AppColors.grey,
-                fontSize: 14,
-                fontFamily: AppFonts.primaryFontFamily,
-              ),
-            ),
-          ),
-          Expanded(
-            child: Text(
-              value,
-              style: TextStyle(
-                fontWeight: AppFonts.regular,
-                fontSize: 14,
-                fontFamily: AppFonts.primaryFontFamily,
-                color: AppColors.textPrimary,
-              ),
-              maxLines: 3,
               overflow: TextOverflow.ellipsis,
             ),
           ),

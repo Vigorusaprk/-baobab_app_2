@@ -1,6 +1,7 @@
 import 'package:baobabe_0_2/core/themes/app_colors.dart';
 import 'package:baobabe_0_2/features/business_detail/domain/entities/menu_restau.dart';
 import 'package:baobabe_0_2/features/business_detail/presentation/widgets/online_order/plat_detail.dart';
+import 'package:baobabe_0_2/features/home_page/data/models/ui_business.dart';
 import 'package:baobabe_0_2/features/home_page/domain/entities/business_entity.dart';
 import 'package:baobabe_0_2/features/order/domain/entities/cart_item.dart';
 import 'package:baobabe_0_2/features/order/presentation/bloc/cart_bloc.dart';
@@ -13,6 +14,7 @@ class MenuSection extends StatelessWidget {
   final String? restaurantId;
   final String? restaurantName;
   final BusinessType? restaurantType;
+  final UIBusiness uiBusiness;
 
   const MenuSection({
     super.key,
@@ -20,6 +22,7 @@ class MenuSection extends StatelessWidget {
     this.restaurantId,
     this.restaurantName,
     this.restaurantType,
+    required this.uiBusiness,
   });
 
   @override
@@ -35,128 +38,185 @@ class MenuSection extends StatelessWidget {
       create: (context) => CartCubit(),
       child: Scaffold(
         backgroundColor: AppColors.scaffoldBackground,
-        appBar: AppBar(
-          title: const Text(
-            "Le Menu",
-            style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
-          ),
-          backgroundColor: AppColors.primary,
-          elevation: 0,
-          centerTitle: true,
-          iconTheme: const IconThemeData(color: Colors.white),
-          // ... (imports inchangés)
-
-          actions: [
-            BlocBuilder<CartCubit, CartState>(
-              builder: (context, state) {
-                final totalItems = context.read<CartCubit>().totalItems;
-                return Stack(
-                  clipBehavior: Clip.none,
+        body: CustomScrollView(
+          slivers: [
+            SliverAppBar(
+              expandedHeight: 200,
+              floating: false,
+              pinned: true,
+              flexibleSpace: FlexibleSpaceBar(
+                title: const Text(
+                  "Le Menu ",
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                    shadows: [Shadow(blurRadius: 10, color: Colors.black45)],
+                  ),
+                ),
+                background: Stack(
+                  fit: StackFit.expand,
                   children: [
-                    IconButton(
-                      icon: const Icon(Icons.shopping_cart),
-                      onPressed: () {
-                        // Récupérer l'instance actuelle du cubit
-                        final cartCubit = context.read<CartCubit>();
-                        // Naviguer vers CartPage en fournissant la même instance
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => BlocProvider.value(
-                              value: cartCubit,
-                              child: CartPage(
-                                restaurantId: restaurantId,
-                                restaurantName: restaurantName,
-                                restaurantType: restaurantType,
+                    _buildBackGroudImage(),
+                    const DecoratedBox(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [Colors.transparent, Colors.black54],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              backgroundColor: AppColors.primary,
+              iconTheme: const IconThemeData(color: Colors.white),
+              actions: [
+                BlocBuilder<CartCubit, CartState>(
+                  builder: (context, state) {
+                    final totalItems = context.read<CartCubit>().totalItems;
+                    return Stack(
+                      clipBehavior: Clip.none,
+                      children: [
+                        IconButton(
+                          icon: const Icon(Icons.shopping_cart),
+                          onPressed: () {
+                            final cartCubit = context.read<CartCubit>();
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => BlocProvider.value(
+                                  value: cartCubit,
+                                  child: CartPage(
+                                    restaurantId: restaurantId,
+                                    restaurantName: restaurantName,
+                                    restaurantType: restaurantType,
+                                  ),
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                        if (totalItems > 0)
+                          Positioned(
+                            right: 4,
+                            top: 4,
+                            child: Container(
+                              padding: const EdgeInsets.all(2),
+                              decoration: BoxDecoration(
+                                color: Colors.red,
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              constraints: const BoxConstraints(
+                                minWidth: 16,
+                                minHeight: 16,
+                              ),
+                              child: Text(
+                                '$totalItems',
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 10,
+                                ),
+                                textAlign: TextAlign.center,
                               ),
                             ),
                           ),
-                        );
-                      },
-                    ),
-                    if (totalItems > 0)
-                      Positioned(
-                        right: 4,
-                        top: 4,
-                        child: Container(
-                          padding: const EdgeInsets.all(2),
-                          decoration: BoxDecoration(
-                            color: Colors.red,
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          constraints: const BoxConstraints(
-                            minWidth: 16,
-                            minHeight: 16,
-                          ),
-                          child: Text(
-                            '$totalItems',
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 10,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                        ),
-                      ),
-                  ],
-                );
-              },
-            ),
-          ],
-        ),
-        body: menuItems.isEmpty
-            ? _buildEmptyState()
-            : CustomScrollView(
-          slivers: [
-            // Image d'en-tête (optionnelle)
-            SliverToBoxAdapter(
-              child: Container(
-                height: 150,
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  color: AppColors.primary.withOpacity(0.1),
-                  image: const DecorationImage(
-                    image: AssetImage('assets/restaurant_cover.jpg'),
-                    fit: BoxFit.cover,
-                  ),
-                ),
-                child: const Center(
-                  child: Icon(Icons.restaurant, size: 60, color: Colors.white),
-                ),
-              ),
-            ),
-            // Liste des catégories
-            ...categories.map((category) => SliverPadding(
-              padding: const EdgeInsets.only(top: 16),
-              sliver: SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: Text(
-                    category,
-                    style: const TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.primary,
-                    ),
-                  ),
-                ),
-              ),
-            )),
-            // Plats de chaque catégorie
-            ...categories.map((category) => SliverPadding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              sliver: SliverList(
-                delegate: SliverChildBuilderDelegate(
-                      (context, index) {
-                    final menu = groupedItems[category]![index];
-                    return _buildMenuItem(context, menu);
+                      ],
+                    );
                   },
-                  childCount: groupedItems[category]!.length,
                 ),
-              ),
-            )),
+              ],
+            ),
+            if (categories.isEmpty)
+              const SliverFillRemaining(
+                child: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.restaurant_menu, size: 80, color: Colors.grey),
+                      SizedBox(height: 16),
+                      Text(
+                        "Menu non disponible",
+                        style: TextStyle(fontSize: 18, color: Colors.grey),
+                      ),
+                    ],
+                  ),
+                ),
+              )
+            else
+              ...categories.expand((category) => [
+                SliverPadding(
+                  padding: const EdgeInsets.fromLTRB(16, 24, 16, 8),
+                  sliver: SliverToBoxAdapter(
+                    child: Text(
+                      category,
+                      style: const TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.primary,
+                      ),
+                    ),
+                  ),
+                ),
+                SliverPadding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  sliver: SliverList(
+                    delegate: SliverChildBuilderDelegate(
+                          (context, index) {
+                        final menu = groupedItems[category]![index];
+                        return _buildMenuItem(context, menu);
+                      },
+                      childCount: groupedItems[category]!.length,
+                    ),
+                  ),
+                ),
+              ]),
           ],
         ),
+      ),
+    );
+  }
+
+  // Widget pour l'image de profil (grande zone)
+  Widget _buildBackGroudImage(){
+    final hasImage = uiBusiness.business.bgImg != null && uiBusiness.business.bgImg!.isNotEmpty;
+    final Color = uiBusiness.categoryColor;
+
+    return Container(
+        width: double.infinity,
+        height: 200,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(28),
+          color: hasImage ? null : uiBusiness.categoryColor, // Fond coloré si pas d'image
+        ),
+        child: hasImage ?
+        ClipRRect(
+          borderRadius: BorderRadius.circular(28),
+          child: Image.asset(
+            uiBusiness.business.bgImg!,
+            fit: BoxFit.cover,
+            errorBuilder: (context, error, stackTrace) {
+              // Si l'image ne se charge pas, afficher les initiales
+              return _buildInitialsContainer(Color);
+            },
+          ),
+        ) : _buildInitialsContainer(Color)
+    );
+  }
+  Widget _buildInitialsContainer(Color color) {
+    return Container(
+      decoration: BoxDecoration(
+          color: color,
+          borderRadius: BorderRadius.circular(28)
+      ),
+      width: double.infinity,
+      height: 200,
+      child: Center(
+          child: Icon(
+            uiBusiness.categoryIcon,
+            size: 80,
+            color: Colors.white,
+          )
       ),
     );
   }
@@ -181,14 +241,7 @@ class MenuSection extends StatelessWidget {
           onTap: () {
             Navigator.push(
               context,
-              MaterialPageRoute(
-                builder: (context) => PlatDetail(
-                  menuItem: menu,
-                  restaurantId: restaurantId,
-                  restaurantName: restaurantName,
-                  restaurantType: restaurantType,
-                ),
-              ),
+              MaterialPageRoute(builder: (_) => PlatDetail(menuItem: menu)),
             );
           },
           borderRadius: BorderRadius.circular(20),
@@ -197,7 +250,6 @@ class MenuSection extends StatelessWidget {
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Image du plat
                 ClipRRect(
                   borderRadius: BorderRadius.circular(16),
                   child: Image.asset(
@@ -216,7 +268,6 @@ class MenuSection extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: 16),
-                // Détails
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -239,7 +290,6 @@ class MenuSection extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: 8),
-                      // Prix et note
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -267,7 +317,6 @@ class MenuSection extends StatelessWidget {
                     ],
                   ),
                 ),
-                // Bouton d'ajout au panier
                 Container(
                   decoration: BoxDecoration(
                     color: AppColors.primary.withOpacity(0.1),
@@ -297,22 +346,6 @@ class MenuSection extends StatelessWidget {
             ),
           ),
         ),
-      ),
-    );
-  }
-
-  Widget _buildEmptyState() {
-    return const Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Icons.restaurant_menu, size: 80, color: Colors.grey),
-          SizedBox(height: 16),
-          Text(
-            "Menu non disponible",
-            style: TextStyle(fontSize: 18, color: Colors.grey),
-          ),
-        ],
       ),
     );
   }

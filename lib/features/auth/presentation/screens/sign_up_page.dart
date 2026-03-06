@@ -5,6 +5,7 @@ import 'package:baobabe_0_2/features/main/presentation/screens/main_screen.dart'
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:go_router/go_router.dart';
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({super.key});
@@ -53,9 +54,7 @@ class _SignUpPageState extends State<SignUpPage> {
     return BlocListener<AuthBloc, AuthState>(
       listener: (context, state) {
         if (state is AuthAuthenticated) {
-          Navigator.of(context).pushReplacement(
-            MaterialPageRoute(builder: (_) =>  MainScreen()),
-          );
+          context.go('/home'); // ← Au lieu de Navigator.pushReplacement
         } else if (state is AuthError) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -135,9 +134,7 @@ class _SignUpPageState extends State<SignUpPage> {
                       Text("Déjà un compte ?", style: TextStyle(color: AppColors.scaffoldBackground)),
                       TextButton(
                         onPressed: () {
-                          Navigator.of(context).pushReplacement(
-                            MaterialPageRoute(builder: (_) => const LoginPage()),
-                          );
+                          context.go('/login');
                         },
                         child: const Text(
                           'Connectez-vous',

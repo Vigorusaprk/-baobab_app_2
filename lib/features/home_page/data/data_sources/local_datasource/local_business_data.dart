@@ -264,6 +264,17 @@ class BusinessLocalDataSourceImpl implements BusinessLocalDataSource {
                   "Lorem ipsum dolor sit, amet consectetur adipisicing elit. Sunt vel illum, neque fugiat et temporibus deleniti sequi esse iusto repellat. Est eligendi aspernatur consequuntur officia quod recusandae consectetur aliquam sunt!",
               ingredients: ["Tomate", "Mozzarella", "Basilic", "Huile d'olive"],
             ),
+
+            MenuItem(
+              itemName: "Salade grec",
+              itemCategory: "Pizza",
+              imageUrl: "assets/00389ddab812fdc051465e0d21b83ee8.jpg",
+              rating: 4.5,
+              price: 5.99,
+              description:
+              "Lorem ipsum dolor sit, amet consectetur adipisicing elit. Sunt vel illum, neque fugiat et temporibus deleniti sequi esse iusto repellat. Est eligendi aspernatur consequuntur officia quod recusandae consectetur aliquam sunt!",
+              ingredients: ["Tomate", "Mozzarella", "Basilic", "Huile d'olive"],
+            ),
           ],
         },
 

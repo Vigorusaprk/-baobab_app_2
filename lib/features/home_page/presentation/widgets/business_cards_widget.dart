@@ -4,6 +4,7 @@ import 'package:baobabe_0_2/features/home_page/presentation/bloc/business_bloc.d
 import 'package:baobabe_0_2/features/home_page/presentation/bloc/category_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import './business_card_widget.dart';
 
 class BusinessCardsWidget extends StatefulWidget {
@@ -188,21 +189,6 @@ class _BusinessCardsWidgetState extends State<BusinessCardsWidget> {
   }
 
   void _navigateToBusinessDetail(BuildContext context, String businessId) {
-    Navigator.push(
-      context,
-      PageRouteBuilder(
-        pageBuilder: (context, animation, secondaryAnimation) =>
-            BusinessDetailScreen(businessId: businessId),
-        transitionsBuilder: (context, animation, secondaryAnimation, child) {
-          return FadeTransition(
-            opacity: animation,
-            child: ScaleTransition(
-              scale: Tween<double>(begin: 0.9, end: 1.0).animate(animation),
-              child: child,
-            ),
-          );
-        },
-      ),
-    );
+    context.pushNamed('businessDetail', pathParameters: {'id': businessId});
   }
 }

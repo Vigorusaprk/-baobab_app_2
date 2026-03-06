@@ -96,7 +96,6 @@ class BusinessCardWidget extends StatelessWidget {
       ) : _buildInitialsContainer(Color)
     );
   }
-
   Widget _buildInitialsContainer(Color color) {
     return Container(
       decoration: BoxDecoration(

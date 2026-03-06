@@ -1,0 +1,183 @@
+import 'package:baobabe_0_2/core/themes/app_colors.dart';
+import 'package:baobabe_0_2/core/themes/app_diemens.dart';
+import 'package:baobabe_0_2/features/home_page/domain/entities/business_entity.dart';
+import 'package:baobabe_0_2/features/order/domain/entities/order.dart';
+import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+
+class OrderDetailPage extends StatelessWidget {
+  final Order order;
+  const OrderDetailPage({super.key, required this.order});
+
+  @override
+  Widget build(BuildContext context) {
+    final dateFormat = DateFormat('dd/MM/yyyy HH:mm');
+
+    return Scaffold(
+      backgroundColor: AppColors.scaffoldBackground,
+      body: Container(
+        padding: const EdgeInsets.all(24),
+        decoration: const BoxDecoration(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SizedBox(height: 24),
+            Text(
+              'Détails de la commande',
+              style: TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
+                color: order.status.color,
+                fontFamily: 'Poppins'
+              ),
+            ),
+            const SizedBox(height: 16),
+            Expanded(
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    _buildDetailSection('Restaurant', [
+                      _buildDetailRow('Nom', order.establishmentName),
+                      _buildDetailRow('Type', _getTypeDisplayName(order.establishmentType)),
+                    ]),
+                    _buildDetailSection('Date et heure', [
+                      _buildDetailRow('Passée le', dateFormat.format(order.orderDate)),
+                    ]),
+                    _buildDetailSection('Articles', [
+                      ...order.items.map((item) => Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 4),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Expanded(child: Text('${item.quantity}x ${item.name}')),
+                            Text('${(item.price * item.quantity).toStringAsFixed(2)} \$'),
+                          ],
+                        ),
+                      )),
+                    ]),
+                    _buildDetailSection('Paiement', [
+                      _buildDetailRow('Sous-total', '${order.subtotal.toStringAsFixed(2)} \$'),
+                      _buildDetailRow('Taxes', '${order.tax.toStringAsFixed(2)} \$'),
+
+                      SizedBox(height: AppDimens.PADDING_20,),
+                      Container(
+                        padding: EdgeInsets.symmetric(horizontal: AppDimens.PADDING_10, vertical: AppDimens.PADDING_10),
+                        decoration: BoxDecoration(
+                          color: AppColors.primary.withOpacity(0.3),
+                          borderRadius: BorderRadius.circular(AppDimens.BORDER_RADIUS_15)
+                        ),
+                        child: _buildDetailRow('Total', '${order.totalAmount.toStringAsFixed(2)} \$', isBold: true),
+                      )
+                    ]),
+                    if (order.notes != null && order.notes!.isNotEmpty)
+                      _buildDetailSection('Notes', [
+                        Text(order.notes!),
+                      ]),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: const Text('Fermer', style: TextStyle(fontFamily: 'Poppins', color: AppColors.primary),),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Fonctionnalité à implémenter', )),
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary),
+                    child: const Text('Recommander', style: TextStyle(fontFamily: 'Poppins', color: AppColors.scaffoldBackground),),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDetailSection(String title, List<Widget> children) {
+    return Container(
+      width: double.infinity,
+      margin: const EdgeInsets.only(bottom: 16),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.grey[50],
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.grey[200]!),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            title,
+            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, fontFamily: 'Poppins'),
+          ),
+          const SizedBox(height: 8),
+          ...children,
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDetailRow(String label, String value, {bool isBold = false}) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(label, style: TextStyle(color: Colors.grey[600])),
+          Text(
+            value,
+            style: TextStyle(
+              fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
+              fontSize: isBold ? 16 : 14,
+              fontFamily: 'Poppins'
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+
+  String _getTypeDisplayName(BusinessType? type) {
+    if (type == null) return 'Autre';
+    switch (type) {
+      case BusinessType.restaurant:
+        return 'Restaurant';
+      case BusinessType.fastFood:
+        return 'Fast Food';
+      case BusinessType.shopping:
+        return 'Shopping';
+      case BusinessType.mall:
+        return 'Centre Commercial';
+      case BusinessType.hotel:
+        return 'Hôtel';
+      case BusinessType.carRental:
+        return 'Location Voiture';
+      case BusinessType.detente:
+        return 'Détente';
+      case BusinessType.travelAgency:
+        return 'Agence de voyages';
+      case BusinessType.spa:
+        return 'Spa';
+      default:
+        return 'Autre';
+    }
+  }
+}

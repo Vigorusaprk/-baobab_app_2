@@ -1,6 +1,10 @@
+import 'package:baobabe_0_2/core/themes/app_diemens.dart';
+import 'package:baobabe_0_2/core/themes/app_fonts.dart';
 import 'package:baobabe_0_2/features/order/domain/entities/order.dart';
 import 'package:baobabe_0_2/features/order/presentation/widgets/order_service.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:baobabe_0_2/core/themes/app_colors.dart';
 import 'package:baobabe_0_2/features/home_page/domain/entities/business_entity.dart';
@@ -47,51 +51,91 @@ class _OrderScreenState extends State<OrderScreen> {
     });
   }
 
-  void _showOrderDetails(Order order) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (context) => _buildOrderDetailSheet(order),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.scaffoldBackground,
-      appBar: AppBar(
-        title: const Text('Mes Commandes'),
-        backgroundColor: Colors.white,
-        elevation: 1,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: _loadOrders,
-          ),
-        ],
-      ),
-      body: Column(
+    return Container(
+      color: AppColors.scaffoldBackground,
+      child: Column(
         children: [
+          // SECTION "MES RÉSERVATIONS"
+          Padding(
+            padding: const EdgeInsets.fromLTRB(20, 55, 20, 20),
+            child: Row(
+              children: [
+                SvgPicture.asset(
+                  'assets/icons/order.svg',
+                  height: 35,
+                  colorFilter: ColorFilter.mode(
+                    AppColors.primary,
+                    BlendMode.srcIn,
+                  ),
+                ),
+                const SizedBox(width: AppDimens.PADDING_12),
+                Text(
+                  'Mes Commandes',
+                  style: TextStyle(
+                    fontFamily: AppFonts.primaryFontFamily,
+                    fontSize: 24,
+                    fontWeight: AppFonts.bold,
+                    color: AppColors.primary,
+                  ),
+                ),
+                const Spacer(),
+                if (_allOrders.isNotEmpty)
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppDimens.PADDING_12,
+                      vertical: AppDimens.PADDING_6,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppColors.primary.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(AppDimens.BORDER_RADIUS_16),
+                    ),
+                    child: Text(
+                      '${_allOrders.length}',
+                      style: TextStyle(
+                        color: AppColors.primary,
+                        fontWeight: AppFonts.semiBold,
+                        fontSize: 14,
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+          ),
+
           if (_allOrders.isNotEmpty)
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              padding: const EdgeInsets.symmetric(vertical: 8),
               child: SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
-                child: Row(
-                  children: [
-                    _buildFilterChip('Toutes', null, _selectedStatusFilter == null),
-                    ..._availableStatuses.map((status) => _buildFilterChip(
-                      status.displayName,
-                      status,
-                      _selectedStatusFilter == status,
-                    )),
-                  ],
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                  child: Row(
+                    children: [
+                      _buildFilterChip('Toutes', null, _selectedStatusFilter == null),
+                      ..._availableStatuses.map((status) => _buildFilterChip(
+                        status.displayName,
+                        status,
+                        _selectedStatusFilter == status,
+                      )),
+                    ],
+                  ),
                 ),
               ),
             ),
+
           Expanded(
-            child: _buildContent(),
+            child: Container(
+              decoration: BoxDecoration(
+                color: AppColors.white,
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(AppDimens.BORDER_RADIUS_30),
+                  topRight: Radius.circular(AppDimens.BORDER_RADIUS_30),
+                ),
+              ),
+              child: _buildContent(),
+            ),
           ),
         ],
       ),
@@ -274,10 +318,11 @@ class _OrderScreenState extends State<OrderScreen> {
     final typeName = _getTypeDisplayName(type);
 
     return Card(
+      color: AppColors.scaffoldBackground,
       margin: const EdgeInsets.only(bottom: 12),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: InkWell(
-        onTap: () => _showOrderDetails(order),
+        onTap: () => context.pushNamed('orderDetail', extra: order),
         borderRadius: BorderRadius.circular(16),
         child: Padding(
           padding: const EdgeInsets.all(16),
@@ -304,7 +349,7 @@ class _OrderScreenState extends State<OrderScreen> {
                       children: [
                         Text(
                           order.establishmentName,
-                          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, fontFamily: "Poppins"),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -319,7 +364,7 @@ class _OrderScreenState extends State<OrderScreen> {
                               ),
                               child: Text(
                                 typeName,
-                                style: TextStyle(color: typeColor, fontSize: 12, fontWeight: FontWeight.w600),
+                                style: TextStyle(color: typeColor, fontSize: 12, fontWeight: FontWeight.w600, fontFamily: "Poppins"),
                               ),
                             ),
                           ],
@@ -335,7 +380,7 @@ class _OrderScreenState extends State<OrderScreen> {
                     ),
                     child: Text(
                       order.status.displayName,
-                      style: TextStyle(color: order.status.color, fontWeight: FontWeight.bold, fontSize: 12),
+                      style: TextStyle(color: order.status.color, fontWeight: FontWeight.bold, fontSize: 12, fontFamily: "Poppins"),
                     ),
                   ),
                 ],
@@ -343,7 +388,7 @@ class _OrderScreenState extends State<OrderScreen> {
               const SizedBox(height: 12),
               Text(
                 dateFormat.format(order.orderDate),
-                style: TextStyle(color: Colors.grey[600], fontSize: 14),
+                style: TextStyle(color: Colors.grey[600], fontSize: 14, fontFamily: "Poppins"),
               ),
               const SizedBox(height: 12),
               ...order.items.take(2).map((item) => Padding(
@@ -351,178 +396,46 @@ class _OrderScreenState extends State<OrderScreen> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text('${item.quantity}x ${item.name}'),
-                    Text('${(item.price * item.quantity).toStringAsFixed(2)} \$'),
+                    Text('${item.quantity}x ${item.name}', style: TextStyle(fontFamily: "Poppins"),),
+                    Text('${(item.price * item.quantity).toStringAsFixed(2)} \$', style: TextStyle(fontFamily: "Poppins")),
                   ],
                 ),
               )),
               if (order.items.length > 2)
                 Text(
                   '+${order.items.length - 2} autres articles',
-                  style: TextStyle(color: Colors.grey[600], fontSize: 13),
+                  style: TextStyle(color: Colors.grey[600], fontSize: 13, fontFamily: "Poppins"),
                 ),
-              const Divider(height: 20),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text(
-                    'Total',
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                  ),
-                  Text(
-                    '${order.totalAmount.toStringAsFixed(2)} \$',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 18,
-                      color: AppColors.primary,
+              
+              SizedBox(height: AppDimens.PADDING_20,),
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: AppDimens.PADDING_10, vertical: AppDimens.PADDING_10),
+                decoration: BoxDecoration(
+                    color: AppColors.primary.withOpacity(0.3),
+                    borderRadius: BorderRadius.circular(AppDimens.BORDER_RADIUS_15)
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      'Total',
+                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, fontFamily: "Poppins"),
                     ),
-                  ),
-                ],
+                    Text(
+                      '${order.totalAmount.toStringAsFixed(2)} \$',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18,
+                        color: AppColors.primary,
+                          fontFamily: "Poppins"
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ],
           ),
         ),
-      ),
-    );
-  }
-
-  Widget _buildOrderDetailSheet(Order order) {
-    final dateFormat = DateFormat('dd/MM/yyyy HH:mm');
-    return Container(
-      padding: const EdgeInsets.all(24),
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Center(
-            child: Container(
-              width: 40,
-              height: 4,
-              decoration: BoxDecoration(
-                color: Colors.grey[300],
-                borderRadius: BorderRadius.circular(2),
-              ),
-            ),
-          ),
-          const SizedBox(height: 24),
-          Text(
-            'Détails de la commande',
-            style: TextStyle(
-              fontSize: 22,
-              fontWeight: FontWeight.bold,
-              color: order.status.color,
-            ),
-          ),
-          const SizedBox(height: 16),
-          Expanded(
-            child: SingleChildScrollView(
-              child: Column(
-                children: [
-                  _buildDetailSection('Restaurant', [
-                    _buildDetailRow('Nom', order.establishmentName),
-                    _buildDetailRow('Type', _getTypeDisplayName(order.establishmentType)),
-                  ]),
-                  _buildDetailSection('Date et heure', [
-                    _buildDetailRow('Passée le', dateFormat.format(order.orderDate)),
-                  ]),
-                  _buildDetailSection('Articles', [
-                    ...order.items.map((item) => Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 4),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Expanded(child: Text('${item.quantity}x ${item.name}')),
-                          Text('${(item.price * item.quantity).toStringAsFixed(2)} \$'),
-                        ],
-                      ),
-                    )),
-                  ]),
-                  _buildDetailSection('Paiement', [
-                    _buildDetailRow('Sous-total', '${order.subtotal.toStringAsFixed(2)} \$'),
-                    _buildDetailRow('Taxes', '${order.tax.toStringAsFixed(2)} \$'),
-                    const Divider(),
-                    _buildDetailRow('Total', '${order.totalAmount.toStringAsFixed(2)} \$', isBold: true),
-                  ]),
-                  if (order.notes != null && order.notes!.isNotEmpty)
-                    _buildDetailSection('Notes', [
-                      Text(order.notes!),
-                    ]),
-                ],
-              ),
-            ),
-          ),
-          const SizedBox(height: 16),
-          Row(
-            children: [
-              Expanded(
-                child: OutlinedButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: const Text('Fermer'),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Fonctionnalité à implémenter')),
-                    );
-                  },
-                  style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary),
-                  child: const Text('Recommander'),
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildDetailSection(String title, List<Widget> children) {
-    return Container(
-      width: double.infinity,
-      margin: const EdgeInsets.only(bottom: 16),
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Colors.grey[50],
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey[200]!),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            title,
-            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-          ),
-          const SizedBox(height: 8),
-          ...children,
-        ],
-      ),
-    );
-  }
-
-  Widget _buildDetailRow(String label, String value, {bool isBold = false}) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(label, style: TextStyle(color: Colors.grey[600])),
-          Text(
-            value,
-            style: TextStyle(
-              fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
-              fontSize: isBold ? 16 : 14,
-            ),
-          ),
-        ],
       ),
     );
   }

@@ -5,6 +5,7 @@ import 'package:baobabe_0_2/features/home_page/presentation/bloc/search_bloc.dar
 import 'package:baobabe_0_2/features/home_page/presentation/screens/search_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 
 class HelloUserWidget extends StatelessWidget {
   const HelloUserWidget({super.key});
@@ -97,15 +98,7 @@ class HelloUserWidget extends StatelessWidget {
   Widget _buildSearchField(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => BlocProvider(
-              create: (context) => getIt<SearchBloc>(),
-              child: const SearchPage(),
-            ),
-          ),
-        );
+        context.pushNamed('search');
       },
       child: Container(
         decoration: BoxDecoration(
