@@ -62,6 +62,8 @@ class BusinessLocalDataSourceImpl implements BusinessLocalDataSource {
         return BusinessType.travelAgency;
       case 'Spa' :
         return BusinessType.spa;
+      case 'Cinema' :
+        return BusinessType.cinema;
       default:
         return BusinessType.restaurant;
     }
@@ -888,6 +890,68 @@ class BusinessLocalDataSourceImpl implements BusinessLocalDataSource {
             {"name": "Julie", "specialty": "Hammam & Gommage"},
           ],
           "amenities": ["Hammam", "Sauna", "Jacuzzi", "Espace détente"],
+        },
+        reviews: [],
+        isFavorite: false,
+        latitude: -4.4419,
+        longitude: 15.2663,
+        stores: null,
+      ),
+
+      BusinessModel(
+        id: "13",
+        name: "Cinéma Kin Plaza",
+        address: "Niveau 3, Centre Commercial Kin Plaza, Kinshasa",
+        description: "Le plus grand complexe cinématographique de Kinshasa avec 6 salles équipées en son Dolby Atmos et fauteuils inclinables.",
+        bgImg: "assets/cinema_cover.jpg",
+        rating: 4.6,
+        reviewCount: 234,
+        openingHours: {"Lundi-Dimanche": "10:00-23:00"},
+        type: BusinessType.cinema,
+        phone: "+243 81 777 8888",
+        email: "contact@kinplazacinema.cd",
+        website: "www.kinplazacinema.cd",
+        images: ["assets/cinema1.jpg", "assets/cinema2.jpg"],
+        specificData: {
+          "canReserve": true,
+          "movies": [
+            {
+              "title": "Avatar : La Voie de l'Eau",
+              "duration": 192,
+              "poster": "assets/avatar.jpg",
+              "synopsis": "Jake Sully et Neytiri sont devenus parents. L'histoire se déroule plus d'une décennie après les événements du premier film.",
+              "rating": 4.5
+            },
+            {
+              "title": "Oppenheimer",
+              "duration": 180,
+              "poster": "assets/oppenheimer.jpg",
+              "synopsis": "L'histoire du physicien J. Robert Oppenheimer et de son rôle dans le développement de la bombe atomique.",
+              "rating": 4.8
+            },
+            {
+              "title": "Barbie",
+              "duration": 114,
+              "poster": "assets/barbie.jpg",
+              "synopsis": "Barbie vit à Barbie Land, jusqu'à ce qu'elle soit expulsée pour ne pas être assez parfaite.",
+              "rating": 4.2
+            },
+            {
+              "title": "Dune : Deuxième partie",
+              "duration": 166,
+              "poster": "assets/dune2.jpg",
+              "synopsis": "Paul Atreides s'unit aux Fremen pour mener une révolte contre ceux qui ont détruit sa famille.",
+              "rating": 4.7
+            }
+          ],
+          "showtimes": ["10:30", "13:45", "16:30", "19:15", "22:00"],
+          "prices": {
+            "standard": 12.0,
+            "vip": 25.0,
+            "student": 8.0
+          },
+          "amenities": ["Son Dolby Atmos", "Fauteuils inclinables", "Bar", "Parking"],
+          "rooms": 6
         },
         reviews: [],
         isFavorite: false,

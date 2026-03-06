@@ -44,10 +44,17 @@ class Reservation {
   final String? departureTime;
 
   // spa
-  final String? treatmentType;      // Type de soin choisi
-  final int? durationMinutes;        // Durée en minutes
-  final String? therapistName;       // Nom du thérapeute (optionnel)
-  final DateTime? appointmentDate;   // Date et heure du rendez-vous (on peut utiliser date et time)
+  final String? treatmentType;
+  final int? durationMinutes;
+  final String? therapistName;
+  final DateTime? appointmentDate;
+
+  // cinema
+  final String? movieTitle;
+  final DateTime? showtime;
+  final String? ticketType;
+  final int? numberOfTickets;
+  final String? seatNumbers;
 
   Reservation({
     required this.id,
@@ -92,6 +99,13 @@ class Reservation {
     this.durationMinutes,
     this.therapistName,
     this.appointmentDate,
+
+    //cinema
+    this.movieTitle,
+    this.showtime,
+    this.ticketType,
+    this.numberOfTickets,
+    this.seatNumbers,
   });
 
   Map<String, dynamic> toMap() {
@@ -139,6 +153,12 @@ class Reservation {
       'therapistName': therapistName,
       'appointmentDate': appointmentDate?.toIso8601String(),
 
+      //cinema
+      'movieTitle': movieTitle,
+      'showtime': showtime?.toIso8601String(),
+      'ticketType': ticketType,
+      'numberOfTickets': numberOfTickets,
+      'seatNumbers': seatNumbers,
     };
   }
 
@@ -194,6 +214,13 @@ class Reservation {
       therapistName: map['therapistName'],
       appointmentDate: map['appointmentDate'] != null ? DateTime.parse(map['appointmentDate']) : null,
 
+      //cinema
+      movieTitle: map['movieTitle'],
+      showtime: map['showtime'] != null ? DateTime.parse(map['showtime']) : null,
+      ticketType: map['ticketType'],
+      numberOfTickets: map['numberOfTickets'],
+      seatNumbers: map['seatNumbers'],
+
     );
   }
 
@@ -213,7 +240,8 @@ class Reservation {
       case 'hotel': return 'Hôtel';
       case 'car_rental': return 'Location de véhicule';
       case 'travel': return 'Voyage en bus';
-      case 'spa': return 'Spa & Bien-être'; // Nouveau
+      case 'spa': return 'Spa & Bien-être';
+      case 'cinema': return 'Cinéma';
       default: return 'Restaurant';
     }
   }
@@ -223,7 +251,8 @@ class Reservation {
       case 'hotel': return Icons.hotel;
       case 'car_rental': return Icons.directions_car;
       case 'travel': return Icons.directions_bus;
-      case 'spa': return Icons.spa; // Nouveau
+      case 'spa': return Icons.spa;
+      case 'cinema': return Icons.movie;
       default: return Icons.restaurant;
     }
   }
@@ -233,7 +262,8 @@ class Reservation {
       case 'hotel': return Colors.purple;
       case 'car_rental': return Colors.teal;
       case 'travel': return Colors.blue;
-      case 'spa': return Colors.pink; // Nouveau
+      case 'spa': return Colors.pink;
+      case 'cinema': return Colors.lightBlue;
       default: return Colors.orange;
     }
   }

@@ -29,6 +29,8 @@ class UICategory {
         return Icons.card_travel;
       case 'spa':
         return Icons.spa;
+      case 'cinema':
+        return Icons.movie;
       default:
         return Icons.business;
     }
@@ -56,6 +58,8 @@ class UICategory {
         return Colors.indigoAccent;
       case 'spa':
         return Colors.purple;
+      case 'cinema':
+        return Colors.lightBlue;
       default:
         return Colors.grey;
     }

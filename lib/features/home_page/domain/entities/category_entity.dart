@@ -22,7 +22,8 @@ class Category extends Equatable {
     Category(id: '6', name: 'carRental', displayName: 'Location Voiture'),
     Category(id: '7', name: 'detente', displayName: 'Détente'),
     Category(id: '8', name: 'travelAgency', displayName: 'Voyage'),
-    Category(id: '9', name: 'spa', displayName: 'Spa')
+    Category(id: '9', name: 'spa', displayName: 'Spa'),
+    Category(id: "10", name: 'cinema', displayName: 'Cinema')
 
   ];
 
@@ -46,6 +47,8 @@ class Category extends Equatable {
         return allCategories[8];
       case BusinessType.spa:
         return allCategories[9];
+      case BusinessType.cinema:
+        return allCategories[10];
       default:
         return allCategories[0];
     }

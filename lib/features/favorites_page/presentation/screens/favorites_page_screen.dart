@@ -49,6 +49,8 @@ class _FavoritesPageScreenState extends State<FavoritesPageScreen> {
         _displayedReservations = _allReservations.where((r) => r.reservationType == 'travel').toList();
       } else if (type == 'Spas') {
         _displayedReservations = _allReservations.where((r) => r.reservationType == 'spa').toList();
+      } else if (type == 'Cinémas') {
+        _displayedReservations = _allReservations.where((r) => r.reservationType == 'cinema').toList();
       }
     });
   }
@@ -57,7 +59,6 @@ class _FavoritesPageScreenState extends State<FavoritesPageScreen> {
     await ReservationService.deleteReservation(id);
     _loadReservations();
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -106,7 +107,7 @@ class _FavoritesPageScreenState extends State<FavoritesPageScreen> {
                         color: AppColors.primary,
                         fontWeight: AppFonts.semiBold,
                         fontSize: 14,
-                        fontFamily: 'Poppins'
+                        fontFamily: 'Poppins',
                       ),
                     ),
                   ),
@@ -136,6 +137,8 @@ class _FavoritesPageScreenState extends State<FavoritesPageScreen> {
                     _buildFilterChip('Voyages', () => _filterReservations('Voyages')),
                     const SizedBox(width: 8),
                     _buildFilterChip('Spas', () => _filterReservations('Spas')),
+                    const SizedBox(width: 8),
+                    _buildFilterChip('Cinémas', () => _filterReservations('Cinémas')),
                   ],
                 ),
               ),
@@ -202,51 +205,8 @@ class _FavoritesPageScreenState extends State<FavoritesPageScreen> {
 
     return Column(
       children: [
-        // STATISTIQUES
-        Container(
-          width: double.infinity,
-          padding: const EdgeInsets.all(AppDimens.PADDING_16),
-          margin: const EdgeInsets.fromLTRB(
-            AppDimens.PADDING_16,
-            AppDimens.PADDING_16,
-            AppDimens.PADDING_16,
-            AppDimens.PADDING_8,
-          ),
-          decoration: BoxDecoration(
-            color: AppColors.primary.withOpacity(0.05),
-            borderRadius: BorderRadius.circular(AppDimens.BORDER_RADIUS_16),
-            border: Border.all(
-              color: AppColors.primary.withOpacity(0.1),
-            ),
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              _buildStatItem('Total', _allReservations.length.toString()),
-              _buildStatItem(
-                'Hôtels',
-                _allReservations.where((r) => r.reservationType == 'hotel').length.toString(),
-              ),
-              _buildStatItem(
-                'Restaurants',
-                _allReservations.where((r) => r.reservationType == 'restaurant').length.toString(),
-              ),
-              _buildStatItem(
-                'Locations',
-                _allReservations.where((r) => r.reservationType == 'car_rental').length.toString(),
-              ),
-              _buildStatItem(
-                'Voyages',
-                _allReservations.where((r) => r.reservationType == 'travel').length.toString(),
-              ),
-              _buildStatItem(
-                'Spas',
-                _allReservations.where((r) => r.reservationType == 'spa').length.toString(),
-              ),
-            ],
-          ),
-        ),
 
+        SizedBox(height: AppDimens.PADDING_40,),
         // INDICATEUR DE FILTRE
         if (_selectedFilter != 'Tous' && _displayedReservations.isNotEmpty)
           Padding(
@@ -346,7 +306,7 @@ class _FavoritesPageScreenState extends State<FavoritesPageScreen> {
                 AppDimens.PADDING_16,
                 AppDimens.PADDING_8,
                 AppDimens.PADDING_16,
-                AppDimens.PADDING_16,
+                100,
               ),
               itemCount: _displayedReservations.length,
               itemBuilder: (context, index) {
@@ -417,29 +377,7 @@ class _FavoritesPageScreenState extends State<FavoritesPageScreen> {
     );
   }
 
-  Widget _buildStatItem(String label, String value) {
-    return Column(
-      children: [
-        Text(
-          value,
-          style: TextStyle(
-            fontSize: 20,
-            fontWeight: AppFonts.bold,
-            color: AppColors.primary,
-            fontFamily: AppFonts.primaryFontFamily,
-          ),
-        ),
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: 12,
-            color: AppColors.grey,
-            fontFamily: AppFonts.primaryFontFamily,
-          ),
-        ),
-      ],
-    );
-  }
+
 
   Widget _buildReservationCard(Reservation reservation) {
     return Container(
@@ -592,7 +530,9 @@ class _FavoritesPageScreenState extends State<FavoritesPageScreen> {
                   else if (reservation.reservationType == 'travel')
                       _buildTravelReservationDetails(reservation)
                     else if (reservation.reservationType == 'spa')
-                        _buildSpaReservationDetails(reservation),
+                        _buildSpaReservationDetails(reservation)
+                      else if (reservation.reservationType == 'cinema')
+                          _buildCinemaReservationDetails(reservation),
 
                 const SizedBox(height: AppDimens.PADDING_12),
 
@@ -644,6 +584,8 @@ class _FavoritesPageScreenState extends State<FavoritesPageScreen> {
       return '${reservation.destination ?? "Destination inconnue"} • ${_formatDate(reservation.displayDate)}';
     } else if (reservation.reservationType == 'spa') {
       return '${reservation.treatmentType ?? "Soin"} • ${_formatDate(reservation.appointmentDate!)}';
+    } else if (reservation.reservationType == 'cinema') {
+      return '${reservation.movieTitle ?? "Film"} • ${_formatDate(reservation.showtime!)}';
     } else {
       return '${_formatDate(reservation.date!)} • ${_formatTime(reservation.time!)}';
     }
@@ -765,6 +707,31 @@ class _FavoritesPageScreenState extends State<FavoritesPageScreen> {
         ),
         if (reservation.therapistName != null)
           _buildDetailRow(Icons.person_pin, 'Thérapeute: ${reservation.therapistName}'),
+        if (reservation.notes != null && reservation.notes!.isNotEmpty)
+          _buildDetailRow(Icons.note, reservation.notes!),
+      ],
+    );
+  }
+
+  Widget _buildCinemaReservationDetails(Reservation reservation) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildDetailRow(Icons.movie, reservation.movieTitle ?? 'Film non spécifié'),
+        _buildDetailRow(Icons.person, reservation.customerName),
+        _buildDetailRow(Icons.phone, reservation.phoneNumber),
+        _buildDetailRow(
+          Icons.calendar_today,
+          _formatDate(reservation.showtime!),
+        ),
+        _buildDetailRow(
+          Icons.access_time,
+          '${reservation.showtime!.hour.toString().padLeft(2, '0')}:${reservation.showtime!.minute.toString().padLeft(2, '0')}',
+        ),
+        _buildDetailRow(
+          Icons.confirmation_number,
+          '${reservation.ticketType} x${reservation.numberOfTickets}',
+        ),
         if (reservation.notes != null && reservation.notes!.isNotEmpty)
           _buildDetailRow(Icons.note, reservation.notes!),
       ],

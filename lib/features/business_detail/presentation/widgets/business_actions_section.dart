@@ -1,4 +1,5 @@
 import 'package:baobabe_0_2/features/business_detail/domain/entities/menu_restau.dart';
+import 'package:baobabe_0_2/features/business_detail/presentation/widgets/online_order/cinema_reservation_modal.dart';
 import 'package:baobabe_0_2/features/business_detail/presentation/widgets/online_order/spa_reservation_modal.dart';
 import 'package:baobabe_0_2/features/business_detail/presentation/widgets/online_order/travel_agency_modal.dart';
 import 'package:baobabe_0_2/features/home_page/data/models/ui_business.dart';
@@ -116,6 +117,13 @@ class BusinessActionsSection extends StatelessWidget {
                     icon: "assets/icons/spa-svgrepo-com.svg",
                     label: "Réserver soin",
                     onTap: () => showSpaReservationModal(context, business),
+                  ),
+                if (business.type == BusinessType.cinema)
+                  _buildActionButton(
+                    context,
+                    icon: "assets/icons/cinema-svgrepo-com.svg", // ou Icons.movie
+                    label: "Réserver séance",
+                    onTap: () => showCinemaReservationModal(context, business),
                   ),
               ],
             ),

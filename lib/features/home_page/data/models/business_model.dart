@@ -185,6 +185,8 @@ class BusinessModel {
         return BusinessType.travelAgency;
       case 'spa':
         return BusinessType.spa;
+      case 'cinema':
+        return BusinessType.cinema;
       default:
         return BusinessType.other;
     }
@@ -210,6 +212,8 @@ class BusinessModel {
         return 'travelAgency';
       case BusinessType.spa:
         return 'spa';
+      case BusinessType.cinema:
+        return 'cinema';
       default:
         return 'other';
     }
