@@ -20,10 +20,9 @@ class Category extends Equatable {
     Category(id: '4', name: 'mall', displayName: 'Centres Commerciaux'),
     Category(id: '5', name: 'hotel', displayName: 'Hôtels'),
     Category(id: '6', name: 'carRental', displayName: 'Location Voiture'),
-    Category(id: '7', name: 'detente', displayName: 'Détente'),
-    Category(id: '8', name: 'travelAgency', displayName: 'Voyage'),
-    Category(id: '9', name: 'spa', displayName: 'Spa'),
-    Category(id: "10", name: 'cinema', displayName: 'Cinema')
+    Category(id: '7', name: 'travelAgency', displayName: 'Voyage'),
+    Category(id: '8', name: 'spa', displayName: 'Spa'),
+    Category(id: "9", name: 'cinema', displayName: 'Cinema')
 
   ];
 
@@ -41,14 +40,12 @@ class Category extends Equatable {
         return allCategories[5];
       case BusinessType.carRental:
         return allCategories[6];
-      case BusinessType.detente:
-        return allCategories[7];
       case BusinessType.travelAgency:
-        return allCategories[8];
+        return allCategories[7];
       case BusinessType.spa:
-        return allCategories[9];
+        return allCategories[8];
       case BusinessType.cinema:
-        return allCategories[10];
+        return allCategories[9];
       default:
         return allCategories[0];
     }

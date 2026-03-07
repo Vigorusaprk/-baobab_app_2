@@ -21,8 +21,6 @@ class UIBusiness {
         return Colors.teal;
       case BusinessType.carRental:
         return Colors.indigo;
-      case BusinessType.detente:
-        return Colors.green;
       case BusinessType.travelAgency:
         return Colors.indigoAccent;
       case BusinessType.spa:
@@ -48,8 +46,6 @@ class UIBusiness {
         return Icons.hotel;
       case BusinessType.carRental:
         return Icons.directions_car;
-      case BusinessType.detente:
-        return Icons.spa;
       case BusinessType.travelAgency:
         return Icons.card_travel;
       case BusinessType.spa:

@@ -179,8 +179,6 @@ class BusinessModel {
         return BusinessType.hotel;
       case 'carRental':
         return BusinessType.carRental;
-      case 'detente':
-        return BusinessType.detente;
       case 'travelAgency':
         return BusinessType.travelAgency;
       case 'spa':
@@ -206,8 +204,6 @@ class BusinessModel {
         return 'hotel';
       case BusinessType.carRental:
         return 'carRental';
-      case BusinessType.detente:
-        return 'detente';
       case BusinessType.travelAgency:
         return 'travelAgency';
       case BusinessType.spa:

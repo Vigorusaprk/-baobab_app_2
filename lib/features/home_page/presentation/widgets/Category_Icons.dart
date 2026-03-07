@@ -99,6 +99,7 @@ class CategoryIcons extends StatelessWidget {
                   fontSize: 12,
                   fontWeight: isActive ? FontWeight.w700 : FontWeight.w500,
                   color: isActive ? Colors.black87 : Colors.grey[600],
+                  fontFamily: 'Poppins'
                 ),
               ),
             ),

@@ -7,7 +7,6 @@ enum BusinessType {
   mall,
   hotel,
   carRental,
-  detente,
   travelAgency,
   spa,
   cinema,

@@ -247,8 +247,6 @@ class _OrderScreenState extends State<OrderScreen> {
         return Icons.hotel;
       case BusinessType.carRental:
         return Icons.directions_car;
-      case BusinessType.detente:
-        return Icons.spa;
       case BusinessType.travelAgency:
         return Icons.card_travel;
       case BusinessType.spa:
@@ -273,8 +271,6 @@ class _OrderScreenState extends State<OrderScreen> {
         return Colors.teal;
       case BusinessType.carRental:
         return Colors.indigo;
-      case BusinessType.detente:
-        return Colors.green;
       case BusinessType.travelAgency:
         return Colors.indigoAccent;
       case BusinessType.spa:
@@ -299,8 +295,6 @@ class _OrderScreenState extends State<OrderScreen> {
         return 'Hôtel';
       case BusinessType.carRental:
         return 'Location Voiture';
-      case BusinessType.detente:
-        return 'Détente';
       case BusinessType.travelAgency:
         return 'Agence de voyages';
       case BusinessType.spa:
@@ -406,7 +400,7 @@ class _OrderScreenState extends State<OrderScreen> {
                   '+${order.items.length - 2} autres articles',
                   style: TextStyle(color: Colors.grey[600], fontSize: 13, fontFamily: "Poppins"),
                 ),
-              
+
               SizedBox(height: AppDimens.PADDING_20,),
               Container(
                 padding: EdgeInsets.symmetric(horizontal: AppDimens.PADDING_10, vertical: AppDimens.PADDING_10),

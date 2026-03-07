@@ -47,8 +47,6 @@ class _SearchFilterSheetState extends State<SearchFilterSheet> {
         return 'Hôtels';
       case BusinessType.carRental:
         return 'Location Voiture';
-      case BusinessType.detente:
-        return 'Détente';
       case BusinessType.travelAgency:
         return 'Agences de voyages';
       default:
@@ -70,8 +68,6 @@ class _SearchFilterSheetState extends State<SearchFilterSheet> {
         return Icons.hotel;
       case BusinessType.carRental:
         return Icons.directions_car;
-      case BusinessType.detente:
-        return Icons.spa;
       case BusinessType.travelAgency:
         return Icons.card_travel;
       default:

@@ -23,8 +23,6 @@ class UICategory {
         return Icons.hotel;
       case 'carRental':
         return Icons.directions_car;
-      case 'detente':
-        return Icons.spa;
       case 'travelAgency':
         return Icons.card_travel;
       case 'spa':
@@ -52,8 +50,6 @@ class UICategory {
         return Colors.teal;
       case 'carRental':
         return Colors.blueGrey;
-      case 'detente':
-        return Colors.green;
       case 'travelAgency':
         return Colors.indigoAccent;
       case 'spa':

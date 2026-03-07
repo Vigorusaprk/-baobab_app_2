@@ -198,8 +198,6 @@ class _SearchPageState extends State<SearchPage> {
         return 'Hôtels';
       case BusinessType.carRental:
         return 'Location Voiture';
-      case BusinessType.detente:
-        return 'Détente';
       case BusinessType.travelAgency:
         return 'Agences de voyages';
       default:

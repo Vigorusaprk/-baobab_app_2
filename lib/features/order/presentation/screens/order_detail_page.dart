@@ -170,8 +170,6 @@ class OrderDetailPage extends StatelessWidget {
         return 'Hôtel';
       case BusinessType.carRental:
         return 'Location Voiture';
-      case BusinessType.detente:
-        return 'Détente';
       case BusinessType.travelAgency:
         return 'Agence de voyages';
       case BusinessType.spa:
