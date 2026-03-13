@@ -385,20 +385,7 @@ class _SpaReservationModalState extends State<SpaReservationModal> {
     final treatments = widget.business.specificData['treatments'] as List? ?? [];
 
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Padding(
-          padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
-          child: Text(
-            'Sélectionnez vos soins',
-            style: TextStyle(
-              fontSize: isSmallScreen ? 14 : 16,
-              color: Colors.grey[600],
-            ),
-          ),
-        ),
-        SizedBox(height: isSmallScreen ? 12 : 16),
-
         Expanded(
           child: ListView.builder(
             padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
@@ -411,9 +398,20 @@ class _SpaReservationModalState extends State<SpaReservationModal> {
               final description = treatment['description'] ?? '';
               final isSelected = _data.selectedTreatments.contains(name);
 
-              return Card(
+              return Container(
                 margin: EdgeInsets.only(bottom: isSmallScreen ? 8 : 12),
-                color: isSelected ? AppColors.primary.withOpacity(0.1) : null,
+                decoration: BoxDecoration(
+                  color: isSelected ? AppColors.primary.withOpacity(0.3) : Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                  border: isSelected ? Border.all(width: 2, color: AppColors.primary) : Border.all(width: 2.5, color: Colors.transparent),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.05),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
                 child: InkWell(
                   onTap: () {
                     setState(() {
@@ -424,6 +422,7 @@ class _SpaReservationModalState extends State<SpaReservationModal> {
                       }
                     });
                   },
+                  borderRadius: BorderRadius.circular(12),
                   child: Padding(
                     padding: EdgeInsets.all(isSmallScreen ? 8 : 12),
                     child: Row(
@@ -488,7 +487,6 @@ class _SpaReservationModalState extends State<SpaReservationModal> {
             },
           ),
         ),
-
         // Récapitulatif du panier
         Padding(
           padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
@@ -514,7 +512,6 @@ class _SpaReservationModalState extends State<SpaReservationModal> {
           ),
         ),
         const SizedBox(height: 12),
-
         Padding(
           padding: EdgeInsets.all(horizontalPadding),
           child: SizedBox(
@@ -741,6 +738,13 @@ class _SpaReservationModalState extends State<SpaReservationModal> {
             ),
             filled: true,
             fillColor: Colors.grey[50],
+            focusedBorder: OutlineInputBorder(
+              borderSide: BorderSide(
+                color: AppColors.primary,
+                width: 2.5
+              ),
+              borderRadius: BorderRadius.circular(10)
+            ),
           ),
           keyboardType: keyboardType,
           maxLines: maxLines,
