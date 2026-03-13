@@ -418,9 +418,9 @@ class _OrderScreenState extends State<OrderScreen> {
                     Text(
                       '${order.totalAmount.toStringAsFixed(2)} \$',
                       style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 18,
-                        color: AppColors.primary,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18,
+                          color: AppColors.primary,
                           fontFamily: "Poppins"
                       ),
                     ),

@@ -748,58 +748,66 @@ class BusinessLocalDataSourceImpl implements BusinessLocalDataSource {
 
       BusinessModel(
         id: "13",
-        name: "Cinéma Kin Plaza",
-        address: "Niveau 3, Centre Commercial Kin Plaza, Kinshasa",
-        description: "Le plus grand complexe cinématographique de Kinshasa avec 6 salles équipées en son Dolby Atmos et fauteuils inclinables.",
+        name: "Cinéma Le Palace",
+        address: "123 Avenue des Stars, Kinshasa",
+        description: "Le plus grand complexe cinématographique de la ville avec 8 salles équipées en Dolby Atmos.",
         bgImg: "assets/cinema_cover.jpg",
-        rating: 4.6,
-        reviewCount: 234,
-        openingHours: {"Lundi-Dimanche": "10:00-23:00"},
+        rating: 4.7,
+        reviewCount: 340,
+        openingHours: {"Lundi-Dimanche": "10:00-00:00"},
         type: BusinessType.cinema,
-        phone: "+243 81 777 8888",
-        email: "contact@kinplazacinema.cd",
-        website: "www.kinplazacinema.cd",
+        phone: "+243 81 999 8888",
+        email: "contact@lepalace.cd",
+        website: "www.lepalace.cd",
         images: ["assets/cinema1.jpg", "assets/cinema2.jpg"],
         specificData: {
           "canReserve": true,
           "movies": [
             {
-              "title": "Avatar : La Voie de l'Eau",
-              "duration": 192,
-              "poster": "assets/avatar.jpg",
-              "synopsis": "Jake Sully et Neytiri sont devenus parents. L'histoire se déroule plus d'une décennie après les événements du premier film.",
-              "rating": 4.5
-            },
-            {
-              "title": "Oppenheimer",
+              "id": "mov1",
+              "title": "Avatar 3",
+              "poster": "assets/b2a5c58cb271445de80688a46464aeba.jpg",
               "duration": 180,
-              "poster": "assets/oppenheimer.jpg",
-              "synopsis": "L'histoire du physicien J. Robert Oppenheimer et de son rôle dans le développement de la bombe atomique.",
-              "rating": 4.8
+              "synopsis": "Jake Sully et Neytiri explorent de nouvelles régions de Pandora.",
+              "genre": "Science-fiction",
+              "rating": 4.8,
+              "releaseDate": "2026-12-15",
+              "showtimes": [
+                {"time": "14:30", "price": 12.0, "room": "Salle 1"},
+                {"time": "17:45", "price": 12.0, "room": "Salle 1"},
+                {"time": "21:00", "price": 15.0, "room": "Salle IMAX"},
+              ]
             },
             {
-              "title": "Barbie",
-              "duration": 114,
-              "poster": "assets/barbie.jpg",
-              "synopsis": "Barbie vit à Barbie Land, jusqu'à ce qu'elle soit expulsée pour ne pas être assez parfaite.",
-              "rating": 4.2
+              "id": "mov2",
+              "title": "Dune 2",
+              "poster": "assets/e8115da94017758a7548247a0d5d5df4.jpg",
+              "duration": 165,
+              "synopsis": "Paul Atreides rejoint les Fremen pour venger sa famille.",
+              "genre": "Science-fiction",
+              "rating": 4.7,
+              "releaseDate": "2026-10-20",
+              "showtimes": [
+                {"time": "15:00", "price": 10.0, "room": "Salle 2"},
+                {"time": "18:30", "price": 10.0, "room": "Salle 2"},
+                {"time": "22:00", "price": 12.0, "room": "Salle 2"},
+              ]
             },
             {
-              "title": "Dune : Deuxième partie",
-              "duration": 166,
-              "poster": "assets/dune2.jpg",
-              "synopsis": "Paul Atreides s'unit aux Fremen pour mener une révolte contre ceux qui ont détruit sa famille.",
-              "rating": 4.7
+              "id": "mov3",
+              "title": "Les Animaux Fantastiques 4",
+              "poster": "assets/0fbd112474d56143db77d5794ce92634.jpg",
+              "duration": 142,
+              "synopsis": "Norbert Dragonneau poursuit ses aventures dans le monde des sorciers.",
+              "genre": "Fantastique",
+              "rating": 4.2,
+              "releaseDate": "2026-08-05",
+              "showtimes": [
+                {"time": "13:00", "price": 9.0, "room": "Salle 3"},
+                {"time": "16:15", "price": 9.0, "room": "Salle 3"},
+              ]
             }
-          ],
-          "showtimes": ["10:30", "13:45", "16:30", "19:15", "22:00"],
-          "prices": {
-            "standard": 12.0,
-            "vip": 25.0,
-            "student": 8.0
-          },
-          "amenities": ["Son Dolby Atmos", "Fauteuils inclinables", "Bar", "Parking"],
-          "rooms": 6
+          ]
         },
         reviews: [],
         isFavorite: false,

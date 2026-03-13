@@ -15,6 +15,7 @@ class MenuSection extends StatelessWidget {
   final String? restaurantName;
   final BusinessType? restaurantType;
   final UIBusiness uiBusiness;
+  final Business business;
 
   const MenuSection({
     super.key,
@@ -22,6 +23,7 @@ class MenuSection extends StatelessWidget {
     this.restaurantId,
     this.restaurantName,
     this.restaurantType,
+    required this.business,
     required this.uiBusiness,
   });
 
@@ -45,9 +47,9 @@ class MenuSection extends StatelessWidget {
               floating: false,
               pinned: true,
               flexibleSpace: FlexibleSpaceBar(
-                title: const Text(
-                  "Le Menu ",
-                  style: TextStyle(
+                title: Text(
+                  "Le Menu ${business.name}",
+                  style: const TextStyle(
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
                     shadows: [Shadow(blurRadius: 10, color: Colors.black45)],

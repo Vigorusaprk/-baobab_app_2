@@ -1,3 +1,4 @@
+import 'package:baobabe_0_2/core/themes/app_diemens.dart';
 import 'package:baobabe_0_2/features/home_page/domain/entities/search_filter_entity.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/bloc/search_bloc.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/bloc/search_event.dart';
@@ -70,7 +71,7 @@ class _SearchPageState extends State<SearchPage> {
               child: Row(
                 children: [
                   IconButton(
-                    icon: const Icon(Icons.arrow_back),
+                    icon: const Icon(Icons.arrow_back_ios_new_rounded),
                     onPressed: () => Navigator.pop(context),
                   ),
                   Expanded(
@@ -81,9 +82,17 @@ class _SearchPageState extends State<SearchPage> {
                       },
                     ),
                   ),
-                  IconButton(
-                    icon: const Icon(Icons.filter_list_rounded),
-                    onPressed: () => _showFilterSheet(context),
+
+                  SizedBox(width: 5,),
+                  Container(
+                    decoration: BoxDecoration(
+                      color: AppColors.primary,
+                      borderRadius: BorderRadius.circular(AppDimens.BORDER_RADIUS_50)
+                    ),
+                    child: IconButton(
+                      icon: Icon(Icons.filter_list_rounded, color: AppColors.scaffoldBackground,),
+                      onPressed: () => _showFilterSheet(context),
+                    ),
                   ),
                 ],
               ),
@@ -200,6 +209,10 @@ class _SearchPageState extends State<SearchPage> {
         return 'Location Voiture';
       case BusinessType.travelAgency:
         return 'Agences de voyages';
+      case BusinessType.spa:
+        return 'Sap';
+      case BusinessType.cinema:
+        return 'Cinema';
       default:
         return 'Autre';
     }
@@ -287,7 +300,14 @@ class _SearchPageState extends State<SearchPage> {
                 style: TextStyle(fontSize: 14, color: Colors.grey[600]),
               ),
               const Spacer(),
-              _buildSortDropdown(state),
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 10),
+                decoration: BoxDecoration(
+                  color: AppColors.primary,
+                  borderRadius: BorderRadius.circular(AppDimens.BORDER_RADIUS_10)
+                ),
+                  child: _buildSortDropdown(state),
+              ),
             ],
           ),
         ),
@@ -325,6 +345,9 @@ class _SearchPageState extends State<SearchPage> {
 
   Widget _buildSortDropdown(SearchResultsLoaded state) {
     return DropdownButton<SortBy>(
+      borderRadius: BorderRadius.circular(AppDimens.BORDER_RADIUS_20),
+      dropdownColor: AppColors.primary,
+      style: TextStyle(color: AppColors.scaffoldBackground),
       value: state.activeFilters.sortBy,
       underline: const SizedBox(),
       items: SortBy.values.map((sortBy) {

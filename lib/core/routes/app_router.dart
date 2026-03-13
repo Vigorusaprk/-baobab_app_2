@@ -121,14 +121,14 @@ final GoRouter appRouter = GoRouter(
       },
     ),
     GoRoute(
-      path: '/order-detail',
-      name: 'orderDetail',
-      pageBuilder: (context, state){
-        final order = state.extra as Order;
-        return MaterialPage(
-            child: OrderDetailPage(order: order)
-        );
-      }
+        path: '/order-detail',
+        name: 'orderDetail',
+        pageBuilder: (context, state){
+          final order = state.extra as Order;
+          return MaterialPage(
+              child: OrderDetailPage(order: order)
+          );
+        }
     ),
     GoRoute(
       path: '/reservation-detail',

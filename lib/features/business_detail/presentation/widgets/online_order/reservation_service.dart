@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:baobabe_0_2/core/themes/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -48,6 +49,7 @@ class Reservation {
   final int? durationMinutes;
   final String? therapistName;
   final DateTime? appointmentDate;
+  final List<Map<String, dynamic>>? selectedTreatments; // ← AJOUT
 
   // cinema
   final String? movieTitle;
@@ -99,6 +101,8 @@ class Reservation {
     this.durationMinutes,
     this.therapistName,
     this.appointmentDate,
+    this.selectedTreatments,
+
 
     //cinema
     this.movieTitle,
@@ -152,6 +156,7 @@ class Reservation {
       'durationMinutes': durationMinutes,
       'therapistName': therapistName,
       'appointmentDate': appointmentDate?.toIso8601String(),
+      'selectedTreatments': selectedTreatments,
 
       //cinema
       'movieTitle': movieTitle,
@@ -169,6 +174,8 @@ class Reservation {
       if (parts.length != 2) return null;
       return TimeOfDay(hour: int.parse(parts[0]), minute: int.parse(parts[1]));
     }
+
+
 
     return Reservation(
       id: map['id'],
@@ -213,6 +220,7 @@ class Reservation {
       durationMinutes: map['durationMinutes'],
       therapistName: map['therapistName'],
       appointmentDate: map['appointmentDate'] != null ? DateTime.parse(map['appointmentDate']) : null,
+      selectedTreatments: map['selectedTreatments'] != null ? List<Map<String, dynamic>>.from(map['selectedTreatments']) : null,
 
       //cinema
       movieTitle: map['movieTitle'],
@@ -253,17 +261,17 @@ class Reservation {
       case 'travel': return Icons.directions_bus;
       case 'spa': return Icons.spa;
       case 'cinema': return Icons.movie;
-      default: return Icons.restaurant;
+      default: return Icons.business;
     }
   }
 
   Color get typeColor {
     switch (reservationType) {
-      case 'hotel': return Colors.purple;
-      case 'car_rental': return Colors.teal;
-      case 'travel': return Colors.blue;
-      case 'spa': return Colors.pink;
-      case 'cinema': return Colors.lightBlue;
+      case 'hotel': return AppColors.Hotel;
+      case 'car_rental': return AppColors.CarRental;
+      case 'travel': return AppColors.TravelAgency;
+      case 'spa': return AppColors.Spa;
+      case 'cinema': return AppColors.Cinema;
       default: return Colors.orange;
     }
   }
@@ -276,6 +284,7 @@ class ReservationService {
   static Future<void> saveReservation(Reservation reservation) async {
     final prefs = await SharedPreferences.getInstance();
     final List<String> reservations = prefs.getStringList(_reservationsKey) ?? [];
+    final List<Map<String, dynamic>>? selectedTreatments;
 
     reservations.add(json.encode(reservation.toMap()));
     await prefs.setStringList(_reservationsKey, reservations);
@@ -289,6 +298,7 @@ class ReservationService {
       final map = json.decode(data);
       return Reservation.fromMap(Map<String, dynamic>.from(map));
     }).toList();
+
   }
 
   static Future<void> deleteReservation(String id) async {

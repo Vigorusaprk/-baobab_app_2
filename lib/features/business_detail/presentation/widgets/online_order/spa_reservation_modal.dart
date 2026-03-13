@@ -6,7 +6,7 @@ import 'reservation_service.dart';
 
 // Données temporaires
 class SpaReservationData {
-  String? selectedTreatment;
+  List<String> selectedTreatments = []; // liste des noms de soins sélectionnés
   DateTime? appointmentDate;
   TimeOfDay? appointmentTime;
   String? selectedTherapist;
@@ -14,24 +14,42 @@ class SpaReservationData {
   String? phoneNumber;
   String? notes;
 
-  int? get durationMinutes {
-    // À implémenter si besoin
-    return null;
-  }
-
   double calculateTotal(List<dynamic> treatments) {
-    if (selectedTreatment == null) return 0.0;
-
-    // Recherche manuelle au lieu de firstWhere
-    Map<String, dynamic>? selected;
-    for (final treatment in treatments) {
-      if (treatment is Map && treatment['name'] == selectedTreatment) {
-        selected = Map<String, dynamic>.from(treatment);
-        break;
+    double total = 0.0;
+    for (final name in selectedTreatments) {
+      Map<String, dynamic>? treatment;
+      for (final t in treatments) {
+        if (t is Map && t['name'] == name) {
+          treatment = Map<String, dynamic>.from(t);
+          break;
+        }
+      }
+      if (treatment != null) {
+        total += (treatment['price'] as num?)?.toDouble() ?? 0.0;
       }
     }
-    if (selected == null) return 0.0;
-    return (selected['price'] as num?)?.toDouble() ?? 0.0;
+    return total;
+  }
+
+  List<Map<String, dynamic>> getSelectedTreatmentsWithPrices(List<dynamic> allTreatments) {
+    List<Map<String, dynamic>> result = [];
+    for (final name in selectedTreatments) {
+      Map<String, dynamic>? treatment;
+      for (final t in allTreatments) {
+        if (t is Map && t['name'] == name) {
+          treatment = Map<String, dynamic>.from(t);
+          break;
+        }
+      }
+      if (treatment != null) {
+        result.add({
+          'name': name,
+          'price': treatment['price'],
+          'duration': treatment['duration'],
+        });
+      }
+    }
+    return result;
   }
 }
 
@@ -95,8 +113,8 @@ class _SpaReservationModalState extends State<SpaReservationModal> {
   }
 
   void _nextPage() {
-    if (_pageController.page == 0 && _data.selectedTreatment == null) {
-      _showSnackBar('Veuillez sélectionner un soin');
+    if (_pageController.page == 0 && _data.selectedTreatments.isEmpty) {
+      _showSnackBar('Veuillez sélectionner au moins un soin');
       return;
     }
     if (_pageController.page == 1 && !_validateStep2()) {
@@ -180,6 +198,7 @@ class _SpaReservationModalState extends State<SpaReservationModal> {
     try {
       final treatments = widget.business.specificData['treatments'] as List? ?? [];
       final totalAmount = _data.calculateTotal(treatments);
+      final selectedTreatmentsWithPrices = _data.getSelectedTreatmentsWithPrices(treatments);
 
       // Combiner date et heure
       final appointmentDateTime = DateTime(
@@ -200,10 +219,10 @@ class _SpaReservationModalState extends State<SpaReservationModal> {
         totalAmount: totalAmount,
         reservationDate: DateTime.now(),
         // Champs spécifiques
-        treatmentType: _data.selectedTreatment,
+        treatmentType: null,
         appointmentDate: appointmentDateTime,
         therapistName: _data.selectedTherapist,
-        // On peut stocker la durée si nécessaire
+        selectedTreatments: selectedTreatmentsWithPrices, // liste des soins
       );
 
       await ReservationService.saveReservation(reservation);
@@ -351,7 +370,7 @@ class _SpaReservationModalState extends State<SpaReservationModal> {
   String _getPageTitle(int pageIndex) {
     switch (pageIndex) {
       case 0:
-        return 'Choisir un soin';
+        return 'Choisir vos soins';
       case 1:
         return 'Informations';
       case 2:
@@ -361,7 +380,7 @@ class _SpaReservationModalState extends State<SpaReservationModal> {
     }
   }
 
-  // Page 1 : Sélection du soin
+  // Page 1 : Sélection multiple des soins avec cases à cocher
   Widget _buildSelectTreatmentPage(bool isSmallScreen, double horizontalPadding) {
     final treatments = widget.business.specificData['treatments'] as List? ?? [];
 
@@ -371,7 +390,7 @@ class _SpaReservationModalState extends State<SpaReservationModal> {
         Padding(
           padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
           child: Text(
-            'Quel soin souhaitez-vous ?',
+            'Sélectionnez vos soins',
             style: TextStyle(
               fontSize: isSmallScreen ? 14 : 16,
               color: Colors.grey[600],
@@ -386,64 +405,83 @@ class _SpaReservationModalState extends State<SpaReservationModal> {
             itemCount: treatments.length,
             itemBuilder: (context, index) {
               final treatment = treatments[index];
-              final isSelected = _data.selectedTreatment == treatment['name'];
+              final name = treatment['name'] ?? '';
               final price = (treatment['price'] as num?)?.toDouble() ?? 0.0;
               final duration = treatment['duration'] ?? 0;
               final description = treatment['description'] ?? '';
+              final isSelected = _data.selectedTreatments.contains(name);
 
               return Card(
                 margin: EdgeInsets.only(bottom: isSmallScreen ? 8 : 12),
                 color: isSelected ? AppColors.primary.withOpacity(0.1) : null,
-                child: ListTile(
-                  leading: Icon(
-                    Icons.spa,
-                    color: isSelected ? AppColors.primary : Colors.grey,
-                    size: isSmallScreen ? 20 : 24,
-                  ),
-                  title: Text(
-                    treatment['name'] ?? '',
-                    style: TextStyle(
-                      fontSize: isSmallScreen ? 14 : 16,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  subtitle: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Durée: $duration min',
-                        style: TextStyle(fontSize: isSmallScreen ? 11 : 13),
-                      ),
-                      SizedBox(height: isSmallScreen ? 2 : 4),
-                      Text(
-                        '\$${price.toStringAsFixed(2)}',
-                        style: TextStyle(
-                          fontSize: isSmallScreen ? 12 : 14,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.primary,
+                child: InkWell(
+                  onTap: () {
+                    setState(() {
+                      if (isSelected) {
+                        _data.selectedTreatments.remove(name);
+                      } else {
+                        _data.selectedTreatments.add(name);
+                      }
+                    });
+                  },
+                  child: Padding(
+                    padding: EdgeInsets.all(isSmallScreen ? 8 : 12),
+                    child: Row(
+                      children: [
+                        Checkbox(
+                          value: isSelected,
+                          onChanged: (value) {
+                            setState(() {
+                              if (value == true) {
+                                _data.selectedTreatments.add(name);
+                              } else {
+                                _data.selectedTreatments.remove(name);
+                              }
+                            });
+                          },
+                          activeColor: AppColors.primary,
                         ),
-                      ),
-                      if (description.isNotEmpty) ...[
-                        SizedBox(height: isSmallScreen ? 2 : 4),
-                        Text(
-                          description,
-                          style: TextStyle(
-                            fontSize: isSmallScreen ? 10 : 12,
-                            color: Colors.grey,
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                name,
+                                style: TextStyle(
+                                  fontSize: isSmallScreen ? 14 : 16,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                'Durée: $duration min',
+                                style: TextStyle(fontSize: isSmallScreen ? 11 : 13),
+                              ),
+                              Text(
+                                '\$${price.toStringAsFixed(2)}',
+                                style: TextStyle(
+                                  fontSize: isSmallScreen ? 12 : 14,
+                                  fontWeight: FontWeight.bold,
+                                  color: AppColors.primary,
+                                ),
+                              ),
+                              if (description.isNotEmpty) ...[
+                                const SizedBox(height: 4),
+                                Text(
+                                  description,
+                                  style: TextStyle(
+                                    fontSize: isSmallScreen ? 10 : 12,
+                                    color: Colors.grey,
+                                  ),
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ],
+                            ],
                           ),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
                         ),
                       ],
-                    ],
-                  ),
-                  trailing: isSelected
-                      ? Icon(Icons.check_circle, color: Colors.green, size: isSmallScreen ? 18 : 20)
-                      : null,
-                  onTap: () => setState(() => _data.selectedTreatment = treatment['name']),
-                  contentPadding: EdgeInsets.symmetric(
-                    horizontal: isSmallScreen ? 12 : 16,
-                    vertical: isSmallScreen ? 8 : 12,
+                    ),
                   ),
                 ),
               );
@@ -451,14 +489,40 @@ class _SpaReservationModalState extends State<SpaReservationModal> {
           ),
         ),
 
+        // Récapitulatif du panier
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                '${_data.selectedTreatments.length} soin(s) sélectionné(s)',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: isSmallScreen ? 14 : 16,
+                ),
+              ),
+              Text(
+                'Total: ${_data.calculateTotal(treatments).toStringAsFixed(2)} €',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.primary,
+                  fontSize: isSmallScreen ? 14 : 16,
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 12),
+
         Padding(
           padding: EdgeInsets.all(horizontalPadding),
           child: SizedBox(
             width: double.infinity,
             child: ElevatedButton(
-              onPressed: _data.selectedTreatment != null ? _nextPage : null,
+              onPressed: _data.selectedTreatments.isNotEmpty ? _nextPage : null,
               style: ElevatedButton.styleFrom(
-                backgroundColor: _data.selectedTreatment != null ? AppColors.primary : Colors.grey[300],
+                backgroundColor: _data.selectedTreatments.isNotEmpty ? AppColors.primary : Colors.grey[300],
                 padding: EdgeInsets.symmetric(vertical: isSmallScreen ? 14 : 16),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
               ),
@@ -467,7 +531,7 @@ class _SpaReservationModalState extends State<SpaReservationModal> {
                 style: TextStyle(
                   fontSize: isSmallScreen ? 16 : 18,
                   fontWeight: FontWeight.bold,
-                  color: _data.selectedTreatment != null ? Colors.white : Colors.grey[600],
+                  color: _data.selectedTreatments.isNotEmpty ? Colors.white : Colors.grey[600],
                 ),
               ),
             ),
@@ -636,6 +700,7 @@ class _SpaReservationModalState extends State<SpaReservationModal> {
     );
   }
 
+  // Widgets de champ
   Widget _buildTextField(
       String label,
       String hint,
@@ -790,22 +855,11 @@ class _SpaReservationModalState extends State<SpaReservationModal> {
     );
   }
 
-  // Page 3 : Récapitulatif
+  // Page 3 : Récapitulatif avec liste des soins
   Widget _buildSummaryPage(bool isSmallScreen, double horizontalPadding) {
     final treatments = widget.business.specificData['treatments'] as List? ?? [];
     final totalAmount = _data.calculateTotal(treatments);
-
-    Map<String, dynamic>? selectedTreatment;
-    if (_data.selectedTreatment != null) {
-      for (final treatment in treatments) {
-        if (treatment is Map && treatment['name'] == _data.selectedTreatment) {
-          selectedTreatment = Map<String, dynamic>.from(treatment);
-          break;
-        }
-      }
-    }
-    final price = (selectedTreatment?['price'] as num?)?.toDouble() ?? 0.0;
-    final duration = selectedTreatment?['duration'] ?? 0;
+    final selectedTreatmentsWithPrices = _data.getSelectedTreatmentsWithPrices(treatments);
 
     return Padding(
       padding: EdgeInsets.all(horizontalPadding),
@@ -832,6 +886,7 @@ class _SpaReservationModalState extends State<SpaReservationModal> {
             child: SingleChildScrollView(
               child: Column(
                 children: [
+                  // Informations client
                   Container(
                     padding: EdgeInsets.all(isSmallScreen ? 12 : 16),
                     decoration: BoxDecoration(
@@ -849,11 +904,6 @@ class _SpaReservationModalState extends State<SpaReservationModal> {
                         _buildSummaryRow(
                           "Téléphone",
                           _phoneController.text.isNotEmpty ? _phoneController.text : "Non renseigné",
-                          isSmallScreen,
-                        ),
-                        _buildSummaryRow(
-                          "Soin",
-                          _data.selectedTreatment ?? "Non sélectionné",
                           isSmallScreen,
                         ),
                         _buildSummaryRow(
@@ -884,6 +934,7 @@ class _SpaReservationModalState extends State<SpaReservationModal> {
 
                   SizedBox(height: isSmallScreen ? 12 : 16),
 
+                  // Liste des soins sélectionnés
                   Container(
                     padding: EdgeInsets.all(isSmallScreen ? 12 : 16),
                     decoration: BoxDecoration(
@@ -892,18 +943,34 @@ class _SpaReservationModalState extends State<SpaReservationModal> {
                       border: Border.all(color: Colors.grey[300]!),
                     ),
                     child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _buildPriceRow(
-                          "Prix du soin",
-                          "\$${price.toStringAsFixed(2)}",
-                          isSmallScreen,
+                        const Text(
+                          'Soins sélectionnés',
+                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                         ),
-                        _buildPriceRow(
-                          "Durée",
-                          "$duration min",
-                          isSmallScreen,
-                        ),
-                        const Divider(),
+                        const SizedBox(height: 12),
+                        ...selectedTreatmentsWithPrices.map((item) {
+                          return Padding(
+                            padding: const EdgeInsets.only(bottom: 8),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Expanded(
+                                  child: Text(
+                                    item['name'],
+                                    style: const TextStyle(fontSize: 14),
+                                  ),
+                                ),
+                                Text(
+                                  '${item['price']} €',
+                                  style: const TextStyle(fontWeight: FontWeight.w500),
+                                ),
+                              ],
+                            ),
+                          );
+                        }).toList(),
+                        const Divider(height: 20),
                         _buildPriceRow(
                           "Total",
                           "\$${totalAmount.toStringAsFixed(2)}",
@@ -920,6 +987,7 @@ class _SpaReservationModalState extends State<SpaReservationModal> {
 
           SizedBox(height: isSmallScreen ? 12 : 16),
 
+          // Boutons
           if (isSmallScreen)
             Column(
               children: [

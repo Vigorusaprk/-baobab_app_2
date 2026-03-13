@@ -1,3 +1,4 @@
+import 'package:baobabe_0_2/core/themes/app_colors.dart';
 import 'package:baobabe_0_2/features/home_page/domain/entities/category_entity.dart';
 import 'package:flutter/material.dart';
 
@@ -39,23 +40,23 @@ class UICategory {
       case 'all':
         return Colors.blue;
       case 'restaurant':
-        return Colors.orange;
+        return AppColors.Restaurant;
       case 'fastFood':
-        return Colors.red;
+        return AppColors.FastFood;
       case 'shopping':
-        return Colors.purple;
+        return AppColors.Shopping;
       case 'mall':
-        return Colors.indigo;
+        return AppColors.Mall;
       case 'hotel':
-        return Colors.teal;
+        return AppColors.Hotel;
       case 'carRental':
-        return Colors.blueGrey;
+        return AppColors.CarRental;
       case 'travelAgency':
-        return Colors.indigoAccent;
+        return AppColors.TravelAgency;
       case 'spa':
-        return Colors.purple;
+        return AppColors.Spa;
       case 'cinema':
-        return Colors.lightBlue;
+        return AppColors.Cinema;
       default:
         return Colors.grey;
     }

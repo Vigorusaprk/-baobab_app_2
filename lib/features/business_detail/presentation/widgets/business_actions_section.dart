@@ -1,5 +1,5 @@
 import 'package:baobabe_0_2/features/business_detail/domain/entities/menu_restau.dart';
-import 'package:baobabe_0_2/features/business_detail/presentation/widgets/online_order/cinema_reservation_modal.dart';
+import 'package:baobabe_0_2/features/business_detail/presentation/widgets/online_order/cinema_list_screen.dart';
 import 'package:baobabe_0_2/features/business_detail/presentation/widgets/online_order/spa_reservation_modal.dart';
 import 'package:baobabe_0_2/features/business_detail/presentation/widgets/online_order/travel_agency_modal.dart';
 import 'package:baobabe_0_2/features/home_page/data/models/ui_business.dart';
@@ -7,7 +7,6 @@ import 'package:baobabe_0_2/features/home_page/domain/entities/business_entity.d
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:go_router/go_router.dart';
 import 'online_order/hotel_reservation_modal.dart';
 import 'online_order/menu_section.dart';
 import 'online_order/reservation_modal.dart';
@@ -66,15 +65,6 @@ class BusinessActionsSection extends StatelessWidget {
                     label: "Commander",
                     onTap: () => _orderFood(context, business),
                   ),
-                if (business.type == BusinessType.fastFood &&
-                    business.specificData['hasDelivery'] == true)
-                  _buildActionButton(
-                    context,
-                    icon: "assets/icons/delivery-svgrepo-com.svg",
-                    label: "Commander",
-                    onTap: () => _orderFood(context, business),
-                  ),
-
                 if (business.type == BusinessType.restaurant &&
                     business.specificData['canReserve'] == true)
                   _buildActionButton(
@@ -82,6 +72,14 @@ class BusinessActionsSection extends StatelessWidget {
                     icon: "assets/icons/calendar-date-svgrepo-com (1).svg",
                     label: "Réserver table",
                     onTap: () => showRestaurantReservationModal(context, business),
+                  ),
+                if (business.type == BusinessType.fastFood &&
+                    business.specificData['hasDelivery'] == true)
+                  _buildActionButton(
+                    context,
+                    icon: "assets/icons/delivery-svgrepo-com.svg",
+                    label: "Commander",
+                    onTap: () => _orderFood(context, business),
                   ),
                 if (business.type == BusinessType.hotel)
                   _buildActionButton(
@@ -114,16 +112,27 @@ class BusinessActionsSection extends StatelessWidget {
                 if (business.type == BusinessType.spa)
                   _buildActionButton(
                     context,
-                    icon: "assets/icons/spa-svgrepo-com.svg",
+                    icon: "assets/icons/spa-svgrepo-com.svg", // ou Icons.spa
                     label: "Réserver soin",
                     onTap: () => showSpaReservationModal(context, business),
                   ),
                 if (business.type == BusinessType.cinema)
                   _buildActionButton(
                     context,
-                    icon: "assets/icons/cinema-svgrepo-com.svg", // ou Icons.movie
-                    label: "Réserver séance",
-                    onTap: () => showCinemaReservationModal(context, business),
+                    icon: "assets/icons/movie-svgrepo-com.svg", // ou Icons.movie
+                    label: "Voir films",
+                    onTap: () {
+                      final movies = business.specificData['movies'] as List? ?? [];
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => CinemaListScreen(
+                            cinema: business,
+                            movies: movies,
+                          ),
+                        ),
+                      );
+                    },
                   ),
               ],
             ),
@@ -200,33 +209,22 @@ class BusinessActionsSection extends StatelessWidget {
     if (menuItemsData != null && menuItemsData is List) {
       // Cas 1 : la liste contient déjà des objets MenuItem (données mockées)
       if (menuItemsData.isNotEmpty && menuItemsData.first is MenuItem) {
-        // Utilisation de go_router
-        context.pushNamed(
-          'menu',
-          extra: {
-            'menuItems': menuItemsData.cast<MenuItem>(),
-            'restaurantId': business.id,
-            'restaurantName': business.name,
-            'restaurantType': business.type,
-            'uiBusiness': uiBusiness,
-          },
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) => MenuSection(menuItems: menuItemsData.cast<MenuItem>(), uiBusiness: uiBusiness, business: business,),
+          ),
         );
         return;
       }
-      // Cas 2 : la liste contient des Maps
+      // Cas 2 : la liste contient des Maps (données venant d'une API par exemple)
       else {
         try {
           final List<MenuItem> menuItems = _convertToMenuItemList(menuItemsData);
           if (menuItems.isNotEmpty) {
-            context.pushNamed(
-              'menu',
-              extra: {
-                'menuItems': menuItems,
-                'restaurantId': business.id,
-                'restaurantName': business.name,
-                'restaurantType': business.type,
-                'uiBusiness': uiBusiness,
-              },
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) => MenuSection(menuItems: menuItems, uiBusiness: uiBusiness, business: business,),
+              ),
             );
             return;
           }
@@ -308,7 +306,7 @@ class MallStoresModal extends StatelessWidget {
               ),
               IconButton(
                 icon: const Icon(Icons.close),
-                onPressed: () => Navigator.pop(context), // OK pour une modal
+                onPressed: () => Navigator.pop(context),
               ),
             ],
           ),
@@ -336,8 +334,12 @@ class MallStoresModal extends StatelessWidget {
                     subtitle: Text(store.address),
                     trailing: Icon(Icons.chevron_right, color: Colors.grey.shade400),
                     onTap: () {
-                      // Utilisation de go_router
-                      context.pushNamed('boutiqueDetail', extra: store);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => BoutiqueDetial(businessModel: store,),
+                        ),
+                      );
                     },
                   ),
                 );

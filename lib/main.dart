@@ -90,6 +90,9 @@ class MyApp extends StatelessWidget {
       child: MaterialApp.router(
         debugShowCheckedModeBanner: false,
         routerConfig: appRouter,
+        theme: ThemeData(
+          fontFamily: 'Poppins',
+        ),
         builder: (context, child) {
           // Vérifier le statut de la session au premier build
           WidgetsBinding.instance.addPostFrameCallback((_) {

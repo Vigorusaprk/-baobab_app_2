@@ -34,4 +34,42 @@ class AppColors {
   static const Color black = Colors.black;
   static const Color transparent = Colors.transparent;
   static const Color grey = Color(0xFF9E9E9E);
+
+
+  //type business color
+  static const Color Restaurant = Color(0xFFE53935);
+  static const Color FastFood = Color(0xFFFB8C00);
+  static const Color Shopping = Color(0xFF1E88E5);
+  static const Color Mall = Color(0xFF8E24AA);
+  static const Color Hotel = Color(0xFF3949AB);
+  static const Color CarRental = Color(0xFF2E7D32);
+  static const Color TravelAgency = Color(0xFF00ACC1);
+  static const Color Spa = Color(0xFF66BB6A);
+  static const Color Cinema = Color(0xFFC62828);
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

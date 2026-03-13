@@ -213,13 +213,46 @@ class ReservationDetailPage extends StatelessWidget {
           _buildDetailRow('Passagers', '${reservation.numberOfPassengers ?? 1}'),
         ];
       case 'spa':
+        List<Widget> details = [];
+        // Informations générales
+        details.add(_buildDetailRow('Date', _formatDate(reservation.appointmentDate!)));
+        details.add(_buildDetailRow('Heure',
+            '${reservation.appointmentDate!.hour.toString().padLeft(2, '0')}:${reservation.appointmentDate!.minute.toString().padLeft(2, '0')}'));
+        if (reservation.therapistName != null) {
+          details.add(_buildDetailRow('Thérapeute', reservation.therapistName!));
+        }
+        // Liste des soins sélectionnés
+        if (reservation.selectedTreatments != null && reservation.selectedTreatments!.isNotEmpty) {
+          details.add(const Padding(
+            padding: EdgeInsets.symmetric(vertical: 8),
+            child: Text('Soins réservés :', style: TextStyle(fontWeight: FontWeight.bold)),
+          ));
+          for (var treatment in reservation.selectedTreatments!) {
+            details.add(Padding(
+              padding: const EdgeInsets.only(left: 8, bottom: 4),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(treatment['name'] ?? 'Soin inconnu'),
+                  Text('${treatment['price']} €'),
+                ],
+              ),
+            ));
+          }
+        } else {
+          details.add(_buildDetailRow('Soin', reservation.treatmentType ?? 'Non spécifié'));
+        }
+        return details;
+      case 'cinema':
         return [
-          _buildDetailRow('Soin', reservation.treatmentType ?? 'Non spécifié'),
-          _buildDetailRow('Date', _formatDate(reservation.appointmentDate!)),
-          _buildDetailRow('Heure',
-              '${reservation.appointmentDate!.hour.toString().padLeft(2, '0')}:${reservation.appointmentDate!.minute.toString().padLeft(2, '0')}'),
-          if (reservation.therapistName != null)
-            _buildDetailRow('Thérapeute', reservation.therapistName!),
+          _buildDetailRow('Film', reservation.movieTitle ?? 'Non spécifié'),
+          _buildDetailRow('Séance', reservation.showtime != null
+              ? _formatDateTime(reservation.showtime!)
+              : 'Non spécifiée'),
+          _buildDetailRow('Type de billet', reservation.ticketType ?? 'Standard'),
+          _buildDetailRow('Nombre de places', '${reservation.numberOfTickets ?? 1}'),
+          if (reservation.seatNumbers != null && reservation.seatNumbers!.isNotEmpty)
+            _buildDetailRow('Places', reservation.seatNumbers!),
         ];
       default:
         return [const SizedBox()];
@@ -255,4 +288,8 @@ class ReservationDetailPage extends StatelessWidget {
       return 'À venir';
     }
   }
+}
+
+String _formatDateTime(DateTime dateTime) {
+  return DateFormat('dd/MM/yyyy HH:mm').format(dateTime);
 }
