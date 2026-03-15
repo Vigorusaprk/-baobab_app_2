@@ -216,7 +216,7 @@ class _SearchFilterSheetState extends State<SearchFilterSheet> {
 
                   const SizedBox(height: 24),
 
-                  // Section Tri
+                  // Section de Tri
                   _buildSectionTitle('Trier par'),
                   const SizedBox(height: 12),
                   Wrap(
