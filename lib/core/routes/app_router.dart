@@ -1,3 +1,4 @@
+import 'package:baobabe_0_2/features/auth/presentation/screens/forgot_password_screen.dart';
 import 'package:baobabe_0_2/features/business_detail/presentation/widgets/online_order/plat_detail.dart';
 import 'package:baobabe_0_2/features/business_detail/presentation/widgets/online_order/reservation_service.dart';
 import 'package:baobabe_0_2/features/favorites_page/presentation/screens/boking_detail_screen.dart';
@@ -46,11 +47,11 @@ final GoRouter appRouter = GoRouter(
       name: 'register',
       pageBuilder: (context, state) => const MaterialPage(child: SignUpPage()),
     ),
-    // GoRoute(
-    //   path: '/forgot-password',
-    //   name: 'forgotPassword',
-    //   pageBuilder: (context, state) => const MaterialPage(child: ForgotPasswordPage()),
-    // ),
+     GoRoute(
+       path: '/forgot-password',
+       name: 'forgotPassword',
+       pageBuilder: (context, state) => const MaterialPage(child: ForgotPasswordScreen()),
+     ),
 
     // Shell principal
     StatefulShellRoute.indexedStack(

@@ -49,6 +49,10 @@ class _SearchFilterSheetState extends State<SearchFilterSheet> {
         return 'Location Voiture';
       case BusinessType.travelAgency:
         return 'Agences de voyages';
+      case BusinessType.spa:
+        return 'Spa';
+      case BusinessType.cinema:
+        return 'Cinema';
       default:
         return 'Autre';
     }
@@ -70,6 +74,10 @@ class _SearchFilterSheetState extends State<SearchFilterSheet> {
         return Icons.directions_car;
       case BusinessType.travelAgency:
         return Icons.card_travel;
+      case BusinessType.spa:
+        return Icons.spa;
+      case BusinessType.cinema:
+        return Icons.movie;
       default:
         return Icons.business;
     }

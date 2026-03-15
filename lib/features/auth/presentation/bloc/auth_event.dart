@@ -28,6 +28,11 @@ class AuthSignUpEvent extends AuthEvent {
   List<Object> get props => [name, email, password];
 }
 
+class ForgotPasswordSubmitted extends AuthEvent {
+  final String email;
+  const ForgotPasswordSubmitted(this.email);
+}
+
 class AuthCheckStatusEvent extends AuthEvent {}
 
 class AuthLogoutEvent extends AuthEvent {}
