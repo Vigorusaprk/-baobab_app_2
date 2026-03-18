@@ -11,6 +11,7 @@ class PlatDetail extends StatefulWidget {
   final String? restaurantId;
   final String? restaurantName;
   final BusinessType? restaurantType; // Type de l'établissement
+  final bool isOrderMode;
 
   const PlatDetail({
     super.key,
@@ -18,6 +19,7 @@ class PlatDetail extends StatefulWidget {
     this.restaurantId,
     this.restaurantName,
     this.restaurantType,
+    this.isOrderMode = true,
   });
 
   @override
@@ -191,7 +193,10 @@ class _PlatDetailState extends State<PlatDetail> {
           ),
         ],
       ),
-      bottomNavigationBar: Container(
+      bottomNavigationBar: widget.isOrderMode
+          ? _isLoading
+          ? null
+          : Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
           color: Colors.white,
@@ -205,9 +210,7 @@ class _PlatDetailState extends State<PlatDetail> {
           ],
         ),
         child: SafeArea(
-          child: _isLoading
-              ? const Center(child: CircularProgressIndicator())
-              : Row(
+          child: Row(
             children: [
               Expanded(
                 child: ElevatedButton(
@@ -219,18 +222,15 @@ class _PlatDetailState extends State<PlatDetail> {
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20),
                     ),
-                    elevation: 0,
                   ),
-                  child: const Text(
-                    'Passer commande',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
+                  child: const Text('Passer commande'),
                 ),
               ),
             ],
           ),
         ),
-      ),
+      )
+          : null, // pas de bouton en mode consultation
     );
   }
 

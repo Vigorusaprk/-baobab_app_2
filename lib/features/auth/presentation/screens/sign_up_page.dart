@@ -1,6 +1,7 @@
 import 'package:baobabe_0_2/core/themes/app_colors.dart';
 import 'package:baobabe_0_2/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:baobabe_0_2/features/auth/presentation/screens/auth_screen.dart';
+import 'package:baobabe_0_2/features/auth/presentation/widgets/password_field.dart';
 import 'package:baobabe_0_2/features/main/presentation/screens/main_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -104,11 +105,15 @@ class _SignUpPageState extends State<SignUpPage> {
                           iconPath: "assets/icons/mail-svgrepo-com.svg",
                         ),
                         const SizedBox(height: 16),
-                        _buildTextField(
+                        PasswordField(
                           controller: _passwordController,
                           label: 'Mot de passe',
-                          iconPath: "assets/icons/password-svgrepo-com.svg",
-                          isPassword: true,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Veuillez saisir votre mot de passe';
+                            }
+                            return null;
+                          },
                         ),
                         const SizedBox(height: 24),
                         _buildSignUpButton(),

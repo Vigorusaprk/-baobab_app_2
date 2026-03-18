@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
+import 'sign_up_page.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -16,7 +17,6 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
-  bool _obscurePassword = true;
 
   @override
   void dispose() {
@@ -61,8 +61,7 @@ class _LoginPageState extends State<LoginPage> {
         }
       },
       child: Scaffold(
-        backgroundColor:
-            AppColors.primaryLight, // Fond très clair pour le contraste
+        backgroundColor: AppColors.primaryLight, // Fond très clair pour le contraste
         body: SafeArea(
           child: Center(
             child: SingleChildScrollView(
@@ -90,87 +89,25 @@ class _LoginPageState extends State<LoginPage> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        TextFormField(
+                        _buildTextField(
                           controller: _emailController,
-                          decoration: InputDecoration(
-                            labelText: 'Email',
-                            prefixIcon: SvgPicture.asset(
-                              "assets/icons/mail-svgrepo-com.svg",
-                              colorFilter: const ColorFilter.mode(
-                                AppColors.primary,
-                                BlendMode.srcIn,
-                              ),
-                            ),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(16),
-                              borderSide: BorderSide.none,
-                            ),
-                            filled: true,
-                            fillColor: Colors.grey[50],
-                          ),
-                          keyboardType: TextInputType.emailAddress,
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Veuillez saisir votre email';
-                            }
-                            if (!value.contains('@')) {
-                              return 'Email invalide';
-                            }
-                            return null;
-                          },
+                          label: 'Email',
+                          iconPath: "assets/icons/mail-svgrepo-com.svg",
                         ),
-
                         const SizedBox(height: 20),
-                        TextFormField(
+                        _buildTextField(
                           controller: _passwordController,
-                          obscureText: _obscurePassword,
-                          decoration: InputDecoration(
-                            labelText: 'Mot de passe',
-                            prefixIcon: SvgPicture.asset(
-                              "assets/icons/password-svgrepo-com.svg",
-                              colorFilter: const ColorFilter.mode(
-                                AppColors.primary,
-                                BlendMode.srcIn,
-                              ),
-                            ),
-                            suffixIcon: IconButton(
-                              icon: Icon(
-                                _obscurePassword
-                                    ? Icons.visibility_off
-                                    : Icons.visibility,
-                                color: AppColors.primary,
-                              ),
-                              onPressed: () {
-                                setState(() {
-                                  _obscurePassword = !_obscurePassword;
-                                });
-                              },
-                            ),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(16),
-                              borderSide: BorderSide.none,
-                            ),
-                            filled: true,
-                            fillColor: Colors.grey[50],
-                          ),
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Veuillez saisir votre mot de passe';
-                            }
-                            return null;
-                          },
+                          label: 'Mot de passe',
+                          iconPath: "assets/icons/password-svgrepo-com.svg",
+                          isPassword: true,
                         ),
-                        const SizedBox(height: 16),
                         Align(
                           alignment: Alignment.centerRight,
                           child: TextButton(
-                            onPressed: () => context.push('/forgot-password'),
+                            onPressed: () {},
                             child: const Text(
                               'Mot de passe oublié ?',
-                              style: TextStyle(
-                                color: Color(0xFF254D32),
-                                fontWeight: FontWeight.w600,
-                              ),
+                              style: TextStyle(color: Color(0xFF254D32), fontWeight: FontWeight.w600),
                             ),
                           ),
                         ),
@@ -185,15 +122,9 @@ class _LoginPageState extends State<LoginPage> {
                   const SizedBox(height: 24),
 
                   // Boutons Sociaux
-                  _buildSocialButton(
-                    label: 'Google',
-                    icon: "assets/icons/google.svg",
-                  ),
+                  _buildSocialButton(label: 'Google', icon: "assets/icons/google.svg"),
                   const SizedBox(height: 12),
-                  _buildSocialButton(
-                    label: 'Facebook',
-                    icon: "assets/icons/facebook.svg",
-                  ),
+                  _buildSocialButton(label: 'Facebook', icon: "assets/icons/facebook.svg"),
 
                   const SizedBox(height: 32),
 
@@ -201,22 +132,14 @@ class _LoginPageState extends State<LoginPage> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text(
-                        "Pas de compte ?",
-                        style: TextStyle(color: AppColors.scaffoldBackground),
-                      ),
+                      Text("Pas de compte ?", style: TextStyle(color: AppColors.scaffoldBackground)),
                       TextButton(
                         onPressed: () {
-                          context.go(
-                            '/register',
-                          ); // ← Au lieu de Navigator.push
+                          context.go('/register'); // ← Au lieu de Navigator.push
                         },
                         child: const Text(
                           'Inscrivez-vous',
-                          style: TextStyle(
-                            color: AppColors.scaffoldBackground,
-                            fontWeight: FontWeight.bold,
-                          ),
+                          style: TextStyle(color: AppColors.scaffoldBackground, fontWeight: FontWeight.bold),
                         ),
                       ),
                     ],
@@ -244,27 +167,53 @@ class _LoginPageState extends State<LoginPage> {
           child: SvgPicture.asset(
             "assets/icons/olive-svgrepo-com.svg",
             height: 48,
-            colorFilter: const ColorFilter.mode(
-              Color(0xFF254D32),
-              BlendMode.srcIn,
-            ),
+            colorFilter: const ColorFilter.mode(Color(0xFF254D32), BlendMode.srcIn),
           ),
         ),
         const SizedBox(height: 16),
         const Text(
           'Bienvenue',
-          style: TextStyle(
-            fontSize: 28,
-            fontWeight: FontWeight.bold,
-            letterSpacing: -0.5,
-            color: AppColors.scaffoldBackground,
-          ),
+          style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, letterSpacing: -0.5, color: AppColors.scaffoldBackground),
         ),
         Text(
           'Heureux de vous revoir !',
           style: TextStyle(fontSize: 16, color: Colors.grey[500]),
         ),
       ],
+    );
+  }
+
+  Widget _buildTextField({
+    required TextEditingController controller,
+    required String label,
+    required String iconPath,
+    bool isPassword = false,
+  }) {
+    return TextField(
+      controller: controller,
+      obscureText: isPassword,
+      decoration: InputDecoration(
+        labelText: label,
+        labelStyle: TextStyle(color: Colors.grey[600], fontSize: 14),
+        prefixIcon: Padding(
+          padding: const EdgeInsets.all(12.0),
+          child: SvgPicture.asset(iconPath, colorFilter: const ColorFilter.mode( AppColors.primary, BlendMode.srcIn)),
+        ),
+        filled: true,
+        fillColor: const Color(0xFFF1F3F4),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(16),
+          borderSide: BorderSide.none,
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(16),
+          borderSide: BorderSide.none,
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(16),
+          borderSide: const BorderSide(color: AppColors.primary, width: 1),
+        ),
+      ),
     );
   }
 
@@ -278,21 +227,15 @@ class _LoginPageState extends State<LoginPage> {
             onPressed: state is AuthLoading ? null : _login,
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFF254D32),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
-              ),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
               elevation: 0,
             ),
             child: state is AuthLoading
                 ? const CircularProgressIndicator(color: Colors.white)
                 : const Text(
-                    'Se connecter',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
+              'Se connecter',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
+            ),
           ),
         );
       },
@@ -305,26 +248,14 @@ class _LoginPageState extends State<LoginPage> {
       height: 54,
       child: OutlinedButton.icon(
         style: OutlinedButton.styleFrom(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
           side: BorderSide(color: Colors.grey.withOpacity(0.2)),
           backgroundColor: AppColors.scaffoldBackground,
         ),
-        icon: SvgPicture.asset(
-          icon,
-          height: 30,
-          colorFilter: const ColorFilter.mode(
-            AppColors.primary,
-            BlendMode.srcIn,
-          ),
-        ),
+        icon: SvgPicture.asset(icon, height: 30, colorFilter: const ColorFilter.mode( AppColors.primary, BlendMode.srcIn)),
         label: Text(
           'Continuer avec $label',
-          style: const TextStyle(
-            color: Colors.black87,
-            fontWeight: FontWeight.w500,
-          ),
+          style: const TextStyle(color: Colors.black87, fontWeight: FontWeight.w500),
         ),
         onPressed: () {},
       ),
@@ -337,14 +268,7 @@ class _LoginPageState extends State<LoginPage> {
         Expanded(child: Divider(color: Colors.grey[300])),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: Text(
-            "OU",
-            style: TextStyle(
-              color: Colors.grey[400],
-              fontSize: 12,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
+          child: Text("OU", style: TextStyle(color: Colors.grey[400], fontSize: 12, fontWeight: FontWeight.bold)),
         ),
         Expanded(child: Divider(color: Colors.grey[300])),
       ],
