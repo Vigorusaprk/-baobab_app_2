@@ -1,11 +1,11 @@
 import 'package:baobabe_0_2/core/themes/app_colors.dart';
 import 'package:baobabe_0_2/features/auth/presentation/bloc/auth_bloc.dart';
-import 'package:baobabe_0_2/features/main/presentation/screens/main_screen.dart';
+import 'package:baobabe_0_2/features/auth/presentation/widgets/password_field.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
-import 'sign_up_page.dart';
+
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -95,12 +95,17 @@ class _LoginPageState extends State<LoginPage> {
                           iconPath: "assets/icons/mail-svgrepo-com.svg",
                         ),
                         const SizedBox(height: 20),
-                        _buildTextField(
+                        PasswordField(
                           controller: _passwordController,
                           label: 'Mot de passe',
-                          iconPath: "assets/icons/password-svgrepo-com.svg",
-                          isPassword: true,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Veuillez saisir votre mot de passe';
+                            }
+                            return null;
+                          },
                         ),
+
                         Align(
                           alignment: Alignment.centerRight,
                           child: TextButton(
@@ -202,16 +207,19 @@ class _LoginPageState extends State<LoginPage> {
         filled: true,
         fillColor: const Color(0xFFF1F3F4),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
-          borderSide: BorderSide.none,
+          borderRadius: BorderRadius.circular(12),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
-          borderSide: BorderSide.none,
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: Colors.grey.shade300),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
-          borderSide: const BorderSide(color: AppColors.primary, width: 1),
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: AppColors.primary, width: 2),
+        ),
+        errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: Colors.red),
         ),
       ),
     );
