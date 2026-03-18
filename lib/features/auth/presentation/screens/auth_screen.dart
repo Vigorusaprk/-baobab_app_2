@@ -1,6 +1,10 @@
+import 'dart:ui';
+
 import 'package:baobabe_0_2/core/themes/app_colors.dart';
 import 'package:baobabe_0_2/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:baobabe_0_2/features/auth/presentation/widgets/password_field.dart';
 import 'package:baobabe_0_2/features/main/presentation/screens/main_screen.dart';
+import 'package:baobabe_0_2/features/main/presentation/widgets/app_background.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -60,90 +64,97 @@ class _LoginPageState extends State<LoginPage> {
           );
         }
       },
-      child: Scaffold(
-        backgroundColor: AppColors.primaryLight, // Fond très clair pour le contraste
-        body: Center(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 24),
-            child: Column(
-              children: [
-                // Logo et Titre
-                _buildHeader(),
-                const SizedBox(height: 40),
+      child: authBackground(
+        child: Scaffold(
+          backgroundColor: Colors.transparent, // Fond très clair pour le contraste
+          body: Center(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              child: Column(
+                children: [
+                  // Logo et Titre
+                  _buildHeader(),
+                  const SizedBox(height: 40),
 
-                // Formulaire dans un conteneur épuré
-                Container(
-                  padding: const EdgeInsets.all(24),
-                  decoration: BoxDecoration(
-                    color: AppColors.scaffoldBackground,
-                    borderRadius: BorderRadius.circular(28),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.05),
-                        blurRadius: 20,
-                        offset: const Offset(0, 10),
-                      ),
-                    ],
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _buildTextField(
-                        controller: _emailController,
-                        label: 'Email',
-                        iconPath: "assets/icons/mail-svgrepo-com.svg",
-                      ),
-                      const SizedBox(height: 20),
-                      _buildTextField(
-                        controller: _passwordController,
-                        label: 'Mot de passe',
-                        iconPath: "assets/icons/password-svgrepo-com.svg",
-                        isPassword: true,
-                      ),
-                      Align(
-                        alignment: Alignment.centerRight,
-                        child: TextButton(
-                          onPressed: () {},
-                          child: const Text(
-                            'Mot de passe oublié ?',
-                            style: TextStyle(color: Color(0xFF254D32), fontWeight: FontWeight.w600),
-                          ),
+                  // Formulaire dans un conteneur épuré
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(22),
+                    child: BackdropFilter(
+                      filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
+                      child: Container(
+                        padding: const EdgeInsets.all(24),
+                        decoration: BoxDecoration(
+                          color: AppColors.primary.withOpacity(0.25),
+                          borderRadius: BorderRadius.circular(28),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.05),
+                              blurRadius: 20,
+                              offset: const Offset(0, 10),
+                            ),
+                          ],
+                          border: Border.all(width: 2.5, color: AppColors.primary)
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            _buildTextField(
+                              controller: _emailController,
+                              label: 'Email',
+                              iconPath: "assets/icons/mail-svgrepo-com.svg",
+                            ),
+                            const SizedBox(height: 20),
+                            PasswordField(
+                                controller: _passwordController,
+                                label: 'Mot de passe',
+                            ),
+                            Align(
+                              alignment: Alignment.centerRight,
+                              child: TextButton(
+                                onPressed: () {},
+                                child: const Text(
+                                  'Mot de passe oublié ?',
+                                  style: TextStyle(color: Color(0xFF254D32), fontWeight: FontWeight.w600),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 10),
+                            _buildLoginButton(),
+                          ],
                         ),
                       ),
-                      const SizedBox(height: 10),
-                      _buildLoginButton(),
+                    ),
+                  ),
+
+                  const SizedBox(height: 32),
+                  _buildDivider(),
+                  const SizedBox(height: 24),
+
+                  // Boutons Sociaux
+                  _buildSocialButton(label: 'Google', icon: "assets/icons/google.svg"),
+                  const SizedBox(height: 12),
+                  _buildSocialButton(label: 'Facebook', icon: "assets/icons/facebook.svg"),
+
+                  const SizedBox(height: 32),
+
+                  // Lien d'inscription
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text("Pas de compte ?", style: TextStyle(color: AppColors.primary)),
+                      TextButton(
+                        onPressed: () {
+                          context.go('/register'); // ← Au lieu de Navigator.push
+                        },
+                        child: const Text(
+                          'Inscrivez-vous',
+                          style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold),
+                        ),
+                      ),
                     ],
                   ),
-                ),
-
-                const SizedBox(height: 32),
-                _buildDivider(),
-                const SizedBox(height: 24),
-
-                // Boutons Sociaux
-                _buildSocialButton(label: 'Google', icon: "assets/icons/google.svg"),
-                const SizedBox(height: 12),
-                _buildSocialButton(label: 'Facebook', icon: "assets/icons/facebook.svg"),
-
-                const SizedBox(height: 32),
-
-                // Lien d'inscription
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text("Pas de compte ?", style: TextStyle(color: AppColors.scaffoldBackground)),
-                    TextButton(
-                      onPressed: () {
-                        context.go('/register'); // ← Au lieu de Navigator.push
-                      },
-                      child: const Text(
-                        'Inscrivez-vous',
-                        style: TextStyle(color: AppColors.scaffoldBackground, fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),
@@ -175,7 +186,7 @@ class _LoginPageState extends State<LoginPage> {
         ),
         Text(
           'Heureux de vous revoir !',
-          style: TextStyle(fontSize: 16, color: Colors.grey[500]),
+          style: TextStyle(fontSize: 16, color: AppColors.primary),
         ),
       ],
     );
@@ -263,12 +274,12 @@ class _LoginPageState extends State<LoginPage> {
   Widget _buildDivider() {
     return Row(
       children: [
-        Expanded(child: Divider(color: Colors.grey[300])),
+        Expanded(child: Divider(color: AppColors.primary)),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: Text("OU", style: TextStyle(color: Colors.grey[400], fontSize: 12, fontWeight: FontWeight.bold)),
+          child: Text("OU", style: TextStyle(color: AppColors.primary, fontSize: 12, fontWeight: FontWeight.bold)),
         ),
-        Expanded(child: Divider(color: Colors.grey[300])),
+        Expanded(child: Divider(color: AppColors.primary)),
       ],
     );
   }

@@ -1,8 +1,11 @@
+import 'dart:ui';
+
 import 'package:baobabe_0_2/core/themes/app_colors.dart';
 import 'package:baobabe_0_2/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:baobabe_0_2/features/auth/presentation/screens/auth_screen.dart';
 import 'package:baobabe_0_2/features/auth/presentation/widgets/password_field.dart';
 import 'package:baobabe_0_2/features/main/presentation/screens/main_screen.dart';
+import 'package:baobabe_0_2/features/main/presentation/widgets/app_background.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
@@ -66,10 +69,10 @@ class _SignUpPageState extends State<SignUpPage> {
           );
         }
       },
-      child: Scaffold(
-        backgroundColor: AppColors.primaryLight,
-        body: SafeArea(
-          child: Center(
+      child: authBackground(
+        child: Scaffold(
+          backgroundColor: AppColors.transparent,
+          body: Center(
             child: SingleChildScrollView(
               padding: const EdgeInsets.symmetric(horizontal: 24),
               child: Column(
@@ -78,46 +81,53 @@ class _SignUpPageState extends State<SignUpPage> {
                   const SizedBox(height: 30),
 
                   // Conteneur du Formulaire
-                  Container(
-                    padding: const EdgeInsets.all(24),
-                    decoration: BoxDecoration(
-                      color: AppColors.scaffoldBackground,
-                      borderRadius: BorderRadius.circular(28),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.05),
-                          blurRadius: 20,
-                          offset: const Offset(0, 10),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(22),
+                    child: BackdropFilter(
+                      filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
+                      child: Container(
+                        padding: const EdgeInsets.all(24),
+                        decoration: BoxDecoration(
+                          color: AppColors.primary.withOpacity(0.25),
+                          borderRadius: BorderRadius.circular(28),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.05),
+                              blurRadius: 20,
+                              offset: const Offset(0, 10),
+                            ),
+                          ],
+                          border: Border.all(width: 2.5, color: AppColors.primary)
                         ),
-                      ],
-                    ),
-                    child: Column(
-                      children: [
-                        _buildTextField(
-                          controller: _nameController,
-                          label: 'Nom complet',
-                          iconPath: "assets/icons/profile-round-1346-svgrepo-com.svg",
+                        child: Column(
+                          children: [
+                            _buildTextField(
+                              controller: _nameController,
+                              label: 'Nom complet',
+                              iconPath: "assets/icons/profile-round-1346-svgrepo-com.svg",
+                            ),
+                            const SizedBox(height: 16),
+                            _buildTextField(
+                              controller: _emailController,
+                              label: 'Email',
+                              iconPath: "assets/icons/mail-svgrepo-com.svg",
+                            ),
+                            const SizedBox(height: 16),
+                            PasswordField(
+                              controller: _passwordController,
+                              label: 'Mot de passe',
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Veuillez saisir votre mot de passe';
+                                }
+                                return null;
+                              },
+                            ),
+                            const SizedBox(height: 24),
+                            _buildSignUpButton(),
+                          ],
                         ),
-                        const SizedBox(height: 16),
-                        _buildTextField(
-                          controller: _emailController,
-                          label: 'Email',
-                          iconPath: "assets/icons/mail-svgrepo-com.svg",
-                        ),
-                        const SizedBox(height: 16),
-                        PasswordField(
-                          controller: _passwordController,
-                          label: 'Mot de passe',
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Veuillez saisir votre mot de passe';
-                            }
-                            return null;
-                          },
-                        ),
-                        const SizedBox(height: 24),
-                        _buildSignUpButton(),
-                      ],
+                      ),
                     ),
                   ),
 
@@ -136,14 +146,14 @@ class _SignUpPageState extends State<SignUpPage> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text("Déjà un compte ?", style: TextStyle(color: AppColors.scaffoldBackground)),
+                      Text("Déjà un compte ?", style: TextStyle(color: AppColors.primary)),
                       TextButton(
                         onPressed: () {
                           context.go('/login');
                         },
                         child: const Text(
                           'Connectez-vous',
-                          style: TextStyle(color: AppColors.scaffoldBackground, fontWeight: FontWeight.bold),
+                          style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold),
                         ),
                       ),
                     ],
@@ -179,7 +189,7 @@ class _SignUpPageState extends State<SignUpPage> {
         ),
         Text(
           'Crée vous un comptes',
-          style: TextStyle(fontSize: 16, color: Colors.grey[500]),
+          style: TextStyle(fontSize: 16, color: AppColors.primary),
         ),
       ],
     );
@@ -271,12 +281,12 @@ class _SignUpPageState extends State<SignUpPage> {
   Widget _buildDivider() {
     return Row(
       children: [
-        Expanded(child: Divider(color: Colors.grey[300])),
+        Expanded(child: Divider(color: AppColors.primary)),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: Text("OU", style: TextStyle(color: Colors.grey[400], fontSize: 12, fontWeight: FontWeight.bold)),
+          child: Text("OU", style: TextStyle(color: AppColors.primary, fontSize: 12, fontWeight: FontWeight.bold)),
         ),
-        Expanded(child: Divider(color: Colors.grey[300])),
+        Expanded(child: Divider(color: AppColors.primary)),
       ],
     );
   }
