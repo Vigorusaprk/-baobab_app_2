@@ -6,6 +6,7 @@ import 'package:baobabe_0_2/features/home_page/presentation/bloc/search_state.da
 import 'package:baobabe_0_2/features/home_page/presentation/widgets/filter_chip.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/widgets/search_bar.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/widgets/search_filter_sheet.dart';
+import 'package:baobabe_0_2/features/main/presentation/widgets/main_background.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:baobabe_0_2/core/themes/app_colors.dart';
@@ -60,87 +61,89 @@ class _SearchPageState extends State<SearchPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.scaffoldBackground,
-      body: SafeArea(
-        child: Column(
-          children: [
-            // Barre de recherche fixe
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Row(
-                children: [
-                  IconButton(
-                    icon: const Icon(Icons.arrow_back_ios_new_rounded),
-                    onPressed: () => Navigator.pop(context),
-                  ),
-                  Expanded(
-                    child: SearchAppBar(
-                      controller: _searchController,
-                      onSubmitted: (value) {
-                        _searchBloc.add(SearchQueryChanged(value));
-                      },
+    return MainBackground(
+      child: Scaffold(
+        backgroundColor: AppColors.transparent,
+        body: SafeArea(
+          child: Column(
+            children: [
+              // Barre de recherche fixe
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  children: [
+                    IconButton(
+                      icon: Icon(Icons.arrow_back_ios_new_rounded, color: AppColors.scaffoldBackground,),
+                      onPressed: () => Navigator.pop(context),
                     ),
-                  ),
+                    Expanded(
+                      child: SearchAppBar(
+                        controller: _searchController,
+                        onSubmitted: (value) {
+                          _searchBloc.add(SearchQueryChanged(value));
+                        },
+                      ),
+                    ),
 
-                  SizedBox(width: 5,),
-                  Container(
-                    decoration: BoxDecoration(
-                      color: AppColors.primary,
-                      borderRadius: BorderRadius.circular(AppDimens.BORDER_RADIUS_50)
+                    SizedBox(width: 5,),
+                    Container(
+                      decoration: BoxDecoration(
+                        color: AppColors.primary,
+                        borderRadius: BorderRadius.circular(AppDimens.BORDER_RADIUS_50)
+                      ),
+                      child: IconButton(
+                        icon: Icon(Icons.filter_list_rounded, color: AppColors.scaffoldBackground,),
+                        onPressed: () => _showFilterSheet(context),
+                      ),
                     ),
-                    child: IconButton(
-                      icon: Icon(Icons.filter_list_rounded, color: AppColors.scaffoldBackground,),
-                      onPressed: () => _showFilterSheet(context),
-                    ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
 
-            // Filtres actifs
-            BlocBuilder<SearchBloc, SearchState>(
-              builder: (context, state) {
-                if (state is SearchResultsLoaded && state.activeFilters.hasActiveFilters) {
-                  return _buildActiveFilters(state.activeFilters);
-                } else if (state is SearchLoading && state.activeFilters != null && state.activeFilters!.hasActiveFilters) {
-                  return _buildActiveFilters(state.activeFilters!);
-                }
-                return const SizedBox.shrink();
-              },
-            ),
-
-            // Résultats
-            Expanded(
-              child: BlocBuilder<SearchBloc, SearchState>(
+              // Filtres actifs
+              BlocBuilder<SearchBloc, SearchState>(
                 builder: (context, state) {
-                  if (state is SearchInitial) {
-                    return _buildEmptyState('Recherchez un établissement', Icons.search);
-                  } else if (state is SearchLoading) {
-                    if (state.previousResults != null && state.previousResults!.isNotEmpty) {
-                      return _buildResultsList(
-                        SearchResultsLoaded(
-                          results: state.previousResults!,
-                          activeFilters: state.activeFilters ?? const SearchFilterEntity(),
-                          hasReachedMax: false,
-                        ),
-                        isLoadingMore: true,
-                      );
-                    }
-                    return _buildLoadingState();
-                  } else if (state is SearchError) {
-                    return _buildErrorState(state.message);
-                  } else if (state is SearchResultsLoaded) {
-                    if (state.results.isEmpty) {
-                      return _buildEmptyState('Aucun résultat trouvé', Icons.search_off);
-                    }
-                    return _buildResultsList(state);
+                  if (state is SearchResultsLoaded && state.activeFilters.hasActiveFilters) {
+                    return _buildActiveFilters(state.activeFilters);
+                  } else if (state is SearchLoading && state.activeFilters != null && state.activeFilters!.hasActiveFilters) {
+                    return _buildActiveFilters(state.activeFilters!);
                   }
-                  return const SizedBox();
+                  return const SizedBox.shrink();
                 },
               ),
-            ),
-          ],
+
+              // Résultats
+              Expanded(
+                child: BlocBuilder<SearchBloc, SearchState>(
+                  builder: (context, state) {
+                    if (state is SearchInitial) {
+                      return _buildEmptyState('Recherchez un établissement', Icons.search);
+                    } else if (state is SearchLoading) {
+                      if (state.previousResults != null && state.previousResults!.isNotEmpty) {
+                        return _buildResultsList(
+                          SearchResultsLoaded(
+                            results: state.previousResults!,
+                            activeFilters: state.activeFilters ?? const SearchFilterEntity(),
+                            hasReachedMax: false,
+                          ),
+                          isLoadingMore: true,
+                        );
+                      }
+                      return _buildLoadingState();
+                    } else if (state is SearchError) {
+                      return _buildErrorState(state.message);
+                    } else if (state is SearchResultsLoaded) {
+                      if (state.results.isEmpty) {
+                        return _buildEmptyState('Aucun résultat trouvé', Icons.search_off);
+                      }
+                      return _buildResultsList(state);
+                    }
+                    return const SizedBox();
+                  },
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -297,7 +300,7 @@ class _SearchPageState extends State<SearchPage> {
             children: [
               Text(
                 '${state.results.length} résultat(s)',
-                style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+                style: TextStyle(fontSize: 14, color: AppColors.primary, fontWeight: FontWeight.bold),
               ),
               const Spacer(),
               Container(

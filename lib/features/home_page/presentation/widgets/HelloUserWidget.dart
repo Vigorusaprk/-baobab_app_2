@@ -1,5 +1,6 @@
 import 'package:baobabe_0_2/core/constants/injector.dart';
 import 'package:baobabe_0_2/core/themes/app_diemens.dart';
+import 'package:baobabe_0_2/features/auth/domain/entities/user.dart';
 import 'package:baobabe_0_2/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/bloc/search_bloc.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/screens/search_page.dart';
@@ -15,9 +16,11 @@ class HelloUserWidget extends StatelessWidget {
     return BlocBuilder<AuthBloc, AuthState>(
       builder: (context, state) {
         String userName = 'Utilisateur';
+        UserEntity? user;
 
         if (state is AuthAuthenticated) {
-          userName = state.user.name;
+          user = state.user;
+          userName = user.name;
         }
 
         return Padding(
@@ -66,7 +69,7 @@ class HelloUserWidget extends StatelessWidget {
                         ],
                       ),
                     ),
-                    _buildHeaderNotification(),
+                    _buildProfileImage(user), // ← passe l'utilisateur
                   ],
                 ),
                 const SizedBox(height: 8),
@@ -137,14 +140,101 @@ class HelloUserWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildHeaderNotification() {
+  // Construction de la photo de profil (image ou initiales)
+  Widget _buildProfileImage(UserEntity? user) {
+    if (user == null) {
+      return const SizedBox.shrink();
+    }
+
+    final hasProfile = user.imgUrl != null && user.imgUrl!.isNotEmpty;
+    final avatarColor = _getAvatarColor(user.name);
+    final initials = _getInitials(user.name);
+
     return Container(
-      padding: const EdgeInsets.all(10),
+      height: 65,
+      width: 65,
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.15),
         shape: BoxShape.circle,
+        border: Border.all(color: Colors.white, width: 3),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.3),
+            blurRadius: 6,
+            offset: const Offset(0, 3),
+          ),
+        ],
       ),
-      child: const Icon(Icons.notifications_none_rounded, color: Colors.white, size: 22),
+      child: ClipOval(
+        child: hasProfile
+            ? Image.network(
+          user.imgUrl!,
+          fit: BoxFit.cover,
+          errorBuilder: (context, error, stackTrace) {
+            return _buildInitialsAvatar(avatarColor, initials);
+          },
+        )
+            : _buildInitialsAvatar(avatarColor, initials),
+      ),
     );
+  }
+
+  // Widget pour les initiales dans le cercle
+  Widget _buildInitialsAvatar(Color color, String initials) {
+    return Container(
+      color: color,
+      child: Center(
+        child: Text(
+          initials,
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ),
+    );
+  }
+
+  // Extrait les initiales du nom (ex: "Jean Dupont" -> "JD")
+  String _getInitials(String name) {
+    if (name.isEmpty || name.trim().isEmpty) return "?";
+    final parts = name.trim().split(' ');
+    if (parts.isEmpty) return "?";
+    if (parts.length == 1) {
+      return parts[0][0].toUpperCase();
+    } else {
+      return (parts[0][0] + parts.last[0]).toUpperCase();
+    }
+  }
+
+  // Obtient une couleur cohérente à partir du nom
+  Color _getAvatarColor(String name) {
+    if (name.isEmpty) return Colors.blue;
+
+    // Utilisation d'une liste de couleurs prédéfinies
+    final List<Color> colors = [
+      Colors.red,
+      Colors.pink,
+      Colors.purple,
+      Colors.deepPurple,
+      Colors.indigo,
+      Colors.blue,
+      Colors.lightBlue,
+      Colors.cyan,
+      Colors.teal,
+      Colors.green,
+      Colors.lightGreen,
+      Colors.lime,
+      Colors.yellow,
+      Colors.amber,
+      Colors.orange,
+      Colors.deepOrange,
+      Colors.brown,
+      Colors.grey,
+      Colors.blueGrey,
+    ];
+
+    int index = name.codeUnitAt(0) % colors.length;
+    return colors[index];
   }
 }

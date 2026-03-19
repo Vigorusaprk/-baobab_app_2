@@ -16,6 +16,7 @@ class AuthRepositoryImpl implements AuthRepository {
       final user = UserEntity(
         id: '1',
         name: 'Utilisateur Test',
+        imgUrl: '',
         email: email,
         loginTime: DateTime.now(),
       );
@@ -28,13 +29,14 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<UserEntity> signUp(String name, String email, String password) async {
+  Future<UserEntity> signUp(String name, String email, String password, {String? imgUrl}) async {
     await Future.delayed(const Duration(seconds: 1));
 
     if (name.isNotEmpty && email.isNotEmpty && password.isNotEmpty) {
       final user = UserEntity(
         id: DateTime.now().millisecondsSinceEpoch.toString(),
         name: name,
+        imgUrl: imgUrl,
         email: email,
         loginTime: DateTime.now(),
       );

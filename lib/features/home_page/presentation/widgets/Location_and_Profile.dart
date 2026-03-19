@@ -1,4 +1,5 @@
 // lib/features/location/presentation/widgets/location_and_profile.dart
+import 'package:baobabe_0_2/core/themes/app_colors.dart';
 import 'package:baobabe_0_2/core/themes/app_diemens.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -36,7 +37,7 @@ class LocationAndProfile extends StatelessWidget {
                 ],
               ),
             ),
-            _buildProfileAvatar(),
+            _buildHeaderNotification()
           ],
         ),
       ),
@@ -45,7 +46,7 @@ class LocationAndProfile extends StatelessWidget {
 
   Widget _buildLocationIcon() {
     return Container(
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(15),
       decoration: BoxDecoration(
         color: const Color(0xFF254D32),
         shape: BoxShape.circle,
@@ -96,24 +97,14 @@ class LocationAndProfile extends StatelessWidget {
     );
   }
 
-  Widget _buildProfileAvatar() {
+  Widget _buildHeaderNotification() {
     return Container(
+      padding: const EdgeInsets.all(15),
       decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          border: Border.all(color: Colors.white, width: 2),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.1),
-              blurRadius: 4,
-            )
-          ]
+        color: AppColors.primary,
+        shape: BoxShape.circle,
       ),
-      child: const CircleAvatar(
-        backgroundImage: NetworkImage(
-          'https://randomuser.me/api/portraits/men/1.jpg',
-        ),
-        radius: 22,
-      ),
+      child: const Icon(Icons.notifications_none_rounded, color: Colors.white, size: 22),
     );
   }
 }

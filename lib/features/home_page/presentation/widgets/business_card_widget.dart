@@ -15,7 +15,7 @@ class BusinessCardWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(28),
+        borderRadius: BorderRadius.circular(30),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.12),
@@ -23,6 +23,7 @@ class BusinessCardWidget extends StatelessWidget {
             offset: const Offset(0, 10),
           ),
         ],
+        border: Border.all(color: uiBusiness.categoryColor, width: 2.5)
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(28),
