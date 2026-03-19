@@ -2,6 +2,7 @@ import 'package:baobabe_0_2/core/themes/app_colors.dart';
 import 'package:baobabe_0_2/core/themes/app_diemens.dart';
 import 'package:baobabe_0_2/core/themes/app_fonts.dart';
 import 'package:baobabe_0_2/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:baobabe_0_2/features/main/presentation/widgets/main_background.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:share_plus/share_plus.dart';
@@ -12,150 +13,152 @@ class SettingsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.scaffoldBackground,
-      appBar: AppBar(
-        elevation: 0,
-        backgroundColor: Colors.transparent,
-        title: Text("Paramètres", style: AppFonts.headlineLarge),
-      ),
-      body: ListView(
-        padding: const EdgeInsets.all(16),
-        children: [
-          // Section Générale
-          DetailSection(
-            sectionTitle: "Générale",
-            children: [
-              InfoTile(
-                subtitle: "Profil",
-                icon: Icons.person_outline,
-                onTap: () {
-                  // Naviguer vers la page de profil
-                  // Navigator.push(context, MaterialPageRoute(builder: (_) => ProfileScreen()));
-                },
-              ),
-              const Divider(color: Colors.grey),
-              InfoTile(
-                subtitle: "Notifications",
-                icon: Icons.notifications_none_outlined,
-                onTap: () {
-                  // Ouvrir les réglages de notification
-                },
-                trailing: Switch(
-                  value: true, // À remplacer par la valeur réelle du bloc
-                  onChanged: (value) {
-                    // Changer l'état
+    return MainBackground(
+      child: Scaffold(
+        backgroundColor: AppColors.transparent,
+        appBar: AppBar(
+          elevation: 0,
+          backgroundColor: Colors.transparent,
+          title: Text("Paramètres", style: AppFonts.headlineLarge),
+        ),
+        body: ListView(
+          padding: const EdgeInsets.all(16),
+          children: [
+            // Section Générale
+            DetailSection(
+              sectionTitle: "Générale",
+              children: [
+                InfoTile(
+                  subtitle: "Profil",
+                  icon: Icons.person_outline,
+                  onTap: () {
+                    // Naviguer vers la page de profil
+                    // Navigator.push(context, MaterialPageRoute(builder: (_) => ProfileScreen()));
                   },
                 ),
-              ),
-              const Divider(color: Colors.grey),
-              InfoTile(
-                subtitle: "Langue",
-                icon: Icons.language_outlined,
-                onTap: () => _showLanguageDialog(context),
-                trailing: Text(
-                  "Français",
-                  style: AppFonts.bodySmall?.copyWith(color: AppColors.primary),
+                const Divider(color: Colors.grey),
+                InfoTile(
+                  subtitle: "Notifications",
+                  icon: Icons.notifications_none_outlined,
+                  onTap: () {
+                    // Ouvrir les réglages de notification
+                  },
+                  trailing: Switch(
+                    value: true, // À remplacer par la valeur réelle du bloc
+                    onChanged: (value) {
+                      // Changer l'état
+                    },
+                  ),
                 ),
-              ),
-              const Divider(color: Colors.grey),
-              InfoTile(
-                subtitle: "Thème",
-                icon: Icons.brightness_6_outlined,
-                onTap: () => _showThemeDialog(context),
-                trailing: Text(
-                  "Clair", // À adapter selon le thème actuel
-                  style: AppFonts.bodySmall?.copyWith(color: AppColors.primary),
+                const Divider(color: Colors.grey),
+                InfoTile(
+                  subtitle: "Langue",
+                  icon: Icons.language_outlined,
+                  onTap: () => _showLanguageDialog(context),
+                  trailing: Text(
+                    "Français",
+                    style: AppFonts.bodySmall?.copyWith(color: AppColors.primary),
+                  ),
                 ),
-              ),
-            ],
-          ),
+                const Divider(color: Colors.grey),
+                InfoTile(
+                  subtitle: "Thème",
+                  icon: Icons.brightness_6_outlined,
+                  onTap: () => _showThemeDialog(context),
+                  trailing: Text(
+                    "Clair", // À adapter selon le thème actuel
+                    style: AppFonts.bodySmall?.copyWith(color: AppColors.primary),
+                  ),
+                ),
+              ],
+            ),
 
-          // Section Compte
-          DetailSection(
-            sectionTitle: "Compte",
-            children: [
-              InfoTile(
-                subtitle: "Informations personnelles",
-                icon: Icons.account_circle_outlined,
-                onTap: () {
-                  // Naviguer vers la page d'édition du profil
-                },
-              ),
-              const Divider(color: Colors.grey),
-              InfoTile(
-                subtitle: "Sécurité",
-                icon: Icons.lock_outline,
-                onTap: () {
-                  // Naviguer vers la page de sécurité (changer mot de passe, etc.)
-                },
-              ),
-              const Divider(color: Colors.grey),
-              InfoTile(
-                subtitle: "Déconnexion",
-                icon: Icons.logout,
-                accentColor: AppColors.error,
-                onTap: () => _showLogoutDialog(context),
-              ),
-            ],
-          ),
+            // Section Compte
+            DetailSection(
+              sectionTitle: "Compte",
+              children: [
+                InfoTile(
+                  subtitle: "Informations personnelles",
+                  icon: Icons.account_circle_outlined,
+                  onTap: () {
+                    // Naviguer vers la page d'édition du profil
+                  },
+                ),
+                const Divider(color: Colors.grey),
+                InfoTile(
+                  subtitle: "Sécurité",
+                  icon: Icons.lock_outline,
+                  onTap: () {
+                    // Naviguer vers la page de sécurité (changer mot de passe, etc.)
+                  },
+                ),
+                const Divider(color: Colors.grey),
+                InfoTile(
+                  subtitle: "Déconnexion",
+                  icon: Icons.logout,
+                  accentColor: AppColors.error,
+                  onTap: () => _showLogoutDialog(context),
+                ),
+              ],
+            ),
 
-          // Section Aide
-          DetailSection(
-            sectionTitle: "FAQ & Aide",
-            children: [
-              InfoTile(
-                subtitle: "Centre d'aide",
-                icon: Icons.help_outline,
-                onTap: () {
-                  // Ouvrir une page d'aide
-                },
-              ),
-              const Divider(color: Colors.grey),
-              InfoTile(
-                subtitle: "Contactez-nous",
-                icon: Icons.mail_outline,
-                onTap: () => _launchEmail(),
-              ),
-              const Divider(color: Colors.grey),
-              InfoTile(
-                subtitle: "Partager l'application",
-                icon: Icons.share_outlined,
-                onTap: () => _shareApp(),
-              ),
-            ],
-          ),
+            // Section Aide
+            DetailSection(
+              sectionTitle: "FAQ & Aide",
+              children: [
+                InfoTile(
+                  subtitle: "Centre d'aide",
+                  icon: Icons.help_outline,
+                  onTap: () {
+                    // Ouvrir une page d'aide
+                  },
+                ),
+                const Divider(color: Colors.grey),
+                InfoTile(
+                  subtitle: "Contactez-nous",
+                  icon: Icons.mail_outline,
+                  onTap: () => _launchEmail(),
+                ),
+                const Divider(color: Colors.grey),
+                InfoTile(
+                  subtitle: "Partager l'application",
+                  icon: Icons.share_outlined,
+                  onTap: () => _shareApp(),
+                ),
+              ],
+            ),
 
-          // Section Application
-          DetailSection(
-            sectionTitle: "Application",
-            children: [
-              InfoTile(
-                subtitle: "Version 1.0.0",
-                icon: Icons.info_outline,
-                onTap: () {},
-              ),
-              const Divider(color: Colors.grey),
-              InfoTile(
-                subtitle: "Confidentialité",
-                icon: Icons.privacy_tip_outlined,
-                onTap: () {
-                  // Ouvrir la politique de confidentialité
-                },
-              ),
-              const Divider(color: Colors.grey),
-              InfoTile(
-                subtitle: "Conditions d'utilisation",
-                icon: Icons.description_outlined,
-                onTap: () {
-                  // Ouvrir les conditions
-                },
-              ),
-            ],
-          ),
+            // Section Application
+            DetailSection(
+              sectionTitle: "Application",
+              children: [
+                InfoTile(
+                  subtitle: "Version 1.0.0",
+                  icon: Icons.info_outline,
+                  onTap: () {},
+                ),
+                const Divider(color: Colors.grey),
+                InfoTile(
+                  subtitle: "Confidentialité",
+                  icon: Icons.privacy_tip_outlined,
+                  onTap: () {
+                    // Ouvrir la politique de confidentialité
+                  },
+                ),
+                const Divider(color: Colors.grey),
+                InfoTile(
+                  subtitle: "Conditions d'utilisation",
+                  icon: Icons.description_outlined,
+                  onTap: () {
+                    // Ouvrir les conditions
+                  },
+                ),
+              ],
+            ),
 
-          SizedBox(height: 95,)
-        ],
+            SizedBox(height: 95,)
+          ],
+        ),
       ),
     );
   }

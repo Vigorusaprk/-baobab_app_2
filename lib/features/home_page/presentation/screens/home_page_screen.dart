@@ -7,6 +7,7 @@ import 'package:baobabe_0_2/features/home_page/presentation/widgets/Category_Ico
 import 'package:baobabe_0_2/features/home_page/presentation/widgets/HelloUserWidget.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/widgets/Location_and_Profile.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/widgets/business_cards_widget.dart';
+import 'package:baobabe_0_2/features/main/presentation/widgets/main_background.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -21,33 +22,35 @@ class HomePageScreen extends StatelessWidget {
           create: (context) => Injector.get<BusinessBloc>()..add(LoadBusinesses()),
         ),
       ],
-      child: Scaffold(
-        backgroundColor: AppTheme.silvaTheme.scaffoldBackgroundColor,
-        body: CustomScrollView(
-          physics: const BouncingScrollPhysics(),
-          slivers: [
-            // Header section (Location, Profile, Greeting, Categories)
-            SliverToBoxAdapter(
-              child: Container(
-                padding: const EdgeInsets.symmetric(
-                  vertical: AppDimens.PADDING_40,
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const LocationAndProfile(),
-                    const SizedBox(height: AppDimens.PADDING_20),
-                    const HelloUserWidget(),
-                    const SizedBox(height: AppDimens.PADDING_20),
-                    const CategoryIcons(),
-                    const SizedBox(height: AppDimens.PADDING_30),
-                    const BusinessCardsWidget(),
-                    const SizedBox(height: AppDimens.PADDING_40),
-                  ],
+      child: MainBackground(
+        child: Scaffold(
+          backgroundColor: Colors.transparent,
+          body: CustomScrollView(
+            physics: const BouncingScrollPhysics(),
+            slivers: [
+              // Header section (Location, Profile, Greeting, Categories)
+              SliverToBoxAdapter(
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    vertical: AppDimens.PADDING_40,
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const LocationAndProfile(),
+                      const SizedBox(height: AppDimens.PADDING_20),
+                      const HelloUserWidget(),
+                      const SizedBox(height: AppDimens.PADDING_20),
+                      const CategoryIcons(),
+                      const SizedBox(height: AppDimens.PADDING_30),
+                      const BusinessCardsWidget(),
+                      const SizedBox(height: AppDimens.PADDING_40),
+                    ],
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
