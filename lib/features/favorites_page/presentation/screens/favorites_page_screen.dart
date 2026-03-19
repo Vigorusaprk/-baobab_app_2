@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:baobabe_0_2/core/themes/app_colors.dart';
 import 'package:baobabe_0_2/core/themes/app_diemens.dart';
 import 'package:baobabe_0_2/core/themes/app_fonts.dart';
@@ -333,44 +335,61 @@ class _FavoritesPageScreenState extends State<FavoritesPageScreen> {
               height: 120,
               width: 120,
             ),
-            const SizedBox(height: AppDimens.PADDING_24),
-            Text(
-              'Aucune réservation',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: AppFonts.semiBold,
-                color: AppColors.textPrimary,
-                fontFamily: AppFonts.primaryFontFamily,
-              ),
-            ),
-            const SizedBox(height: AppDimens.PADDING_12),
-            Text(
-              'Vos réservations futures apparaîtront ici',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 16,
-                color: AppColors.grey,
-                fontFamily: AppFonts.primaryFontFamily,
-              ),
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-            ),
-            const SizedBox(height: AppDimens.PADDING_32),
-            ElevatedButton(
-              onPressed: _loadReservations,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary,
-                foregroundColor: AppColors.white,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppDimens.PADDING_24,
-                  vertical: AppDimens.PADDING_12,
+            ClipRRect(
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+                child: Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: AppColors.primary.withOpacity(0.25),
+                    borderRadius: BorderRadius.circular(22),
+                    border: Border.all(color: AppColors.primary, width: 3),
+                  ),
+                  child: Column(
+                    children: [
+                      const SizedBox(height: AppDimens.PADDING_24),
+                      Text(
+                        'Aucune réservation',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: AppFonts.semiBold,
+                          color: AppColors.textPrimary,
+                          fontFamily: AppFonts.primaryFontFamily,
+                        ),
+                      ),
+                      const SizedBox(height: AppDimens.PADDING_12),
+                      Text(
+                        'Vos réservations futures apparaîtront ici',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: AppColors.primary,
+                          fontFamily: AppFonts.primaryFontFamily,
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: AppDimens.PADDING_32),
+                      ElevatedButton(
+                        onPressed: _loadReservations,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.primary,
+                          foregroundColor: AppColors.white,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: AppDimens.PADDING_24,
+                            vertical: AppDimens.PADDING_12,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(AppDimens.BORDER_RADIUS_12),
+                          ),
+                        ),
+                        child: const Text('Actualiser'),
+                      ),
+                    ],
+                  ),
                 ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(AppDimens.BORDER_RADIUS_12),
-                ),
               ),
-              child: const Text('Actualiser'),
-            ),
+            )
           ],
         ),
       ),
