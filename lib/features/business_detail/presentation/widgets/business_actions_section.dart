@@ -132,14 +132,14 @@ class BusinessActionsSection extends StatelessWidget {
                 if (business.type == BusinessType.spa)
                   _buildActionButton(
                     context,
-                    icon: "assets/icons/spa-svgrepo-com.svg", // ou Icons.spa
+                    icon: "assets/icons/calendar-date-svgrepo-com (1).svg", // ou Icons.spa
                     label: "Réserver soin",
                     onTap: () => showSpaReservationModal(context, business),
                   ),
                 if (business.type == BusinessType.cinema)
                   _buildActionButton(
                     context,
-                    icon: "assets/icons/movie-svgrepo-com.svg", // ou Icons.movie
+                    icon: "assets/icons/calendar-date-svgrepo-com (1).svg", // ou Icons.movie
                     label: "Voir films",
                     onTap: () {
                       final movies = business.specificData['movies'] as List? ?? [];

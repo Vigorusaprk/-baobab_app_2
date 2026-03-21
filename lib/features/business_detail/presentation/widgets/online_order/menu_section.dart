@@ -8,6 +8,7 @@ import 'package:baobabe_0_2/features/order/presentation/bloc/cart_bloc.dart';
 import 'package:baobabe_0_2/features/order/presentation/screens/cart_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/svg.dart';
 
 class MenuSection extends StatelessWidget {
   final List<MenuItem> menuItems;
@@ -29,8 +30,7 @@ class MenuSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Regroupement des plats par catégorie
-    final Map<String, List<MenuItem>> groupedItems = {};
+    final groupedItems = <String, List<MenuItem>>{};
     for (var item in menuItems) {
       groupedItems.putIfAbsent(item.itemCategory, () => []).add(item);
     }
@@ -40,200 +40,170 @@ class MenuSection extends StatelessWidget {
       create: (context) => CartCubit(),
       child: Scaffold(
         backgroundColor: AppColors.scaffoldBackground,
-        body: CustomScrollView(
-          slivers: [
-            SliverAppBar(
-              expandedHeight: 200,
-              floating: false,
-              pinned: true,
-              flexibleSpace: FlexibleSpaceBar(
-                title: Text(
-                  "Le Menu ${business.name}",
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                    shadows: [Shadow(blurRadius: 10, color: Colors.black45)],
-                  ),
-                ),
-                background: Stack(
-                  fit: StackFit.expand,
-                  children: [
-                    _buildBackGroudImage(),
-                    const DecoratedBox(
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter,
-                          colors: [Colors.transparent, Colors.black54],
-                        ),
-                      ),
-                    ),
-                  ],
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back_ios, color: AppColors.primary),
+            onPressed: () => Navigator.pop(context),
+          ),
+          title: Row(
+            children: [
+              SvgPicture.asset(
+                'assets/icons/delivery-svgrepo-com.svg',
+                height: 35,
+                colorFilter: ColorFilter.mode(
+                  AppColors.primary,
+                  BlendMode.srcIn,
                 ),
               ),
-              backgroundColor: AppColors.primary,
-              iconTheme: const IconThemeData(color: Colors.white),
-              actions: [
-                BlocBuilder<CartCubit, CartState>(
-                  builder: (context, state) {
-                    final totalItems = context.read<CartCubit>().totalItems;
-                    return Stack(
-                      clipBehavior: Clip.none,
-                      children: [
-                        IconButton(
-                          icon: const Icon(Icons.shopping_cart),
-                          onPressed: () {
-                            final cartCubit = context.read<CartCubit>();
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => BlocProvider.value(
-                                  value: cartCubit,
-                                  child: CartPage(
-                                    restaurantId: restaurantId,
-                                    restaurantName: restaurantName,
-                                    restaurantType: restaurantType,
-                                  ),
-                                ),
-                              ),
-                            );
-                          },
-                        ),
-                        if (totalItems > 0)
-                          Positioned(
-                            right: 4,
-                            top: 4,
-                            child: Container(
-                              padding: const EdgeInsets.all(2),
-                              decoration: BoxDecoration(
-                                color: Colors.red,
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              constraints: const BoxConstraints(
-                                minWidth: 16,
-                                minHeight: 16,
-                              ),
-                              child: Text(
-                                '$totalItems',
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 10,
-                                ),
-                                textAlign: TextAlign.center,
+              const SizedBox(width: 12),
+              Text(
+                'Commander',
+                style: TextStyle(
+                  fontFamily: 'Poppins',
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.primary,
+                  decoration: TextDecoration.none,
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            BlocBuilder<CartCubit, CartState>(
+              builder: (context, state) {
+                final totalItems = context.read<CartCubit>().totalItems;
+                return Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.shopping_cart),
+                      onPressed: () {
+                        final cartCubit = context.read<CartCubit>();
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => BlocProvider.value(
+                              value: cartCubit,
+                              child: CartPage(
+                                restaurantId: restaurantId,
+                                restaurantName: restaurantName,
+                                restaurantType: restaurantType,
                               ),
                             ),
                           ),
-                      ],
-                    );
-                  },
-                ),
-              ],
-            ),
-            if (categories.isEmpty)
-              const SliverFillRemaining(
-                child: Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.restaurant_menu, size: 80, color: Colors.grey),
-                      SizedBox(height: 16),
-                      Text(
-                        "Menu non disponible",
-                        style: TextStyle(fontSize: 18, color: Colors.grey),
-                      ),
-                    ],
-                  ),
-                ),
-              )
-            else
-              ...categories.expand((category) => [
-                SliverPadding(
-                  padding: const EdgeInsets.fromLTRB(16, 24, 16, 8),
-                  sliver: SliverToBoxAdapter(
-                    child: Text(
-                      category,
-                      style: const TextStyle(
-                        fontSize: 22,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.primary,
-                      ),
-                    ),
-                  ),
-                ),
-                SliverPadding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  sliver: SliverList(
-                    delegate: SliverChildBuilderDelegate(
-                          (context, index) {
-                        final menu = groupedItems[category]![index];
-                        return _buildMenuItem(context, menu);
+                        );
                       },
-                      childCount: groupedItems[category]!.length,
                     ),
+                    if (totalItems > 0)
+                      Positioned(
+                        right: 4,
+                        top: 4,
+                        child: Container(
+                          padding: const EdgeInsets.all(2),
+                          decoration: BoxDecoration(
+                            color: Colors.red,
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          constraints: const BoxConstraints(minWidth: 16, minHeight: 16),
+                          child: Text(
+                            '$totalItems',
+                            style: const TextStyle(color: Colors.white, fontSize: 10),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      ),
+                  ],
+                );
+              },
+            ),
+          ],
+        ),
+        body: Column(
+          children: [
+            Expanded(
+              child: Container(
+                decoration: BoxDecoration(
+                  color: AppColors.white,
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(30),
+                    topRight: Radius.circular(30),
                   ),
                 ),
-              ]),
+                child: _buildContent(context, categories, groupedItems),
+              ),
+            ),
           ],
         ),
       ),
     );
   }
 
-  // Widget pour l'image de profil (grande zone)
-  Widget _buildBackGroudImage(){
-    final hasImage = uiBusiness.business.bgImg != null && uiBusiness.business.bgImg!.isNotEmpty;
-    final Color = uiBusiness.categoryColor;
-
-    return Container(
-        width: double.infinity,
-        height: 200,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(28),
-          color: hasImage ? null : uiBusiness.categoryColor, // Fond coloré si pas d'image
+  Widget _buildContent(
+      BuildContext context,
+      List<String> categories,
+      Map<String, List<MenuItem>> groupedItems,
+      ) {
+    if (menuItems.isEmpty) {
+      return const Center(
+        child: Text(
+          'Menu non disponible',
+          style: TextStyle(fontFamily: 'Poppins'),
         ),
-        child: hasImage ?
-        ClipRRect(
-          borderRadius: BorderRadius.circular(28),
-          child: Image.asset(
-            uiBusiness.business.bgImg!,
-            fit: BoxFit.cover,
-            errorBuilder: (context, error, stackTrace) {
-              // Si l'image ne se charge pas, afficher les initiales
-              return _buildInitialsContainer(Color);
-            },
-          ),
-        ) : _buildInitialsContainer(Color)
-    );
-  }
-  Widget _buildInitialsContainer(Color color) {
-    return Container(
-      decoration: BoxDecoration(
-          color: color,
-          borderRadius: BorderRadius.circular(28)
-      ),
-      width: double.infinity,
-      height: 200,
-      child: Center(
-          child: Icon(
-            uiBusiness.categoryIcon,
-            size: 80,
-            color: Colors.white,
-          )
-      ),
+      );
+    }
+
+    return ListView.builder(
+      padding: const EdgeInsets.all(16),
+      itemCount: categories.length,
+      itemBuilder: (context, index) {
+        final category = categories[index];
+        final items = groupedItems[category]!;
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8),
+              child: Text(
+                category,
+                style: const TextStyle(
+                  fontFamily: 'Poppins',
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.primary,
+                  decoration: TextDecoration.none,
+                ),
+              ),
+            ),
+            ListView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: items.length,
+              itemBuilder: (context, idx) {
+                final item = items[idx];
+                return _buildMenuItemCard(context, item);
+              },
+            ),
+            const SizedBox(height: 16),
+          ],
+        );
+      },
     );
   }
 
-  Widget _buildMenuItem(BuildContext context, MenuItem menu) {
+  Widget _buildMenuItemCard(BuildContext context, MenuItem item) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 16),
+      margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
+        color: AppColors.scaffoldBackground,
+        borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
+            color: Colors.black.withOpacity(0.5),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
           ),
         ],
       ),
@@ -243,52 +213,61 @@ class MenuSection extends StatelessWidget {
           onTap: () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (_) => PlatDetail(menuItem: menu)),
+              MaterialPageRoute(
+                builder: (_) => PlatDetail(
+                  menuItem: item,
+                  restaurantId: restaurantId,
+                  restaurantName: restaurantName,
+                  restaurantType: restaurantType,
+                  isOrderMode: true,
+                ),
+              ),
             );
           },
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(16),
           child: Padding(
             padding: const EdgeInsets.all(12),
             child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 ClipRRect(
-                  borderRadius: BorderRadius.circular(16),
+                  borderRadius: BorderRadius.circular(12),
                   child: Image.asset(
-                    menu.imageUrl,
-                    width: 90,
-                    height: 90,
+                    item.imageUrl,
+                    width: 80,
+                    height: 80,
                     fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) {
-                      return Container(
-                        width: 90,
-                        height: 90,
-                        color: Colors.grey[300],
-                        child: const Icon(Icons.fastfood, color: Colors.grey),
-                      );
-                    },
+                    errorBuilder: (_, __, ___) => Container(
+                      width: 80,
+                      height: 80,
+                      color: Colors.grey[300],
+                      child: const Icon(Icons.fastfood),
+                    ),
                   ),
                 ),
-                const SizedBox(width: 16),
+                const SizedBox(width: 12),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        menu.itemName,
+                        item.itemName,
                         style: const TextStyle(
                           fontWeight: FontWeight.bold,
-                          fontSize: 18,
+                          fontSize: 16,
+                          decoration: TextDecoration.none,
                         ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        menu.description,
+                        item.description,
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
                           color: Colors.grey[600],
-                          fontSize: 14,
+                          fontSize: 13,
+                          decoration: TextDecoration.none,
                         ),
                       ),
                       const SizedBox(height: 8),
@@ -296,21 +275,25 @@ class MenuSection extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            "${menu.price.toStringAsFixed(2)} \$",
+                            '${item.price.toStringAsFixed(2)} €',
                             style: const TextStyle(
+                              fontWeight: FontWeight.bold,
                               color: AppColors.primary,
-                              fontWeight: FontWeight.w900,
-                              fontSize: 18,
+                              fontSize: 16,
+                              decoration: TextDecoration.none,
                             ),
                           ),
-                          if (menu.rating > 0)
+                          if (item.rating > 0)
                             Row(
                               children: [
-                                const Icon(Icons.star, color: Colors.amber, size: 18),
+                                const Icon(Icons.star, color: Colors.amber, size: 16),
                                 const SizedBox(width: 4),
                                 Text(
-                                  menu.rating.toString(),
-                                  style: const TextStyle(fontWeight: FontWeight.w500),
+                                  item.rating.toString(),
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.w500,
+                                    decoration: TextDecoration.none,
+                                  ),
                                 ),
                               ],
                             ),
@@ -325,17 +308,13 @@ class MenuSection extends StatelessWidget {
                     shape: BoxShape.circle,
                   ),
                   child: IconButton(
-                    icon: const Icon(
-                      Icons.add_shopping_cart,
-                      color: AppColors.primary,
-                      size: 24,
-                    ),
+                    icon: const Icon(Icons.add_shopping_cart, color: AppColors.primary, size: 24),
                     onPressed: () {
                       final cart = context.read<CartCubit>();
-                      cart.addItem(CartItem(menuItem: menu, quantity: 1));
+                      cart.addItem(CartItem(menuItem: item, quantity: 1));
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
-                          content: Text('${menu.itemName} ajouté au panier'),
+                          content: Text('${item.itemName} ajouté au panier'),
                           duration: const Duration(seconds: 1),
                           behavior: SnackBarBehavior.floating,
                           backgroundColor: AppColors.primary,

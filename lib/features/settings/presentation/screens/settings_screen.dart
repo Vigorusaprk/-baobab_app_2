@@ -19,7 +19,7 @@ class SettingsScreen extends StatelessWidget {
         appBar: AppBar(
           elevation: 0,
           backgroundColor: Colors.transparent,
-          title: Text("Paramètres", style: AppFonts.headlineLarge),
+          title: Text("Paramètres", style: AppFonts.headlineLarge,),
         ),
         body: ListView(
           padding: const EdgeInsets.all(16),
@@ -47,6 +47,7 @@ class SettingsScreen extends StatelessWidget {
                     value: true, // À remplacer par la valeur réelle du bloc
                     onChanged: (value) {
                       // Changer l'état
+
                     },
                   ),
                 ),

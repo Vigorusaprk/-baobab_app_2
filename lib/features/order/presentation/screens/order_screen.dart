@@ -1,5 +1,8 @@
+import 'dart:ui';
+
 import 'package:baobabe_0_2/core/themes/app_diemens.dart';
 import 'package:baobabe_0_2/core/themes/app_fonts.dart';
+import 'package:baobabe_0_2/features/main/presentation/widgets/main_background.dart';
 import 'package:baobabe_0_2/features/order/domain/entities/order.dart';
 import 'package:baobabe_0_2/features/order/presentation/widgets/order_service.dart';
 import 'package:flutter/material.dart';
@@ -53,91 +56,90 @@ class _OrderScreenState extends State<OrderScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: AppColors.scaffoldBackground,
-      child: Column(
-        children: [
-          // SECTION "MES RÉSERVATIONS"
-          Padding(
-            padding: const EdgeInsets.fromLTRB(20, 55, 20, 20),
-            child: Row(
-              children: [
-                SvgPicture.asset(
-                  'assets/icons/order.svg',
-                  height: 35,
-                  colorFilter: ColorFilter.mode(
-                    AppColors.primary,
-                    BlendMode.srcIn,
-                  ),
-                ),
-                const SizedBox(width: AppDimens.PADDING_12),
-                Text(
-                  'Mes Commandes',
-                  style: TextStyle(
-                    fontFamily: AppFonts.primaryFontFamily,
-                    fontSize: 24,
-                    fontWeight: AppFonts.bold,
-                    color: AppColors.primary,
-                  ),
-                ),
-                const Spacer(),
-                if (_allOrders.isNotEmpty)
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: AppDimens.PADDING_12,
-                      vertical: AppDimens.PADDING_6,
+    return MainBackground(
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        body: Padding(
+          padding: EdgeInsets.symmetric(
+            horizontal: MediaQuery.of(context).size.width * 0.05,
+          ),
+          child: Column(
+            children: [
+              // SECTION "MES COMMANDES"
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 55, 20, 20),
+                child: Row(
+                  children: [
+                    SvgPicture.asset(
+                      'assets/icons/order.svg',
+                      height: 35,
+                      colorFilter: ColorFilter.mode(
+                        AppColors.scaffoldBackground,
+                        BlendMode.srcIn,
+                      ),
                     ),
-                    decoration: BoxDecoration(
-                      color: AppColors.primary.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(AppDimens.BORDER_RADIUS_16),
-                    ),
-                    child: Text(
-                      '${_allOrders.length}',
+                    const SizedBox(width: AppDimens.PADDING_12),
+                    Text(
+                      'Mes Commandes',
                       style: TextStyle(
-                        color: AppColors.primary,
-                        fontWeight: AppFonts.semiBold,
-                        fontSize: 14,
+                        fontFamily: AppFonts.primaryFontFamily,
+                        fontSize: 24,
+                        fontWeight: AppFonts.bold,
+                        color: AppColors.scaffoldBackground,
+                      ),
+                    ),
+                    const Spacer(),
+                    if (_allOrders.isNotEmpty)
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: AppDimens.PADDING_12,
+                          vertical: AppDimens.PADDING_6,
+                        ),
+                        decoration: BoxDecoration(
+                          color: AppColors.scaffoldBackground,
+                          borderRadius: BorderRadius.circular(AppDimens.BORDER_RADIUS_16),
+                        ),
+                        child: Text(
+                          '${_allOrders.length}',
+                          style: TextStyle(
+                            color: AppColors.primary,
+                            fontWeight: AppFonts.semiBold,
+                            fontSize: 14,
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+
+              if (_allOrders.isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                      child: Row(
+                        children: [
+                          _buildFilterChip('Toutes', null, _selectedStatusFilter == null),
+                          ..._availableStatuses.map((status) => _buildFilterChip(
+                            status.displayName,
+                            status,
+                            _selectedStatusFilter == status,
+                          )),
+                        ],
                       ),
                     ),
                   ),
-              ],
-            ),
-          ),
-
-          if (_allOrders.isNotEmpty)
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8),
-              child: SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                  child: Row(
-                    children: [
-                      _buildFilterChip('Toutes', null, _selectedStatusFilter == null),
-                      ..._availableStatuses.map((status) => _buildFilterChip(
-                        status.displayName,
-                        status,
-                        _selectedStatusFilter == status,
-                      )),
-                    ],
-                  ),
                 ),
-              ),
-            ),
 
-          Expanded(
-            child: Container(
-              decoration: BoxDecoration(
-                color: AppColors.white,
-                borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(AppDimens.BORDER_RADIUS_30),
-                  topRight: Radius.circular(AppDimens.BORDER_RADIUS_30),
-                ),
+              // Important : Expanded pour contraindre la hauteur
+              Expanded(
+                child: _buildContent(),
               ),
-              child: _buildContent(),
-            ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
@@ -204,28 +206,40 @@ class _OrderScreenState extends State<OrderScreen> {
   }
 
   Widget _buildEmptyState() {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(32),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.shopping_bag_outlined, size: 100, color: Colors.grey[400]),
-            const SizedBox(height: 24),
-            Text(
-              'Aucune commande',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: Colors.grey[800],
-              ),
+    return Padding(
+      padding: const EdgeInsets.all(32),
+      child: ClipRRect(
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+          child: Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: AppColors.primary.withOpacity(0.25),
+              borderRadius: BorderRadius.circular(22),
+              border: Border.all(color: AppColors.primary, width: 3),
             ),
-            const SizedBox(height: 12),
-            Text(
-              'Vos commandes apparaîtront ici',
-              style: TextStyle(fontSize: 16, color: Colors.grey[600]),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.shopping_bag_outlined, size: 100, color: Colors.grey[400]),
+                const SizedBox(height: 24),
+                Text(
+                  'Aucune commande',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.scaffoldBackground,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  'Vos commandes apparaîtront ici',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 16, color: AppColors.primary,),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );

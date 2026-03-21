@@ -1,11 +1,10 @@
-import 'package:baobabe_0_2/features/order/domain/entities/cart_item.dart';
-import 'package:baobabe_0_2/features/order/domain/entities/order.dart';
-import 'package:baobabe_0_2/features/order/presentation/bloc/cart_bloc.dart';
-import 'package:baobabe_0_2/features/order/presentation/widgets/order_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:baobabe_0_2/core/themes/app_colors.dart';
+import 'package:baobabe_0_2/features/order/presentation/bloc/cart_bloc.dart';
+import 'package:baobabe_0_2/features/order/domain/entities/order.dart';
+import 'package:baobabe_0_2/features/order/presentation/widgets/order_service.dart';
 import 'package:baobabe_0_2/features/home_page/domain/entities/business_entity.dart';
+import 'package:baobabe_0_2/core/themes/app_colors.dart';
 
 class CartPage extends StatelessWidget {
   final String? restaurantId;
@@ -21,235 +20,123 @@ class CartPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cubit = context.read<CartCubit>();
+    final state = cubit.state;
+
     return Scaffold(
-      backgroundColor: AppColors.scaffoldBackground,
       appBar: AppBar(
         title: const Text('Mon panier'),
         backgroundColor: Colors.white,
-        elevation: 1,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.delete_sweep),
-            onPressed: () {
-              context.read<CartCubit>().clearCart();
-            },
-          ),
-        ],
       ),
-      body: BlocBuilder<CartCubit, CartState>(
-        builder: (context, state) {
-          if (state.items.isEmpty) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.shopping_cart_outlined, size: 100, color: Colors.grey[400]),
-                  const SizedBox(height: 16),
-                  Text(
-                    'Votre panier est vide',
-                    style: TextStyle(fontSize: 18, color: Colors.grey[600]),
-                  ),
-                ],
-              ),
-            );
-          }
-
-          return Column(
-            children: [
-              Expanded(
-                child: ListView.builder(
-                  padding: const EdgeInsets.all(16),
-                  itemCount: state.items.length,
-                  itemBuilder: (context, index) {
-                    final item = state.items[index];
-                    return _buildCartItem(context, item);
-                  },
-                ),
-              ),
-              _buildBottomBar(context, state),
-            ],
-          );
-        },
-      ),
-    );
-  }
-
-  Widget _buildCartItem(BuildContext context, CartItem item) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Row(
+      body: state.items.isEmpty
+          ? Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.shopping_cart_outlined, size: 80, color: Colors.grey[400]),
+            const SizedBox(height: 16),
+            const Text('Votre panier est vide'),
+          ],
+        ),
+      )
+          : Column(
         children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(12),
-            child: Image.asset(
-              item.menuItem.imageUrl,
-              width: 70,
-              height: 70,
-              fit: BoxFit.cover,
-              errorBuilder: (context, error, stackTrace) {
-                return Container(
-                  width: 70,
-                  height: 70,
-                  color: Colors.grey[300],
-                  child: const Icon(Icons.fastfood, color: Colors.grey),
+          Expanded(
+            child: ListView.builder(
+              padding: const EdgeInsets.all(16),
+              itemCount: state.items.length,
+              itemBuilder: (context, index) {
+                final item = state.items[index];
+                return Card(
+                  child: ListTile(
+                    leading: const Icon(Icons.fastfood),
+                    title: Text(item.menuItem.itemName),
+                    subtitle: Text('${item.menuItem.price} €'),
+                    trailing: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        IconButton(
+                          icon: const Icon(Icons.remove),
+                          onPressed: () => cubit.updateQuantity(item.menuItem, item.quantity - 1),
+                        ),
+                        Text('${item.quantity}'),
+                        IconButton(
+                          icon: const Icon(Icons.add),
+                          onPressed: () => cubit.updateQuantity(item.menuItem, item.quantity + 1),
+                        ),
+                      ],
+                    ),
+                  ),
                 );
               },
             ),
           ),
-          const SizedBox(width: 12),
-          Expanded(
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.05),
+                  blurRadius: 10,
+                  offset: const Offset(0, -4),
+                ),
+              ],
+            ),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  item.menuItem.itemName,
-                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text('Total', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                    Text(
+                      '${cubit.totalPrice.toStringAsFixed(2)} €',
+                      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 4),
-                Text(
-                  '${item.menuItem.price.toStringAsFixed(2)} \$',
-                  style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.w600),
+                const SizedBox(height: 16),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () => _validateOrder(context),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primary,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                    ),
+                    child: const Text('Valider la commande'),
+                  ),
                 ),
               ],
             ),
-          ),
-          Row(
-            children: [
-              IconButton(
-                icon: const Icon(Icons.remove, size: 20),
-                onPressed: () {
-                  context.read<CartCubit>().updateQuantity(
-                    item.menuItem,
-                    item.quantity - 1,
-                  );
-                },
-                color: AppColors.primary,
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8),
-                child: Text(
-                  '${item.quantity}',
-                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                ),
-              ),
-              IconButton(
-                icon: const Icon(Icons.add, size: 20),
-                onPressed: () {
-                  context.read<CartCubit>().updateQuantity(
-                    item.menuItem,
-                    item.quantity + 1,
-                  );
-                },
-                color: AppColors.primary,
-              ),
-            ],
           ),
         ],
       ),
     );
   }
 
-  Widget _buildBottomBar(BuildContext context, CartState state) {
-    final cubit = context.read<CartCubit>();
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(30)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, -4),
-          ),
-        ],
-      ),
-      child: SafeArea(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text(
-                  'Total',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                ),
-                Text(
-                  '${cubit.totalPrice.toStringAsFixed(2)} \$',
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.primary,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () => _placeOrder(context),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primary,
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                ),
-                child: const Text(
-                  'Passer commande',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Future<void> _placeOrder(BuildContext context) async {
+  Future<void> _validateOrder(BuildContext context) async {
     final cubit = context.read<CartCubit>();
     final state = cubit.state;
     if (state.items.isEmpty) return;
 
-    final orderItems = state.items.map((item) {
-      return OrderItem(
-        menuItemId: item.menuItem.itemName, // ID temporaire
-        name: item.menuItem.itemName,
-        price: item.menuItem.price,
-        quantity: item.quantity,
-      );
-    }).toList();
-
-    final subtotal = cubit.totalPrice;
-    const tax = 0.0;
-    final total = subtotal + tax;
+    final orderItems = state.items.map((item) => OrderItem(
+      menuItemId: item.menuItem.itemName,
+      name: item.menuItem.itemName,
+      price: item.menuItem.price,
+      quantity: item.quantity,
+    )).toList();
 
     final order = Order(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
-      establishmentId: restaurantId ?? 'restaurant_inconnu',
-      establishmentName: restaurantName ?? 'Restaurant',
-      establishmentType: restaurantType,
+      establishmentId: restaurantId ?? 'unknown',
+      establishmentName: restaurantName ?? 'Restaurant', // ← nom correct
+      establishmentType: restaurantType,                 // ← type correct
       orderDate: DateTime.now(),
       items: orderItems,
-      subtotal: subtotal,
-      tax: tax,
-      totalAmount: total,
+      subtotal: cubit.totalPrice,
+      tax: 0.0,
+      totalAmount: cubit.totalPrice,
       status: OrderStatus.pending,
       notes: null,
     );
@@ -257,22 +144,15 @@ class CartPage extends StatelessWidget {
     try {
       await OrderService.saveOrder(order);
       cubit.clearCart();
-
       if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Commande passée avec succès !'),
-          backgroundColor: Colors.green,
-        ),
+        const SnackBar(content: Text('Commande validée !'), backgroundColor: Colors.green),
       );
-      Navigator.pop(context);
+      Navigator.pop(context); // Retour au menu
     } catch (e) {
       if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Erreur : $e'),
-          backgroundColor: Colors.red,
-        ),
+        SnackBar(content: Text('Erreur : $e'), backgroundColor: Colors.red),
       );
     }
   }
