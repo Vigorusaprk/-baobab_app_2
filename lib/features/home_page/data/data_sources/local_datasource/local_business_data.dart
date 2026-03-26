@@ -56,12 +56,14 @@ class BusinessLocalDataSourceImpl implements BusinessLocalDataSource {
         return BusinessType.hotel;
       case 'Location Voiture':
         return BusinessType.carRental;
-      case 'Voyage' :
+      case 'Voyage':
         return BusinessType.travelAgency;
-      case 'Spa' :
+      case 'Spa':
         return BusinessType.spa;
-      case 'Cinema' :
+      case 'Cinema':
         return BusinessType.cinema;
+      case 'Toursime':
+        return BusinessType.tourisme;
       default:
         return BusinessType.restaurant;
     }
@@ -272,7 +274,7 @@ class BusinessLocalDataSourceImpl implements BusinessLocalDataSource {
               rating: 4.5,
               price: 5.99,
               description:
-              "Lorem ipsum dolor sit, amet consectetur adipisicing elit. Sunt vel illum, neque fugiat et temporibus deleniti sequi esse iusto repellat. Est eligendi aspernatur consequuntur officia quod recusandae consectetur aliquam sunt!",
+                  "Lorem ipsum dolor sit, amet consectetur adipisicing elit. Sunt vel illum, neque fugiat et temporibus deleniti sequi esse iusto repellat. Est eligendi aspernatur consequuntur officia quod recusandae consectetur aliquam sunt!",
               ingredients: ["Tomate", "Mozzarella", "Basilic", "Huile d'olive"],
             ),
           ],
@@ -334,7 +336,7 @@ class BusinessLocalDataSourceImpl implements BusinessLocalDataSource {
               rating: 4.5,
               price: 12.99,
               description:
-              "Lorem ipsum dolor sit, amet consectetur adipisicing elit. Sunt vel illum, neque fugiat et temporibus deleniti sequi esse iusto repellat. Est eligendi aspernatur consequuntur officia quod recusandae consectetur aliquam sunt!",
+                  "Lorem ipsum dolor sit, amet consectetur adipisicing elit. Sunt vel illum, neque fugiat et temporibus deleniti sequi esse iusto repellat. Est eligendi aspernatur consequuntur officia quod recusandae consectetur aliquam sunt!",
               ingredients: ["Tomate", "Mozzarella", "Basilic", "Huile d'olive"],
             ),
           ],
@@ -677,32 +679,38 @@ class BusinessLocalDataSourceImpl implements BusinessLocalDataSource {
         stores: null,
       ),
 
-
       BusinessModel(
         id: "11",
         name: "Voyages Express",
         address: "123 Avenue du voyage, Kinshasa",
-        description: "Agence spesialiée dans les trajets en bus vers toutes les provinces. Confort et securité farnatis.",
+        description:
+            "Agence spesialiée dans les trajets en bus vers toutes les provinces. Confort et securité farnatis.",
         bgImg: "bgImg",
         rating: 4.5,
         reviewCount: 56,
-        openingHours: {"Lundi-venderedi": "08:00-18:00", "Samedi": "09:00-15:00"},
+        openingHours: {
+          "Lundi-venderedi": "08:00-18:00",
+          "Samedi": "09:00-15:00",
+        },
         type: BusinessType.travelAgency,
         phone: "000 000 0000",
         images: [],
         specificData: {
           "canReserve": true,
-          "destinations":[
+          "destinations": [
             {"name": "Matadi", "price": 25.0, "duration": "5h"},
             {"name": "Kikwit", "price": 30.0, "duration": "8h"},
             {"name": "Lumbubashi", "price": 80.0, "duration": "24h"},
           ],
-          "services": ["Wifi", "Climatisation", "Pris de rechearge", "Bagages inclus"],
+          "services": [
+            "Wifi",
+            "Climatisation",
+            "Pris de rechearge",
+            "Bagages inclus",
+          ],
           "departureTimes": ["06:00", "09:00", "14:00", "18:00"],
         },
-        reviews: [
-
-        ],
+        reviews: [],
         isFavorite: false,
         latitude: -4.4419,
         longitude: 15.2663,
@@ -713,11 +721,15 @@ class BusinessLocalDataSourceImpl implements BusinessLocalDataSource {
         id: "12",
         name: "Spa Détente & Bien-être",
         address: "456 Avenue de la Relaxation, Kinshasa",
-        description: "Un havre de paix offrant des soins de qualité, massages, hammam et soins du visage dans un cadre apaisant.",
+        description:
+            "Un havre de paix offrant des soins de qualité, massages, hammam et soins du visage dans un cadre apaisant.",
         bgImg: "assets/spa_cover.jpg",
         rating: 4.8,
         reviewCount: 120,
-        openingHours: {"Lundi-Samedi": "09:00-20:00", "Dimanche": "10:00-18:00"},
+        openingHours: {
+          "Lundi-Samedi": "09:00-20:00",
+          "Dimanche": "10:00-18:00",
+        },
         type: BusinessType.spa,
         phone: "+243 81 123 4567",
         email: "contact@spa.cd",
@@ -726,11 +738,41 @@ class BusinessLocalDataSourceImpl implements BusinessLocalDataSource {
         specificData: {
           "canReserve": true,
           "treatments": [
-            {"name": "Massage relaxant", "duration": 60, "price": 50.0, "description": "Massage aux huiles essentielles pour détendre les muscles."},
-            {"name": "Massage aux pierres chaudes", "duration": 90, "price": 80.0, "description": "Massage profond avec des pierres volcaniques chaudes."},
-            {"name": "Soin du visage", "duration": 45, "price": 40.0, "description": "Nettoyage, gommage et masque adapté à votre peau."},
-            {"name": "Hammam & Gommage", "duration": 60, "price": 55.0, "description": "Séance de hammam suivie d'un gommage au savon noir."},
-            {"name": "Forfait Bien-être", "duration": 120, "price": 130.0, "description": "Massage relaxant + soin du visage + accès hammam."},
+            {
+              "name": "Massage relaxant",
+              "duration": 60,
+              "price": 50.0,
+              "description":
+                  "Massage aux huiles essentielles pour détendre les muscles.",
+            },
+            {
+              "name": "Massage aux pierres chaudes",
+              "duration": 90,
+              "price": 80.0,
+              "description":
+                  "Massage profond avec des pierres volcaniques chaudes.",
+            },
+            {
+              "name": "Soin du visage",
+              "duration": 45,
+              "price": 40.0,
+              "description":
+                  "Nettoyage, gommage et masque adapté à votre peau.",
+            },
+            {
+              "name": "Hammam & Gommage",
+              "duration": 60,
+              "price": 55.0,
+              "description":
+                  "Séance de hammam suivie d'un gommage au savon noir.",
+            },
+            {
+              "name": "Forfait Bien-être",
+              "duration": 120,
+              "price": 130.0,
+              "description":
+                  "Massage relaxant + soin du visage + accès hammam.",
+            },
           ],
           "therapists": [
             {"name": "Sophie", "specialty": "Massages"},
@@ -750,7 +792,8 @@ class BusinessLocalDataSourceImpl implements BusinessLocalDataSource {
         id: "13",
         name: "Cinéma Le Palace",
         address: "123 Avenue des Stars, Kinshasa",
-        description: "Le plus grand complexe cinématographique de la ville avec 8 salles équipées en Dolby Atmos.",
+        description:
+            "Le plus grand complexe cinématographique de la ville avec 8 salles équipées en Dolby Atmos.",
         bgImg: "assets/cinema_cover.jpg",
         rating: 4.7,
         reviewCount: 340,
@@ -768,7 +811,8 @@ class BusinessLocalDataSourceImpl implements BusinessLocalDataSource {
               "title": "Avatar 3",
               "poster": "assets/b2a5c58cb271445de80688a46464aeba.jpg",
               "duration": 180,
-              "synopsis": "Jake Sully et Neytiri explorent de nouvelles régions de Pandora.",
+              "synopsis":
+                  "Jake Sully et Neytiri explorent de nouvelles régions de Pandora.",
               "genre": "Science-fiction",
               "rating": 4.8,
               "releaseDate": "2026-12-15",
@@ -776,14 +820,15 @@ class BusinessLocalDataSourceImpl implements BusinessLocalDataSource {
                 {"time": "14:30", "price": 12.0, "room": "Salle 1"},
                 {"time": "17:45", "price": 12.0, "room": "Salle 1"},
                 {"time": "21:00", "price": 15.0, "room": "Salle IMAX"},
-              ]
+              ],
             },
             {
               "id": "mov2",
               "title": "Dune 2",
               "poster": "assets/e8115da94017758a7548247a0d5d5df4.jpg",
               "duration": 165,
-              "synopsis": "Paul Atreides rejoint les Fremen pour venger sa famille.",
+              "synopsis":
+                  "Paul Atreides rejoint les Fremen pour venger sa famille.",
               "genre": "Science-fiction",
               "rating": 4.7,
               "releaseDate": "2026-10-20",
@@ -791,30 +836,48 @@ class BusinessLocalDataSourceImpl implements BusinessLocalDataSource {
                 {"time": "15:00", "price": 10.0, "room": "Salle 2"},
                 {"time": "18:30", "price": 10.0, "room": "Salle 2"},
                 {"time": "22:00", "price": 12.0, "room": "Salle 2"},
-              ]
+              ],
             },
             {
               "id": "mov3",
               "title": "Les Animaux Fantastiques 4",
               "poster": "assets/0fbd112474d56143db77d5794ce92634.jpg",
               "duration": 142,
-              "synopsis": "Norbert Dragonneau poursuit ses aventures dans le monde des sorciers.",
+              "synopsis":
+                  "Norbert Dragonneau poursuit ses aventures dans le monde des sorciers.",
               "genre": "Fantastique",
               "rating": 4.2,
               "releaseDate": "2026-08-05",
               "showtimes": [
                 {"time": "13:00", "price": 9.0, "room": "Salle 3"},
                 {"time": "16:15", "price": 9.0, "room": "Salle 3"},
-              ]
-            }
-          ]
+              ],
+            },
+          ],
         },
         reviews: [],
         isFavorite: false,
         latitude: -4.4419,
         longitude: 15.2663,
         stores: null,
-      )
+      ),
+
+      BusinessModel(
+        id: "14",
+        name: "name",
+        address: "address",
+        description: "description",
+        bgImg: "",
+        rating: 5,
+        reviewCount: 3,
+        openingHours: {"Lundi-Dimanche": "10:00-00:00"},
+        type: BusinessType.tourisme,
+        phone: "000-000-000",
+        images: [],
+        specificData: {},
+        reviews: [],
+        isFavorite: true,
+      ),
     ];
   }
 }

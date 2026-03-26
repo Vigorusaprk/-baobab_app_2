@@ -68,6 +68,13 @@ class RestaurantMenuPage extends StatelessWidget {
             topLeft: Radius.circular(AppDimens.BORDER_RADIUS_30),
             topRight: Radius.circular(AppDimens.BORDER_RADIUS_30),
           ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.7),
+              blurRadius: 20,
+              offset: const Offset(0, 10),
+            ),
+          ],
         ),
         child: _buildContent(context, categories, groupedItems),
       ),

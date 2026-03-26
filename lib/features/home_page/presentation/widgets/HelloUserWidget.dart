@@ -69,7 +69,12 @@ class HelloUserWidget extends StatelessWidget {
                         ],
                       ),
                     ),
-                    _buildProfileImage(user), // ← passe l'utilisateur
+                    GestureDetector(
+                      onTap: () {
+                        context.pushNamed('profil-page');
+                      },
+                        child: _buildProfileImage(user),
+                    ), // ← passe l'utilisateur
                   ],
                 ),
                 const SizedBox(height: 8),

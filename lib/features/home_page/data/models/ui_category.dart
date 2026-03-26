@@ -30,6 +30,8 @@ class UICategory {
         return Icons.spa;
       case 'cinema':
         return Icons.movie;
+      case 'tourisme':
+        return Icons.tour_rounded;
       default:
         return Icons.business;
     }
@@ -57,6 +59,8 @@ class UICategory {
         return AppColors.Spa;
       case 'cinema':
         return AppColors.Cinema;
+      case 'tourisme':
+        return AppColors.Tourisme;
       default:
         return Colors.grey;
     }

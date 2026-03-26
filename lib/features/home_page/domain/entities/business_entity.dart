@@ -10,6 +10,7 @@ enum BusinessType {
   travelAgency,
   spa,
   cinema,
+  tourisme,
   other
 }
 

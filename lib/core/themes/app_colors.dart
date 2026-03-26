@@ -46,6 +46,7 @@ class AppColors {
   static const Color TravelAgency = Color(0xFF00ACC1);
   static const Color Spa = Color(0xFF66BB6A);
   static const Color Cinema = Color(0xFFC62828);
+  static const Color Tourisme = Color(0xFF704545);
 
   static const List<Color> avatarColors = [
     Color(0xFFFF7D53),

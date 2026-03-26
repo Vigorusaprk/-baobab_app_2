@@ -130,6 +130,13 @@ class MenuSection extends StatelessWidget {
                     topLeft: Radius.circular(30),
                     topRight: Radius.circular(30),
                   ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.7),
+                      blurRadius: 20,
+                      offset: const Offset(0, 10),
+                    ),
+                  ],
                 ),
                 child: _buildContent(context, categories, groupedItems),
               ),
