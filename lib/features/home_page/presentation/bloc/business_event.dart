@@ -10,7 +10,7 @@ abstract class BusinessEvent extends Equatable {
 class LoadBusinesses extends BusinessEvent {}
 
 class LoadBusinessesByCategory extends BusinessEvent {
-  final String category;
+  final BusinessType category; // Le nom doit être 'category'
 
   const LoadBusinessesByCategory(this.category);
 

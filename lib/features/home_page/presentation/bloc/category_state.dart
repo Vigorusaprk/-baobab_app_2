@@ -12,12 +12,12 @@ class CategoryInitial extends CategoryState {}
 class CategoryLoading extends CategoryState {}
 
 class CategoriesLoaded extends CategoryState {
-  final List<String> categories; // Noms d'affichage des catégories
-  final String selectedCategory;
+  final List<Category> categories;
+  final Category selectedCategory;
 
   const CategoriesLoaded({
     required this.categories,
-    this.selectedCategory = 'Tout',
+    required this.selectedCategory,
   });
 
   @override

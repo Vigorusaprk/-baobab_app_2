@@ -1,16 +1,19 @@
 import 'dart:ui';
-
+import 'package:baobabe_0_2/features/order/presentation/widgets/order_service.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/svg.dart';
+import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
+import 'package:visibility_detector/visibility_detector.dart';
+import 'package:baobabe_0_2/core/themes/app_colors.dart';
 import 'package:baobabe_0_2/core/themes/app_diemens.dart';
 import 'package:baobabe_0_2/core/themes/app_fonts.dart';
 import 'package:baobabe_0_2/features/main/presentation/widgets/main_background.dart';
 import 'package:baobabe_0_2/features/order/domain/entities/order.dart';
-import 'package:baobabe_0_2/features/order/presentation/widgets/order_service.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
-import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
-import 'package:baobabe_0_2/core/themes/app_colors.dart';
 import 'package:baobabe_0_2/features/home_page/domain/entities/business_entity.dart';
+import 'package:baobabe_0_2/features/auth/presentation/bloc/auth_bloc.dart';
+
 
 class OrderScreen extends StatefulWidget {
   const OrderScreen({super.key});
@@ -19,28 +22,68 @@ class OrderScreen extends StatefulWidget {
   State<OrderScreen> createState() => _OrderScreenState();
 }
 
-class _OrderScreenState extends State<OrderScreen> {
+class _OrderScreenState extends State<OrderScreen> with WidgetsBindingObserver {
   List<Order> _allOrders = [];
   List<Order> _displayedOrders = [];
   bool _isLoading = true;
   OrderStatus? _selectedStatusFilter;
-
   final List<OrderStatus> _availableStatuses = OrderStatus.values;
+  String _userId = "";
+  late final OrderApiService _apiService;
+  final String _visibilityId = 'order_screen'; // ✅ Défini ici
 
   @override
   void initState() {
     super.initState();
-    _loadOrders();
+    _apiService = OrderApiService();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _loadUserId();
+    });
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      _loadOrders();
+    }
+  }
+
+  Future<void> _loadUserId() async {
+    final authState = context.read<AuthBloc>().state;
+    if (authState is AuthAuthenticated) {
+      _userId = authState.user.id;
+      await _loadOrders();
+    } else {
+      context.go('/login');
+    }
   }
 
   Future<void> _loadOrders() async {
-    final orders = await OrderService.getOrders();
-    orders.sort((a, b) => b.orderDate.compareTo(a.orderDate));
-    setState(() {
-      _allOrders = orders;
-      _displayedOrders = orders;
-      _isLoading = false;
-    });
+    if (_userId.isEmpty) return;
+    setState(() => _isLoading = true);
+    try {
+      final orders = await _apiService.getOrders(_userId);
+      orders.sort((a, b) => b.orderDate.compareTo(a.orderDate));
+      setState(() {
+        _allOrders = orders;
+        _displayedOrders = orders;
+      });
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Erreur : $e'), backgroundColor: Colors.red),
+        );
+      }
+    } finally {
+      setState(() => _isLoading = false);
+    }
   }
 
   void _filterOrders(OrderStatus? status) {
@@ -65,7 +108,7 @@ class _OrderScreenState extends State<OrderScreen> {
           ),
           child: Column(
             children: [
-              // SECTION "MES COMMANDES"
+              // En‑tête "Mes Commandes"
               Padding(
                 padding: const EdgeInsets.fromLTRB(20, 55, 20, 20),
                 child: Row(
@@ -73,22 +116,24 @@ class _OrderScreenState extends State<OrderScreen> {
                     SvgPicture.asset(
                       'assets/icons/order.svg',
                       height: 35,
-                      colorFilter: ColorFilter.mode(
+                      colorFilter: const ColorFilter.mode(
                         AppColors.scaffoldBackground,
                         BlendMode.srcIn,
                       ),
                     ),
                     const SizedBox(width: AppDimens.PADDING_12),
-                    Text(
-                      'Mes Commandes',
-                      style: TextStyle(
-                        fontFamily: AppFonts.primaryFontFamily,
-                        fontSize: 24,
-                        fontWeight: AppFonts.bold,
-                        color: AppColors.scaffoldBackground,
+                    Expanded(
+                      child: Text(
+                        'Mes Commandes',
+                        style: TextStyle(
+                          fontFamily: AppFonts.primaryFontFamily,
+                          fontSize: 24,
+                          fontWeight: AppFonts.bold,
+                          color: AppColors.scaffoldBackground,
+                        ),
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
-                    const Spacer(),
                     if (_allOrders.isNotEmpty)
                       Container(
                         padding: const EdgeInsets.symmetric(
@@ -108,10 +153,17 @@ class _OrderScreenState extends State<OrderScreen> {
                           ),
                         ),
                       ),
+                    const SizedBox(width: 8),
+                    IconButton(
+                      icon: const Icon(Icons.refresh, color: Colors.white),
+                      onPressed: _loadOrders,
+                      tooltip: 'Actualiser',
+                    ),
                   ],
                 ),
               ),
 
+              // Filtres
               if (_allOrders.isNotEmpty)
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 8),
@@ -133,9 +185,17 @@ class _OrderScreenState extends State<OrderScreen> {
                   ),
                 ),
 
-              // Important : Expanded pour contraindre la hauteur
+              // Contenu principal avec détecteur de visibilité
               Expanded(
-                child: _buildContent(),
+                child: VisibilityDetector(
+                  key: Key(_visibilityId),
+                  onVisibilityChanged: (info) {
+                    if (info.visibleFraction > 0.1) {
+                      _loadOrders();
+                    }
+                  },
+                  child: _buildContent(),
+                ),
               ),
             ],
           ),
@@ -235,7 +295,7 @@ class _OrderScreenState extends State<OrderScreen> {
                 Text(
                   'Vos commandes apparaîtront ici',
                   textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 16, color: AppColors.primary,),
+                  style: TextStyle(fontSize: 16, color: AppColors.primary),
                 ),
               ],
             ),
@@ -245,7 +305,7 @@ class _OrderScreenState extends State<OrderScreen> {
     );
   }
 
-  // Méthodes pour obtenir l'icône, la couleur et le nom d'affichage
+  // ========== Méthodes d'affichage ==========
   IconData _getTypeIcon(BusinessType? type) {
     if (type == null) return Icons.business;
     switch (type) {
@@ -319,132 +379,182 @@ class _OrderScreenState extends State<OrderScreen> {
   }
 
   Widget _buildOrderCard(Order order) {
-    final dateFormat = DateFormat('dd/MM/yyyy HH:mm');
-    final type = order.establishmentType;
-    final typeIcon = _getTypeIcon(type);
-    final typeColor = _getTypeColor(type);
-    final typeName = _getTypeDisplayName(type);
+    try {
+      final dateFormat = DateFormat('dd/MM/yyyy HH:mm');
+      final type = order.establishmentType;
+      final typeIcon = _getTypeIcon(type);
+      final typeColor = _getTypeColor(type);
+      final typeName = _getTypeDisplayName(type);
 
-    return Card(
-      color: AppColors.scaffoldBackground,
-      margin: const EdgeInsets.only(bottom: 12),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      child: InkWell(
-        onTap: () => context.pushNamed('orderDetail', extra: order),
-        borderRadius: BorderRadius.circular(16),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // En-tête avec icône, nom et statut
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Container(
-                    width: 50,
-                    height: 50,
-                    decoration: BoxDecoration(
-                      color: typeColor.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(12),
+      return Card(
+        color: AppColors.scaffoldBackground,
+        margin: const EdgeInsets.only(bottom: 12),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        child: InkWell(
+          onTap: () => context.pushNamed('orderDetail', extra: order),
+          borderRadius: BorderRadius.circular(16),
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      width: 50,
+                      height: 50,
+                      decoration: BoxDecoration(
+                        color: typeColor.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Icon(typeIcon, color: typeColor, size: 24),
                     ),
-                    child: Icon(typeIcon, color: typeColor, size: 24),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          order.establishmentName,
-                          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, fontFamily: "Poppins"),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        const SizedBox(height: 4),
-                        Row(
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                              decoration: BoxDecoration(
-                                color: typeColor.withOpacity(0.1),
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              child: Text(
-                                typeName,
-                                style: TextStyle(color: typeColor, fontSize: 12, fontWeight: FontWeight.w600, fontFamily: "Poppins"),
-                              ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            order.establishmentName,
+                            style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              fontFamily: "Poppins",
                             ),
-                          ],
-                        ),
-                      ],
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          const SizedBox(height: 4),
+                          Row(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                  vertical: 2,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: typeColor.withOpacity(0.1),
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: Text(
+                                  typeName,
+                                  style: TextStyle(
+                                    color: typeColor,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w600,
+                                    fontFamily: "Poppins",
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                    decoration: BoxDecoration(
-                      color: order.status.color.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Text(
-                      order.status.displayName,
-                      style: TextStyle(color: order.status.color, fontWeight: FontWeight.bold, fontSize: 12, fontFamily: "Poppins"),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 12),
-              Text(
-                dateFormat.format(order.orderDate),
-                style: TextStyle(color: Colors.grey[600], fontSize: 14, fontFamily: "Poppins"),
-              ),
-              const SizedBox(height: 12),
-              ...order.items.take(2).map((item) => Padding(
-                padding: const EdgeInsets.only(bottom: 4),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text('${item.quantity}x ${item.name}', style: TextStyle(fontFamily: "Poppins"),),
-                    Text('${(item.price * item.quantity).toStringAsFixed(2)} \$', style: TextStyle(fontFamily: "Poppins")),
-                  ],
-                ),
-              )),
-              if (order.items.length > 2)
-                Text(
-                  '+${order.items.length - 2} autres articles',
-                  style: TextStyle(color: Colors.grey[600], fontSize: 13, fontFamily: "Poppins"),
-                ),
-
-              SizedBox(height: AppDimens.PADDING_20,),
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: AppDimens.PADDING_10, vertical: AppDimens.PADDING_10),
-                decoration: BoxDecoration(
-                    color: AppColors.primary.withOpacity(0.3),
-                    borderRadius: BorderRadius.circular(AppDimens.BORDER_RADIUS_15)
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text(
-                      'Total',
-                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, fontFamily: "Poppins"),
-                    ),
-                    Text(
-                      '${order.totalAmount.toStringAsFixed(2)} \$',
-                      style: TextStyle(
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 5,
+                      ),
+                      decoration: BoxDecoration(
+                        color: order.status.color.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Text(
+                        order.status.displayName,
+                        style: TextStyle(
+                          color: order.status.color,
                           fontWeight: FontWeight.bold,
-                          fontSize: 18,
-                          color: AppColors.primary,
-                          fontFamily: "Poppins"
+                          fontSize: 12,
+                          fontFamily: "Poppins",
+                        ),
                       ),
                     ),
                   ],
                 ),
-              ),
-            ],
+                const SizedBox(height: 12),
+                Text(
+                  dateFormat.format(order.orderDate),
+                  style: TextStyle(
+                    color: Colors.grey[600],
+                    fontSize: 14,
+                    fontFamily: "Poppins",
+                  ),
+                ),
+                const SizedBox(height: 12),
+                ...order.items.take(2).map((item) => Padding(
+                  padding: const EdgeInsets.only(bottom: 4),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        '${item.quantity}x ${item.name}',
+                        style: const TextStyle(fontFamily: "Poppins"),
+                      ),
+                      Text(
+                        '${(item.price * item.quantity).toStringAsFixed(2)} \$',
+                        style: const TextStyle(fontFamily: "Poppins"),
+                      ),
+                    ],
+                  ),
+                )),
+                if (order.items.length > 2)
+                  Text(
+                    '+${order.items.length - 2} autres articles',
+                    style: TextStyle(
+                      color: Colors.grey[600],
+                      fontSize: 13,
+                      fontFamily: "Poppins",
+                    ),
+                  ),
+                const SizedBox(height: AppDimens.PADDING_20),
+                Container(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: AppDimens.PADDING_10,
+                    vertical: AppDimens.PADDING_10,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppColors.primary.withOpacity(0.3),
+                    borderRadius: BorderRadius.circular(AppDimens.BORDER_RADIUS_15),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        'Total',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                          fontFamily: "Poppins",
+                        ),
+                      ),
+                      Text(
+                        '${order.totalAmount.toStringAsFixed(2)} \$',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18,
+                          color: AppColors.primary,
+                          fontFamily: "Poppins",
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
-      ),
-    );
+      );
+    } catch (e, stack) {
+      print('Erreur lors du rendu de la commande : $e');
+      print(stack);
+      return Card(
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Text('Erreur d’affichage : $e'),
+        ),
+      );
+    }
   }
 }

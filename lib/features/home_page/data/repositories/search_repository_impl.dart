@@ -1,11 +1,12 @@
 import 'package:baobabe_0_2/core/errors/exeptions.dart';
-import 'package:baobabe_0_2/features/home_page/data/data_sources/local_datasource/local_business_data.dart';
 import 'package:baobabe_0_2/features/home_page/domain/entities/business_entity.dart';
 import 'package:baobabe_0_2/features/home_page/domain/entities/search_filter_entity.dart';
 import 'package:baobabe_0_2/features/home_page/domain/repositories/search_repository.dart';
 
+import '../data_sources/remote_datasource/business_remote_datasource.dart' show BusinessRemoteDataSource;
+
 class SearchRepositoryImpl implements SearchRepository {
-  final BusinessLocalDataSource localDataSource;
+  final BusinessRemoteDataSource localDataSource;
 
   SearchRepositoryImpl({required this.localDataSource});
 

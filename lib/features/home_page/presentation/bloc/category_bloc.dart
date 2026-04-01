@@ -6,6 +6,7 @@ import '../../domain/repositories/category_repository.dart';
 part 'category_event.dart';
 part 'category_state.dart';
 
+// Vérifiez que CategoryState est bien reconnu ici
 class CategoryBloc extends Bloc<CategoryEvent, CategoryState> {
   final CategoryRepository categoryRepository;
 
@@ -13,31 +14,21 @@ class CategoryBloc extends Bloc<CategoryEvent, CategoryState> {
     on<LoadCategories>(_onLoadCategories);
     on<SelectCategory>(_onSelectCategory);
 
-    // Charger les catégories au démarrage
     add(LoadCategories());
   }
 
   void _onLoadCategories(LoadCategories event, Emitter<CategoryState> emit) async {
     emit(CategoryLoading());
-
     try {
-      // Charger les catégories depuis le repository
       final categories = await categoryRepository.getCategories();
-
-      // Convertir en noms d'affichage pour l'état
-      final categoryNames = categories.map((c) => c.displayName).toList();
-
       emit(CategoriesLoaded(
-        categories: categoryNames,
-        selectedCategory: 'Tout',
+        categories: categories,
+        selectedCategory: categories.first,
       ));
     } catch (e) {
-      // En cas d'erreur, utiliser les catégories par défaut
-      final defaultCategories = Category.allCategories.map((c) => c.displayName).toList();
-
       emit(CategoriesLoaded(
-        categories: defaultCategories,
-        selectedCategory: 'Tout',
+        categories: Category.allCategories,
+        selectedCategory: Category.allCategories.first,
       ));
     }
   }

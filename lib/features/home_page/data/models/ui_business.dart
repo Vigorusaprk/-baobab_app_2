@@ -28,8 +28,8 @@ class UIBusiness {
         return AppColors.Spa;
       case BusinessType.cinema:
         return AppColors.Cinema; // ou votre couleur
-      case BusinessType.tourisme:
-        return AppColors.Tourisme;
+      case BusinessType.tourism:
+        return AppColors.Tourisme; // à définir dans AppColors
       default:
         return Colors.grey;
     }
@@ -55,8 +55,8 @@ class UIBusiness {
         return Icons.spa;
       case BusinessType.cinema:
         return Icons.movie;
-      case BusinessType.tourisme:
-        return Icons.tour_rounded;
+      case BusinessType.tourism:
+        return Icons.tour; // ou Icons.landscape, Icons.explore
       default:
         return Icons.business;
     }

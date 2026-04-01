@@ -86,7 +86,7 @@ class BusinessCardWidget extends StatelessWidget {
       child: hasImage ?
       ClipRRect(
         borderRadius: BorderRadius.circular(28),
-        child: Image.asset(
+        child: Image.network(
             uiBusiness.business.bgImg!,
           fit: BoxFit.cover,
           errorBuilder: (context, error, stackTrace) {

@@ -9,9 +9,15 @@ abstract class BusinessDetailEvent extends Equatable {
 
 class LoadBusinessDetail extends BusinessDetailEvent {
   final String businessId;
-
   const LoadBusinessDetail(this.businessId);
-
   @override
   List<Object> get props => [businessId];
+}
+
+// ✅ Événement pour créer une réservation
+class MakeReservation extends BusinessDetailEvent {
+  final ReservationModel reservation;
+  const MakeReservation(this.reservation);
+  @override
+  List<Object> get props => [reservation];
 }

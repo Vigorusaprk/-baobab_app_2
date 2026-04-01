@@ -1,18 +1,21 @@
 import 'package:equatable/equatable.dart';
 
 enum BusinessType {
+  all,
   restaurant,
   fastFood,
   shopping,
   mall,
   hotel,
   carRental,
+  cinema,
   travelAgency,
   spa,
-  cinema,
-  tourisme,
+  tourism,      // ← nouveau
   other
 }
+
+// lib/features/home_page/domain/entities/business_entity.dart
 
 class BusinessReview extends Equatable {
   final String id;
@@ -35,17 +38,34 @@ class BusinessReview extends Equatable {
     this.commentCount = 0,
   });
 
+  factory BusinessReview.fromJson(Map<String, dynamic> json) {
+    return BusinessReview(
+      id: json['id'] as String,
+      userName: json['userName'] as String,
+      userAvatar: json['userAvatar'] as String,
+      rating: (json['rating'] as num).toDouble(),
+      comment: json['comment'] as String,
+      date: DateTime.parse(json['date'] as String),
+      likes: json['likes'] as int,
+      commentCount: json['commentCount'] as int? ?? 0,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'userName': userName,
+      'userAvatar': userAvatar,
+      'rating': rating,
+      'comment': comment,
+      'date': date.toIso8601String(),
+      'likes': likes,
+      'commentCount': commentCount,
+    };
+  }
+
   @override
-  List<Object?> get props => [
-    id,
-    userName,
-    userAvatar,
-    rating,
-    comment,
-    date,
-    likes,
-    commentCount,
-  ];
+  List<Object?> get props => [id, userName, userAvatar, rating, comment, date, likes, commentCount];
 }
 
 class Business extends Equatable {

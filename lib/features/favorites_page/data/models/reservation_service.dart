@@ -1,42 +1,32 @@
-// reservation_service.dart
-import 'dart:convert';
+import 'package:baobabe_0_2/features/favorites_page/data/models/reservation_model.dart';
+import 'package:dio/dio.dart';
 
-import 'package:shared_preferences/shared_preferences.dart';
-import 'reservation_model.dart';
 
-class ReservationService {
-  static const String _reservationsKey = 'user_reservations';
+class ReservationApiService {
+  final Dio _dio;
+  final String _baseUrl;
 
-  // Sauvegarder une réservation
-  static Future<void> saveReservation(Reservation reservation) async {
-    final prefs = await SharedPreferences.getInstance();
-    final List<String> reservations = prefs.getStringList(_reservationsKey) ?? [];
+  ReservationApiService({Dio? dio, String baseUrl = 'http://10.0.2.2:3000/api'})
+      : _dio = dio ?? Dio(),
+        _baseUrl = baseUrl;
 
-    reservations.add(json.encode(reservation.toMap()));
-    await prefs.setStringList(_reservationsKey, reservations);
+  Future<List<Reservation>> getReservations(String userId) async {
+    try {
+      final response = await _dio.get('$_baseUrl/reservations', queryParameters: {
+        'user_id': userId,
+      });
+      final List data = response.data;
+      return data.map((json) => Reservation.fromMap(json)).toList();
+    } catch (e) {
+      throw Exception('Erreur lors du chargement des réservations : $e');
+    }
   }
 
-  // Récupérer toutes les réservations
-  static Future<List<Reservation>> getReservations() async {
-    final prefs = await SharedPreferences.getInstance();
-    final List<String> reservationsData = prefs.getStringList(_reservationsKey) ?? [];
-
-    return reservationsData.map((data) {
-      final map = json.decode(data);
-      return Reservation.fromMap(Map<String, dynamic>.from(map));
-    }).toList();
-  }
-
-  // Supprimer une réservation
-  static Future<void> deleteReservation(String id) async {
-    final prefs = await SharedPreferences.getInstance();
-    final List<String> reservations = prefs.getStringList(_reservationsKey) ?? [];
-
-    reservations.removeWhere((data) {
-      final map = json.decode(data);
-      return map['id'] == id;
-    });
-
-    await prefs.setStringList(_reservationsKey, reservations);
+  Future<void> deleteReservation(String reservationId) async {
+    try {
+      await _dio.delete('$_baseUrl/reservations/$reservationId');
+    } catch (e) {
+      throw Exception('Erreur lors de la suppression : $e');
+    }
   }
 }

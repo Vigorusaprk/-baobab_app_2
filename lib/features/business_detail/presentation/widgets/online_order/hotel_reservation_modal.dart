@@ -1,8 +1,10 @@
 import 'package:baobabe_0_2/core/themes/app_colors.dart';
 import 'package:baobabe_0_2/features/home_page/domain/entities/business_entity.dart';
+import 'package:baobabe_0_2/features/business_detail/data/models/reservation_model.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'reservation_service.dart';
+import 'package:baobabe_0_2/features/business_detail/presentation/bloc/business_detail_bloc.dart';
 
 class HotelReservationData {
   String? selectedRoomType;
@@ -40,48 +42,15 @@ class HotelReservationData {
   }
 }
 
-void showHotelReservationModal(BuildContext context, Business business) {
-  final isHotel = business.type.name.toLowerCase() == 'hotel';
-  // Accepter la réservation si canReserve n'est pas explicitement false
-  final canReserve = business.specificData['canReserve'] != false;
-
-  if (!isHotel || !canReserve) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('La réservation n\'est pas disponible pour ${business.name}'),
-        backgroundColor: Colors.orange,
-      ),
-    );
-    return;
-  }
-
-  showModalBottomSheet(
-    context: context,
-    isScrollControlled: true,
-    backgroundColor: Colors.transparent,
-    builder: (context) {
-      return Localizations(
-        locale: const Locale('fr', 'FR'),
-        delegates: [
-          GlobalMaterialLocalizations.delegate,
-          GlobalWidgetsLocalizations.delegate,
-          GlobalCupertinoLocalizations.delegate,
-        ],
-        child: HotelReservationModal(business: business),
-      );
-    },
-  );
-}
-
-class HotelReservationModal extends StatefulWidget {
+class HotelReservationSheet extends StatefulWidget {
   final Business business;
-  const HotelReservationModal({Key? key, required this.business}) : super(key: key);
+  const HotelReservationSheet({super.key, required this.business});
 
   @override
-  _HotelReservationModalState createState() => _HotelReservationModalState();
+  State<HotelReservationSheet> createState() => _HotelReservationSheetState();
 }
 
-class _HotelReservationModalState extends State<HotelReservationModal> {
+class _HotelReservationSheetState extends State<HotelReservationSheet> {
   final PageController _pageController = PageController();
   final HotelReservationData _data = HotelReservationData();
 
@@ -164,23 +133,25 @@ class _HotelReservationModalState extends State<HotelReservationModal> {
       final roomTypes = widget.business.specificData['roomTypes'] as List? ?? [];
       final totalAmount = _data.calculateTotal(roomTypes);
 
-      final reservation = Reservation(
-        id: DateTime.now().millisecondsSinceEpoch.toString(),
-        establishmentName: widget.business.name,
-        reservationType: 'hotel',
-        customerName: _fullNameController.text,
-        phoneNumber: _phoneController.text,
-        notes: _notesController.text.isNotEmpty ? _notesController.text : null,
-        totalAmount: totalAmount,
+      final reservation = ReservationModel(
+        businessId: widget.business.id,
+        userId: "USER_ID_AUTH",
+        type: "hotel",
         reservationDate: DateTime.now(),
-        roomType: _data.selectedRoomType,
-        checkInDate: _data.checkInDate,
-        checkOutDate: _data.checkOutDate,
-        numberOfRooms: _data.numberOfRooms,
-        numberOfGuests: _data.numberOfGuests,
+        totalAmount: totalAmount,
+        details: {
+          "room_type": _data.selectedRoomType,
+          "check_in_date": _data.checkInDate?.toIso8601String(),
+          "check_out_date": _data.checkOutDate?.toIso8601String(),
+          "number_of_rooms": _data.numberOfRooms,
+          "number_of_guests": _data.numberOfGuests,
+          "customer_name": _fullNameController.text,
+          "phone_number": _phoneController.text,
+          "notes": _notesController.text,
+        },
       );
 
-      await ReservationService.saveReservation(reservation);
+      context.read<BusinessDetailBloc>().add(MakeReservation(reservation));
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -261,8 +232,6 @@ class _HotelReservationModalState extends State<HotelReservationModal> {
                   ],
                 ),
               ),
-              const Divider(height: 1, color: Colors.grey),
-              _buildProgressIndicator(isSmallScreen),
               SizedBox(height: isSmallScreen ? 12 : 16),
               Expanded(
                 child: PageView(
@@ -282,27 +251,7 @@ class _HotelReservationModalState extends State<HotelReservationModal> {
     );
   }
 
-  Widget _buildProgressIndicator(bool isSmallScreen) {
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: isSmallScreen ? 16 : 20, vertical: 8),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [0, 1, 2].map((index) {
-          final currentPage = _pageController.hasClients ? _pageController.page!.round() : 0;
-          return Container(
-            width: isSmallScreen ? 6 : 8,
-            height: isSmallScreen ? 6 : 8,
-            margin: EdgeInsets.symmetric(horizontal: isSmallScreen ? 3 : 4),
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: currentPage >= index ? Theme.of(context).colorScheme.primary : Colors.grey[300],
-            ),
-          );
-        }).toList(),
-      ),
-    );
-  }
-
+  // --- UI methods (inchangées) ---
   String _getPageTitle(int pageIndex) {
     switch (pageIndex) {
       case 0: return 'Sélection de la chambre';
@@ -725,4 +674,5 @@ class _HotelReservationModalState extends State<HotelReservationModal> {
       ),
     );
   }
+// ... les méthodes _buildTextField, _buildDatePickerTile, _buildCounterRow, _buildSummaryRow, _buildPriceRow restent identiques.
 }

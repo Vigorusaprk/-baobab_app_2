@@ -2,7 +2,6 @@ part of 'category_bloc.dart';
 
 abstract class CategoryEvent extends Equatable {
   const CategoryEvent();
-
   @override
   List<Object> get props => [];
 }
@@ -10,8 +9,7 @@ abstract class CategoryEvent extends Equatable {
 class LoadCategories extends CategoryEvent {}
 
 class SelectCategory extends CategoryEvent {
-  final String category; // Nom d'affichage de la catégorie
-
+  final Category category; // Changé de String à Category
   const SelectCategory(this.category);
 
   @override

@@ -278,34 +278,6 @@ class MenuSection extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: 8),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            '${item.price.toStringAsFixed(2)} €',
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: AppColors.primary,
-                              fontSize: 16,
-                              decoration: TextDecoration.none,
-                            ),
-                          ),
-                          if (item.rating > 0)
-                            Row(
-                              children: [
-                                const Icon(Icons.star, color: Colors.amber, size: 16),
-                                const SizedBox(width: 4),
-                                Text(
-                                  item.rating.toString(),
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.w500,
-                                    decoration: TextDecoration.none,
-                                  ),
-                                ),
-                              ],
-                            ),
-                        ],
-                      ),
                     ],
                   ),
                 ),

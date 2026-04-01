@@ -1,10 +1,13 @@
+import 'package:baobabe_0_2/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:baobabe_0_2/features/order/presentation/widgets/order_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:baobabe_0_2/features/order/presentation/bloc/cart_bloc.dart';
 import 'package:baobabe_0_2/features/order/domain/entities/order.dart';
-import 'package:baobabe_0_2/features/order/presentation/widgets/order_service.dart';
 import 'package:baobabe_0_2/features/home_page/domain/entities/business_entity.dart';
 import 'package:baobabe_0_2/core/themes/app_colors.dart';
+import 'package:baobabe_0_2/core/constants/injector.dart';
+import 'package:go_router/go_router.dart';
 
 class CartPage extends StatelessWidget {
   final String? restaurantId;
@@ -120,35 +123,37 @@ class CartPage extends StatelessWidget {
     final state = cubit.state;
     if (state.items.isEmpty) return;
 
+    // Récupérer l'utilisateur connecté
+    final authState = context.read<AuthBloc>().state;
+    if (authState is! AuthAuthenticated) {
+      // Rediriger vers la page de connexion
+      context.go('/login');
+      return;
+    }
+    final userId = authState.user.id;
+
     final orderItems = state.items.map((item) => OrderItem(
-      menuItemId: item.menuItem.itemName,
+      menuItemId: item.menuItem.id.toString(),
       name: item.menuItem.itemName,
       price: item.menuItem.price,
       quantity: item.quantity,
     )).toList();
 
-    final order = Order(
-      id: DateTime.now().millisecondsSinceEpoch.toString(),
-      establishmentId: restaurantId ?? 'unknown',
-      establishmentName: restaurantName ?? 'Restaurant', // ← nom correct
-      establishmentType: restaurantType,                 // ← type correct
-      orderDate: DateTime.now(),
-      items: orderItems,
-      subtotal: cubit.totalPrice,
-      tax: 0.0,
-      totalAmount: cubit.totalPrice,
-      status: OrderStatus.pending,
-      notes: null,
-    );
+    final apiService = OrderApiService();
 
     try {
-      await OrderService.saveOrder(order);
+      await apiService.createOrder(
+        userId: userId,
+        businessId: restaurantId ?? 'unknown',
+        items: orderItems,
+      );
+
       cubit.clearCart();
       if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Commande validée !'), backgroundColor: Colors.green),
       );
-      Navigator.pop(context); // Retour au menu
+      Navigator.pop(context);
     } catch (e) {
       if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(

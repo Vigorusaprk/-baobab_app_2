@@ -1,109 +1,97 @@
 import 'package:baobabe_0_2/core/themes/app_colors.dart';
-import 'package:flutter/material.dart';
+import 'package:baobabe_0_2/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:baobabe_0_2/features/business_detail/data/models/reservation_model.dart';
+import 'package:baobabe_0_2/features/business_detail/domain/entities/movie.dart';
+import 'package:baobabe_0_2/features/business_detail/presentation/bloc/business_detail_bloc.dart';
 import 'package:baobabe_0_2/features/home_page/domain/entities/business_entity.dart';
-import 'package:baobabe_0_2/features/business_detail/presentation/widgets/online_order/reservation_service.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 void showCinemaReservationModal(
-    BuildContext context, {
-      required Business cinema,
-      required Map<String, dynamic> movie,
-      Map<String, dynamic>? selectedShowtime,
-    }) {
+    BuildContext context,
+    Business cinema,
+    Movie movie,
+    Showtime showtime,
+    ) {
+  final bloc = context.read<BusinessDetailBloc>();
   showModalBottomSheet(
     context: context,
     isScrollControlled: true,
     backgroundColor: Colors.transparent,
-    builder: (context) => CinemaReservationModal(
-      cinema: cinema,
-      movie: movie,
-      selectedShowtime: selectedShowtime,
+    builder: (modalContext) => BlocProvider.value(
+      value: bloc,
+      child: _CinemaSheet(
+        cinema: cinema,
+        movie: movie,
+        showtime: showtime,
+      ),
     ),
   );
 }
 
-class CinemaReservationModal extends StatefulWidget {
+class _CinemaSheet extends StatefulWidget {
   final Business cinema;
-  final Map<String, dynamic> movie;
-  final Map<String, dynamic>? selectedShowtime;
+  final Movie movie;
+  final Showtime showtime;
 
-  const CinemaReservationModal({
-    super.key,
+  const _CinemaSheet({
     required this.cinema,
     required this.movie,
-    this.selectedShowtime,
+    required this.showtime,
   });
 
   @override
-  State<CinemaReservationModal> createState() => _CinemaReservationModalState();
+  State<_CinemaSheet> createState() => _CinemaSheetState();
 }
 
-class _CinemaReservationModalState extends State<CinemaReservationModal> {
-  final TextEditingController _fullNameController = TextEditingController();
-  final TextEditingController _phoneController = TextEditingController();
-  final TextEditingController _notesController = TextEditingController();
-
-  Map<String, dynamic>? _selectedShowtime;
-  int _numberOfTickets = 1;
+class _CinemaSheetState extends State<_CinemaSheet> {
+  int _tickets = 1;
   bool _isLoading = false;
 
-  @override
-  void initState() {
-    super.initState();
-    _selectedShowtime = widget.selectedShowtime ?? (widget.movie['showtimes'] as List?)?.first;
-  }
-
-  @override
-  void dispose() {
-    _fullNameController.dispose();
-    _phoneController.dispose();
-    _notesController.dispose();
-    super.dispose();
-  }
-
-  double get totalPrice {
-    if (_selectedShowtime == null) return 0.0;
-    final price = (_selectedShowtime!['price'] as num?)?.toDouble() ?? 0.0;
-    return price * _numberOfTickets;
-  }
-
-  void _saveReservation() async {
-    if (_fullNameController.text.isEmpty || _phoneController.text.isEmpty) {
+  void _book() async {
+    // Récupérer l'utilisateur connecté
+    final authState = context.read<AuthBloc>().state;
+    if (authState is! AuthAuthenticated) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Veuillez remplir tous les champs obligatoires'), backgroundColor: Colors.red),
+        const SnackBar(content: Text('Veuillez vous connecter'), backgroundColor: Colors.orange),
       );
+      Navigator.pop(context);
       return;
     }
+    final userId = authState.user.id;
 
     setState(() => _isLoading = true);
 
-    final reservation = Reservation(
-      id: DateTime.now().millisecondsSinceEpoch.toString(),
-      establishmentName: widget.cinema.name,
-      reservationType: 'cinema',
-      customerName: _fullNameController.text,
-      phoneNumber: _phoneController.text,
-      notes: _notesController.text.isNotEmpty ? _notesController.text : null,
-      totalAmount: totalPrice,
-      reservationDate: DateTime.now(),
-      movieTitle: widget.movie['title'],
-      // On pourrait combiner date+heure, mais pour simplifier on met juste l'heure dans showtime
-      showtime: _selectedShowtime != null ? DateTime.now() : null, // À améliorer
-      ticketType: _selectedShowtime?['room'],
-      numberOfTickets: _numberOfTickets,
+    final reservation = ReservationModel(
+      businessId: widget.cinema.id,
+      userId: userId,
+      type: "cinema",
+      reservationDate: widget.showtime.startTime,
+      totalAmount: widget.showtime.price * _tickets,
+      details: {
+        "movie_id": widget.movie.id,
+        "movie_title": widget.movie.title,
+        "showtime_id": widget.showtime.id,
+        "tickets_count": _tickets,
+        "hall": widget.showtime.room,
+        "price_per_ticket": widget.showtime.price,
+      },
     );
 
     try {
-      await ReservationService.saveReservation(reservation);
-      if (!mounted) return;
+      context.read<BusinessDetailBloc>().add(MakeReservation(reservation));
       Navigator.pop(context);
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Réservation confirmée !'), backgroundColor: Colors.green),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Réservation confirmée !'), backgroundColor: Colors.green),
+        );
+      }
     } catch (e) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Erreur : $e'), backgroundColor: Colors.red),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Erreur : $e'), backgroundColor: Colors.red),
+        );
+      }
     } finally {
       setState(() => _isLoading = false);
     }
@@ -111,120 +99,70 @@ class _CinemaReservationModalState extends State<CinemaReservationModal> {
 
   @override
   Widget build(BuildContext context) {
-    final screenHeight = MediaQuery.of(context).size.height;
+    final formattedTime = '${widget.showtime.startTime.hour.toString().padLeft(2, '0')}:${widget.showtime.startTime.minute.toString().padLeft(2, '0')}';
+    final formattedDate = '${widget.showtime.startTime.day}/${widget.showtime.startTime.month}/${widget.showtime.startTime.year}';
 
     return Container(
-      padding: const EdgeInsets.all(20),
       decoration: const BoxDecoration(
-        color: AppColors.scaffoldBackground,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        color: Colors.white,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
       ),
-      height: screenHeight * 0.7,
+      padding: const EdgeInsets.all(25),
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Center(
-            child: Container(
-              width: 40,
-              height: 4,
-              decoration: BoxDecoration(
-                color: Colors.grey[300],
-                borderRadius: BorderRadius.circular(2),
-              ),
-            ),
-          ),
-          const SizedBox(height: 16),
-          Text(
-            'Réserver ${widget.movie['title']}',
-            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 16),
-          const Text('Séance', style: TextStyle(fontWeight: FontWeight.bold)),
+          Text(widget.movie.title, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
           const SizedBox(height: 8),
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: (widget.movie['showtimes'] as List?)?.map<Widget>((show) {
-              final isSelected = _selectedShowtime == show;
-              return ChoiceChip(
-                label: Text('${show['time']} (${show['price']}€)'),
-                selected: isSelected,
-                onSelected: (selected) {
-                  setState(() => _selectedShowtime = selected ? show : null);
-                },
-                backgroundColor: Colors.grey[100],
-                selectedColor: Colors.green.withOpacity(0.2),
-              );
-            }).toList() ??
-                [],
-          ),
-          const SizedBox(height: 16),
+          Text('$formattedDate à $formattedTime - ${widget.showtime.room}',
+              style: const TextStyle(color: Colors.grey)),
+          const SizedBox(height: 20),
+          const Text("Sélectionnez vos places", style: TextStyle(color: Colors.grey)),
+          const SizedBox(height: 20),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text('Nombre de tickets', style: TextStyle(fontWeight: FontWeight.bold)),
+              const Text("Nombre de places"),
               Row(
                 children: [
                   IconButton(
-                    icon: const Icon(Icons.remove),
-                    onPressed: _numberOfTickets > 1
-                        ? () => setState(() => _numberOfTickets--)
-                        : null,
+                    onPressed: () => setState(() => _tickets--),
+                    icon: const Icon(Icons.remove_circle_outline),
                   ),
-                  Text('$_numberOfTickets'),
+                  Text("$_tickets", style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                   IconButton(
-                    icon: const Icon(Icons.add),
-                    onPressed: () => setState(() => _numberOfTickets++),
+                    onPressed: () => setState(() => _tickets++),
+                    icon: const Icon(Icons.add_circle_outline),
                   ),
                 ],
               ),
             ],
           ),
-          const SizedBox(height: 16),
-          TextFormField(
-            controller: _fullNameController,
-            decoration: const InputDecoration(
-              labelText: 'Nom complet *',
-              border: OutlineInputBorder(),
-            ),
-          ),
-          const SizedBox(height: 12),
-          TextFormField(
-            controller: _phoneController,
-            decoration: const InputDecoration(
-              labelText: 'Téléphone *',
-              border: OutlineInputBorder(),
-            ),
-            keyboardType: TextInputType.phone,
-          ),
-          const SizedBox(height: 12),
-          TextFormField(
-            controller: _notesController,
-            decoration: const InputDecoration(
-              labelText: 'Notes (optionnel)',
-              border: OutlineInputBorder(),
-            ),
-            maxLines: 2,
-          ),
-          const Spacer(),
+          const SizedBox(height: 20),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
+              const Text("Total", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
               Text(
-                'Total: ${totalPrice.toStringAsFixed(2)} €',
-                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              ElevatedButton(
-                onPressed: _isLoading ? null : _saveReservation,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.green,
-                  foregroundColor: Colors.white,
-                ),
-                child: _isLoading
-                    ? const CircularProgressIndicator(color: Colors.white)
-                    : const Text('Confirmer'),
+                '${(widget.showtime.price * _tickets).toStringAsFixed(2)} €',
+                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.primary),
               ),
             ],
+          ),
+          const SizedBox(height: 30),
+          SizedBox(
+            width: double.infinity,
+            height: 55,
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.black,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+              ),
+              onPressed: _isLoading ? null : _book,
+              child: _isLoading
+                  ? const CircularProgressIndicator(color: Colors.white)
+                  : const Text("Payer maintenant"),
+            ),
           ),
         ],
       ),

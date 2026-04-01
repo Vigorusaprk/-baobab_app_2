@@ -1,48 +1,58 @@
-import 'dart:convert';
+import 'package:dio/dio.dart';
 import 'package:baobabe_0_2/features/order/domain/entities/order.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
-class OrderService {
-  static const String _ordersKey = 'user_orders';
+class OrderApiService {
+  final Dio _dio;
+  final String _baseUrl;
 
-  static Future<void> saveOrder(Order order) async {
-    final prefs = await SharedPreferences.getInstance();
-    final List<String> orders = prefs.getStringList(_ordersKey) ?? [];
-    orders.add(json.encode(order.toMap()));
-    await prefs.setStringList(_ordersKey, orders);
+  OrderApiService({Dio? dio, String baseUrl = 'http://10.0.2.2:3000/api'})
+      : _dio = dio ?? Dio(),
+        _baseUrl = baseUrl;
+
+  Future<void> createOrder({
+    required String userId,
+    required String businessId,
+    required List<OrderItem> items,
+    String? deliveryAddress,
+    double? deliveryFee,
+    String? paymentMethod,
+    String? notes,
+  }) async {
+    final payload = {
+      'user_id': userId,
+      'business_id': businessId,
+      'items': items.map((item) => {
+        'menu_item_id': item.menuItemId,
+        'quantity': item.quantity,
+        'special_instructions': item.specialInstructions,
+      }).toList(),
+      'delivery_address': deliveryAddress,
+      'delivery_fee': deliveryFee,
+      'payment_method': paymentMethod,
+      'notes': notes,
+    };
+    try {
+      await _dio.post('$_baseUrl/orders', data: payload);
+    } catch (e) {
+      throw Exception('Erreur lors de la création de la commande : $e');
+    }
   }
 
-  static Future<List<Order>> getOrders() async {
-    final prefs = await SharedPreferences.getInstance();
-    final List<String> ordersData = prefs.getStringList(_ordersKey) ?? [];
-    return ordersData.map((data) {
-      final map = json.decode(data);
-      return Order.fromMap(Map<String, dynamic>.from(map));
-    }).toList();
+  Future<List<Order>> getOrders(String userId) async {
+    try {
+      final response = await _dio.get('$_baseUrl/orders', queryParameters: {'user_id': userId});
+      final List data = response.data;
+      return data.map((json) => Order.fromMap(json)).toList();
+    } catch (e) {
+      throw Exception('Erreur lors du chargement des commandes : $e');
+    }
   }
 
-  static Future<void> deleteOrder(String id) async {
-    final prefs = await SharedPreferences.getInstance();
-    final List<String> orders = prefs.getStringList(_ordersKey) ?? [];
-    orders.removeWhere((data) {
-      final map = json.decode(data);
-      return map['id'] == id;
-    });
-    await prefs.setStringList(_ordersKey, orders);
-  }
-
-  static Future<void> updateOrderStatus(String id, OrderStatus newStatus) async {
-    final prefs = await SharedPreferences.getInstance();
-    final List<String> orders = prefs.getStringList(_ordersKey) ?? [];
-    final index = orders.indexWhere((data) {
-      final map = json.decode(data);
-      return map['id'] == id;
-    });
-    if (index != -1) {
-      final map = json.decode(orders[index]);
-      map['status'] = newStatus.index;
-      orders[index] = json.encode(map);
-      await prefs.setStringList(_ordersKey, orders);
+  Future<void> updateOrderStatus(String orderId, OrderStatus status) async {
+    try {
+      await _dio.patch('$_baseUrl/orders/$orderId', data: {'status': status.index});
+    } catch (e) {
+      throw Exception('Erreur lors de la mise à jour du statut : $e');
     }
   }
 }

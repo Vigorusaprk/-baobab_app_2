@@ -1,4 +1,3 @@
-// lib/features/business/presentation/screens/business_detail_screen.dart
 import 'package:baobabe_0_2/core/constants/injector.dart';
 import 'package:baobabe_0_2/features/business_detail/domain/usecases/get_business_detail.dart';
 import 'package:baobabe_0_2/features/business_detail/presentation/widgets/business_actions_section.dart';
@@ -13,7 +12,8 @@ import '../../../../core/themes/app_colors.dart';
 import '../bloc/business_detail_bloc.dart';
 import '../widgets/common/business_detail_app_bar.dart';
 import '../widgets/common/responsive_container.dart';
-
+// ✅ Import du repository
+import 'package:baobabe_0_2/features/home_page/domain/repositories/business_repository.dart';
 
 class BusinessDetailScreen extends StatelessWidget {
   final String businessId;
@@ -25,6 +25,7 @@ class BusinessDetailScreen extends StatelessWidget {
     return BlocProvider(
       create: (context) => BusinessDetailBloc(
         getBusinessDetail: Injector.get<GetBusinessDetail>(),
+        repository: Injector.get<BusinessRepository>(), // ✅ Ajout
         businessId: businessId,
       )..add(LoadBusinessDetail(businessId)),
       child: Scaffold(
@@ -68,12 +69,11 @@ class BusinessDetailScreen extends StatelessWidget {
     }
 
     if (state is BusinessDetailLoaded) {
-      // Créer le modèle UI à partir de l'entité métier pure
-      final uiBusiness =  UIBusiness(state.business);
+      final uiBusiness = UIBusiness(state.business);
 
       return CustomScrollView(
         slivers: [
-          BusinessDetailAppBar(business: state.business, uiBusiness: uiBusiness,),
+          BusinessDetailAppBar(business: state.business, uiBusiness: uiBusiness),
           SliverToBoxAdapter(
             child: ResponsiveContainer(
               child: Column(
@@ -85,7 +85,7 @@ class BusinessDetailScreen extends StatelessWidget {
                   const SizedBox(height: 24),
                   BusinessSpecificSection(business: state.business),
                   const SizedBox(height: 24),
-                  BusinessActionsSection(uiBusiness: uiBusiness),
+                  BusinessActionSection(business: state.business), // ✅ inchangé
                   const SizedBox(height: 24),
                   BusinessCommentsSection(business: state.business),
                   const SizedBox(height: 32),

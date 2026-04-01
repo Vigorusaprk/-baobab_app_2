@@ -96,7 +96,7 @@ class MyApp extends StatelessWidget {
         builder: (context, child) {
           // Vérifier le statut de la session au premier build
           WidgetsBinding.instance.addPostFrameCallback((_) {
-            context.read<AuthBloc>().add(AuthCheckStatusEvent());
+            BlocProvider(create: (_) => Injector.get<AuthBloc>());
           });
           return child!;
         },

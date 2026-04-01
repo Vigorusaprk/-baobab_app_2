@@ -12,8 +12,8 @@ class BusinessInitial extends BusinessState {}
 class BusinessLoading extends BusinessState {}
 
 class BusinessLoaded extends BusinessState {
-  final List<Business>  businesses;
-  final String currentCategory;
+  final List<Business> businesses;
+  final BusinessType currentCategory;
 
   const BusinessLoaded({
     required this.businesses,
@@ -24,10 +24,11 @@ class BusinessLoaded extends BusinessState {
   List<Object> get props => [businesses, currentCategory];
 }
 
+// AJOUTEZ CETTE CLASSE ICI :
 class BusinessError extends BusinessState {
   final String message;
 
-  const BusinessError({required this.message});
+  const BusinessError(this.message);
 
   @override
   List<Object> get props => [message];

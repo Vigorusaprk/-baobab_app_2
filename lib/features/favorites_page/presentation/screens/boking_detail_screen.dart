@@ -1,10 +1,9 @@
+import 'package:baobabe_0_2/features/favorites_page/data/models/reservation_model.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:baobabe_0_2/core/themes/app_colors.dart';
 import 'package:baobabe_0_2/core/themes/app_diemens.dart';
 import 'package:baobabe_0_2/core/themes/app_fonts.dart';
-import 'package:baobabe_0_2/features/business_detail/presentation/widgets/online_order/reservation_service.dart';
-import 'package:baobabe_0_2/features/home_page/domain/entities/business_entity.dart';
 import 'package:go_router/go_router.dart';
 
 class ReservationDetailPage extends StatelessWidget {
@@ -145,7 +144,7 @@ class ReservationDetailPage extends StatelessWidget {
             style: const TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
-              fontFamily: 'Poppins'
+              fontFamily: 'Poppins',
             ),
           ),
           const SizedBox(height: 12),
@@ -169,7 +168,7 @@ class ReservationDetailPage extends StatelessWidget {
               fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
               fontSize: isBold ? 16 : 14,
               color: valueColor,
-              fontFamily: 'Poppins'
+              fontFamily: 'Poppins',
             ),
           ),
         ],
@@ -182,8 +181,8 @@ class ReservationDetailPage extends StatelessWidget {
       case 'hotel':
         return [
           _buildDetailRow('Type de chambre', reservation.roomType ?? 'Non spécifié'),
-          _buildDetailRow('Arrivée', _formatDate(reservation.checkInDate!)),
-          _buildDetailRow('Départ', _formatDate(reservation.checkOutDate!)),
+          _buildDetailRow('Arrivée', _safeFormatDate(reservation.checkInDate)),
+          _buildDetailRow('Départ', _safeFormatDate(reservation.checkOutDate)),
           _buildDetailRow('Chambres', '${reservation.numberOfRooms ?? 1}'),
           _buildDetailRow('Personnes', '${reservation.numberOfGuests ?? 1}'),
         ];
@@ -191,16 +190,16 @@ class ReservationDetailPage extends StatelessWidget {
         return [
           _buildDetailRow('Table', reservation.tableNumber ?? 'Non spécifiée'),
           _buildDetailRow('Étage', reservation.floor ?? 'Non spécifié'),
-          _buildDetailRow('Date', _formatDate(reservation.date!)),
-          _buildDetailRow('Heure', _formatTime(reservation.time!)),
+          _buildDetailRow('Date', _safeFormatDate(reservation.date)),
+          _buildDetailRow('Heure', _safeFormatTime(reservation.time)),
           _buildDetailRow('Personnes', '${reservation.numberOfPeople ?? 1}'),
         ];
       case 'car_rental':
         return [
           _buildDetailRow('Véhicule', reservation.vehicleType ?? 'Non spécifié'),
-          _buildDetailRow('Début', _formatDate(reservation.rentalStartDate!)),
-          _buildDetailRow('Fin', _formatDate(reservation.rentalEndDate!)),
-          _buildDetailRow('Durée', '${reservation.rentalDays} jours'),
+          _buildDetailRow('Début', _safeFormatDate(reservation.rentalStartDate)),
+          _buildDetailRow('Fin', _safeFormatDate(reservation.rentalEndDate)),
+          _buildDetailRow('Durée', '${reservation.rentalDays ?? 0} jours'),
           _buildDetailRow('Chauffeur', reservation.withDriver == true ? 'Oui' : 'Non'),
           _buildDetailRow('Assurance', reservation.includeInsurance == true ? 'Incluse' : 'Optionnelle'),
           _buildDetailRow('Livraison', reservation.needDelivery == true ? 'Oui' : 'Non'),
@@ -208,16 +207,18 @@ class ReservationDetailPage extends StatelessWidget {
       case 'travel':
         return [
           _buildDetailRow('Destination', reservation.destination ?? 'Non spécifiée'),
-          _buildDetailRow('Départ', _formatDate(reservation.displayDate)),
+          _buildDetailRow('Départ', _safeFormatDate(reservation.displayDate)),
           _buildDetailRow('Heure', reservation.departureTime ?? 'Non spécifiée'),
           _buildDetailRow('Passagers', '${reservation.numberOfPassengers ?? 1}'),
         ];
       case 'spa':
         List<Widget> details = [];
         // Informations générales
-        details.add(_buildDetailRow('Date', _formatDate(reservation.appointmentDate!)));
+        details.add(_buildDetailRow('Date', _safeFormatDate(reservation.appointmentDate)));
         details.add(_buildDetailRow('Heure',
-            '${reservation.appointmentDate!.hour.toString().padLeft(2, '0')}:${reservation.appointmentDate!.minute.toString().padLeft(2, '0')}'));
+            reservation.appointmentDate != null
+                ? '${reservation.appointmentDate!.hour.toString().padLeft(2, '0')}:${reservation.appointmentDate!.minute.toString().padLeft(2, '0')}'
+                : 'Non spécifiée'));
         if (reservation.therapistName != null) {
           details.add(_buildDetailRow('Thérapeute', reservation.therapistName!));
         }
@@ -246,9 +247,8 @@ class ReservationDetailPage extends StatelessWidget {
       case 'cinema':
         return [
           _buildDetailRow('Film', reservation.movieTitle ?? 'Non spécifié'),
-          _buildDetailRow('Séance', reservation.showtime != null
-              ? _formatDateTime(reservation.showtime!)
-              : 'Non spécifiée'),
+          _buildDetailRow('Séance',
+              reservation.showtime != null ? _formatDateTime(reservation.showtime!) : 'Non spécifiée'),
           _buildDetailRow('Type de billet', reservation.ticketType ?? 'Standard'),
           _buildDetailRow('Nombre de places', '${reservation.numberOfTickets ?? 1}'),
           if (reservation.seatNumbers != null && reservation.seatNumbers!.isNotEmpty)
@@ -259,34 +259,33 @@ class ReservationDetailPage extends StatelessWidget {
     }
   }
 
-  String _formatDate(DateTime date) {
+  // ✅ Méthodes de formatage sécurisées
+  String _safeFormatDate(DateTime? date) {
+    if (date == null) return 'Non spécifiée';
     return DateFormat('dd/MM/yyyy').format(date);
   }
 
-  String _formatTime(TimeOfDay time) {
+  String _safeFormatTime(TimeOfDay? time) {
+    if (time == null) return 'Non spécifiée';
     return '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';
   }
 
+  String _formatDate(DateTime date) => DateFormat('dd/MM/yyyy').format(date);
+  String _formatTime(TimeOfDay time) =>
+      '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';
+
   Color _getStatusColor(DateTime reservationDate) {
     final now = DateTime.now();
-    if (reservationDate.isBefore(now)) {
-      return Colors.grey;
-    } else if (reservationDate.difference(now).inDays <= 1) {
-      return Colors.orange;
-    } else {
-      return Colors.green;
-    }
+    if (reservationDate.isBefore(now)) return Colors.grey;
+    if (reservationDate.difference(now).inDays <= 1) return Colors.orange;
+    return Colors.green;
   }
 
   String _getStatusText(DateTime reservationDate) {
     final now = DateTime.now();
-    if (reservationDate.isBefore(now)) {
-      return 'Passée';
-    } else if (reservationDate.difference(now).inDays <= 1) {
-      return 'Bientôt';
-    } else {
-      return 'À venir';
-    }
+    if (reservationDate.isBefore(now)) return 'Passée';
+    if (reservationDate.difference(now).inDays <= 1) return 'Bientôt';
+    return 'À venir';
   }
 }
 

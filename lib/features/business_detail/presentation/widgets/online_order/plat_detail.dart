@@ -188,7 +188,7 @@ class _PlatDetailState extends State<PlatDetail> {
     );
 
     try {
-      await OrderService.saveOrder(order);
+      await OrderApiService();
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Commande passée !'), backgroundColor: Colors.green),

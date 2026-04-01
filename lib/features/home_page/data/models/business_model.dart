@@ -45,40 +45,36 @@ class BusinessModel {
 
   factory BusinessModel.fromJson(Map<String, dynamic> json) {
     return BusinessModel(
-      id: json['id'] as String,
-      name: json['name'] as String,
-      address: json['address'] as String,
-      description: json['description'] as String,
-      bgImg: json['bgImg'] as String,
-      rating: (json['rating'] as num).toDouble(),
-      reviewCount: json['reviewCount'] as int,
-      openingHours: Map<String, String>.from(json['openingHours'] as Map),
-      type: _parseBusinessType(json['type'] as String),
-      phone: json['phone'] as String,
-      email: json['email'] as String?,
-      website: json['website'] as String?,
-      images: List<String>.from(json['images'] as List),
-      specificData: Map<String, dynamic>.from(json['specificData'] as Map),
-      reviews: (json['reviews'] as List).map((review) => BusinessReview(
-        id: review['id'] as String,
-        userName: review['userName'] as String,
-        userAvatar: review['userAvatar'] as String,
-        rating: (review['rating'] as num).toDouble(),
-        comment: review['comment'] as String,
-        date: DateTime.parse(review['date'] as String),
-        likes: review['likes'] as int,
-        commentCount: review['commentCount'] as int? ?? 0,
-      )).toList(),
-      isFavorite: json['isFavorite'] as bool,
+      id: json['id']?.toString() ?? '',
+      name: json['name'] ?? '',
+      address: json['address'] ?? '',
+      description: json['description'] ?? '',
+      bgImg: json['bg_img'] ?? json['bgImg'] ?? '',
+      // Correction pour l'erreur "String has no method toDouble" vue dans tes logs
+      rating: json['rating'] is String
+          ? double.tryParse(json['rating']) ?? 0.0
+          : (json['rating'] as num?)?.toDouble() ?? 0.0,
+      reviewCount: json['review_count'] ?? json['reviewCount'] ?? 0,
+      openingHours: Map<String, String>.from(json['opening_hours'] ?? {}),
+      type: BusinessType.values.firstWhere(
+            (e) => e.name == json['type'],
+        orElse: () => BusinessType.other, // Valeur par défaut si le type est inconnu
+      ),
+      phone: json['phone'] ?? '',
+      email: json['email'],
+      website: json['website'],
+      images: List<String>.from(json['images'] ?? []),
+      specificData: Map<String, dynamic>.from(json['specific_data'] ?? {}),
+      reviews: (json['reviews'] as List?)?.map((r) => BusinessReview.fromJson(r)).toList() ?? [],
+      isFavorite: json['is_favorite'] ?? false,
       latitude: (json['latitude'] as num?)?.toDouble(),
       longitude: (json['longitude'] as num?)?.toDouble(),
       stores: json['stores'] != null
-          ? (json['stores'] as List)
-          .map((store) => BusinessModel.fromJson(store))
-          .toList()
+          ? (json['stores'] as List).map((s) => BusinessModel.fromJson(s)).toList()
           : null,
     );
   }
+
 
   Map<String, dynamic> toJson() {
     return {
@@ -185,8 +181,8 @@ class BusinessModel {
         return BusinessType.spa;
       case 'cinema':
         return BusinessType.cinema;
-      case 'tourisme':
-        return BusinessType.tourisme;
+      case 'tourism':
+        return BusinessType.tourism;
       default:
         return BusinessType.other;
     }
@@ -212,8 +208,8 @@ class BusinessModel {
         return 'spa';
       case BusinessType.cinema:
         return 'cinema';
-      case BusinessType.tourisme:
-        return 'tourisme';
+      case BusinessType.tourism:
+        return 'tourism';
       default:
         return 'other';
     }

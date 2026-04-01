@@ -20,7 +20,7 @@ class RestaurantMenuPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Regrouper les plats par catégorie
+    // Regrouper les plats par catégorie (item_category en SQL)
     final Map<String, List<MenuItem>> groupedItems = {};
     for (var item in menuItems) {
       groupedItems.putIfAbsent(item.itemCategory, () => []).add(item);
@@ -41,25 +41,20 @@ class RestaurantMenuPage extends StatelessWidget {
             SvgPicture.asset(
               'assets/icons/menu-food-svgrepo-com.svg',
               height: 35,
-              colorFilter: ColorFilter.mode(
-                AppColors.primary,
-                BlendMode.srcIn,
-              ),
+              colorFilter: const ColorFilter.mode(AppColors.primary, BlendMode.srcIn),
             ),
             const SizedBox(width: AppDimens.PADDING_12),
-            Text(
+            const Text(
               'Notre Menu',
               style: TextStyle(
                 fontFamily: AppFonts.primaryFontFamily,
                 fontSize: 24,
                 fontWeight: AppFonts.bold,
                 color: AppColors.primary,
-                decoration: TextDecoration.none,
               ),
             ),
           ],
         ),
-
       ),
       body: Container(
         decoration: BoxDecoration(
@@ -70,9 +65,9 @@ class RestaurantMenuPage extends StatelessWidget {
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.7),
+              color: Colors.black.withOpacity(0.1),
               blurRadius: 20,
-              offset: const Offset(0, 10),
+              offset: const Offset(0, -5),
             ),
           ],
         ),
@@ -81,17 +76,10 @@ class RestaurantMenuPage extends StatelessWidget {
     );
   }
 
-  Widget _buildContent(
-      BuildContext context,
-      List<String> categories,
-      Map<String, List<MenuItem>> groupedItems,
-      ) {
+  Widget _buildContent(BuildContext context, List<String> categories, Map<String, List<MenuItem>> groupedItems) {
     if (menuItems.isEmpty) {
       return const Center(
-        child: Text(
-          'Aucun menu disponible',
-          style: TextStyle(fontFamily: AppFonts.primaryFontFamily),
-        ),
+        child: Text('Aucun menu disponible', style: TextStyle(fontFamily: AppFonts.primaryFontFamily)),
       );
     }
 
@@ -106,15 +94,14 @@ class RestaurantMenuPage extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8),
+              padding: const EdgeInsets.symmetric(vertical: 12),
               child: Text(
                 category,
-                style: TextStyle(
+                style: const TextStyle(
                   fontFamily: AppFonts.primaryFontFamily,
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
                   color: AppColors.primary,
-                  decoration: TextDecoration.none,
                 ),
               ),
             ),
@@ -128,12 +115,9 @@ class RestaurantMenuPage extends StatelessWidget {
                 mainAxisSpacing: 16,
               ),
               itemCount: items.length,
-              itemBuilder: (context, idx) {
-                final item = items[idx];
-                return _buildMenuItemCard(context, item);
-              },
+              itemBuilder: (context, idx) => _buildMenuItemCard(context, items[idx]),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 24),
           ],
         );
       },
@@ -142,101 +126,58 @@ class RestaurantMenuPage extends StatelessWidget {
 
   Widget _buildMenuItemCard(BuildContext context, MenuItem item) {
     return GestureDetector(
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (_) => PlatDetail(
-              menuItem: item,
-              restaurantId: restaurantId,
-              restaurantName: restaurantName,
-              isOrderMode: false,
-            ),
+      onTap: () => Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => PlatDetail(
+            menuItem: item,
+            restaurantId: restaurantId,
+            restaurantName: restaurantName,
+            isOrderMode: false,
           ),
-        );
-      },
+        ),
+      ),
       child: Container(
         decoration: BoxDecoration(
           color: AppColors.scaffoldBackground,
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.3),
+              color: Colors.black.withOpacity(0.05),
               blurRadius: 10,
               offset: const Offset(0, 4),
             ),
           ],
         ),
         child: Column(
-          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Expanded(
               flex: 3,
               child: ClipRRect(
                 borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
-                child: Image.asset(
-                  item.imageUrl,
-                  width: double.infinity,
-                  fit: BoxFit.cover,
-                  errorBuilder: (_, __, ___) => Container(
-                    color: Colors.grey[300],
-                    child: const Icon(Icons.fastfood),
-                  ),
-                ),
+                child: item.imageUrl.startsWith('http')
+                    ? Image.network(item.imageUrl, width: double.infinity, fit: BoxFit.cover, errorBuilder: (_, __, ___) => _buildPlaceholder())
+                    : Image.asset(item.imageUrl, width: double.infinity, fit: BoxFit.cover, errorBuilder: (_, __, ___) => _buildPlaceholder()),
               ),
             ),
-            Expanded(
-              flex: 2,
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Expanded(
-                          child: Text(
-                            item.itemName,
-                            style: TextStyle(
-                              fontFamily: AppFonts.primaryFontFamily,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 14,
-                              decoration: TextDecoration.none,
-                            ),
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                        const SizedBox(width: 4),
-                        Text(
-                          '${item.price.toStringAsFixed(2)} €',
-                          style: TextStyle(
-                            fontFamily: AppFonts.primaryFontFamily,
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.primary,
-                            fontSize: 15,
-                            decoration: TextDecoration.none,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      item.description,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        fontFamily: AppFonts.primaryFontFamily,
-                        color: Colors.grey[600],
-                        fontSize: 12,
-                        decoration: TextDecoration.none,
-                      ),
-                    ),
-                  ],
-                ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    item.itemName,
+                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    '${item.price.toStringAsFixed(2)} \$',
+                    style: const TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold),
+                  ),
+                ],
               ),
             ),
           ],
@@ -244,4 +185,6 @@ class RestaurantMenuPage extends StatelessWidget {
       ),
     );
   }
+
+  Widget _buildPlaceholder() => Container(color: Colors.grey[200], child: const Icon(Icons.fastfood, color: Colors.grey));
 }

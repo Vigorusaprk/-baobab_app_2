@@ -1,4 +1,5 @@
 import 'package:baobabe_0_2/features/home_page/data/models/ui_category.dart';
+import 'package:baobabe_0_2/features/home_page/domain/entities/category_entity.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/bloc/business_bloc.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/bloc/category_bloc.dart';
 import 'package:flutter/material.dart';
@@ -11,7 +12,8 @@ class CategoryIcons extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<CategoryBloc, CategoryState>(
       builder: (context, categoryState) {
-        String selectedCategory = 'Tout';
+        Category selectedCategory = Category.allCategories.first;
+
         if (categoryState is CategoriesLoaded) {
           selectedCategory = categoryState.selectedCategory;
         }
@@ -20,17 +22,24 @@ class CategoryIcons extends StatelessWidget {
           height: 120,
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
-            physics: const BouncingScrollPhysics(),
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
             itemCount: UICategory.allCategories.length,
             itemBuilder: (context, index) {
               final uiCategory = UICategory.allCategories[index];
-              return Padding(
-                padding: const EdgeInsets.only(right: 12),
-                child: _buildCategory(
-                  context,
-                  uiCategory,
-                  selectedCategory,
+              final bool isActive = selectedCategory.id == uiCategory.category.id;
+
+              return GestureDetector(
+                onTap: () {
+                  // Sélection visuelle de la catégorie
+                  context.read<CategoryBloc>().add(SelectCategory(uiCategory.category));
+
+                  // FILTRAGE : On envoie bien le .type (Enum BusinessType)
+                  context.read<BusinessBloc>().add(
+                    LoadBusinessesByCategory(uiCategory.category.type),
+                  );
+                },
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: _buildCategory(context, uiCategory, isActive),
                 ),
               );
             },
@@ -40,71 +49,61 @@ class CategoryIcons extends StatelessWidget {
     );
   }
 
-  Widget _buildCategory(BuildContext context, UICategory uiCategory, String selectedCategory) {
-    final isActive = selectedCategory == uiCategory.category.displayName;
-
-    return GestureDetector(
-      onTap: () {
-        // Mettre à jour la catégorie sélectionnée dans le CategoryBloc
-        context.read<CategoryBloc>().add(SelectCategory(uiCategory.category.displayName));
-        // Charger les établissements de cette catégorie via le BusinessBloc
-        context.read<BusinessBloc>().add(LoadBusinessesByCategory(uiCategory.category.displayName));
-      },
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 250),
-        width: 85,
-        decoration: BoxDecoration(
-          color: isActive ? Colors.white : const Color(0xFFF5F7F9),
-          borderRadius: BorderRadius.circular(24),
-          boxShadow: isActive
-              ? [
-            BoxShadow(
-              color: uiCategory.color.withOpacity(0.2),
-              blurRadius: 12,
-              offset: const Offset(0, 6),
-            )
-          ]
-              : [],
-          border: Border.all(
-            color: isActive ? uiCategory.color.withOpacity(0.5) : Colors.transparent,
-            width: 1.5,
-          ),
+  Widget _buildCategory(BuildContext context, UICategory uiCategory, bool isActive) {
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 250),
+      width: 85,
+      decoration: BoxDecoration(
+        color: isActive ? Colors.white : const Color(0xFFF5F7F9),
+        borderRadius: BorderRadius.circular(24),
+        boxShadow: isActive
+            ? [
+          BoxShadow(
+            color: uiCategory.color.withOpacity(0.2),
+            blurRadius: 12,
+            offset: const Offset(0, 6),
+          )
+        ]
+            : [],
+        border: Border.all(
+          color: isActive ? uiCategory.color.withOpacity(0.5) : Colors.transparent,
+          width: 1.5,
         ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            AnimatedContainer(
-              duration: const Duration(milliseconds: 250),
-              width: 52,
-              height: 52,
-              decoration: BoxDecoration(
-                color: isActive ? uiCategory.color : uiCategory.color.withOpacity(0.12),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(
-                uiCategory.icon,
-                color: isActive ? Colors.white : uiCategory.color,
-                size: 26,
-              ),
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          AnimatedContainer(
+            duration: const Duration(milliseconds: 250),
+            width: 52,
+            height: 52,
+            decoration: BoxDecoration(
+              color: isActive ? uiCategory.color : uiCategory.color.withOpacity(0.12),
+              shape: BoxShape.circle,
             ),
-            const SizedBox(height: 10),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 4),
-              child: Text(
-                uiCategory.category.displayName,
-                textAlign: TextAlign.center,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
+            child: Icon(
+              uiCategory.icon,
+              color: isActive ? Colors.white : uiCategory.color,
+              size: 26,
+            ),
+          ),
+          const SizedBox(height: 10),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 4),
+            child: Text(
+              uiCategory.category.displayName,
+              textAlign: TextAlign.center,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
                   fontSize: 12,
                   fontWeight: isActive ? FontWeight.w700 : FontWeight.w500,
                   color: isActive ? Colors.black87 : Colors.grey[600],
                   fontFamily: 'Poppins'
-                ),
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
