@@ -1,8 +1,8 @@
+import 'dart:async';
+
 import 'package:baobabe_0_2/features/auth/presentation/screens/forgot_password_screen.dart';
+import 'package:baobabe_0_2/features/business_detail/domain/entities/reservation.dart';
 import 'package:baobabe_0_2/features/business_detail/presentation/widgets/online_order/plat_detail.dart';
-import 'package:baobabe_0_2/features/favorites_page/data/models/reservation_model.dart';
-// Supprimer l'import de reservation_service.dart
-// import 'package:baobabe_0_2/features/business_detail/presentation/widgets/online_order/reservation_service.dart';
 import 'package:baobabe_0_2/features/favorites_page/presentation/screens/boking_detail_screen.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/screens/search_page.dart';
 import 'package:baobabe_0_2/features/main/presentation/screens/main_screen.dart';
@@ -20,26 +20,53 @@ import 'package:baobabe_0_2/features/favorites_page/presentation/screens/favorit
 import 'package:baobabe_0_2/features/home_page/presentation/screens/home_page_screen.dart';
 import 'package:baobabe_0_2/features/order/presentation/screens/order_screen.dart';
 import 'package:baobabe_0_2/features/settings/presentation/screens/settings_screen.dart';
+import 'package:baobabe_0_2/core/constants/injector.dart';
 
+// Écouteur pour GoRouter (réévalue le redirect à chaque changement d'état du AuthBloc)
+class AuthStateNotifier extends ChangeNotifier {
+  AuthStateNotifier() {
+    final authBloc = Injector.get<AuthBloc>();
+    _subscription = authBloc.stream.listen((_) {
+      notifyListeners();
+    });
+  }
+  late final StreamSubscription _subscription;
+  @override
+  void dispose() {
+    _subscription.cancel();
+    super.dispose();
+  }
+}
+
+final _authStateNotifier = AuthStateNotifier();
 
 final GoRouter appRouter = GoRouter(
   initialLocation: '/',
+  refreshListenable: _authStateNotifier,
   redirect: (context, state) {
     final authState = context.read<AuthBloc>().state;
+    if (authState is AuthInitial || authState is AuthLoading) return null;
     final isLoggedIn = authState is AuthAuthenticated;
     final isAuthRoute = state.matchedLocation.startsWith('/login') ||
         state.matchedLocation.startsWith('/register') ||
         state.matchedLocation.startsWith('/forgot-password');
-
-    if (!isLoggedIn && !isAuthRoute) {
-      return '/login';
-    }
-    if (isLoggedIn && isAuthRoute) {
-      return '/home';
-    }
+    if (!isLoggedIn && !isAuthRoute) return '/login';
+    if (isLoggedIn && isAuthRoute) return '/home';
     return null;
   },
   routes: [
+    // Route racine avec redirection conditionnelle
+    GoRoute(
+      path: '/',
+      redirect: (context, state) {
+        final authState = context.read<AuthBloc>().state;
+        if (authState is AuthInitial || authState is AuthLoading) return null;
+        return authState is AuthAuthenticated ? '/home' : '/login';
+      },
+      pageBuilder: (context, state) => const MaterialPage(
+        child: Scaffold(body: Center(child: CircularProgressIndicator())),
+      ),
+    ),
     // Routes publiques
     GoRoute(
       path: '/login',
@@ -56,7 +83,6 @@ final GoRouter appRouter = GoRouter(
       name: 'forgotPassword',
       pageBuilder: (context, state) => const MaterialPage(child: ForgotPasswordScreen()),
     ),
-
     // Shell principal
     StatefulShellRoute.indexedStack(
       builder: (context, state, navigationShell) {
@@ -93,16 +119,13 @@ final GoRouter appRouter = GoRouter(
         ]),
       ],
     ),
-
     // Autres routes protégées
     GoRoute(
       path: '/business/:id',
       name: 'businessDetail',
       pageBuilder: (context, state) {
         final businessId = state.pathParameters['id']!;
-        return MaterialPage(
-          child: BusinessDetailScreen(businessId: businessId),
-        );
+        return MaterialPage(child: BusinessDetailScreen(businessId: businessId));
       },
     ),
     GoRoute(
@@ -130,9 +153,7 @@ final GoRouter appRouter = GoRouter(
       name: 'orderDetail',
       pageBuilder: (context, state) {
         final order = state.extra as Order;
-        return MaterialPage(
-          child: OrderDetailPage(order: order),
-        );
+        return MaterialPage(child: OrderDetailPage(order: order));
       },
     ),
     GoRoute(
@@ -140,18 +161,14 @@ final GoRouter appRouter = GoRouter(
       name: 'reservationDetail',
       pageBuilder: (context, state) {
         final reservation = state.extra as Reservation;
-        return MaterialPage(
-          child: ReservationDetailPage(reservation: reservation),
-        );
+        return MaterialPage(child: ReservationDetailPage(reservation: reservation));
       },
     ),
     GoRoute(
       path: '/profil-page',
       name: 'profil-page',
       pageBuilder: (context, state) {
-        return MaterialPage(
-          child: ProfilPage(),
-        );
+        return MaterialPage(child: ProfilPage());
       },
     ),
   ],

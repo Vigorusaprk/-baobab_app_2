@@ -11,6 +11,7 @@ class ProfilPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(),
       backgroundColor: AppColors.scaffoldBackground,
       body: BlocBuilder<AuthBloc, AuthState>(
         builder: (context, state) {
@@ -81,6 +82,11 @@ class ProfilPage extends StatelessWidget {
                       _buildSection(
                         title: 'Activité',
                         children: [
+                          _buildActionTile(
+                            icon: Icons.edit,
+                            label: 'Modifier le profil',
+                            onTap: () => context.pushNamed('edit-profile'),
+                          ),
                           _buildActionTile(
                             icon: Icons.shopping_bag_outlined,
                             label: 'Mes commandes',

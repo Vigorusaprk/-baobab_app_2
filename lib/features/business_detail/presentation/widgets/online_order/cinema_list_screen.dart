@@ -1,13 +1,16 @@
 import 'package:baobabe_0_2/core/themes/app_colors.dart';
 import 'package:baobabe_0_2/features/business_detail/domain/entities/movie.dart';
+import 'package:baobabe_0_2/features/business_detail/presentation/bloc/business_detail_bloc.dart';
 import 'package:baobabe_0_2/features/business_detail/presentation/widgets/movie_api_service.dart';
 import 'package:flutter/material.dart';
 import 'package:baobabe_0_2/features/home_page/domain/entities/business_entity.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'movie_detail_screen.dart';
 
 class CinemaListScreen extends StatefulWidget {
   final Business cinema;
-  const CinemaListScreen({super.key, required this.cinema});
+  final BusinessDetailBloc businessDetailBloc;
+  const CinemaListScreen({super.key, required this.cinema, required this.businessDetailBloc});
 
   @override
   State<CinemaListScreen> createState() => _CinemaListScreenState();
@@ -86,9 +89,12 @@ class _CinemaListScreenState extends State<CinemaListScreen> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => MovieDetailScreen(
-                    cinema: widget.cinema,
-                    movie: movie,
+                  builder: (context) => BlocProvider.value(
+                    value: widget.businessDetailBloc,
+                    child: MovieDetailScreen(
+                      cinema: widget.cinema,
+                      movie: movie,
+                    ),
                   ),
                 ),
               );

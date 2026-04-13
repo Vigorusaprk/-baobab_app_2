@@ -1,6 +1,5 @@
 import 'package:baobabe_0_2/core/themes/app_colors.dart';
 import 'package:baobabe_0_2/features/home_page/domain/entities/business_entity.dart';
-import 'package:baobabe_0_2/features/business_detail/data/models/reservation_model.dart';
 import 'package:flutter/material.dart';
 
 void showTravelReservationModal(BuildContext context, Business business) {

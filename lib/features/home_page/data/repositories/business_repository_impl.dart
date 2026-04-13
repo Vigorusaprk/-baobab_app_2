@@ -1,9 +1,8 @@
 import 'package:baobabe_0_2/features/business_detail/domain/entities/menu_restau.dart';
+import 'package:baobabe_0_2/features/favorites_page/data/models/reservation_model.dart';
 import 'package:baobabe_0_2/features/home_page/data/data_sources/remote_datasource/business_remote_datasource.dart';
 import 'package:baobabe_0_2/features/home_page/domain/entities/business_entity.dart';
 import 'package:baobabe_0_2/features/home_page/domain/repositories/business_repository.dart';
-// AJOUT DE L'IMPORT
-import 'package:baobabe_0_2/features/business_detail/data/models/reservation_model.dart';
 import '../models/business_model.dart';
 
 class BusinessRepositoryImpl implements BusinessRepository {

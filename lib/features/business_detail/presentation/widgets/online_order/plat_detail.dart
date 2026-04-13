@@ -57,8 +57,9 @@ class _PlatDetailState extends State<PlatDetail> {
                 fit: BoxFit.cover,
                 errorBuilder: (_, __, ___) => Container(
                   height: 200,
+                  width: double.infinity,
                   color: Colors.grey[300],
-                  child: const Icon(Icons.fastfood),
+                  child: const Icon(Icons.fastfood, size: 100,),
                 ),
               ),
             ),

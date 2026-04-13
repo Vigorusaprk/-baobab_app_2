@@ -24,6 +24,7 @@ import 'package:baobabe_0_2/features/home_page/presentation/bloc/business_bloc.d
 import 'package:baobabe_0_2/features/home_page/presentation/bloc/category_bloc.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/bloc/search_bloc.dart';
 import 'package:baobabe_0_2/features/main/presentation/bloc/main_screen_bloc.dart';
+import 'package:baobabe_0_2/features/settings/presentation/bloc/settings_bloc.dart';
 import 'package:dio/dio.dart';
 import 'package:get_it/get_it.dart';
 
@@ -112,11 +113,7 @@ class Injector {
 
   static void _registerBlocs() {
     // Auth Bloc
-    getIt.registerFactory<AuthBloc>(
-          () => AuthBloc(
-        authRepository: getIt<AuthRepository>(),
-      ),
-    );
+    getIt.registerLazySingleton<AuthBloc>(() => AuthBloc(authRepository: getIt<AuthRepository>()));
 
     // Business Bloc
     getIt.registerFactory<BusinessBloc>(
@@ -153,6 +150,8 @@ class Injector {
     getIt.registerFactory<MainScreenBloc>(
           () => MainScreenBloc(),
     );
+
+    getIt.registerFactory<SettingsCubit>(() => SettingsCubit());
   }
 
   static T get<T extends Object>() {

@@ -1,4 +1,6 @@
 import 'package:baobabe_0_2/core/themes/app_colors.dart';
+import 'package:baobabe_0_2/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:baobabe_0_2/features/business_detail/data/review_api_service.dart';
 import 'package:baobabe_0_2/features/business_detail/presentation/widgets/online_order/car_rental_modal.dart';
 import 'package:baobabe_0_2/features/business_detail/presentation/widgets/online_order/cinema_list_screen.dart';
 // ✅ Import de la page de liste des chambres
@@ -9,6 +11,7 @@ import 'package:baobabe_0_2/features/business_detail/presentation/widgets/online
 import 'package:baobabe_0_2/features/business_detail/presentation/widgets/online_order/spa_reservation_modal.dart';
 import 'package:baobabe_0_2/features/business_detail/presentation/widgets/online_order/tourisme_reservation_modale.dart';
 import 'package:baobabe_0_2/features/order/presentation/bloc/cart_bloc.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:baobabe_0_2/features/home_page/domain/entities/business_entity.dart';
@@ -19,6 +22,7 @@ import 'package:baobabe_0_2/features/home_page/data/models/ui_business.dart';
 import 'package:baobabe_0_2/features/home_page/domain/repositories/business_repository.dart';
 import 'package:baobabe_0_2/core/constants/injector.dart';
 import 'package:baobabe_0_2/features/business_detail/presentation/widgets/online_order/mall_stores_page.dart';
+import 'package:go_router/go_router.dart';
 
 class BusinessActionSection extends StatelessWidget {
   final Business business;
@@ -100,6 +104,14 @@ class BusinessActionSection extends StatelessWidget {
         onTap: () => _showMallStores(context, business),
       ));
     }
+
+
+      actions.add(_buildActionButton(
+        context,
+        icon: "assets/icons/star-circle-svgrepo.svg", // ou Icons.star_rate
+        label: "Donner un avis",
+        onTap: () => _showReviewDialog(context, business),
+      ));
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 20),
@@ -211,23 +223,27 @@ class BusinessActionSection extends StatelessWidget {
   Widget _buildModalContent(String type, Business business) {
     switch (type) {
       case 'restaurant':
-        return RestaurantReservationSheet(business: business);
+        return ReservationModal(business: business);
       case 'car_rental':
         return CarRentalSheet(business: business);
       case 'spa':
-        return SpaSheet(business: business);
+        return SpaReservationModal(business: business);
       case 'tourism':
-        return TourismSheet(business: business);
+        return TourismReservationModal(business: business);
       default:
         return Container();
     }
   }
 
   void _showCinemaMovies(BuildContext context, Business business) {
+    final bloc = context.read<BusinessDetailBloc>();
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => CinemaListScreen(cinema: business),
+        builder: (context) => CinemaListScreen(
+          cinema: business,
+          businessDetailBloc: bloc,
+        ),
       ),
     );
   }
@@ -345,6 +361,72 @@ class BusinessActionSection extends StatelessWidget {
     }
   }
 
+  void _showReviewDialog(BuildContext context, Business business) async {
+    final authState = context.read<AuthBloc>().state;
+    if (authState is! AuthAuthenticated) {
+      context.go('/login');
+      return;
+    }
+
+    int rating = 5;
+    final commentController = TextEditingController();
+
+    await showDialog(
+      context: context,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setStateDialog) {
+          return AlertDialog(
+            backgroundColor: AppColors.surface,
+            title: Text('Donner votre avis sur ${business.name}'),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: List.generate(5, (index) {
+                    return IconButton(
+                      icon: Icon(index < rating ? Icons.star : Icons.star_border, color: Colors.amber),
+                      onPressed: () => setStateDialog(() => rating = index + 1),
+                    );
+                  }),
+                ),
+                TextField(
+                  controller: commentController,
+
+                  decoration: const InputDecoration(
+                      labelText: 'Votre commentaire (optionnel)',
+                    labelStyle: TextStyle(color: AppColors.surface),
+                  ),
+                  maxLines: 3,
+                ),
+              ],
+            ),
+            actions: [
+              TextButton(onPressed: () => Navigator.pop(context), child: const Text('Annuler')),
+              ElevatedButton(
+                onPressed: () async {
+                  try {
+                    final service = ReviewApiService(dio: Injector.get<Dio>());
+                    await service.submitReview(business.id, authState.user.id, rating, commentController.text);
+                    Navigator.pop(context);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Merci pour votre avis !')),
+                    );
+                    // Optionnel : rafraîchir l'affichage des avis
+                  } catch (e) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Erreur: $e'), backgroundColor: Colors.red),
+                    );
+                  }
+                },
+                child: const Text('Envoyer'),
+              ),
+            ],
+          );
+        },
+      ),
+    );
+  }
   List<MenuItem> _convertToMenuItemList(List<dynamic> data) {
     return data.map((item) {
       if (item is MenuItem) return item;

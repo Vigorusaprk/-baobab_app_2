@@ -1,4 +1,4 @@
-import 'package:baobabe_0_2/features/favorites_page/data/models/reservation_model.dart';
+import 'package:baobabe_0_2/features/business_detail/domain/entities/reservation.dart';
 import 'package:dio/dio.dart';
 
 

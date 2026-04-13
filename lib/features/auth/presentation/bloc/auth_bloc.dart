@@ -19,7 +19,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   Future<void> _onLogin(AuthLoginEvent event, Emitter<AuthState> emit) async {
     emit(AuthLoading());
     try {
-      final user = await authRepository.login(event.email, event.password);
+      final user = await authRepository.login(event.email, event.password, rememberMe: event.rememberMe);
       emit(AuthAuthenticated(user: user));
     } catch (error) {
       emit(AuthError(message: error.toString()));
@@ -50,7 +50,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       } else {
         emit(AuthUnAuthenticated());
       }
-    } catch (error) {
+    } catch (e) {
       emit(AuthUnAuthenticated());
     }
   }

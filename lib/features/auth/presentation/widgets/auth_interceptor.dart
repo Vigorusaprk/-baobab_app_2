@@ -1,6 +1,4 @@
 import 'package:dio/dio.dart';
-import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthInterceptor extends Interceptor {
@@ -17,18 +15,13 @@ class AuthInterceptor extends Interceptor {
   }
 
   @override
-  void onError(DioException err, ErrorInterceptorHandler handler) {
+  void onError(DioException err, ErrorInterceptorHandler handler) async {
     if (err.response?.statusCode == 401) {
-      // Token expiré ou invalide -> déconnecter l'utilisateur
-      _logout();
+      // Token expiré ou invalide -> déconnexion
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.remove(_tokenKey);
+      // Optionnel: rediriger vers login via un service de navigation
     }
     handler.next(err);
-  }
-
-  Future<void> _logout() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.remove(_tokenKey);
-    // Rediriger vers l'écran de connexion (à adapter selon votre système de navigation)
-    // Si vous utilisez un GlobalKey<NavigatorState>, vous pouvez l'utiliser ici.
   }
 }

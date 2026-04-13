@@ -1,5 +1,4 @@
 import 'dart:ui';
-
 import 'package:baobabe_0_2/core/themes/app_colors.dart';
 import 'package:baobabe_0_2/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:baobabe_0_2/features/auth/presentation/widgets/password_field.dart';
@@ -21,6 +20,7 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  bool _rememberMe = false;  // ✅ Ajout
 
   @override
   void dispose() {
@@ -44,7 +44,11 @@ class _LoginPageState extends State<LoginPage> {
     }
 
     context.read<AuthBloc>().add(
-      AuthLoginEvent(email: email, password: password),
+      AuthLoginEvent(
+        email: email,
+        password: password,
+        rememberMe: _rememberMe,  // ✅ Ajout
+      ),
     );
   }
 
@@ -53,7 +57,7 @@ class _LoginPageState extends State<LoginPage> {
     return BlocListener<AuthBloc, AuthState>(
       listener: (context, state) {
         if (state is AuthAuthenticated) {
-          context.go('/home'); // ← Au lieu de Navigator.pushReplacement
+          context.go('/home');
         } else if (state is AuthError) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -66,17 +70,14 @@ class _LoginPageState extends State<LoginPage> {
       },
       child: authBackground(
         child: Scaffold(
-          backgroundColor: Colors.transparent, // Fond très clair pour le contraste
+          backgroundColor: Colors.transparent,
           body: Center(
             child: SingleChildScrollView(
               padding: const EdgeInsets.symmetric(horizontal: 24),
               child: Column(
                 children: [
-                  // Logo et Titre
                   _buildHeader(),
                   const SizedBox(height: 40),
-
-                  // Formulaire dans un conteneur épuré
                   ClipRRect(
                     borderRadius: BorderRadius.circular(22),
                     child: BackdropFilter(
@@ -93,7 +94,7 @@ class _LoginPageState extends State<LoginPage> {
                               offset: const Offset(0, 10),
                             ),
                           ],
-                          border: Border.all(width: 2.5, color: AppColors.primary)
+                          border: Border.all(width: 2.5, color: AppColors.primary),
                         ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -105,13 +106,33 @@ class _LoginPageState extends State<LoginPage> {
                             ),
                             const SizedBox(height: 20),
                             PasswordField(
-                                controller: _passwordController,
-                                label: 'Mot de passe',
+                              controller: _passwordController,
+                              label: 'Mot de passe',
+                            ),
+                            // ✅ Case "Se souvenir de moi"
+                            Row(
+                              children: [
+                                Checkbox(
+                                  value: _rememberMe,
+                                  onChanged: (value) {
+                                    setState(() {
+                                      _rememberMe = value ?? false;
+                                    });
+                                  },
+                                  activeColor: AppColors.primary,
+                                ),
+                                const Text(
+                                  'Se souvenir de moi',
+                                  style: TextStyle(color: Color(0xFF254D32), fontWeight: FontWeight.w500),
+                                ),
+                              ],
                             ),
                             Align(
                               alignment: Alignment.centerRight,
                               child: TextButton(
-                                onPressed: () {},
+                                onPressed: () {
+                                  context.go('/forgot-password');
+                                },
                                 child: const Text(
                                   'Mot de passe oublié ?',
                                   style: TextStyle(color: Color(0xFF254D32), fontWeight: FontWeight.w600),
@@ -125,26 +146,20 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                     ),
                   ),
-
                   const SizedBox(height: 32),
                   _buildDivider(),
                   const SizedBox(height: 24),
-
-                  // Boutons Sociaux
                   _buildSocialButton(label: 'Google', icon: "assets/icons/google.svg"),
                   const SizedBox(height: 12),
                   _buildSocialButton(label: 'Facebook', icon: "assets/icons/facebook.svg"),
-
                   const SizedBox(height: 32),
-
-                  // Lien d'inscription
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text("Pas de compte ?", style: TextStyle(color: AppColors.primary)),
                       TextButton(
                         onPressed: () {
-                          context.go('/register'); // ← Au lieu de Navigator.push
+                          context.go('/register');
                         },
                         child: const Text(
                           'Inscrivez-vous',

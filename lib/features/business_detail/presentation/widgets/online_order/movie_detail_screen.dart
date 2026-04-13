@@ -130,6 +130,8 @@ class MovieDetailScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 12),
                 ...movie.showtimes.map((showtime) {
+                  final formattedTime = '${showtime.startTime.hour.toString().padLeft(2, '0')}:${showtime.startTime.minute.toString().padLeft(2, '0')}';
+                  final formattedDate = '${showtime.startTime.day}/${showtime.startTime.month}/${showtime.startTime.year}';
                   return Container(
                     margin: const EdgeInsets.symmetric(vertical: 10),
                     padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
@@ -140,38 +142,23 @@ class MovieDetailScreen extends StatelessWidget {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Container(
-                          padding: const EdgeInsets.all(8),
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: AppColors.primary.withOpacity(0.1),
-                          ),
-                          child: Text(
-                            '${showtime.startTime.hour}h${showtime.startTime.minute.toString().padLeft(2, '0')}',
-                            style: const TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                        ),
-                        Expanded(
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 12),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'Salle ${showtime.room}',
-                                  style: const TextStyle(fontWeight: FontWeight.bold),
-                                ),
-                                Text(
-                                  '${showtime.price} €',
-                                  style: const TextStyle(color: Colors.grey),
-                                ),
-                              ],
-                            ),
-                          ),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(formattedDate, style: Theme.of(context).textTheme.bodyMedium),
+                            Text(formattedTime, style: Theme.of(context).textTheme.bodyMedium),
+                            Text('${showtime.room} • ${showtime.price.toStringAsFixed(2)} €',
+                                style: Theme.of(context).textTheme.bodySmall),
+                          ],
                         ),
                         ElevatedButton(
                           onPressed: () {
-                            showCinemaReservationModal(context, cinema, movie, showtime);
+                            showCinemaReservationModal(
+                              context,
+                              cinema: cinema,
+                              movie: movie,
+                              showtime: showtime,
+                            );
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: AppColors.primary,
@@ -179,12 +166,12 @@ class MovieDetailScreen extends StatelessWidget {
                               borderRadius: BorderRadius.circular(20),
                             ),
                           ),
-                          child: const Text('Réserver'),
+                          child: const Text('Réserver', style: TextStyle(color: Colors.white)),
                         ),
                       ],
                     ),
                   );
-                }),
+                }).toList(),
                 const SizedBox(height: 25),
               ]),
             ),
