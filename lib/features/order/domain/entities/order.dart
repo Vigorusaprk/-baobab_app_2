@@ -167,7 +167,7 @@ class Order {
         subtotal: _toDouble(map['subtotal']) ?? computedSubtotal,
         tax: _toDouble(map['tax']) ?? 0.0,
         totalAmount: _toDouble(map['total_amount']) ?? 0.0,
-        status: OrderStatus.values[_toInt(map['status']) ?? 0],
+        status: _parseOrderStatus(map['status']),
         notes: map['notes']?.toString(),
         deliveryAddress: map['delivery_address']?.toString(),
         deliveryFee: _toDouble(map['delivery_fee']),
@@ -180,6 +180,24 @@ class Order {
       rethrow;
     }
   }
+}
+
+OrderStatus _parseOrderStatus(dynamic value) {
+  if (value is String) {
+    final normalized = value.trim().toLowerCase();
+    for (final status in OrderStatus.values) {
+      if (status.name == normalized) {
+        return status;
+      }
+    }
+  }
+
+  final index = _toInt(value);
+  if (index != null && index >= 0 && index < OrderStatus.values.length) {
+    return OrderStatus.values[index];
+  }
+
+  return OrderStatus.pending;
 }
 
 // Fonctions utilitaires

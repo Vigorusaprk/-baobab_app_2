@@ -1,7 +1,7 @@
 import 'package:baobabe_0_2/core/themes/app_colors.dart';
 import 'package:baobabe_0_2/features/home_page/data/models/ui_business.dart';
 import 'package:baobabe_0_2/features/home_page/domain/entities/business_entity.dart';
-import 'package:baobabe_0_2/features/business_detail/presentation/widgets/online_order/boutique_detial.dart';
+import 'package:baobabe_0_2/features/business_detail/presentation/widgets/online_order/page/boutique_detial.dart';
 import 'package:flutter/material.dart';
 
 class MallStoresPage extends StatefulWidget {

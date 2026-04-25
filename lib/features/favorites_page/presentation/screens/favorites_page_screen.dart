@@ -48,7 +48,7 @@ class _FavoritesPageScreenState extends State<FavoritesPageScreen> {
   Future<void> _loadReservations() async {
     setState(() => _isLoading = true);
     try {
-      final reservations = await _apiService.getReservations(_userId);
+      final reservations = await _apiService.getReservations(userId: _userId);
       print('📦 Nombre total de réservations : ${reservations.length}');
       for (var r in reservations) {
         print('  - Type: ${r.reservationType}, Établissement: ${r.establishmentName}');
@@ -94,7 +94,7 @@ class _FavoritesPageScreenState extends State<FavoritesPageScreen> {
 
   Future<void> _deleteReservation(String id) async {
     try {
-      await _apiService.deleteReservation(id);
+      await _apiService.deleteReservation(id, userId: _userId);
       await _loadReservations();
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -226,17 +226,73 @@ class _FavoritesPageScreenState extends State<FavoritesPageScreen> {
             child: _displayedReservations.isEmpty
                 ? Center(
               child: Padding(
-                padding: const EdgeInsets.all(AppDimens.PADDING_32),
+                padding: const EdgeInsets.symmetric(horizontal: 24),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(Icons.filter_alt_off, size: 64, color: AppColors.grey.withOpacity(0.5)),
-                    const SizedBox(height: AppDimens.PADDING_16),
-                    Text('Aucune réservation trouvée', style: TextStyle(fontSize: 18, fontWeight: AppFonts.semiBold, color: AppColors.textPrimary, fontFamily: AppFonts.primaryFontFamily)),
-                    const SizedBox(height: AppDimens.PADDING_8),
-                    Text('Aucune réservation ne correspond au filtre "$_selectedFilter"', textAlign: TextAlign.center, style: TextStyle(fontSize: 14, color: AppColors.grey, fontFamily: AppFonts.primaryFontFamily)),
-                    const SizedBox(height: AppDimens.PADDING_24),
-                    ElevatedButton(onPressed: () => _filterReservations('Tous'), style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary, foregroundColor: AppColors.white, padding: const EdgeInsets.symmetric(horizontal: AppDimens.PADDING_24, vertical: AppDimens.PADDING_12), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppDimens.BORDER_RADIUS_12))), child: const Text('Afficher toutes les réservations')),
+                    Container(
+                      padding: const EdgeInsets.all(24),
+                      decoration: BoxDecoration(
+                        color: Colors.grey[100],
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(
+                          color: Colors.grey[300]!,
+                          width: 2,
+                        ),
+                      ),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            Icons.filter_alt_off,
+                            size: 64,
+                            color: Colors.grey[400],
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            'Aucune réservation',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.scaffoldBackground,
+                              fontFamily: AppFonts.primaryFontFamily,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            'Aucune réservation ne correspond au filtre "$_selectedFilter"',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.grey[600],
+                              fontFamily: AppFonts.primaryFontFamily,
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          SizedBox(
+                            width: double.infinity,
+                            child: OutlinedButton(
+                              onPressed: () => _filterReservations('Tous'),
+                              style: OutlinedButton.styleFrom(
+                                foregroundColor: AppColors.primary,
+                                side: const BorderSide(color: AppColors.primary, width: 2),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                padding: const EdgeInsets.symmetric(vertical: 12),
+                              ),
+                              child: const Text(
+                                'Voir toutes les réservations',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -256,29 +312,110 @@ class _FavoritesPageScreenState extends State<FavoritesPageScreen> {
   }
 
   Widget _buildEmptyState() {
-    return Padding(
-      padding: const EdgeInsets.all(AppDimens.PADDING_32),
-      child: Center(
-        child: ClipRRect(
-          child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-            child: Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(color: AppColors.primary.withOpacity(0.25), borderRadius: BorderRadius.circular(22), border: Border.all(color: AppColors.primary, width: 3)),
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 48),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(32),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    AppColors.primary.withOpacity(0.15),
+                    AppColors.primary.withOpacity(0.05),
+                  ],
+                ),
+                borderRadius: BorderRadius.circular(24),
+                border: Border.all(
+                  color: AppColors.primary.withOpacity(0.3),
+                  width: 2,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.primary.withOpacity(0.1),
+                    blurRadius: 20,
+                    offset: const Offset(0, 8),
+                  ),
+                ],
+              ),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  SvgPicture.asset('assets/icons/calendar-date-svgrepo-com (1).svg', height: 120, colorFilter: ColorFilter.mode(AppColors.scaffoldBackground, BlendMode.srcIn)),
-                  const SizedBox(height: AppDimens.PADDING_10),
-                  Text('Aucune réservation', style: TextStyle(fontSize: 20, fontWeight: AppFonts.semiBold, color: AppColors.scaffoldBackground, fontFamily: AppFonts.primaryFontFamily)),
-                  const SizedBox(height: AppDimens.PADDING_12),
-                  Text('Vos réservations futures apparaîtront ici', textAlign: TextAlign.center, style: TextStyle(fontSize: 16, color: AppColors.primary, fontFamily: AppFonts.primaryFontFamily), maxLines: 2, overflow: TextOverflow.ellipsis),
-                  const SizedBox(height: AppDimens.PADDING_32),
-                  ElevatedButton(onPressed: _loadReservations, style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary, foregroundColor: AppColors.white, padding: const EdgeInsets.symmetric(horizontal: AppDimens.PADDING_24, vertical: AppDimens.PADDING_12), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppDimens.BORDER_RADIUS_12))), child: const Text('Actualiser')),
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: AppColors.primary.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: SvgPicture.asset(
+                      'assets/icons/calendar-date-svgrepo-com (1).svg',
+                      height: 80,
+                      colorFilter: ColorFilter.mode(AppColors.primary, BlendMode.srcIn),
+                    ),
+                  ),
+                  const SizedBox(height: 28),
+                  Text(
+                    'Aucune réservation',
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.scaffoldBackground,
+                      fontFamily: AppFonts.primaryFontFamily,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    'Vous n\'avez pas encore passé de réservation',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.grey[600],
+                      fontFamily: AppFonts.primaryFontFamily,
+                      height: 1.5,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Explorez nos hôtels, restaurants et services pour réserver',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: Colors.grey[500],
+                      fontFamily: AppFonts.primaryFontFamily,
+                    ),
+                  ),
+                  const SizedBox(height: 28),
+                  SizedBox(
+                    width: double.infinity,
+                    height: 48,
+                    child: ElevatedButton.icon(
+                      onPressed: () => context.go('/home'),
+                      icon: const Icon(Icons.storefront_outlined, size: 20),
+                      label: const Text(
+                        'Découvrir les commerces',
+                        style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.primary,
+                        foregroundColor: AppColors.scaffoldBackground,
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),
-          ),
+          ],
         ),
       ),
     );

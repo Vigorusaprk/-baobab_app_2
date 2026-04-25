@@ -1,16 +1,17 @@
 import 'package:baobabe_0_2/core/themes/app_colors.dart';
 import 'package:baobabe_0_2/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:baobabe_0_2/features/business_detail/data/review_api_service.dart';
-import 'package:baobabe_0_2/features/business_detail/presentation/widgets/online_order/car_rental_modal.dart';
-import 'package:baobabe_0_2/features/business_detail/presentation/widgets/online_order/cinema_list_screen.dart';
+import 'package:baobabe_0_2/features/business_detail/presentation/widgets/online_order/page/car_list_page.dart';
+import 'package:baobabe_0_2/features/business_detail/presentation/widgets/online_order/page/cinema_list_screen.dart';
 // ✅ Import de la page de liste des chambres
-import 'package:baobabe_0_2/features/business_detail/presentation/widgets/online_order/hotel_rooms_list_page.dart';
-import 'package:baobabe_0_2/features/business_detail/presentation/widgets/online_order/reservation_modal.dart';
-import 'package:baobabe_0_2/features/business_detail/presentation/widgets/online_order/restaurant_menu_page.dart';
-import 'package:baobabe_0_2/features/business_detail/presentation/widgets/online_order/menu_section.dart';
+import 'package:baobabe_0_2/features/business_detail/presentation/widgets/online_order/page/hotel_rooms_list_page.dart';
+import 'package:baobabe_0_2/features/business_detail/presentation/widgets/online_order/page/reservation_modal.dart';
+import 'package:baobabe_0_2/features/business_detail/presentation/widgets/online_order/page/restaurant_menu_page.dart';
+import 'package:baobabe_0_2/features/business_detail/presentation/widgets/online_order/page/menu_section.dart' hide CarListPage;
 import 'package:baobabe_0_2/features/business_detail/presentation/widgets/online_order/spa_reservation_modal.dart';
 import 'package:baobabe_0_2/features/business_detail/presentation/widgets/online_order/tourisme_reservation_modale.dart';
 import 'package:baobabe_0_2/features/order/presentation/bloc/cart_bloc.dart';
+// ✅ Import de la nouvelle page de liste des véhicules
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -21,7 +22,7 @@ import 'package:baobabe_0_2/features/business_detail/presentation/bloc/business_
 import 'package:baobabe_0_2/features/home_page/data/models/ui_business.dart';
 import 'package:baobabe_0_2/features/home_page/domain/repositories/business_repository.dart';
 import 'package:baobabe_0_2/core/constants/injector.dart';
-import 'package:baobabe_0_2/features/business_detail/presentation/widgets/online_order/mall_stores_page.dart';
+import 'package:baobabe_0_2/features/business_detail/presentation/widgets/online_order/page/mall_stores_page.dart';
 import 'package:go_router/go_router.dart';
 
 class BusinessActionSection extends StatelessWidget {
@@ -51,14 +52,21 @@ class BusinessActionSection extends StatelessWidget {
         context,
         icon: resIcon,
         label: "Réserver chambre",
-        onTap: () => _showHotelRoomsList(context, business), // ✅ Nouvelle navigation
+        onTap: () => _showHotelRoomsList(context, business),
       ));
-    } else if (business.type == BusinessType.carRental || business.type == BusinessType.travelAgency) {
+    } else if (business.type == BusinessType.carRental) {
       actions.add(_buildActionButton(
         context,
         icon: resIcon,
         label: "Réserver véhicule",
-        onTap: () => _showReservationModal(context, business, 'car_rental'),
+        onTap: () => _showCarRentalList(context, business), // ✅ Nouvelle navigation
+      ));
+    } else if (business.type == BusinessType.travelAgency) {
+      actions.add(_buildActionButton(
+        context,
+        icon: resIcon,
+        label: "Réserver voyage",
+        onTap: () => _showReservationModal(context, business, 'travel'), // ou modal voyage
       ));
     } else if (business.type == BusinessType.spa) {
       actions.add(_buildActionButton(
@@ -105,13 +113,12 @@ class BusinessActionSection extends StatelessWidget {
       ));
     }
 
-
-      actions.add(_buildActionButton(
-        context,
-        icon: "assets/icons/star-circle-svgrepo.svg", // ou Icons.star_rate
-        label: "Donner un avis",
-        onTap: () => _showReviewDialog(context, business),
-      ));
+    actions.add(_buildActionButton(
+      context,
+      icon: "assets/icons/star-circle-svgrepo.svg",
+      label: "Donner un avis",
+      onTap: () => _showReviewDialog(context, business),
+    ));
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 20),
@@ -224,12 +231,13 @@ class BusinessActionSection extends StatelessWidget {
     switch (type) {
       case 'restaurant':
         return ReservationModal(business: business);
-      case 'car_rental':
-        return CarRentalSheet(business: business);
       case 'spa':
         return SpaReservationModal(business: business);
       case 'tourism':
         return TourismReservationModal(business: business);
+      case 'travel':
+      // À remplacer par un modal dédié si nécessaire
+        return Container();
       default:
         return Container();
     }
@@ -248,13 +256,25 @@ class BusinessActionSection extends StatelessWidget {
     );
   }
 
-  // ✅ Navigation vers la liste des chambres
   void _showHotelRoomsList(BuildContext context, Business business) {
     final bloc = context.read<BusinessDetailBloc>();
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => HotelRoomsListPage(hotel: business, businessDetailBloc: bloc,),
+        builder: (context) => HotelRoomsListPage(hotel: business, businessDetailBloc: bloc),
+      ),
+    );
+  }
+
+  // ✅ Nouvelle méthode pour la location de véhicules (liste)
+  void _showCarRentalList(BuildContext context, Business business) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => CarListPage(
+          businessId: business.id,
+          businessName: business.name,
+        ),
       ),
     );
   }
@@ -275,7 +295,6 @@ class BusinessActionSection extends StatelessWidget {
     }
   }
 
-  // ✅ Menu (lecture API)
   void _showMenu(BuildContext context, Business business) async {
     showDialog(
       context: context,
@@ -288,7 +307,7 @@ class BusinessActionSection extends StatelessWidget {
       final items = await repository.getMenuByBusiness(business.id);
       if (items.isNotEmpty) {
         final bloc = context.read<BusinessDetailBloc>();
-        Navigator.pop(context); // fermer loader
+        Navigator.pop(context);
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -316,7 +335,6 @@ class BusinessActionSection extends StatelessWidget {
     }
   }
 
-  // ✅ Commander (lecture API)
   void _orderFood(BuildContext context, Business business) async {
     showDialog(
       context: context,
@@ -392,9 +410,8 @@ class BusinessActionSection extends StatelessWidget {
                 ),
                 TextField(
                   controller: commentController,
-
                   decoration: const InputDecoration(
-                      labelText: 'Votre commentaire (optionnel)',
+                    labelText: 'Votre commentaire (optionnel)',
                     labelStyle: TextStyle(color: AppColors.surface),
                   ),
                   maxLines: 3,
@@ -412,7 +429,6 @@ class BusinessActionSection extends StatelessWidget {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(content: Text('Merci pour votre avis !')),
                     );
-                    // Optionnel : rafraîchir l'affichage des avis
                   } catch (e) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(content: Text('Erreur: $e'), backgroundColor: Colors.red),
@@ -427,6 +443,7 @@ class BusinessActionSection extends StatelessWidget {
       ),
     );
   }
+
   List<MenuItem> _convertToMenuItemList(List<dynamic> data) {
     return data.map((item) {
       if (item is MenuItem) return item;

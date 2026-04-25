@@ -3,7 +3,7 @@ import 'package:baobabe_0_2/core/themes/app_colors.dart';
 import 'package:baobabe_0_2/core/themes/app_diemens.dart';
 import 'package:baobabe_0_2/core/themes/app_fonts.dart';
 import 'package:baobabe_0_2/features/business_detail/domain/entities/menu_restau.dart';
-import 'package:baobabe_0_2/features/business_detail/presentation/widgets/online_order/plat_detail.dart';
+import 'package:baobabe_0_2/features/business_detail/presentation/widgets/online_order/page/plat_detail.dart';
 import 'package:flutter_svg/svg.dart';
 
 class RestaurantMenuPage extends StatelessWidget {

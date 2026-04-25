@@ -1,40 +1,25 @@
 const express = require('express');
-const { Pool } = require('pg');
 const cors = require('cors');
-const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
-const JWT_SECRET = 'votre_secret_jwt';
+require('dotenv').config();
+const pool = require('./src/db/pool');
+const isBusinessOwner = require('./src/middleware/isBusinessOwner');
+const createOrdersRouter = require('./src/routes/orders');
+const createAuthRouter = require('./src/routes/auth');
+const createVehiclesRouter = require('./src/routes/vehicles');
+
+const JWT_SECRET = process.env.JWT_SECRET;
+if (!JWT_SECRET) {
+  throw new Error('JWT_SECRET manquant. Définissez-le dans les variables d\'environnement.');
+}
 
 const app = express();
-const PORT = 3000;
+const PORT = parseInt(process.env.PORT, 10) || 3000;
 
 app.use(cors());
 app.use(express.json());
-
-const pool = new Pool({
-  user: 'postgres',
-  host: 'localhost',
-  database: 'baobabe_db',
-  password: 'admin123',
-  port: 5432,
-});
-
-// ==================== MIDDLEWARE ====================
-function isBusinessOwner(req, res, next) {
-  const authHeader = req.headers.authorization;
-  if (!authHeader) return res.status(401).json({ error: 'Token manquant' });
-  const token = authHeader.split(' ')[1];
-  try {
-    const decoded = jwt.verify(token, JWT_SECRET);
-    if (!decoded.businessId) {
-      return res.status(403).json({ error: 'Accès réservé aux commerçants' });
-    }
-    req.user = decoded;
-    next();
-  } catch (err) {
-    return res.status(401).json({ error: 'Token invalide' });
-  }
-}
+app.use(createOrdersRouter({ pool, isBusinessOwner }));
+app.use(createAuthRouter({ pool, jwtSecret: JWT_SECRET }));
+app.use(createVehiclesRouter({ pool }));
 
 // ==================== BUSINESS ====================
 app.get('/api/businesses', async (req, res) => {
@@ -207,140 +192,7 @@ app.delete('/api/reservations/:id', async (req, res) => {
   }
 });
 
-// ==================== COMMANDES ====================
-app.post('/api/orders', async (req, res) => {
-  const { user_id, business_id, items, delivery_address, delivery_fee, payment_method, notes } = req.body;
-  const client = await pool.connect();
-  try {
-    await client.query('BEGIN');
-    let total = 0;
-    for (const item of items) {
-      const menuRes = await client.query('SELECT price FROM menu_items WHERE id = $1', [item.menu_item_id]);
-      if (menuRes.rows.length === 0) throw new Error(`Item ${item.menu_item_id} introuvable`);
-      total += menuRes.rows[0].price * item.quantity;
-    }
-    total += delivery_fee || 0;
-
-    const orderRes = await client.query(
-      `INSERT INTO orders (user_id, business_id, status, total_amount, delivery_address, delivery_fee, payment_method, notes)
-       VALUES ($1, $2, 'pending', $3, $4, $5, $6, $7) RETURNING id`,
-      [user_id, business_id, total, delivery_address, delivery_fee || 0, payment_method, notes]
-    );
-    const orderId = orderRes.rows[0].id;
-
-    for (const item of items) {
-      const menuRes = await client.query('SELECT price FROM menu_items WHERE id = $1', [item.menu_item_id]);
-      const unitPrice = menuRes.rows[0].price;
-      await client.query(
-        `INSERT INTO order_items (order_id, menu_item_id, quantity, unit_price, special_instructions)
-         VALUES ($1, $2, $3, $4, $5)`,
-        [orderId, item.menu_item_id, item.quantity, unitPrice, item.special_instructions]
-      );
-    }
-    await client.query('COMMIT');
-    res.status(201).json({ id: orderId, message: 'Commande créée' });
-  } catch (err) {
-    await client.query('ROLLBACK');
-    console.error(err.message);
-    res.status(500).json({ error: err.message });
-  } finally {
-    client.release();
-  }
-});
-
-app.get('/api/orders', async (req, res) => {
-  const { user_id } = req.query;
-  if (!user_id) return res.status(400).json({ error: 'user_id requis' });
-  try {
-    const orders = await pool.query(
-      `SELECT o.*, b.name AS establishment_name,
-              json_agg(json_build_object(
-                'menu_item_id', oi.menu_item_id,
-                'name', mi.item_name,
-                'unit_price', oi.unit_price,
-                'quantity', oi.quantity,
-                'special_instructions', oi.special_instructions
-              )) as items
-       FROM orders o
-       LEFT JOIN business b ON o.business_id = b.id
-       LEFT JOIN order_items oi ON oi.order_id = o.id
-       LEFT JOIN menu_items mi ON oi.menu_item_id = mi.id
-       WHERE o.user_id = $1
-       GROUP BY o.id, b.name
-       ORDER BY o.created_at DESC`,
-      [user_id]
-    );
-    res.json(orders.rows);
-  } catch (err) {
-    console.error(err.message);
-    res.status(500).json({ error: err.message });
-  }
-});
-
-app.patch('/api/orders/:id', async (req, res) => {
-  const { id } = req.params;
-  const { status } = req.body;
-  try {
-    const result = await pool.query(
-      'UPDATE orders SET status = $1, updated_at = CURRENT_TIMESTAMP WHERE id = $2 RETURNING id',
-      [status, id]
-    );
-    if (result.rowCount === 0) return res.status(404).json({ error: 'Commande non trouvée' });
-    res.json({ message: 'Statut mis à jour', id: result.rows[0].id });
-  } catch (err) {
-    console.error(err.message);
-    res.status(500).json({ error: err.message });
-  }
-});
-
 // ==================== ROUTES BUSINESS (commerçants) ====================
-app.get('/api/businesses/:businessId/orders', isBusinessOwner, async (req, res) => {
-  const { businessId } = req.params;
-  const { status, page = 1, limit = 20 } = req.query;
-  const offset = (page - 1) * limit;
-  try {
-    let query = 'SELECT * FROM orders WHERE business_id = $1';
-    const params = [businessId];
-    if (status) {
-      query += ' AND status = $2';
-      params.push(status);
-    }
-    query += ' ORDER BY created_at DESC LIMIT $' + (params.length + 1) + ' OFFSET $' + (params.length + 2);
-    params.push(limit, offset);
-    const result = await pool.query(query, params);
-    const countResult = await pool.query('SELECT COUNT(*) FROM orders WHERE business_id = $1', [businessId]);
-    res.json({
-      orders: result.rows,
-      total: parseInt(countResult.rows[0].count),
-      page: parseInt(page),
-      limit: parseInt(limit),
-    });
-  } catch (err) {
-    console.error(err.message);
-    res.status(500).json({ error: err.message });
-  }
-});
-
-app.patch('/api/orders/:id/status', isBusinessOwner, async (req, res) => {
-  const { id } = req.params;
-  const { status } = req.body;
-  const validStatus = ['pending', 'confirmed', 'preparing', 'ready', 'delivered', 'cancelled'];
-  if (!validStatus.includes(status)) {
-    return res.status(400).json({ error: 'Statut invalide' });
-  }
-  try {
-    const order = await pool.query('SELECT business_id FROM orders WHERE id = $1', [id]);
-    if (order.rows.length === 0) return res.status(404).json({ error: 'Commande non trouvée' });
-    if (order.rows[0].business_id !== req.user.businessId) {
-      return res.status(403).json({ error: 'Non autorisé' });
-    }
-    await pool.query('UPDATE orders SET status = $1, updated_at = NOW() WHERE id = $2', [status, id]);
-    res.json({ message: 'Statut mis à jour' });
-  } catch (err) {
-    console.error(err.message);
-    res.status(500).json({ error: err.message });
-  }
-});
 
 app.get('/api/businesses/:businessId/reservations', isBusinessOwner, async (req, res) => {
   const { businessId } = req.params;
@@ -406,101 +258,6 @@ app.patch('/api/businesses/:id/rooms/:roomId', isBusinessOwner, async (req, res)
   } catch (err) {
     console.error(err.message);
     res.status(500).json({ error: err.message });
-  }
-});
-
-// ==================== AUTHENTIFICATION ====================
-// ==================== AUTHENTIFICATION ====================
-// Inscription
-app.post('/api/auth/signup', async (req, res) => {
-  console.log('Signup body reçu:', req.body);
-  const { name, email, password, phone } = req.body;
-  if (!name || !email || !password) {
-    return res.status(400).json({ error: 'Tous les champs sont requis' });
-  }
-  try {
-    const existing = await pool.query('SELECT id FROM users WHERE email = $1', [email]);
-    if (existing.rows.length > 0) {
-      return res.status(409).json({ error: 'Email déjà utilisé' });
-    }
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const id = Date.now().toString();
-    await pool.query(
-      `INSERT INTO users (id, name, email, password, phone, img_url, created_at)
-       VALUES ($1, $2, $3, $4, $5, $6, NOW())`,
-      [id, name, email, hashedPassword, phone || null, '']
-    );
-    const token = jwt.sign({ id, email, businessId: null }, JWT_SECRET, { expiresIn: '2h' });
-    res.status(201).json({
-      id,
-      name,
-      email,
-      token,
-      businessId: null,        // ← Ajouté
-    });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// Connexion
-app.post('/api/auth/login', async (req, res) => {
-  const { email, password, rememberMe } = req.body;
-  console.log('Login body reçu:', req.body);
-  if (!email || !password) {
-    return res.status(400).json({ error: 'Email et mot de passe requis' });
-  }
-  try {
-    const result = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
-    if (result.rows.length === 0) {
-      return res.status(401).json({ error: 'Email ou mot de passe incorrect' });
-    }
-    const user = result.rows[0];
-    const valid = await bcrypt.compare(password, user.password);
-    if (!valid) {
-      return res.status(401).json({ error: 'Email ou mot de passe incorrect' });
-    }
-    await pool.query('UPDATE users SET last_login = NOW() WHERE id = $1', [user.id]);
-    const expiresIn = rememberMe ? '7d' : '2h';
-    const token = jwt.sign(
-      { id: user.id, email: user.email, businessId: user.business_id },
-      JWT_SECRET,
-      { expiresIn }
-    );
-    res.json({
-      id: user.id,
-      name: user.name,
-      email: user.email,
-      imgUrl: user.img_url ?? '',
-      token,
-      businessId: user.business_id,    // ← Ajouté
-    });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// Obtenir l'utilisateur courant
-app.get('/api/auth/me', async (req, res) => {
-  const authHeader = req.headers.authorization;
-  if (!authHeader) return res.status(401).json({ error: 'Token manquant' });
-  const token = authHeader.split(' ')[1];
-  try {
-    const decoded = jwt.verify(token, JWT_SECRET);
-    const result = await pool.query('SELECT id, name, email, img_url, business_id FROM users WHERE id = $1', [decoded.id]);
-    if (result.rows.length === 0) return res.status(404).json({ error: 'Utilisateur non trouvé' });
-    const user = result.rows[0];
-    res.json({
-      id: user.id,
-      name: user.name,
-      email: user.email,
-      imgUrl: user.img_url ?? '',
-      businessId: user.business_id,
-    });
-  } catch (err) {
-    return res.status(401).json({ error: 'Token invalide' });
   }
 });
 
@@ -664,25 +421,6 @@ app.patch('/api/businesses/:businessId/menu/:itemId', isBusinessOwner, async (re
     res.json({ message: 'Article mis à jour' });
   } catch (err) {
     console.error('Erreur modification item:', err.message);
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// ==================== AJOUTER UN ARTICLE AU MENU ====================
-app.post('C', isBusinessOwner, async (req, res) => {
-  const { businessId } = req.params;
-  const { item_name, price, item_category } = req.body;
-  console.log('📝 Ajout article reçu:', { businessId, item_name, price, item_category });
-  try {
-    const result = await pool.query(
-      `INSERT INTO menu_items (business_id, item_name, price, item_category, is_available)
-       VALUES ($1, $2, $3, $4, true)
-       RETURNING id`,
-      [businessId, item_name, price, item_category]
-    );
-    res.status(201).json({ id: result.rows[0].id, message: 'Article ajouté' });
-  } catch (err) {
-    console.error('❌ Erreur ajout:', err.message);
     res.status(500).json({ error: err.message });
   }
 });

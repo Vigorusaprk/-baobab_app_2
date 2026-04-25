@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 class Reservation {
   final String id;
+  final String? businessId;
   final String establishmentName;
   final String reservationType;
   final String customerName;
@@ -60,6 +61,7 @@ class Reservation {
 
   Reservation({
     required this.id,
+    this.businessId,
     required this.establishmentName,
     required this.reservationType,
     required this.customerName,
@@ -164,6 +166,7 @@ class Reservation {
 
     return Reservation(
       id: map['id']?.toString() ?? '',
+      businessId: map['business_id'],
       establishmentName: map['establishment_name'] ?? '',
       reservationType: map['type'] ?? '',
       customerName: details['customer_name'] ?? map['customer_name'] ?? '',
@@ -206,5 +209,85 @@ class Reservation {
       day: _parseDate(details['day']),
       selectedActivities: details['selected_activities'] != null ? List<Map<String, dynamic>>.from(details['selected_activities']) : null,
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    final details = <String, dynamic>{};
+
+    // Configuration commune
+    details['customer_name'] = customerName;
+    details['phone'] = phoneNumber;
+    details['notes'] = notes;
+
+    // Configuration spécifique par type de réservation
+    switch (reservationType) {
+      case 'car_rental':
+        details['vehicle_type'] = vehicleType;
+        details['rental_start_date'] = rentalStartDate?.toIso8601String();
+        details['rental_end_date'] = rentalEndDate?.toIso8601String();
+        details['rental_days'] = rentalDays;
+        details['with_driver'] = withDriver;
+        details['include_insurance'] = includeInsurance;
+        details['need_delivery'] = needDelivery;
+        break;
+
+      case 'hotel':
+        details['room_type'] = roomType;
+        details['check_in_date'] = checkInDate?.toIso8601String();
+        details['check_out_date'] = checkOutDate?.toIso8601String();
+        details['number_of_rooms'] = numberOfRooms;
+        details['number_of_guests'] = numberOfGuests;
+        break;
+
+      case 'restaurant':
+        details['table_number'] = tableNumber;
+        details['floor'] = floor;
+        details['date'] = date?.toIso8601String();
+        details['time'] = time != null ? '${time!.hour}:${time!.minute}' : null;
+        details['guests'] = numberOfPeople;
+        break;
+
+      case 'spa':
+        details['treatment_type'] = treatmentType;
+        details['duration_minutes'] = durationMinutes;
+        details['therapist_name'] = therapistName;
+        details['appointment_date'] = appointmentDate?.toIso8601String();
+        details['selected_treatments'] = selectedTreatments;
+        break;
+
+      case 'cinema':
+        details['movie_title'] = movieTitle;
+        details['showtime'] = showtime?.toIso8601String();
+        details['ticket_type'] = ticketType;
+        details['tickets_count'] = numberOfTickets;
+        details['seat_numbers'] = seatNumbers;
+        break;
+
+      case 'travel':
+        details['destination'] = destination;
+        details['number_of_passengers'] = numberOfPassengers;
+        details['departure_time'] = departureTime;
+        break;
+
+      case 'toursime':
+        details['activity_name'] = activitiName;
+        details['activity_type'] = activiteType;
+        details['day'] = day?.toIso8601String();
+        details['selected_activities'] = selectedActivities;
+        break;
+    }
+
+    return {
+      'id': id,
+      'business_id': businessId,
+      'establishment_name': establishmentName,
+      'type': reservationType,
+      'customer_name': customerName,
+      'phone_number': phoneNumber,
+      'notes': notes,
+      'total_amount': totalAmount,
+      'reservation_date': reservationDate.toIso8601String(),
+      'details': details,
+    };
   }
 }

@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:baobabe_0_2/features/auth/presentation/screens/forgot_password_screen.dart';
 import 'package:baobabe_0_2/features/business_detail/domain/entities/reservation.dart';
-import 'package:baobabe_0_2/features/business_detail/presentation/widgets/online_order/plat_detail.dart';
+import 'package:baobabe_0_2/features/business_detail/presentation/widgets/online_order/page/plat_detail.dart';
 import 'package:baobabe_0_2/features/favorites_page/presentation/screens/boking_detail_screen.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/screens/search_page.dart';
 import 'package:baobabe_0_2/features/main/presentation/screens/main_screen.dart';

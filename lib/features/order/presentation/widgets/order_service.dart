@@ -50,7 +50,7 @@ class OrderApiService {
 
   Future<void> updateOrderStatus(String orderId, OrderStatus status) async {
     try {
-      await _dio.patch('$_baseUrl/orders/$orderId', data: {'status': status.index});
+      await _dio.patch('$_baseUrl/orders/$orderId', data: {'status': status.name});
     } catch (e) {
       throw Exception('Erreur lors de la mise à jour du statut : $e');
     }

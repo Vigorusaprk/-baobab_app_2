@@ -28,6 +28,7 @@ class AuthResponse {
   final String email;
   final String? imgUrl;
   final String token;
+  final String refreshToken;
   final DateTime expirationDate;
 
   AuthResponse({
@@ -36,11 +37,13 @@ class AuthResponse {
     required this.email,
     this.imgUrl,
     required this.token,
+    required this.refreshToken,
     required this.expirationDate,
   });
 
   factory AuthResponse.fromJson(Map<String, dynamic> json) {
-    final token = json['token'] as String;
+    final token = (json['accessToken'] ?? json['token']) as String;
+    final refreshToken = (json['refreshToken'] ?? '') as String;
     final decoded = JwtDecoder.decode(token);
     final expirationDate = DateTime.fromMillisecondsSinceEpoch(decoded['exp'] * 1000);
     return AuthResponse(
@@ -49,6 +52,7 @@ class AuthResponse {
       email: json['email']?.toString() ?? '',
       imgUrl: json['imgUrl']?.toString(),
       token: token,
+      refreshToken: refreshToken,
       expirationDate: expirationDate,
     );
   }

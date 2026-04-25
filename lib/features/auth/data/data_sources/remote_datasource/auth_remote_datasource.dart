@@ -4,6 +4,8 @@ import 'package:dio/dio.dart';
 abstract class AuthRemoteDataSource {
   Future<AuthResponse> login(String email, String password, {bool rememberMe = false});
   Future<AuthResponse> signUp(String name, String email, String password, {String? imgUrl});
+  Future<AuthResponse> refreshSession(String refreshToken);
+  Future<void> logout(String refreshToken);
   Future<UserInfo> getCurrentUser(String token);
 }
 
@@ -38,6 +40,23 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       },
     );
     return AuthResponse.fromJson(response.data);
+  }
+
+  @override
+  Future<AuthResponse> refreshSession(String refreshToken) async {
+    final response = await dio.post(
+      '$baseUrl/auth/refresh',
+      data: {'refreshToken': refreshToken},
+    );
+    return AuthResponse.fromJson(response.data);
+  }
+
+  @override
+  Future<void> logout(String refreshToken) async {
+    await dio.post(
+      '$baseUrl/auth/logout',
+      data: {'refreshToken': refreshToken},
+    );
   }
 
   @override
