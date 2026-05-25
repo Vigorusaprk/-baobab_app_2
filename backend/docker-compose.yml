@@ -1,0 +1,21 @@
+services:
+  backend:
+    build: .
+    container_name: baobab_backend
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      - PORT=3000
+      - JWT_SECRET=${JWT_SECRET:-votre_secret_jwt_par_defaut}
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_USER=postgres
+      - DB_PASSWORD=admin123
+      - DB_NAME=baobabe_db
+    networks:
+      - baobabe-net
+
+networks:
+  baobabe-net:
+    external: true

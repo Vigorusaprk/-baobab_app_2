@@ -41,7 +41,7 @@ class HomePageScreen extends StatelessWidget {
                       const SizedBox(height: AppDimens.PADDING_20),
                       const HelloUserWidget(),
                       const SizedBox(height: AppDimens.PADDING_20),
-                      const CategoryIcons(),
+                      //const CategoryIcons(),
                       const SizedBox(height: AppDimens.PADDING_30),
                       const BusinessCardsWidget(),
                       const SizedBox(height: AppDimens.PADDING_40),

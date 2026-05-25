@@ -8,6 +8,7 @@ import 'package:baobabe_0_2/features/home_page/presentation/screens/search_page.
 import 'package:baobabe_0_2/features/main/presentation/screens/main_screen.dart';
 import 'package:baobabe_0_2/features/order/domain/entities/order.dart';
 import 'package:baobabe_0_2/features/order/presentation/screens/order_detail_page.dart';
+import 'package:baobabe_0_2/features/settings/presentation/widgets/edit_profile_page.dart';
 import 'package:baobabe_0_2/features/settings/presentation/widgets/profil_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -171,5 +172,13 @@ final GoRouter appRouter = GoRouter(
         return MaterialPage(child: ProfilPage());
       },
     ),
+    
+    GoRoute(
+      path: '/edit-profile',
+      name: 'edit-profile',
+      pageBuilder: (context, state){
+        return MaterialPage(child: EditProfilePage());
+      }  
+    )
   ],
 );

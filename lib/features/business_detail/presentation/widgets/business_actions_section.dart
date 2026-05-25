@@ -113,12 +113,6 @@ class BusinessActionSection extends StatelessWidget {
       ));
     }
 
-    actions.add(_buildActionButton(
-      context,
-      icon: "assets/icons/star-circle-svgrepo.svg",
-      label: "Donner un avis",
-      onTap: () => _showReviewDialog(context, business),
-    ));
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 20),

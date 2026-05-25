@@ -1,4 +1,3 @@
-// lib/features/location/presentation/widgets/location_and_profile.dart
 import 'package:baobabe_0_2/core/themes/app_colors.dart';
 import 'package:baobabe_0_2/core/themes/app_diemens.dart';
 import 'package:flutter/material.dart';

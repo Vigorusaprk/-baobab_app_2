@@ -1,5 +1,5 @@
 import 'package:baobabe_0_2/features/auth/data/data_sources/remote_datasource/auth_remote_datasource.dart';
-import 'package:baobabe_0_2/features/auth/data/repositories/auth_repository_impl.dart'; // ✅ bon chemin
+import 'package:baobabe_0_2/features/auth/data/repositories/auth_repository_impl.dart';
 import 'package:baobabe_0_2/features/auth/domain/repositories/auth_repository.dart';
 import 'package:baobabe_0_2/features/auth/domain/usecases/check_auth_status_use_case.dart';
 import 'package:baobabe_0_2/features/auth/domain/usecases/login_usecase.dart';
@@ -39,13 +39,14 @@ class Injector {
   }
 
   static void _registerDataSources() {
-    // Dio doit être enregistré en premier
     final dio = Dio(BaseOptions(
+      baseUrl: 'http://10.0.2.2:3000/api', // ✅ Ajout indispensable
       connectTimeout: const Duration(seconds: 30),
       receiveTimeout: const Duration(seconds: 30),
     ));
     dio.interceptors.add(AuthInterceptor());
     getIt.registerLazySingleton<Dio>(() => dio);
+
     // Ensuite les autres data sources
     getIt.registerLazySingleton<BusinessRemoteDataSource>(
           () => BusinessRemoteDataSourceImpl(),
@@ -56,26 +57,22 @@ class Injector {
   }
 
   static void _registerRepositories() {
-    // Auth Repository – **CORRECTION** : fournir remoteDataSource
     getIt.registerLazySingleton<AuthRepository>(
           () => AuthRepositoryImpl(
         remoteDataSource: getIt<AuthRemoteDataSource>(),
       ),
     );
 
-    // Business Repository
     getIt.registerLazySingleton<BusinessRepository>(
           () => BusinessRepositoryImpl(
         remoteDataSource: getIt<BusinessRemoteDataSource>(),
       ),
     );
 
-    // Category Repository
     getIt.registerLazySingleton<CategoryRepository>(
           () => CategoryRepositoryImpl(),
     );
 
-    // Search Repository
     getIt.registerLazySingleton<SearchRepository>(
           () => SearchRepositoryImpl(localDataSource: getIt()),
     );

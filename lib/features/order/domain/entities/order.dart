@@ -180,7 +180,46 @@ class Order {
       rethrow;
     }
   }
+
+  String get typeName {
+    switch (establishmentType) {
+      case 'hotel': return 'Hôtel';
+      case 'car_rental': return 'Location de véhicule';
+      case 'travel': return 'Voyage en bus';
+      case 'spa': return 'Spa & Bien-être';
+      case 'cinema': return 'Cinéma';
+      case 'toursime': return 'Tourisme';
+      default: return 'Restaurant';
+    }
+  }
+
+
+  IconData get typeIcon {
+    switch (establishmentType) {
+      case 'hotel': return Icons.hotel;
+      case 'car_rental': return Icons.directions_car;
+      case 'travel': return Icons.directions_bus;
+      case 'spa': return Icons.spa;
+      case 'cinema': return Icons.movie;
+      case 'toursime': return Icons.tour;
+      default: return Icons.restaurant;
+    }
+  }
+
+  Color get typeColor {
+    switch (establishmentType) {
+      case 'hotel': return const Color(0xFF009688);
+      case 'car_rental': return const Color(0xFF3F51B5);
+      case 'travel': return const Color(0xFF9C27B0);
+      case 'spa': return const Color(0xFFE91E63);
+      case 'cinema': return const Color(0xFF673AB7);
+      case 'toursime': return const Color(0xFF795548);
+      default: return Colors.orange;
+    }
+  }
 }
+
+
 
 OrderStatus _parseOrderStatus(dynamic value) {
   if (value is String) {

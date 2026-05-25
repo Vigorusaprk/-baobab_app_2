@@ -1,3 +1,4 @@
+import 'package:baobabe_0_2/features/business_detail/presentation/widgets/menu_cards.dart';
 import 'package:flutter/material.dart';
 import 'package:baobabe_0_2/core/themes/app_colors.dart';
 import 'package:baobabe_0_2/core/themes/app_diemens.dart';
@@ -28,14 +29,14 @@ class RestaurantMenuPage extends StatelessWidget {
     final categories = groupedItems.keys.toList();
 
     return Scaffold(
-      backgroundColor: AppColors.scaffoldBackground,
+      backgroundColor: AppColors.primary,
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
+        backgroundColor: AppColors.primary,
         elevation: 0,
         leading: IconButton(
           icon: const Icon(
             Icons.arrow_back_ios_new_rounded,
-            color: AppColors.primary,
+            color: AppColors.scaffoldBackground,
           ),
           onPressed: () => Navigator.pop(context),
         ),
@@ -45,7 +46,7 @@ class RestaurantMenuPage extends StatelessWidget {
               'assets/icons/menu-food-svgrepo-com.svg',
               height: 35,
               colorFilter: const ColorFilter.mode(
-                AppColors.primary,
+                AppColors.scaffoldBackground,
                 BlendMode.srcIn,
               ),
             ),
@@ -56,7 +57,7 @@ class RestaurantMenuPage extends StatelessWidget {
                 fontFamily: AppFonts.primaryFontFamily,
                 fontSize: 24,
                 fontWeight: AppFonts.bold,
-                color: AppColors.primary,
+                color: AppColors.scaffoldBackground,
               ),
             ),
           ],
@@ -118,103 +119,17 @@ class RestaurantMenuPage extends StatelessWidget {
                 ),
               ),
             ),
-            GridView.builder(
+            ListView.builder(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                childAspectRatio: 0.7,
-                crossAxisSpacing: 16,
-                mainAxisSpacing: 16,
-              ),
               itemCount: items.length,
               itemBuilder: (context, idx) =>
-                  _buildMenuItemCard(context, items[idx]),
+                  RestaurantInfoBigCard(item: items[idx]),
             ),
             const SizedBox(height: 24),
           ],
         );
       },
-    );
-  }
-
-  Widget _buildMenuItemCard(BuildContext context, MenuItem item) {
-    return GestureDetector(
-      onTap: () => Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (_) => PlatDetail(
-            menuItem: item,
-            restaurantId: restaurantId,
-            restaurantName: restaurantName,
-            isOrderMode: false,
-          ),
-        ),
-      ),
-      child: Container(
-        decoration: BoxDecoration(
-          color: AppColors.scaffoldBackground,
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Expanded(
-              flex: 3,
-              child: ClipRRect(
-                borderRadius: const BorderRadius.vertical(
-                  top: Radius.circular(16),
-                ),
-                child: item.imageUrl.startsWith('http')
-                    ? Image.network(
-                        item.imageUrl,
-                        width: double.infinity,
-                        fit: BoxFit.cover,
-                        errorBuilder: (_, __, ___) => _buildPlaceholder(),
-                      )
-                    : Image.asset(
-                        item.imageUrl,
-                        width: double.infinity,
-                        fit: BoxFit.cover,
-                        errorBuilder: (_, __, ___) => _buildPlaceholder(),
-                      ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    item.itemName,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 14,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    '${item.price.toStringAsFixed(2)} \$',
-                    style: const TextStyle(
-                      color: AppColors.primary,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
     );
   }
 
@@ -224,3 +139,6 @@ class RestaurantMenuPage extends StatelessWidget {
     child: const Icon(Icons.fastfood, color: Colors.grey, size: 50,),
   );
 }
+
+
+

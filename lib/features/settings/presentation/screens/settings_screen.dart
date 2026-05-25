@@ -254,6 +254,7 @@ class SettingsScreen extends StatelessWidget {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
+        backgroundColor: AppColors.scaffoldBackground,
         title: Text("Choisir la langue", style: AppFonts.titleMedium),
         content: Column(
           mainAxisSize: MainAxisSize.min,
@@ -299,6 +300,8 @@ class SettingsScreen extends StatelessWidget {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
+        backgroundColor: AppColors.scaffoldBackground,
+
         title: Text("Choisir le thème", style: AppFonts.titleMedium),
         content: Column(
           mainAxisSize: MainAxisSize.min,

@@ -14,26 +14,42 @@ class OrderDetailPage extends StatelessWidget {
     final dateFormat = DateFormat('dd/MM/yyyy HH:mm');
 
     return Scaffold(
-      backgroundColor: AppColors.scaffoldBackground,
+      appBar: AppBar(
+        backgroundColor: AppColors.primary,
+        title: Text(
+          'Détails de la commande',
+          style: TextStyle(
+              fontSize: 22,
+              fontWeight: FontWeight.bold,
+              color: order.status.color,
+              fontFamily: 'Poppins'
+          ),
+        ),
+
+        leading: IconButton(
+          icon: const Icon(
+            Icons.arrow_back_ios_new_rounded,
+            color: AppColors.scaffoldBackground,
+          ),
+          onPressed: () => Navigator.pop(context),
+        ),
+      ),
+      backgroundColor: AppColors.primary,
       body: Container(
         padding: const EdgeInsets.all(24),
-        decoration: const BoxDecoration(
-          borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
+        decoration: BoxDecoration(
+          color: AppColors.scaffoldBackground,
+          borderRadius: const BorderRadius.only(
+            topLeft: Radius.circular(AppDimens.BORDER_RADIUS_30),
+            topRight: Radius.circular(AppDimens.BORDER_RADIUS_30),
+          ),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SizedBox(height: 24),
-            Text(
-              'Détails de la commande',
-              style: TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
-                color: order.status.color,
-                fontFamily: 'Poppins'
-              ),
-            ),
+
             const SizedBox(height: 16),
             Expanded(
               child: SingleChildScrollView(
@@ -41,7 +57,7 @@ class OrderDetailPage extends StatelessWidget {
                   children: [
                     _buildDetailSection('Restaurant', [
                       _buildDetailRow('Nom', order.establishmentName),
-                      _buildDetailRow('Type', _getTypeDisplayName(order.establishmentType)),
+                      _buildDetailRow('Type', order.typeName),
                     ]),
                     _buildDetailSection('Date et heure', [
                       _buildDetailRow('Passée le', dateFormat.format(order.orderDate)),
@@ -66,7 +82,7 @@ class OrderDetailPage extends StatelessWidget {
                       Container(
                         padding: EdgeInsets.symmetric(horizontal: AppDimens.PADDING_10, vertical: AppDimens.PADDING_10),
                         decoration: BoxDecoration(
-                          color: AppColors.primary.withOpacity(0.3),
+                          color: AppColors.success.withOpacity(0.3),
                           borderRadius: BorderRadius.circular(AppDimens.BORDER_RADIUS_15)
                         ),
                         child: _buildDetailRow('Total', '${order.totalAmount.toStringAsFixed(2)} \$', isBold: true),

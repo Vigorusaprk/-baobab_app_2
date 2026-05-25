@@ -1,10 +1,12 @@
+import 'package:baobabe_0_2/core/constants/injector.dart';
 import 'package:baobabe_0_2/core/themes/app_colors.dart';
-import 'package:baobabe_0_2/core/themes/app_diemens.dart';
+import 'package:baobabe_0_2/features/business_detail/data/review_api_service.dart';
+import 'package:baobabe_0_2/features/business_detail/domain/entities/review.dart';
 import 'package:baobabe_0_2/features/home_page/data/models/ui_business.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'dart:ui';
-
 
 class BusinessCardWidget extends StatelessWidget {
   final UIBusiness uiBusiness;
@@ -13,95 +15,100 @@ class BusinessCardWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(30),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.12),
-            blurRadius: 20,
-            offset: const Offset(0, 10),
-          ),
-        ],
-        border: Border.all(color: uiBusiness.categoryColor, width: 2.5)
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(28),
-        child: Stack(
-          children: [
-            // Image de fond
-            Positioned.fill(
-              child: _buildBackGroudImage(),
-            ),
+    return FutureBuilder<List<Review>>(
+      future: ReviewApiService(dio: Injector.get<Dio>()).getReviews(uiBusiness.business.id),
+      builder: (context, snapshot) {
+        // Calcul de la note moyenne réelle
+        double rating;
+        if (snapshot.hasData && snapshot.data!.isNotEmpty) {
+          final reviews = snapshot.data!;
+          rating = reviews.map((r) => r.rating).reduce((a, b) => a + b) / reviews.length;
+        } else {
+          rating = uiBusiness.business.rating; // fallback
+        }
 
-            // Gradient protecteur
-            Positioned.fill(
-              child: DecoratedBox(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [
-                      Colors.transparent,
-                      Colors.black.withOpacity(0.6),
-                    ],
-                    stops: const [0.6, 1.0],
+        return Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(30),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.12),
+                blurRadius: 20,
+                offset: const Offset(0, 10),
+              ),
+            ],
+            border: Border.all(color: uiBusiness.categoryColor, width: 2.5),
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(28),
+            child: Stack(
+              children: [
+                Positioned.fill(child: _buildBackgroundImage()),
+                Positioned.fill(
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          Colors.transparent,
+                          Colors.black.withOpacity(0.6),
+                        ],
+                        stops: const [0.6, 1.0],
+                      ),
+                    ),
                   ),
                 ),
-              ),
+                Positioned(
+                  top: 16,
+                  right: 16,
+                  child: _buildCategoryBadge(),
+                ),
+                Positioned(
+                  bottom: 16,
+                  left: 16,
+                  right: 16,
+                  child: _buildInfoOverlay(rating),
+                ),
+              ],
             ),
-
-            // Badge de catégorie
-            Positioned(
-              top: 16,
-              right: 16,
-              child: _buildCategoryBadge(),
-            ),
-
-            // Overlay d'information
-            Positioned(
-              bottom: 16,
-              left: 16,
-              right: 16,
-              child: _buildInfoOverlay(),
-            ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 
-  // Widget pour l'image de profil (grande zone)
-  Widget _buildBackGroudImage(){
+  Widget _buildBackgroundImage() {
     final hasImage = uiBusiness.business.bgImg != null && uiBusiness.business.bgImg!.isNotEmpty;
-    final Color = uiBusiness.categoryColor;
+    final Color color = uiBusiness.categoryColor;
 
     return Container(
       width: double.infinity,
       height: 200,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(28),
-        color: hasImage ? null : uiBusiness.categoryColor, // Fond coloré si pas d'image
+        color: hasImage ? null : color,
       ),
-      child: hasImage ?
-      ClipRRect(
+      child: hasImage
+          ? ClipRRect(
         borderRadius: BorderRadius.circular(28),
         child: Image.network(
-            uiBusiness.business.bgImg!,
+          uiBusiness.business.bgImg!,
           fit: BoxFit.cover,
           errorBuilder: (context, error, stackTrace) {
-            // Si l'image ne se charge pas, afficher les initiales
-            return _buildInitialsContainer(Color);
+            return _buildInitialsContainer(color);
           },
         ),
-      ) : _buildInitialsContainer(Color)
+      )
+          : _buildInitialsContainer(color),
     );
   }
+
   Widget _buildInitialsContainer(Color color) {
     return Container(
       decoration: BoxDecoration(
-          color: color,
-          borderRadius: BorderRadius.circular(28)
+        color: color,
+        borderRadius: BorderRadius.circular(28),
       ),
       width: double.infinity,
       height: 200,
@@ -110,7 +117,7 @@ class BusinessCardWidget extends StatelessWidget {
           uiBusiness.categoryIcon,
           size: 80,
           color: Colors.white,
-        )
+        ),
       ),
     );
   }
@@ -133,7 +140,7 @@ class BusinessCardWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildInfoOverlay() {
+  Widget _buildInfoOverlay(double rating) {
     return ClipRRect(
       borderRadius: BorderRadius.circular(22),
       child: BackdropFilter(
@@ -162,7 +169,7 @@ class BusinessCardWidget extends StatelessWidget {
                       ),
                     ),
                   ),
-                  _buildRatingBadge(),
+                  _buildRatingBadge(rating),
                 ],
               ),
               const SizedBox(height: 8),
@@ -190,7 +197,7 @@ class BusinessCardWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildRatingBadge() {
+  Widget _buildRatingBadge(double rating) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
@@ -202,7 +209,7 @@ class BusinessCardWidget extends StatelessWidget {
           const Icon(Icons.star_rounded, size: 16, color: Colors.white),
           const SizedBox(width: 4),
           Text(
-            uiBusiness.business.rating.toString(),
+            rating.toStringAsFixed(1),
             style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12),
           ),
         ],

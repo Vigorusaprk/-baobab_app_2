@@ -125,60 +125,62 @@ class _FavoritesPageScreenState extends State<FavoritesPageScreen> {
     return MainBackground(
       child: Scaffold(
         backgroundColor: Colors.transparent,
-        body: Padding(
-          padding: EdgeInsets.symmetric(horizontal: MediaQuery.of(context).size.width * 0.05),
-          child: Column(
-            children: [
-              // En-tête
-              Padding(
-                padding: const EdgeInsets.fromLTRB(20, 55, 20, 20),
-                child: Row(
-                  children: [
-                    SvgPicture.asset('assets/icons/calendar-date-svgrepo-com (1).svg', height: 35,
-                        colorFilter: ColorFilter.mode(AppColors.scaffoldBackground, BlendMode.srcIn)),
-                    const SizedBox(width: AppDimens.PADDING_12),
-                    Text('Mes Réservations', style: TextStyle(fontFamily: AppFonts.primaryFontFamily, fontSize: 24, fontWeight: AppFonts.bold, color: AppColors.scaffoldBackground)),
-                    const Spacer(),
-                    if (_allReservations.isNotEmpty)
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: AppDimens.PADDING_12, vertical: AppDimens.PADDING_6),
-                        decoration: BoxDecoration(color: AppColors.primary.withOpacity(0.15), borderRadius: BorderRadius.circular(AppDimens.BORDER_RADIUS_16)),
-                        child: Text('${_allReservations.length}', style: TextStyle(color: AppColors.primary, fontWeight: AppFonts.semiBold, fontSize: 14, fontFamily: 'Poppins')),
-                      ),
-                  ],
-                ),
-              ),
-              // Filtres
-              if (_allReservations.isNotEmpty)
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: AppDimens.PADDING_16, vertical: AppDimens.PADDING_8),
-                  child: SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Row(
-                      children: [
-                        _buildFilterChip('Tous', () => _filterReservations('Tous')),
-                        const SizedBox(width: 8),
-                        _buildFilterChip('Hôtels', () => _filterReservations('Hôtels')),
-                        const SizedBox(width: 8),
-                        _buildFilterChip('Restaurants', () => _filterReservations('Restaurants')),
-                        const SizedBox(width: 8),
-                        _buildFilterChip('Locations', () => _filterReservations('Locations')),
-                        const SizedBox(width: 8),
-                        _buildFilterChip('Voyages', () => _filterReservations('Voyages')),
-                        const SizedBox(width: 8),
-                        _buildFilterChip('Spas', () => _filterReservations('Spas')),
-                        const SizedBox(width: 8),
-                        _buildFilterChip('Cinémas', () => _filterReservations('Cinémas')),
-                        const SizedBox(width: 8),
-                        _buildFilterChip('Tourisme', () => _filterReservations('Tourisme')),
-                      ],
+        body: Column(
+          children: [
+            // En-tête
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 55, 20, 20),
+              child: Row(
+                children: [
+                  SvgPicture.asset('assets/icons/calendar-date-svgrepo-com (1).svg', height: 35,
+                      colorFilter: ColorFilter.mode(AppColors.scaffoldBackground, BlendMode.srcIn)),
+                  const SizedBox(width: AppDimens.PADDING_12),
+                  Text('Mes Réservations', style: TextStyle(fontFamily: AppFonts.primaryFontFamily, fontSize: 24, fontWeight: AppFonts.bold, color: AppColors.scaffoldBackground)),
+                  const Spacer(),
+                  if (_allReservations.isNotEmpty)
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: AppDimens.PADDING_12, vertical: AppDimens.PADDING_6),
+                      decoration: BoxDecoration(color: AppColors.scaffoldBackground, borderRadius: BorderRadius.circular(AppDimens.BORDER_RADIUS_16)),
+                      child: Text('${_allReservations.length}', style: TextStyle(color: AppColors.primary, fontWeight: AppFonts.semiBold, fontSize: 14, fontFamily: 'Poppins')),
                     ),
+                ],
+              ),
+            ),
+            // Filtres
+            if (_allReservations.isNotEmpty)
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                  child: Row(
+                    children: [
+                      _buildFilterChip('Tous', () => _filterReservations('Tous')),
+                      const SizedBox(width: 8),
+                      _buildFilterChip('Hôtels', () => _filterReservations('Hôtels')),
+                      const SizedBox(width: 8),
+                      _buildFilterChip('Restaurants', () => _filterReservations('Restaurants')),
+                      const SizedBox(width: 8),
+                      _buildFilterChip('Locations', () => _filterReservations('Locations')),
+                      const SizedBox(width: 8),
+                      _buildFilterChip('Voyages', () => _filterReservations('Voyages')),
+                      const SizedBox(width: 8),
+                      _buildFilterChip('Spas', () => _filterReservations('Spas')),
+                      const SizedBox(width: 8),
+                      _buildFilterChip('Cinémas', () => _filterReservations('Cinémas')),
+                      const SizedBox(width: 8),
+                      _buildFilterChip('Tourisme', () => _filterReservations('Tourisme')),
+                    ],
                   ),
                 ),
-              const SizedBox(height: 10),
-              Expanded(child: _buildContent()),
-            ],
-          ),
+              ),
+            const SizedBox(height: 10),
+            Expanded(
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: MediaQuery.of(context).size.width * 0.05),
+                  child: _buildContent(),
+                )
+            ),
+          ],
         ),
       ),
     );
@@ -191,12 +193,12 @@ class _FavoritesPageScreenState extends State<FavoritesPageScreen> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: AppDimens.PADDING_16, vertical: AppDimens.PADDING_8),
         decoration: BoxDecoration(
-          color: isSelected ? AppColors.primary : AppColors.grey.withOpacity(0.1),
+          color: isSelected ? AppColors.primary : AppColors.grey.withOpacity(0.3),
           borderRadius: BorderRadius.circular(AppDimens.BORDER_RADIUS_20),
           border: isSelected ? Border.all(color: AppColors.primary) : null,
           boxShadow: isSelected ? [BoxShadow(color: AppColors.primary.withOpacity(0.3), blurRadius: 8, offset: const Offset(0, 2))] : [],
         ),
-        child: Text(label, style: TextStyle(fontSize: 14, fontWeight: AppFonts.medium, fontFamily: AppFonts.primaryFontFamily, color: isSelected ? AppColors.white : AppColors.textPrimary)),
+        child: Text(label, style: TextStyle(fontSize: 14, fontWeight: AppFonts.medium, fontFamily: AppFonts.primaryFontFamily, color: isSelected ? AppColors.white : AppColors.scaffoldBackground)),
       ),
     );
   }
@@ -423,7 +425,6 @@ class _FavoritesPageScreenState extends State<FavoritesPageScreen> {
 
   Widget _buildReservationCard(Reservation reservation) {
     try {
-      print('🏨 Construction carte pour type: ${reservation.reservationType}, nom: ${reservation.establishmentName}');
       return Container(
         margin: const EdgeInsets.only(bottom: AppDimens.PADDING_16),
         decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(AppDimens.BORDER_RADIUS_20), boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.08), blurRadius: 12, offset: const Offset(0, 4))]),

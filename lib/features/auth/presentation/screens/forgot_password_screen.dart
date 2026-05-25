@@ -1,3 +1,7 @@
+import 'dart:ui';
+
+import 'package:baobabe_0_2/core/themes/app_colors.dart';
+import 'package:baobabe_0_2/features/main/presentation/widgets/app_background.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -45,19 +49,13 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
           context.go('/login');
         }
       },
-      child: Scaffold(
-        body: LayoutBuilder(
-          builder: (context, constraints) {
-            final isLarge = constraints.maxWidth > 600;
-            return Container(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [Colors.green.shade50, Colors.white],
-                ),
-              ),
-              child: Center(
+      child: authBackground(
+        child: Scaffold(
+          backgroundColor: Colors.transparent,
+          body: LayoutBuilder(
+            builder: (context, constraints) {
+              final isLarge = constraints.maxWidth > 600;
+              return Center(
                 child: SingleChildScrollView(
                   padding: EdgeInsets.all(isLarge ? 40 : 24),
                   child: Container(
@@ -65,7 +63,14 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Icon(Icons.lock_reset, size: 80, color: Colors.green),
+                        Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: AppColors.scaffoldBackground,
+                            ),
+                            child: Icon(Icons.lock_reset, size: 80, color: AppColors.primary)
+                        ),
                         const SizedBox(height: 24),
                         const Text(
                           'Mot de passe oublié',
@@ -74,91 +79,101 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                         const SizedBox(height: 8),
                         Text(
                           'Entrez votre email pour recevoir un lien de réinitialisation.',
-                          style: TextStyle(color: Colors.grey[600], fontSize: 16),
+                          style: TextStyle(color: AppColors.scaffoldBackground, fontSize: 16),
                           textAlign: TextAlign.center,
                         ),
                         const SizedBox(height: 32),
-                        Container(
-                          padding: const EdgeInsets.all(24),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(24),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.05),
-                                blurRadius: 20,
-                                offset: const Offset(0, 10),
-                              ),
-                            ],
-                          ),
-                          child: Form(
-                            key: _formKey,
-                            child: Column(
-                              children: [
-                                TextFormField(
-                                  controller: _emailController,
-                                  decoration: InputDecoration(
-                                    labelText: 'Email',
-                                    prefixIcon: const Icon(Icons.email_outlined, color: Colors.green),
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(16),
-                                      borderSide: BorderSide.none,
-                                    ),
-                                    filled: true,
-                                    fillColor: Colors.grey[50],
+                        ClipRRect(
+                          child: BackdropFilter(
+                            filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
+                            child: Container(
+                              padding: const EdgeInsets.all(24),
+                              decoration: BoxDecoration(
+                                color: AppColors.primary.withOpacity(0.25),
+                                borderRadius: BorderRadius.circular(28),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withOpacity(0.05),
+                                    blurRadius: 20,
+                                    offset: const Offset(0, 10),
                                   ),
-                                  keyboardType: TextInputType.emailAddress,
-                                  validator: (value) {
-                                    if (value == null || value.isEmpty) {
-                                      return 'Veuillez saisir votre email';
-                                    }
-                                    if (!value.contains('@')) {
-                                      return 'Email invalide';
-                                    }
-                                    return null;
-                                  },
-                                ),
-                                const SizedBox(height: 24),
-                                BlocBuilder<AuthBloc, AuthState>(
-                                  builder: (context, state) {
-                                    return ElevatedButton(
-                                      onPressed: state is AuthLoading ? null : _onSubmit,
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: Colors.green,
-                                        foregroundColor: Colors.white,
-                                        minimumSize: const Size(double.infinity, 56),
-                                        shape: RoundedRectangleBorder(
+                                ],
+                                border: Border.all(width: 2.5, color: AppColors.primary),
+                              ),
+                              child: Form(
+                                key: _formKey,
+                                child: Column(
+                                  children: [
+                                    TextFormField(
+                                      controller: _emailController,
+                                      decoration: InputDecoration(
+                                        labelText: 'Email',
+                                        prefixIcon:  Icon(Icons.email_outlined, ),
+                                        border: OutlineInputBorder(
                                           borderRadius: BorderRadius.circular(16),
+                                          borderSide: BorderSide.none,
                                         ),
+                                        focusedBorder: OutlineInputBorder(
+                                          borderRadius: BorderRadius.circular(16),
+                                          borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
+                                        ),
+                                        filled: true,
+                                        fillColor: Colors.grey[50],
                                       ),
-                                      child: state is AuthLoading
-                                          ? const CircularProgressIndicator(color: Colors.white)
-                                          : const Text(
-                                        'Envoyer le lien',
-                                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                                      ),
-                                    );
-                                  },
+                                      keyboardType: TextInputType.emailAddress,
+                                      validator: (value) {
+                                        if (value == null || value.isEmpty) {
+                                          return 'Veuillez saisir votre email';
+                                        }
+                                        if (!value.contains('@')) {
+                                          return 'Email invalide';
+                                        }
+                                        return null;
+                                      },
+                                    ),
+                                    const SizedBox(height: 24),
+                                    BlocBuilder<AuthBloc, AuthState>(
+                                      builder: (context, state) {
+                                        return ElevatedButton(
+                                          onPressed: state is AuthLoading ? null : _onSubmit,
+                                          style: ElevatedButton.styleFrom(
+                                            backgroundColor: AppColors.primary,
+                                            foregroundColor: Colors.white,
+                                            minimumSize: const Size(double.infinity, 56),
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius: BorderRadius.circular(16),
+                                            ),
+                                          ),
+                                          child: state is AuthLoading
+                                              ? const CircularProgressIndicator(color: Colors.white)
+                                              : const Text(
+                                            'Envoyer le lien',
+                                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                  ],
                                 ),
-                              ],
+                              ),
                             ),
                           ),
                         ),
                         const SizedBox(height: 24),
                         TextButton(
                           onPressed: () => context.go('/login'),
-                          child: const Text(
+                          child: Text(
                             'Retour à la connexion',
-                            style: TextStyle(color: Colors.green),
+                            style: TextStyle(color: AppColors.primary),
                           ),
                         ),
                       ],
                     ),
                   ),
                 ),
-              ),
-            );
-          },
+              );
+            },
+          ),
         ),
       ),
     );

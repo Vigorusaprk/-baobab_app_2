@@ -5,6 +5,8 @@ import 'package:baobabe_0_2/features/business_detail/presentation/widgets/busine
 import 'package:baobabe_0_2/features/business_detail/presentation/widgets/business_hero_section.dart';
 import 'package:baobabe_0_2/features/business_detail/presentation/widgets/business_info_section.dart';
 import 'package:baobabe_0_2/features/business_detail/presentation/widgets/business_specific_section.dart';
+import 'package:baobabe_0_2/features/business_detail/presentation/widgets/restaurant_review.dart';
+import 'package:baobabe_0_2/features/business_detail/presentation/widgets/review.dart' hide BusinessCommentsSection;
 import 'package:baobabe_0_2/features/home_page/data/models/ui_business.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -87,7 +89,7 @@ class BusinessDetailScreen extends StatelessWidget {
                   const SizedBox(height: 24),
                   BusinessActionSection(business: state.business), // ✅ inchangé
                   const SizedBox(height: 24),
-                  BusinessCommentsSection(business: state.business),
+                  RestaurantReview(business: state.business),
                   const SizedBox(height: 32),
                 ],
               ),

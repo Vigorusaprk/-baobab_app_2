@@ -102,120 +102,167 @@ class _OrderScreenState extends State<OrderScreen> with WidgetsBindingObserver {
     return MainBackground(
       child: Scaffold(
         backgroundColor: Colors.transparent,
-        body: Padding(
-          padding: EdgeInsets.symmetric(
-            horizontal: MediaQuery.of(context).size.width * 0.05,
-          ),
-          child: Column(
-            children: [
-              // En‑tête "Mes Commandes"
-              Padding(
-                padding: const EdgeInsets.fromLTRB(20, 55, 20, 20),
-                child: Row(
-                  children: [
-                    SvgPicture.asset(
-                      'assets/icons/order.svg',
-                      height: 35,
-                      colorFilter: const ColorFilter.mode(
-                        AppColors.scaffoldBackground,
-                        BlendMode.srcIn,
-                      ),
+        body: Column(
+          children: [
+            // En‑tête "Mes Commandes"
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 55, 20, 20),
+              child: Row(
+                children: [
+                  SvgPicture.asset(
+                    'assets/icons/order.svg',
+                    height: 35,
+                    colorFilter: const ColorFilter.mode(
+                      AppColors.scaffoldBackground,
+                      BlendMode.srcIn,
                     ),
-                    const SizedBox(width: AppDimens.PADDING_12),
-                    Expanded(
+                  ),
+                  const SizedBox(width: AppDimens.PADDING_12),
+                  Expanded(
+                    child: Text(
+                      'Mes Commandes',
+                      style: TextStyle(
+                        fontFamily: AppFonts.primaryFontFamily,
+                        fontSize: 24,
+                        fontWeight: AppFonts.bold,
+                        color: AppColors.scaffoldBackground,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  if (_allOrders.isNotEmpty)
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: AppDimens.PADDING_12,
+                        vertical: AppDimens.PADDING_6,
+                      ),
+                      decoration: BoxDecoration(
+                        color: AppColors.scaffoldBackground,
+                        borderRadius: BorderRadius.circular(AppDimens.BORDER_RADIUS_16),
+                      ),
                       child: Text(
-                        'Mes Commandes',
+                        '${_allOrders.length}',
                         style: TextStyle(
-                          fontFamily: AppFonts.primaryFontFamily,
-                          fontSize: 24,
-                          fontWeight: AppFonts.bold,
-                          color: AppColors.scaffoldBackground,
-                        ),
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                    if (_allOrders.isNotEmpty)
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: AppDimens.PADDING_12,
-                          vertical: AppDimens.PADDING_6,
-                        ),
-                        decoration: BoxDecoration(
-                          color: AppColors.scaffoldBackground,
-                          borderRadius: BorderRadius.circular(AppDimens.BORDER_RADIUS_16),
-                        ),
-                        child: Text(
-                          '${_allOrders.length}',
-                          style: TextStyle(
-                            color: AppColors.primary,
-                            fontWeight: AppFonts.semiBold,
-                            fontSize: 14,
-                          ),
+                          color: AppColors.primary,
+                          fontWeight: AppFonts.semiBold,
+                          fontSize: 14,
                         ),
                       ),
-                    const SizedBox(width: 8),
-                    IconButton(
-                      icon: const Icon(Icons.refresh, color: Colors.white),
-                      onPressed: _loadOrders,
-                      tooltip: 'Actualiser',
                     ),
-                  ],
-                ),
-              ),
 
-              // Filtres
-              if (_allOrders.isNotEmpty)
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 8),
-                  child: SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                      child: Row(
-                        children: [
-                          _buildFilterChip('Toutes', null, _selectedStatusFilter == null),
-                          ..._availableStatuses.map((status) => _buildFilterChip(
-                            status.displayName,
-                            status,
-                            _selectedStatusFilter == status,
-                          )),
-                        ],
-                      ),
+                ],
+              ),
+            ),
+
+            // Filtres
+            if (_allOrders.isNotEmpty)
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                    child: Row(
+                      children: [
+                        _buildFilterChip('Toutes', null, _selectedStatusFilter == null),
+                        ..._availableStatuses.map((status) => _buildFilterChip(
+                          status.displayName,
+                          status,
+                          _selectedStatusFilter == status,
+                        )),
+                      ],
                     ),
                   ),
                 ),
+              ),
 
-              // Contenu principal avec détecteur de visibilité
-              Expanded(
-                child: VisibilityDetector(
-                  key: Key(_visibilityId),
-                  onVisibilityChanged: (info) {
-                    if (info.visibleFraction > 0.1) {
-                      _loadOrders();
-                    }
-                  },
+            // Contenu principal avec détecteur de visibilité
+            Expanded(
+              child: VisibilityDetector(
+                key: Key(_visibilityId),
+                onVisibilityChanged: (info) {
+                  if (info.visibleFraction > 0.1) {
+                    _loadOrders();
+                  }
+                },
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: MediaQuery.of(context).size.width * 0.05,),
                   child: _buildContent(),
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
   }
 
-  Widget _buildFilterChip(String label, OrderStatus? status, bool isSelected) {
+  Widget _buildFilterChip(
+      String label,
+      OrderStatus? status,
+      bool isSelected, {
+        Color? selectedColor,
+        Color? unselectedColor,
+        Color? labelColor,
+        Color? selectedLabelColor,
+        double? fontSize,
+        FontWeight? fontWeight,
+        EdgeInsetsGeometry? padding,
+        double? borderRadius,
+        bool showIcon = true,
+        IconData? icon,
+        VoidCallback? onTap,
+      }) {
+    final effectiveSelectedColor = selectedColor ?? AppColors.primary;
+    final effectiveUnselectedColor = unselectedColor ?? AppColors.grey.withOpacity(0.3);
+    final effectiveLabelColor =   AppColors.scaffoldBackground;
+    final effectiveSelectedLabelColor = selectedLabelColor ?? AppColors.scaffoldBackground;
+    final effectiveFontSize = fontSize ?? 14;
+    final effectiveFontWeight = fontWeight ?? FontWeight.w500;
+    final effectivePadding = padding ?? const EdgeInsets.symmetric(horizontal: 12, vertical: 8);
+    final effectiveBorderRadius = borderRadius ?? 20.0;
+
     return Padding(
-      padding: const EdgeInsets.only(right: 8),
-      child: FilterChip(
-        label: Text(label),
-        selected: isSelected,
-        onSelected: (_) => _filterOrders(status),
-        backgroundColor: Colors.grey[200],
-        selectedColor: status?.color ?? AppColors.primary,
-        labelStyle: TextStyle(
-          color: isSelected ? Colors.white : Colors.black,
-          fontWeight: FontWeight.w500,
+      padding: EdgeInsetsGeometry.only(left: 10),
+      child: GestureDetector(
+        onTap: onTap ?? () => _filterOrders(status),
+        child: Container(
+          padding: effectivePadding,
+          decoration: BoxDecoration(
+            color: isSelected ? effectiveSelectedColor : effectiveUnselectedColor,
+            borderRadius: BorderRadius.circular(effectiveBorderRadius),
+            boxShadow: isSelected
+                ? [
+              BoxShadow(
+                color: effectiveSelectedColor.withOpacity(0.3),
+                blurRadius: 4,
+                offset: const Offset(0, 2),
+              ),
+            ]
+                : null,
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (showIcon && status != null)
+                Padding(
+                  padding: const EdgeInsets.only(right: 6),
+                  child: Icon(
+                    icon ?? (isSelected ? Icons.check_circle : Icons.circle_outlined),
+                    size: 16,
+                    color: isSelected ? effectiveSelectedLabelColor : effectiveLabelColor,
+                  ),
+                ),
+              Text(
+                label,
+                style: TextStyle(
+                  color: isSelected ? effectiveSelectedLabelColor : effectiveLabelColor,
+                  fontSize: effectiveFontSize,
+                  fontWeight: effectiveFontWeight,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -310,7 +357,7 @@ class _OrderScreenState extends State<OrderScreen> with WidgetsBindingObserver {
       onRefresh: _loadOrders,
       color: AppColors.primary,
       child: ListView.builder(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.only(left: 16, right: 16, bottom: 100),
         itemCount: _displayedOrders.length,
         itemBuilder: (context, index) {
           final order = _displayedOrders[index];
@@ -436,88 +483,12 @@ class _OrderScreenState extends State<OrderScreen> with WidgetsBindingObserver {
   }
 
   // ========== Méthodes d'affichage ==========
-  IconData _getTypeIcon(BusinessType? type) {
-    if (type == null) return Icons.business;
-    switch (type) {
-      case BusinessType.restaurant:
-        return Icons.restaurant;
-      case BusinessType.fastFood:
-        return Icons.fastfood;
-      case BusinessType.shopping:
-        return Icons.shopping_bag;
-      case BusinessType.mall:
-        return Icons.store_mall_directory;
-      case BusinessType.hotel:
-        return Icons.hotel;
-      case BusinessType.carRental:
-        return Icons.directions_car;
-      case BusinessType.travelAgency:
-        return Icons.card_travel;
-      case BusinessType.spa:
-        return Icons.spa;
-      default:
-        return Icons.business;
-    }
-  }
-
-  Color _getTypeColor(BusinessType? type) {
-    if (type == null) return Colors.grey;
-    switch (type) {
-      case BusinessType.restaurant:
-        return Colors.orange;
-      case BusinessType.fastFood:
-        return Colors.red;
-      case BusinessType.shopping:
-        return Colors.blue;
-      case BusinessType.mall:
-        return Colors.purple;
-      case BusinessType.hotel:
-        return Colors.teal;
-      case BusinessType.carRental:
-        return Colors.indigo;
-      case BusinessType.travelAgency:
-        return Colors.indigoAccent;
-      case BusinessType.spa:
-        return Colors.pink;
-      default:
-        return Colors.grey;
-    }
-  }
-
-  String _getTypeDisplayName(BusinessType? type) {
-    if (type == null) return 'Autre';
-    switch (type) {
-      case BusinessType.restaurant:
-        return 'Restaurant';
-      case BusinessType.fastFood:
-        return 'Fast Food';
-      case BusinessType.shopping:
-        return 'Shopping';
-      case BusinessType.mall:
-        return 'Centre Commercial';
-      case BusinessType.hotel:
-        return 'Hôtel';
-      case BusinessType.carRental:
-        return 'Location Voiture';
-      case BusinessType.travelAgency:
-        return 'Agence de voyages';
-      case BusinessType.spa:
-        return 'Spa';
-      default:
-        return 'Autre';
-    }
-  }
-
   Widget _buildOrderCard(Order order) {
     try {
       final dateFormat = DateFormat('dd/MM/yyyy HH:mm');
-      final type = order.establishmentType;
-      final typeIcon = _getTypeIcon(type);
-      final typeColor = _getTypeColor(type);
-      final typeName = _getTypeDisplayName(type);
 
       return Card(
-        color: AppColors.scaffoldBackground,
+        color: Colors.white,
         margin: const EdgeInsets.only(bottom: 12),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         child: InkWell(
@@ -535,10 +506,10 @@ class _OrderScreenState extends State<OrderScreen> with WidgetsBindingObserver {
                       width: 50,
                       height: 50,
                       decoration: BoxDecoration(
-                        color: typeColor.withOpacity(0.1),
+                        color: order.typeColor.withOpacity(0.1),
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      child: Icon(typeIcon, color: typeColor, size: 24),
+                      child: Icon(order.typeIcon, color: order.typeColor, size: 24),
                     ),
                     const SizedBox(width: 12),
                     Expanded(
@@ -564,13 +535,13 @@ class _OrderScreenState extends State<OrderScreen> with WidgetsBindingObserver {
                                   vertical: 2,
                                 ),
                                 decoration: BoxDecoration(
-                                  color: typeColor.withOpacity(0.1),
+                                  color: order.typeColor.withOpacity(0.1),
                                   borderRadius: BorderRadius.circular(12),
                                 ),
                                 child: Text(
-                                  typeName,
+                                  order.typeName,
                                   style: TextStyle(
-                                    color: typeColor,
+                                    color: order.typeColor,
                                     fontSize: 12,
                                     fontWeight: FontWeight.w600,
                                     fontFamily: "Poppins",
@@ -645,7 +616,7 @@ class _OrderScreenState extends State<OrderScreen> with WidgetsBindingObserver {
                     vertical: AppDimens.PADDING_10,
                   ),
                   decoration: BoxDecoration(
-                    color: AppColors.primary.withOpacity(0.3),
+                    color: AppColors.success.withOpacity(0.3),
                     borderRadius: BorderRadius.circular(AppDimens.BORDER_RADIUS_15),
                   ),
                   child: Row(
