@@ -79,19 +79,29 @@ class _SignUpPageState extends State<SignUpPage> {
                         ClipRRect(
                           borderRadius: BorderRadius.circular(22),
                           child: BackdropFilter(
-                            filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
+                            filter: ImageFilter.blur(sigmaX: 12.0, sigmaY: 12.0),
                             child: Container(
                               padding: const EdgeInsets.all(24),
-                              decoration: BoxDecoration(
+                              decoration:  BoxDecoration(
                                 borderRadius: BorderRadius.circular(28),
-                                gradient: LinearGradient(
-                                  colors: [
-                                    AppColors.secondaryLight.withOpacity(0.5),
-                                    AppColors.primary.withOpacity(0.5)
-                                  ],
-                                  transform: const GradientRotation(2),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withOpacity(0.15),
+                                    blurRadius: 30,
+                                    spreadRadius: 5,
+                                    offset: const Offset(0, 15),
+                                  ),
+                                  BoxShadow(
+                                    color: Colors.white.withOpacity(0.1),
+                                    blurRadius: 40,
+                                    spreadRadius: -10,
+                                    offset: const Offset(-10, -10),
+                                  ),
+                                ],
+                                border: Border.all(
+                                  width: 1.5,
+                                  color: Colors.white.withOpacity(0.3),
                                 ),
-                                border: Border.all(width: 2.5, color: AppColors.primaryDark),
                               ),
                               child: Column(
                                 children: [
@@ -201,7 +211,7 @@ class _SignUpPageState extends State<SignUpPage> {
           height: 56,
           child: ElevatedButton(
             style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primaryDark,
+              backgroundColor: AppColors.secondaryDark,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
             ),
             onPressed: state is AuthLoadingState ? null : _signup,

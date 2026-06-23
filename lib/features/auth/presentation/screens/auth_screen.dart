@@ -81,17 +81,6 @@ class _LoginPageState extends State<LoginPage> {
                                   horizontal: 25, vertical: 25),
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(28),
-                                // Dégradé 3 couleurs (effet verre)
-                                gradient: LinearGradient(
-                                  begin: Alignment.topLeft,
-                                  end: Alignment.bottomRight,
-                                  colors: [
-                                    AppColors.primaryLight.withOpacity(0.25),
-                                    AppColors.primary.withOpacity(0.10),
-                                    AppColors.primaryDark.withOpacity(0.25),
-                                  ],
-                                  stops: const [0.0, 0.5, 1.0],
-                                ),
                                 boxShadow: [
                                   BoxShadow(
                                     color: Colors.black.withOpacity(0.15),
@@ -250,12 +239,13 @@ class _LoginPageState extends State<LoginPage> {
           children: [
             Checkbox(
               value: _rememberMe,
-              activeColor: AppColors.primaryDark,
+              activeColor: AppColors.secondary,
               onChanged: (value) =>
                   setState(() => _rememberMe = value ?? false),
             ),
+            SizedBox(height: 20,),
             const Text('Se souvenir',
-                style: TextStyle(color: AppColors.primaryDark)),
+                style: TextStyle(color: AppColors.secondaryDark)),
           ],
         ),
         TextButton(
@@ -263,7 +253,7 @@ class _LoginPageState extends State<LoginPage> {
           child: const Text(
             'Mot de passe oublié ?',
             style: TextStyle(
-                color: AppColors.primaryDark, fontWeight: FontWeight.w600),
+                color: AppColors.secondaryDark, fontWeight: FontWeight.w600),
           ),
         ),
       ],
@@ -278,7 +268,7 @@ class _LoginPageState extends State<LoginPage> {
           height: 56,
           child: ElevatedButton(
             style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primaryDark,
+              backgroundColor: AppColors.secondaryDark,
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16)),
             ),
@@ -326,7 +316,7 @@ class _LoginPageState extends State<LoginPage> {
         label: Text(
           'Continuer avec $label',
           style: const TextStyle(
-              color: AppColors.primaryDark, fontWeight: FontWeight.w500),
+              color: Colors.white, fontWeight: FontWeight.w500),
         ),
         onPressed: () {},
       ),

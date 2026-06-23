@@ -9,12 +9,12 @@ class AppColors {
 
   // Le VERT devient la couleur secondaire (Accent / Action)
   // À utiliser UNIQUEMENT pour les boutons d'action, "Écrire un avis", "OUVERT", etc.
-  static const Color secondary = Color(0xFF303531);
-  static const Color secondaryDark = Color(0xFF202221);
-  static const Color secondaryLight = Color(0xFF202221);
+  static const Color secondary = Color(0xFF004741);
+  static const Color secondaryDark = Color(0xFF04332D);
+  static const Color secondaryLight = Color(0xFF306D64);
 
   // --- Fonds de l'application ---
-  static const Color scaffoldBackground = Color(0xFFfff7d3);
+  static const Color scaffoldBackground = Color(0xFFF0EDE4);
   static const Color canvasBackground = Color(0xFFF3EBDD);
   static const Color surface = Color(0xFFC6C6D0); // Pour les cartes (Cards) et conteneurs blancs cassés
 

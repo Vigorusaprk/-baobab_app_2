@@ -11,6 +11,8 @@ import 'package:baobabe_0_2/features/main/presentation/widgets/main_background.d
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../main/presentation/widgets/app_background.dart';
+
 class HomePageScreen extends StatelessWidget {
   const HomePageScreen({super.key});
 
@@ -22,7 +24,7 @@ class HomePageScreen extends StatelessWidget {
           create: (context) => Injector.get<BusinessBloc>()..add(LoadBusinesses()),
         ),
       ],
-      child: MainBackground(
+      child: authBackground(
         child: Scaffold(
           backgroundColor: Colors.transparent,
           body: CustomScrollView(
