@@ -2,12 +2,21 @@ import 'package:baobabe_0_2/features/auth/domain/entities/user.dart';
 import 'package:baobabe_0_2/features/auth/domain/repositories/auth_repository.dart';
 
 class SignUpUseCase {
-  final AuthRepository repository;
+  final AuthRepository authRepository;
 
-  SignUpUseCase(this.repository);
+  SignUpUseCase(this.authRepository);
 
-  Future<UserEntity> execute(String name, String email, String password, String? imgUrl) {
-    return repository.signUp(name, email, password, imgUrl: imgUrl);
+  Future<UserEntity> call({
+    required String name,
+    required String email,
+    required String password,
+    String? phone,
+  }) {
+    return authRepository.signUp(
+      name: name,
+      email: email,
+      password: password,
+      phone: phone,
+    );
   }
 }
-

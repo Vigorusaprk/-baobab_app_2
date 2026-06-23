@@ -1,4 +1,3 @@
-
 class MenuItem {
   final int id;
   final String businessId;
@@ -22,24 +21,35 @@ class MenuItem {
     this.isAvailable = true,
   });
 
-  // Convertit le JSON de PostgreSQL vers l'objet Flutter
   factory MenuItem.fromJson(Map<String, dynamic> json) {
     return MenuItem(
-      id: json['id'],
-      businessId: json['business_id'], // Mappe le snake_case SQL
-      itemName: json['item_name'],
-      itemCategory: json['item_category'],
-      // Gestion sécurisée du type Decimal/Double
+      id: json['id'] is int ? json['id'] : int.parse(json['id'].toString()),
+      businessId: json['business_id']?.toString() ?? '',
+      itemName: json['item_name'] ?? '',
+      itemCategory: json['item_category'] ?? '',
       price: (json['price'] is String)
           ? double.parse(json['price'])
           : (json['price'] as num).toDouble(),
       description: json['description'] ?? '',
       imageUrl: json['image_url'] ?? '',
-      // Gestion du tableau TEXT[] de PostgreSQL
       ingredients: json['ingredients'] != null
           ? List<String>.from(json['ingredients'])
           : [],
       isAvailable: json['is_available'] ?? true,
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'business_id': businessId,
+      'item_name': itemName,
+      'item_category': itemCategory,
+      'price': price,
+      'description': description,
+      'image_url': imageUrl,
+      'ingredients': ingredients,
+      'is_available': isAvailable,
+    };
   }
 }

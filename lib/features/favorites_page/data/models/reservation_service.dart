@@ -1,37 +1,12 @@
-import 'dart:convert';
-import 'package:http/http.dart' as http;
-import 'package:shared_preferences/shared_preferences.dart';
+﻿import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:baobabe_0_2/features/business_detail/domain/entities/reservation.dart';
 
 class ReservationApiService {
-  static const String _baseUrl = 'http://10.0.2.2:3000/api';
-  
-  // Pour web: http://localhost:3000/api
-  // Pour émulateur Android: http://10.0.2.2:3000/api
-  // Pour émulateur iOS: http://localhost:3000/api
+  final SupabaseClient _supabase;
 
-  /// Récupérer l'ID utilisateur depuis SharedPreferences
-  Future<String?> _getUserId() async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getString('user_id');
-  }
+  ReservationApiService([SupabaseClient? supabase])
+      : _supabase = supabase ?? Supabase.instance.client;
 
-  /// Récupérer le token d'authentification depuis SharedPreferences
-  Future<String?> _getAccessToken() async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getString('access_token');
-  }
-
-  /// Headers HTTP avec authentification
-  Future<Map<String, String>> _getHeaders() async {
-    final token = await _getAccessToken();
-    return {
-      'Content-Type': 'application/json',
-      if (token != null) 'Authorization': 'Bearer $token',
-    };
-  }
-
-  /// Créer une nouvelle réservation
   Future<Map<String, dynamic>> createReservation({
     required String businessId,
     required String type,
@@ -40,14 +15,11 @@ class ReservationApiService {
     required Map<String, dynamic> details,
     String? userId,
   }) async {
-    // Utiliser l'userId fourni, sinon le récupérer depuis SharedPreferences
-    final finalUserId = userId ?? await _getUserId();
+    final finalUserId = userId ?? _supabase.auth.currentUser?.id;
     if (finalUserId == null) {
       throw Exception('Utilisateur non authentifié. Veuillez vous connecter.');
     }
 
-    final headers = await _getHeaders();
-    
     final payload = {
       'business_id': businessId,
       'user_id': finalUserId,
@@ -57,71 +29,53 @@ class ReservationApiService {
       'details': details,
     };
 
-    print('📤 Envoi de la réservation: ${jsonEncode(payload)}');
-
     try {
-      final response = await http.post(
-        Uri.parse('$_baseUrl/reservations'),
-        headers: headers,
-        body: jsonEncode(payload),
-      );
+      final response = await _supabase
+          .from('reservations')
+          .insert(payload)
+          .select()
+          .single();
 
-      if (response.statusCode == 201 || response.statusCode == 200) {
-        return jsonDecode(response.body);
-      } else {
-        throw Exception(
-          'Erreur ${response.statusCode}: ${response.body}'
-        );
-      }
+      return response as Map<String, dynamic>;
     } catch (e) {
       throw Exception('Erreur lors de la création de la réservation: $e');
     }
   }
 
-  /// Récupérer toutes les réservations de l'utilisateur
   Future<List<Reservation>> getReservations({String? userId}) async {
-    // Utiliser l'userId fourni, sinon le récupérer depuis SharedPreferences
-    final finalUserId = userId ?? await _getUserId();
+    final finalUserId = userId ?? _supabase.auth.currentUser?.id;
     if (finalUserId == null) {
       throw Exception('Utilisateur non authentifié');
     }
 
-    final headers = await _getHeaders();
-
     try {
-      final response = await http.get(
-        Uri.parse('$_baseUrl/reservations').replace(
-          queryParameters: {'user_id': finalUserId},
-        ),
-        headers: headers,
-      );
+      final response = await _supabase
+          .from('reservations')
+          .select()
+          .eq('user_id', finalUserId)
+          .order('reservation_date', ascending: false);
 
-      if (response.statusCode == 200) {
-        final List<dynamic> data = jsonDecode(response.body);
+      final data = response as List<dynamic>;
         return data
-            .map((json) => Reservation.fromMap(json as Map<String, dynamic>))
-            .toList();
-      } else {
-        throw Exception('Erreur ${response.statusCode}');
-      }
+          .map((json) => Reservation.fromJson(json as Map<String, dynamic>))
+          .toList();
     } catch (e) {
       throw Exception('Erreur lors du chargement des réservations: $e');
     }
   }
 
-  /// Supprimer une réservation
   Future<void> deleteReservation(String reservationId, {String? userId}) async {
-    final headers = await _getHeaders();
+    final finalUserId = userId ?? _supabase.auth.currentUser?.id;
+    if (finalUserId == null) {
+      throw Exception('Utilisateur non authentifié');
+    }
 
     try {
-      final response = await http.delete(
-        Uri.parse('$_baseUrl/reservations/$reservationId'),
-        headers: headers,
-      );
-
-      if (response.statusCode != 200) {
-        throw Exception('Erreur ${response.statusCode}');
-      }
+      await _supabase
+          .from('reservations')
+          .delete()
+          .eq('id', reservationId)
+          .eq('user_id', finalUserId);
     } catch (e) {
       throw Exception('Erreur lors de la suppression: $e');
     }

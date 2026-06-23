@@ -1,67 +1,75 @@
-import 'package:baobabe_0_2/features/auth/domain/entities/user.dart';
-import 'package:baobabe_0_2/features/auth/domain/repositories/auth_repository.dart';
-import 'package:bloc/bloc.dart';
-import 'package:equatable/equatable.dart';
-
-part 'auth_event.dart';
-part 'auth_state.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:baobabe_0_2/features/auth/domain/usecases/check_auth_status_use_case.dart';
+import 'package:baobabe_0_2/features/auth/domain/usecases/login_usecase.dart';
+import 'package:baobabe_0_2/features/auth/domain/usecases/logout_usecase.dart';
+import 'package:baobabe_0_2/features/auth/domain/usecases/signup_usecase.dart';
+import 'package:baobabe_0_2/features/auth/presentation/bloc/auth_event.dart';
+import 'package:baobabe_0_2/features/auth/presentation/bloc/auth_state.dart';
 
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
-  final AuthRepository authRepository;
+  final LoginUseCase loginUseCase;
+  final SignUpUseCase signUpUseCase;
+  final LogoutUseCase logoutUseCase;
+  final CheckAuthStatusUseCase checkAuthStatusUseCase;
 
-  AuthBloc({required this.authRepository}) : super(AuthInitial()) {
-    on<AuthLoginEvent>(_onLogin);
-    on<AuthSignUpEvent>(_onSignUp);
-    on<AuthCheckStatusEvent>(_onCheckStatus);
-    on<AuthLogoutEvent>(_onLogout);
+  AuthBloc({
+    required this.loginUseCase,
+    required this.signUpUseCase,
+    required this.logoutUseCase,
+    required this.checkAuthStatusUseCase,
+  }) : super(AuthInitialState()) {
+    on<CheckAuthStatusEvent>(_onCheckAuthStatus);
+    on<LoginSubmittedEvent>(_onLoginSubmitted);
+    on<SignUpSubmittedEvent>(_onSignUpSubmitted);
+    on<LogoutRequestedEvent>(_onLogoutRequested);
   }
 
-  Future<void> _onLogin(AuthLoginEvent event, Emitter<AuthState> emit) async {
-    emit(AuthLoading());
+  Future<void> _onCheckAuthStatus(CheckAuthStatusEvent event, Emitter<AuthState> emit) async {
+    emit(AuthLoadingState());
     try {
-      final user = await authRepository.login(event.email, event.password, rememberMe: event.rememberMe);
-      emit(AuthAuthenticated(user: user));
-    } catch (error) {
-      emit(AuthError(message: error.toString()));
-    }
-  }
-
-  Future<void> _onSignUp(AuthSignUpEvent event, Emitter<AuthState> emit) async {
-    emit(AuthLoading());
-    try {
-      final user = await authRepository.signUp(event.name, event.email, event.password);
-      emit(AuthAuthenticated(user: user));
-    } catch (error) {
-      emit(AuthError(message: error.toString()));
-    }
-  }
-
-  Future<void> _onCheckStatus(AuthCheckStatusEvent event, Emitter<AuthState> emit) async {
-    emit(AuthLoading());
-    try {
-      final isAuthenticated = await authRepository.isAuthenticated();
-      if (isAuthenticated) {
-        final user = await authRepository.getCurrentUser();
-        if (user != null) {
-          emit(AuthAuthenticated(user: user));
-        } else {
-          emit(AuthUnAuthenticated());
-        }
+      final user = await checkAuthStatusUseCase();
+      if (user != null) {
+        emit(AuthenticatedState(user: user));
       } else {
-        emit(AuthUnAuthenticated());
+        emit(UnauthenticatedState());
       }
     } catch (e) {
-      emit(AuthUnAuthenticated());
+      emit(AuthFailureState(errorMessage: e.toString()));
     }
   }
 
-  Future<void> _onLogout(AuthLogoutEvent event, Emitter<AuthState> emit) async {
-    emit(AuthLoading());
+  Future<void> _onLoginSubmitted(LoginSubmittedEvent event, Emitter<AuthState> emit) async {
+    emit(AuthLoadingState());
     try {
-      await authRepository.logout();
-      emit(AuthUnAuthenticated());
-    } catch (error) {
-      emit(AuthError(message: error.toString()));
+      final user = await loginUseCase(event.email, event.password);
+      emit(AuthenticatedState(user: user));
+    } catch (e) {
+      emit(AuthFailureState(errorMessage: e.toString()));
+    }
+  }
+
+  Future<void> _onSignUpSubmitted(SignUpSubmittedEvent event, Emitter<AuthState> emit) async {
+    emit(AuthLoadingState());
+    try {
+      final user = await signUpUseCase(
+        name: event.name,
+        email: event.email,
+        password: event.password,
+        phone: event.phone,
+      );
+      emit(AuthenticatedState(user: user));
+    } catch (e) {
+      emit(AuthFailureState(errorMessage: e.toString()));
+    }
+  }
+
+  Future<void> _onLogoutRequested(LogoutRequestedEvent event, Emitter<AuthState> emit) async {
+    emit(AuthLoadingState());
+    try {
+      await logoutUseCase();
+      emit(UnauthenticatedState());
+    } catch (e) {
+      emit(AuthFailureState(errorMessage: e.toString()));
     }
   }
 }

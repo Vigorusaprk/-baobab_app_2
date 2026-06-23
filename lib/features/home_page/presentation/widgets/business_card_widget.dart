@@ -1,9 +1,7 @@
-import 'package:baobabe_0_2/core/constants/injector.dart';
 import 'package:baobabe_0_2/core/themes/app_colors.dart';
 import 'package:baobabe_0_2/features/business_detail/data/review_api_service.dart';
 import 'package:baobabe_0_2/features/business_detail/domain/entities/review.dart';
 import 'package:baobabe_0_2/features/home_page/data/models/ui_business.dart';
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'dart:ui';
@@ -15,8 +13,9 @@ class BusinessCardWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final reviewService = ReviewApiService();
     return FutureBuilder<List<Review>>(
-      future: ReviewApiService(dio: Injector.get<Dio>()).getReviews(uiBusiness.business.id),
+      future: reviewService.getReviews(uiBusiness.business.id),
       builder: (context, snapshot) {
         // Calcul de la note moyenne réelle
         double rating;
@@ -92,7 +91,7 @@ class BusinessCardWidget extends StatelessWidget {
       child: hasImage
           ? ClipRRect(
         borderRadius: BorderRadius.circular(28),
-        child: Image.network(
+        child: Image.asset(
           uiBusiness.business.bgImg!,
           fit: BoxFit.cover,
           errorBuilder: (context, error, stackTrace) {
@@ -123,76 +122,177 @@ class BusinessCardWidget extends StatelessWidget {
   }
 
   Widget _buildCategoryBadge() {
+    final businessData = uiBusiness.business;
+
     return ClipRRect(
-      borderRadius: BorderRadius.circular(16),
+      borderRadius: BorderRadius.circular(50),
       child: BackdropFilter(
         filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
         child: Container(
-          padding: const EdgeInsets.all(10),
+          width: 70,
+          height: 70,
           decoration: BoxDecoration(
-            color: uiBusiness.categoryColor.withOpacity(0.8),
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: Colors.white.withOpacity(0.5), width: 5),
+            color: Colors.white,
+            shape: BoxShape.circle,
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.5),
+                blurRadius: 15,
+                offset: const Offset(0, 1),
+              ),
+            ],
+            border: Border.all(color: uiBusiness.categoryColor.withOpacity(0.7), width: 5.5),
           ),
-          child: Icon(uiBusiness.categoryIcon, size: 20, color: Colors.white),
+          child: Container(
+            decoration: const BoxDecoration(shape: BoxShape.circle),
+            child: businessData.profilImg != null && businessData.profilImg!.isNotEmpty
+                ? Container(
+              width: 100,
+              height: 100,
+              decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  image: DecorationImage(
+                    image: AssetImage(businessData.profilImg!),
+                    fit: BoxFit.cover,
+                  )
+              ),
+            )
+                : Icon(uiBusiness.categoryIcon, size: 45, color: uiBusiness.categoryColor),
+          ),
         ),
       ),
     );
   }
 
   Widget _buildInfoOverlay(double rating) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(22),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-        child: Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: AppColors.primary.withOpacity(0.25),
-            borderRadius: BorderRadius.circular(22),
-            border: Border.all(color: Colors.white.withOpacity(0.2)),
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(22),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 16,
+            offset: const Offset(0, 8),
           ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Expanded(
-                    child: Text(
-                      uiBusiness.business.name,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        letterSpacing: -0.5,
-                      ),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(22),
+        child: Stack(
+          children: [
+            Positioned.fill(child: _buildBackgroundOrbes()),
+            BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 15.0, sigmaY: 15.0),
+              child: Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.15),
+                  borderRadius: BorderRadius.circular(22),
+                  border: Border.all(
+                    color: Colors.white.withOpacity(0.3),
+                    width: 1,
+                  ),
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: Text(
+                            uiBusiness.business.name,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              letterSpacing: -0.5,
+                            ),
+                          ),
+                        ),
+                        _buildRatingBadge(rating),
+                      ],
                     ),
-                  ),
-                  _buildRatingBadge(rating),
-                ],
-              ),
-              const SizedBox(height: 8),
-              Row(
-                children: [
-                  SvgPicture.asset(
-                    "assets/icons/location-svgrepo-com (1).svg",
-                    height: 14,
-                    colorFilter: const ColorFilter.mode(Colors.white70, BlendMode.srcIn),
-                  ),
-                  const SizedBox(width: 6),
-                  Expanded(
-                    child: Text(
-                      uiBusiness.business.address,
-                      style: TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 13),
-                      overflow: TextOverflow.ellipsis,
+                    const SizedBox(height: 8),
+                    Row(
+                      children: [
+                        SvgPicture.asset(
+                          "assets/icons/location-svgrepo-com (1).svg",
+                          height: 14,
+                          colorFilter: const ColorFilter.mode(
+                            Colors.white,
+                            BlendMode.srcIn,
+                          ),
+                        ),
+                        const SizedBox(width: 6),
+                        Expanded(
+                          child: Text(
+                            uiBusiness.business.address,
+                            style: TextStyle(
+                              color: Colors.white.withOpacity(0.85),
+                              fontSize: 13,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildBackgroundOrbes() {
+    return Container(
+      padding: EdgeInsets.all(0.5),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(22),
+      ),
+      child: Stack(
+        children: [
+          Positioned(
+            top: -20,
+            right: 40,
+            child: Container(
+              width: 120,
+              height: 120,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: AppColors.secondaryLight.withOpacity(0.25),
+              ),
+            ),
+          ),
+          Positioned(
+            bottom: 10,
+            right: 10,
+            child: Container(
+              width: 90,
+              height: 90,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: AppColors.primaryLight.withOpacity(0.4),
+              ),
+            ),
+          ),
+          Positioned(
+            bottom: 30,
+            left: -10,
+            child: Container(
+              width: 100,
+              height: 100,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: AppColors.secondaryDark.withOpacity(0.5),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:baobabe_0_2/core/themes/app_colors.dart';
-import 'package:baobabe_0_2/features/favorites_page/data/models/reservation_service.dart';
+// reservation service not used here; removed unused import
 import 'package:baobabe_0_2/features/order/data/services/vehicle_service.dart';
 import 'package:baobabe_0_2/features/order/data/models/vehicle_model.dart';
 import 'car_detail_page.dart';
@@ -10,10 +10,10 @@ class CarListPage extends StatefulWidget {
   final String businessName;
 
   const CarListPage({
+    super.key,
     required this.businessId,
     required this.businessName,
-    Key? key,
-  }) : super(key: key);
+  });
 
   @override
   State<CarListPage> createState() => _CarListPageState();

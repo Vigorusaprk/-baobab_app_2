@@ -1,3 +1,4 @@
+import 'package:baobabe_0_2/core/themes/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:baobabe_0_2/features/home_page/domain/entities/business_entity.dart';
 
@@ -189,7 +190,8 @@ class Order {
       case 'spa': return 'Spa & Bien-être';
       case 'cinema': return 'Cinéma';
       case 'toursime': return 'Tourisme';
-      default: return 'Restaurant';
+      case 'restaurant': return 'Restaurant';
+      default: return 'Business';
     }
   }
 
@@ -202,19 +204,21 @@ class Order {
       case 'spa': return Icons.spa;
       case 'cinema': return Icons.movie;
       case 'toursime': return Icons.tour;
-      default: return Icons.restaurant;
+      case 'restaurant': return Icons.restaurant;
+      default: return Icons.business;
     }
   }
 
   Color get typeColor {
     switch (establishmentType) {
-      case 'hotel': return const Color(0xFF009688);
-      case 'car_rental': return const Color(0xFF3F51B5);
-      case 'travel': return const Color(0xFF9C27B0);
-      case 'spa': return const Color(0xFFE91E63);
-      case 'cinema': return const Color(0xFF673AB7);
-      case 'toursime': return const Color(0xFF795548);
-      default: return Colors.orange;
+      case 'hotel': return AppColors.Hotel;
+      case 'car_rental': return AppColors.CarRental;
+      case 'travel': return  AppColors.TravelAgency;
+      case 'spa': return AppColors.Spa;
+      case 'cinema': return AppColors.Cinema;
+      case 'toursime': return AppColors.Tourisme;
+      case 'restaurant': return AppColors.Restaurant;
+      default: return Colors.grey;
     }
   }
 }

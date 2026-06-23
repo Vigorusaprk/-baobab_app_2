@@ -1,22 +1,16 @@
-import 'dart:convert';
-import 'package:http/http.dart' as http;
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class VehicleService {
-  static const String _baseUrl = 'http://10.0.2.2:3000/api';
-
-  /// Récupérer les véhicules disponibles pour un commerce
   static Future<List<Map<String, dynamic>>> getVehicles(String businessId) async {
     try {
-      final response = await http.get(
-        Uri.parse('$_baseUrl/businesses/$businessId/vehicles'),
-      );
+      final response = await Supabase.instance.client
+          .from('vehicles')
+          .select()
+          .eq('business_id', businessId);
 
-      if (response.statusCode == 200) {
-        final List<dynamic> data = jsonDecode(response.body);
-        return data.cast<Map<String, dynamic>>();
-      } else {
-        throw Exception('Erreur ${response.statusCode}: ${response.body}');
-      }
+      return (response as List<dynamic>)
+          .map((item) => Map<String, dynamic>.from(item as Map<String, dynamic>))
+          .toList();
     } catch (e) {
       throw Exception('Erreur lors du chargement des véhicules: $e');
     }

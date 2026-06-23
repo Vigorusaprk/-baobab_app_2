@@ -2,83 +2,90 @@ import 'package:baobabe_0_2/features/business_detail/domain/entities/menu_restau
 import 'package:baobabe_0_2/features/favorites_page/data/models/reservation_model.dart';
 import 'package:baobabe_0_2/features/home_page/data/data_sources/remote_datasource/business_remote_datasource.dart';
 import 'package:baobabe_0_2/features/home_page/data/models/business_model.dart';
-import 'package:dio/dio.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class BusinessRemoteDataSourceImpl implements BusinessRemoteDataSource {
-  final Dio _dio;
-  final String _baseUrl;
+  final SupabaseClient _supabase;
 
-  BusinessRemoteDataSourceImpl({Dio? dio, String baseUrl = 'http://10.0.2.2:3000/api'})
-      : _dio = dio ?? Dio(),
-        _baseUrl = baseUrl;
+  BusinessRemoteDataSourceImpl({SupabaseClient? supabase})
+      : _supabase = supabase ?? Supabase.instance.client;
+
+  // REMARQUE : Vérifiez bien dans votre tableau de bord Supabase si la table
+  // s'appelle 'business' ou 'businesses'. J'ai utilisé 'business' ci-dessous.
+  static const String _tableName = 'business';
 
   @override
   Future<List<BusinessModel>> getBusinesses() async {
     try {
-      final response = await _dio.get('$_baseUrl/businesses');
-      return (response.data as List)
-          .map((json) => BusinessModel.fromJson(json))
+      final response = await _supabase.from(_tableName).select();
+
+      return (response as List)
+          .map((json) => BusinessModel.fromJson(json as Map<String, dynamic>))
           .toList();
     } catch (e) {
-      throw Exception('Failed to load businesses: $e');
-    }
-  }
-
-  // AJOUT DE LA MÉTHODE createReservation
-  @override
-  Future<void> createReservation(ReservationModel reservation) async {
-    try {
-      // Envoi du JSON au endpoint /reservations
-      final response = await _dio.post(
-        '$_baseUrl/reservations',
-        data: reservation.toJson(),
-      );
-
-      // Vérification du statut (201 Created ou 200 OK)
-      if (response.statusCode != 201 && response.statusCode != 200) {
-        throw Exception('Erreur serveur lors de la création de la réservation');
-      }
-    } on DioException catch (e) {
-      // Gestion spécifique des erreurs Dio
-      final errorMessage = e.response?.data?['error'] ?? e.message;
-      throw Exception('Erreur réseau : $errorMessage');
-    } catch (e) {
-      throw Exception('Échec de la réservation : $e');
+      throw Exception('Erreur Supabase lors du chargement des businesses : $e');
     }
   }
 
   @override
   Future<BusinessModel> getBusinessDetail(String businessId) async {
-    final response = await _dio.get('$_baseUrl/businesses/$businessId');
-    return BusinessModel.fromJson(response.data);
+    try {
+      final response = await _supabase
+          .from(_tableName)
+          .select()
+          .eq('id', businessId)
+          .maybeSingle(); // Utilisation de maybeSingle pour éviter les crashs si non trouvé
+
+      if (response == null) {
+        throw Exception('Business non trouvé avec l\'ID : $businessId');
+      }
+
+      return BusinessModel.fromJson(response as Map<String, dynamic>);
+    } catch (e) {
+      throw Exception('Erreur Supabase lors du chargement du détail business : $e');
+    }
   }
 
   @override
   Future<List<BusinessModel>> getBusinessesByCategory(String category) async {
-    final response = await _dio.get(
-      '$_baseUrl/businesses',
-      queryParameters: {'category': category},
-    );
-    return (response.data as List)
-        .map((json) => BusinessModel.fromJson(json))
-        .toList();
+    try {
+      final response = await _supabase
+          .from(_tableName)
+          .select()
+          .eq('type', category);
+
+      return (response as List)
+          .map((json) => BusinessModel.fromJson(json as Map<String, dynamic>))
+          .toList();
+    } catch (e) {
+      throw Exception('Erreur Supabase lors de la recherche par catégorie : $e');
+    }
   }
 
   @override
   Future<List<MenuItem>> getMenuByBusiness(String businessId) async {
     try {
-      // Appel à votre route Node.js (ex: /businesses/res_01/menu)
-      final response = await _dio.get('$_baseUrl/businesses/$businessId/menu');
+      final response = await _supabase
+          .from('menu_items')
+          .select()
+          .eq('business_id', businessId);
 
-      if (response.statusCode == 200) {
-        final List data = response.data;
-        // Utilisation du constructeur fromJson adapté au snake_case SQL
-        return data.map((json) => MenuItem.fromJson(json)).toList();
-      } else {
-        throw Exception('Erreur serveur lors de la récupération du menu');
-      }
+      return (response as List)
+          .map((json) => MenuItem.fromJson(json as Map<String, dynamic>))
+          .toList();
     } catch (e) {
-      throw Exception('Erreur de connexion API: $e');
+      throw Exception('Erreur Supabase lors de la récupération du menu : $e');
+    }
+  }
+
+  @override
+  Future<void> createReservation(Reservation reservation) async {
+    try {
+      await _supabase
+          .from('reservations')
+          .insert(reservation.toJson());
+    } catch (e) {
+      throw Exception('Erreur Supabase lors de la création de la réservation : $e');
     }
   }
 }

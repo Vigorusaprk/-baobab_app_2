@@ -1,83 +1,43 @@
-import 'package:jwt_decoder/jwt_decoder.dart';
+import 'package:baobabe_0_2/features/auth/domain/entities/user.dart';
 
-class LoginRequest {
-  final String email;
-  final String password;
-  LoginRequest({required this.email, required this.password});
-  Map<String, dynamic> toJson() => {'email': email, 'password': password};
-}
-
-class SignUpRequest {
-  final String name;
-  final String email;
-  final String password;
-  final String? imgUrl;
-  SignUpRequest({required this.name, required this.email, required this.password, this.imgUrl});
-  Map<String, dynamic> toJson() => {
-    'name': name,
-    'email': email,
-    'password': password,
-    'imgUrl': imgUrl,
-  };
-}
-
-// Réponse pour login / signup (avec token)
-class AuthResponse {
-  final String id;
-  final String name;
-  final String email;
-  final String? imgUrl;
-  final String token;
-  final String refreshToken;
-  final DateTime expirationDate;
-
-  AuthResponse({
-    required this.id,
-    required this.name,
-    required this.email,
-    this.imgUrl,
-    required this.token,
-    required this.refreshToken,
-    required this.expirationDate,
+class UserModel extends UserEntity {
+  const UserModel({
+    required super.id,
+    required super.name,
+    required super.email,
+    super.imgUrl,
+    super.createdAt,
+    super.lastLogin,
+    super.businessId,
+    required super.role,
+    super.phone,
   });
 
-  factory AuthResponse.fromJson(Map<String, dynamic> json) {
-    final token = (json['accessToken'] ?? json['token']) as String;
-    final refreshToken = (json['refreshToken'] ?? '') as String;
-    final decoded = JwtDecoder.decode(token);
-    final expirationDate = DateTime.fromMillisecondsSinceEpoch(decoded['exp'] * 1000);
-    return AuthResponse(
-      id: json['id']?.toString() ?? '',
-      name: json['name']?.toString() ?? '',
-      email: json['email']?.toString() ?? '',
-      imgUrl: json['imgUrl']?.toString(),
-      token: token,
-      refreshToken: refreshToken,
-      expirationDate: expirationDate,
+  factory UserModel.fromJson(Map<String, dynamic> json) {
+    return UserModel(
+      id: json['id'] as String,
+      name: json['name'] as String,
+      email: json['email'] as String,
+      imgUrl: json['img_url'] as String?,
+      createdAt: json['created_at'] != null ? DateTime.parse(json['created_at'] as String) : null,
+      lastLogin: json['last_login'] != null ? DateTime.parse(json['last_login'] as String) : null,
+      businessId: json['business_id'] as String?,
+      role: json['role'] as String? ?? 'user',
+      phone: json['phone'] as String?,
     );
   }
-}
 
-// Informations utilisateur (sans token)
-class UserInfo {
-  final String id;
-  final String name;
-  final String email;
-  final String? imgUrl;
-
-  UserInfo({
-    required this.id,
-    required this.name,
-    required this.email,
-    this.imgUrl,
-  });
-
-  factory UserInfo.fromJson(Map<String, dynamic> json) {
-    return UserInfo(
-      id: json['id']?.toString() ?? '',
-      name: json['name']?.toString() ?? '',
-      email: json['email']?.toString() ?? '',
-      imgUrl: json['imgUrl']?.toString(),
-    );
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'email': email,
+      'img_url': imgUrl,
+      'created_at': createdAt?.toIso8601String(),
+      'last_login': lastLogin?.toIso8601String(),
+      'business_id': businessId,
+      'role': role,
+      'phone': phone,
+    };
   }
 }

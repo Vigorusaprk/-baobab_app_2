@@ -1,70 +1,48 @@
 import 'package:baobabe_0_2/features/auth/data/models/user_model.dart';
-import 'package:dio/dio.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 abstract class AuthRemoteDataSource {
-  Future<AuthResponse> login(String email, String password, {bool rememberMe = false});
-  Future<AuthResponse> signUp(String name, String email, String password, {String? imgUrl});
-  Future<AuthResponse> refreshSession(String refreshToken);
-  Future<void> logout(String refreshToken);
-  Future<UserInfo> getCurrentUser(String token);
+  Future<UserModel> login({required String email, required String password});
+  Future<UserModel> signUp({required String name, required String email, required String password, String? phone});
+  Future<void> logout();
+  Future<UserModel?> checkAuthStatus();
 }
 
 class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
-  final Dio dio;
-  final String baseUrl;
+  final SupabaseClient supabase;
 
-  AuthRemoteDataSourceImpl({required this.dio, this.baseUrl = 'http://10.0.2.2:3000/api'});
+  AuthRemoteDataSourceImpl({required this.supabase});
 
   @override
-  Future<AuthResponse> login(String email, String password, {bool rememberMe = false}) async {
-    final response = await dio.post(
-      '$baseUrl/auth/login',
-      data: {
-        'email': email,
-        'password': password,
-        'rememberMe': rememberMe,
-      },
-    );
-    return AuthResponse.fromJson(response.data);
+  Future<UserModel> login({required String email, required String password}) async {
+    final response = await supabase.auth.signInWithPassword(email: email, password: password);
+    if (response.user == null) throw Exception("Connexion échouée");
+
+    final userData = await supabase.from('users').select().eq('id', response.user!.id).maybeSingle();
+    if (userData == null) throw Exception("Profil introuvable");
+    return UserModel.fromJson(userData);
   }
 
   @override
-  Future<AuthResponse> signUp(String name, String email, String password, {String? imgUrl}) async {
-    final response = await dio.post(
-      '$baseUrl/auth/signup',
-      data: {
-        'name': name,
-        'email': email,
-        'password': password,
-        'imgUrl': imgUrl,
-      },
-    );
-    return AuthResponse.fromJson(response.data);
+  Future<UserModel> signUp({required String name, required String email, required String password, String? phone}) async {
+    final response = await supabase.auth.signUp(email: email, password: password, data: {'name': name, 'phone': phone});
+
+    if (response.user == null) throw Exception("Inscription échouée");
+
+    final newUserMap = {'id': response.user!.id, 'name': name, 'email': email, 'phone': phone};
+    await supabase.from('users').insert(newUserMap);
+
+    return UserModel.fromJson(newUserMap);
   }
 
   @override
-  Future<AuthResponse> refreshSession(String refreshToken) async {
-    final response = await dio.post(
-      '$baseUrl/auth/refresh',
-      data: {'refreshToken': refreshToken},
-    );
-    return AuthResponse.fromJson(response.data);
-  }
+  Future<void> logout() => supabase.auth.signOut();
 
   @override
-  Future<void> logout(String refreshToken) async {
-    await dio.post(
-      '$baseUrl/auth/logout',
-      data: {'refreshToken': refreshToken},
-    );
-  }
-
-  @override
-  Future<UserInfo> getCurrentUser(String token) async {
-    final response = await dio.get(
-      '$baseUrl/auth/me',
-      options: Options(headers: {'Authorization': 'Bearer $token'}),
-    );
-    return UserInfo.fromJson(response.data);
+  Future<UserModel?> checkAuthStatus() async {
+    final user = supabase.auth.currentUser;
+    if (user == null) return null;
+    final userData = await supabase.from('users').select().eq('id', user.id).maybeSingle();
+    return userData != null ? UserModel.fromJson(userData) : null;
   }
 }

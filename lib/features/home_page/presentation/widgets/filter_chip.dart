@@ -24,22 +24,22 @@ class FilterChipWidget extends StatelessWidget {
           label,
           style: TextStyle(
             fontSize: 12,
-            color: color ?? AppColors.primary,
+            color: color ?? AppColors.secondary,
             fontWeight: FontWeight.w500,
           ),
         ),
-        backgroundColor: (color ?? AppColors.primary).withOpacity(0.1),
+        backgroundColor: (color ?? AppColors.secondary).withOpacity(0.1),
         side: BorderSide(
-          color: (color ?? AppColors.primary).withOpacity(0.3),
+          color: (color ?? AppColors.secondary).withOpacity(0.3),
           width: 1,
         ),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),
         ),
         avatar: icon != null
-            ? Icon(icon, size: 14, color: color ?? AppColors.primary)
+            ? Icon(icon, size: 14, color: color ?? AppColors.secondary)
             : null,
-        deleteIcon: Icon(Icons.close, size: 16, color: color ?? AppColors.primary),
+        deleteIcon: Icon(Icons.close, size: 16, color: color ?? AppColors.secondary),
         onDeleted: onRemoved,
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
       ),

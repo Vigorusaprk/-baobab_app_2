@@ -17,8 +17,8 @@ class MainBackground extends StatelessWidget {
           decoration: BoxDecoration(
             gradient: LinearGradient(
               colors: [
-                AppColors.primaryLight ,
-                AppColors.scaffoldBackground,
+                AppColors.primary,
+                AppColors.primaryDark,
               ],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
@@ -40,14 +40,4 @@ class MainBackground extends StatelessWidget {
     );
   }
 
-  Widget _circle(double size, Color color) {
-    return Container(
-      width: size,
-      height: size,
-      decoration: BoxDecoration(
-        color: color.withOpacity(0.4),
-        shape: BoxShape.circle,
-      ),
-    );
-  }
 }

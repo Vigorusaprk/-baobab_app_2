@@ -6,6 +6,7 @@ class BusinessModel {
   final String address;
   final String description;
   final String bgImg;
+  final String profilImg;
   final double rating;
   final int reviewCount;
   final Map<String, String> openingHours;
@@ -27,6 +28,7 @@ class BusinessModel {
     required this.address,
     required this.description,
     required this.bgImg,
+    required this.profilImg,
     required this.rating,
     required this.reviewCount,
     required this.openingHours,
@@ -50,7 +52,7 @@ class BusinessModel {
       address: json['address'] ?? '',
       description: json['description'] ?? '',
       bgImg: json['bg_img'] ?? json['bgImg'] ?? '',
-      // Correction pour l'erreur "String has no method toDouble" vue dans tes logs
+      profilImg: json['profil_img'] ?? json['profilImg'] ?? '',
       rating: json['rating'] is String
           ? double.tryParse(json['rating']) ?? 0.0
           : (json['rating'] as num?)?.toDouble() ?? 0.0,
@@ -58,7 +60,7 @@ class BusinessModel {
       openingHours: Map<String, String>.from(json['opening_hours'] ?? {}),
       type: BusinessType.values.firstWhere(
             (e) => e.name == json['type'],
-        orElse: () => BusinessType.other, // Valeur par défaut si le type est inconnu
+        orElse: () => BusinessType.other,
       ),
       phone: json['phone'] ?? '',
       email: json['email'],
@@ -66,7 +68,7 @@ class BusinessModel {
       images: List<String>.from(json['images'] ?? []),
       specificData: Map<String, dynamic>.from(json['specific_data'] ?? {}),
       reviews: (json['reviews'] as List?)?.map((r) => BusinessReview.fromJson(r)).toList() ?? [],
-      isFavorite: json['is_favorite'] ?? false,
+      isFavorite: json['is_favorite'] ?? json['isFavorite'] ?? false,
       latitude: (json['latitude'] as num?)?.toDouble(),
       longitude: (json['longitude'] as num?)?.toDouble(),
       stores: json['stores'] != null
@@ -75,34 +77,25 @@ class BusinessModel {
     );
   }
 
-
   Map<String, dynamic> toJson() {
     return {
       'id': id,
       'name': name,
       'address': address,
       'description': description,
-      'bgImg': bgImg,
+      'bg_img': bgImg,
+      'profil_img' : profilImg,
       'rating': rating,
-      'reviewCount': reviewCount,
-      'openingHours': openingHours,
-      'type': _businessTypeToString(type),
+      'review_count': reviewCount,
+      'opening_hours': openingHours,
+      'type': type.name,
       'phone': phone,
       'email': email,
       'website': website,
       'images': images,
-      'specificData': specificData,
-      'reviews': reviews.map((review) => {
-        'id': review.id,
-        'userName': review.userName,
-        'userAvatar': review.userAvatar,
-        'rating': review.rating,
-        'comment': review.comment,
-        'date': review.date.toIso8601String(),
-        'likes': review.likes,
-        'commentCount': review.commentCount,
-      }).toList(),
-      'isFavorite': isFavorite,
+      'specific_data': specificData,
+      'reviews': reviews.map((review) => review.toJson()).toList(),
+      'is_favorite': isFavorite,
       'latitude': latitude,
       'longitude': longitude,
       'stores': stores?.map((store) => store.toJson()).toList(),
@@ -116,6 +109,7 @@ class BusinessModel {
       address: address,
       description: description,
       bgImg: bgImg,
+      profilImg: profilImg,
       rating: rating,
       reviewCount: reviewCount,
       openingHours: openingHours,
@@ -131,87 +125,5 @@ class BusinessModel {
       longitude: longitude,
       stores: stores?.map((store) => store.toEntity()).toList(),
     );
-  }
-
-  static BusinessModel fromEntity(Business entity) {
-    return BusinessModel(
-      id: entity.id,
-      name: entity.name,
-      address: entity.address,
-      description: entity.description,
-      bgImg: entity.bgImg,
-      rating: entity.rating,
-      reviewCount: entity.reviewCount,
-      openingHours: entity.openingHours,
-      type: entity.type,
-      phone: entity.phone,
-      email: entity.email,
-      website: entity.website,
-      images: entity.images,
-      specificData: entity.specificData,
-      reviews: entity.reviews,
-      isFavorite: entity.isFavorite,
-      latitude: entity.latitude,
-      longitude: entity.longitude,
-      stores: entity.stores != null
-          ? entity.stores!
-          .map((store) => BusinessModel.fromEntity(store))
-          .toList()
-          : null,
-    );
-  }
-
-  static BusinessType _parseBusinessType(String type) {
-    switch (type) {
-      case 'restaurant':
-        return BusinessType.restaurant;
-      case 'fastFood':
-        return BusinessType.fastFood;
-      case 'shopping':
-        return BusinessType.shopping;
-      case 'mall':
-        return BusinessType.mall;
-      case 'hotel':
-        return BusinessType.hotel;
-      case 'carRental':
-        return BusinessType.carRental;
-      case 'travelAgency':
-        return BusinessType.travelAgency;
-      case 'spa':
-        return BusinessType.spa;
-      case 'cinema':
-        return BusinessType.cinema;
-      case 'tourism':
-        return BusinessType.tourism;
-      default:
-        return BusinessType.other;
-    }
-  }
-
-  static String _businessTypeToString(BusinessType type) {
-    switch (type) {
-      case BusinessType.restaurant:
-        return 'restaurant';
-      case BusinessType.fastFood:
-        return 'fastFood';
-      case BusinessType.shopping:
-        return 'shopping';
-      case BusinessType.mall:
-        return 'mall';
-      case BusinessType.hotel:
-        return 'hotel';
-      case BusinessType.carRental:
-        return 'carRental';
-      case BusinessType.travelAgency:
-        return 'travelAgency';
-      case BusinessType.spa:
-        return 'spa';
-      case BusinessType.cinema:
-        return 'cinema';
-      case BusinessType.tourism:
-        return 'tourism';
-      default:
-        return 'other';
-    }
   }
 }

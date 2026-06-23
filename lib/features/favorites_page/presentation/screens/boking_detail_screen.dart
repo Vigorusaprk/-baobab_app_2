@@ -20,7 +20,6 @@ class ReservationDetailPage extends StatelessWidget {
     final theme = Theme.of(context);
     final primaryColor = theme.primaryColor;
 
-    // Valeurs de secours pour éviter les affichages vides
     final establishmentName = reservation.establishmentName.isNotEmpty
         ? reservation.establishmentName
         : 'Établissement inconnu';
@@ -30,120 +29,139 @@ class ReservationDetailPage extends StatelessWidget {
       backgroundColor: AppColors.primary,
       appBar: AppBar(
         title: Text(
-            'Détails de la réservation',
+          'Détails de la réservation',
           style: TextStyle(
             fontFamily: AppFonts.primaryFontFamily,
             fontSize: 24,
             fontWeight: AppFonts.bold,
-            color: AppColors.scaffoldBackground,
+            color: AppColors.secondaryLight,
           ),
         ),
         centerTitle: true,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(
-            Icons.arrow_back_ios_new_rounded,
-            color: AppColors.scaffoldBackground,
+          icon: Container(
+            decoration: BoxDecoration(
+              color: AppColors.secondaryLight,
+              shape: BoxShape.circle,
+            ),
+            child: const Center(
+              child: Icon(
+                Icons.arrow_back_ios_new_rounded,
+                color: AppColors.scaffoldBackground,
+              ),
+            ),
           ),
           onPressed: () => Navigator.pop(context),
         ),
-        backgroundColor: AppColors.primary,
+        backgroundColor: AppColors.transparent,
         foregroundColor: Colors.black87,
       ),
       body: SingleChildScrollView(
-        child: Container(
-          padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-          decoration: BoxDecoration(
-            borderRadius: const BorderRadius.only(
-              topLeft: Radius.circular(AppDimens.BORDER_RADIUS_30),
-              topRight: Radius.circular(AppDimens.BORDER_RADIUS_30),
-            ),
-            color: AppColors.scaffoldBackground
-          ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20),
           child: Column(
             children: [
-             Container(
-               child: Column(
-                 children: [
-                   _buildHeaderCard(primaryColor, establishmentName),
-                   const SizedBox(height: 16),
-                   _buildInfoCard('Informations générales', [
-                     _buildRow('Établissement', establishmentName, icon: Icons.store),
-                     _buildRow('Type', reservation.typeDisplayName, icon: Icons.category),
-                     _buildRow('Nom', reservation.customerName.isNotEmpty ? reservation.customerName : 'Non renseigné',
-                         icon: Icons.person),
-                     _buildRow('Téléphone',
-                         reservation.phoneNumber.isNotEmpty ? reservation.phoneNumber : 'Non renseigné',
-                         icon: Icons.phone),
-                   ]),
-                   const SizedBox(height: 16),
-                   if (reservation.reservationType == 'restaurant')
-                     _buildInfoCard('Détails du restaurant', [
-                       _buildRow('Table', reservation.tableNumber ?? 'Non spécifiée', icon: Icons.table_restaurant),
-                       _buildRow('Date', _safeFormatDate(reservation.date), icon: Icons.calendar_today),
-                       _buildRow('Heure', _safeFormatTime(reservation.time), icon: Icons.access_time),
-                       _buildRow('Personnes', '${reservation.numberOfPeople ?? 0}', icon: Icons.people),
-                     ]),
-                   if (reservation.reservationType == 'hotel')
-                     _buildInfoCard('Détails de l\'hôtel', [
-                       _buildRow('Chambre', reservation.roomType ?? 'Non spécifiée', icon: Icons.king_bed),
-                       _buildRow('Arrivée', _safeFormatDate(reservation.checkInDate), icon: Icons.calendar_today),
-                       _buildRow('Départ', _safeFormatDate(reservation.checkOutDate), icon: Icons.calendar_today),
-                       _buildRow('Chambres', '${reservation.numberOfRooms ?? 1}', icon: Icons.hotel),
-                       _buildRow('Personnes', '${reservation.numberOfGuests ?? 1}', icon: Icons.people),
-                     ]),
-                   if (reservation.reservationType == 'car_rental')
-                     _buildInfoCard('Détails de la location', [
-                       _buildRow('Véhicule', reservation.vehicleType ?? 'Non spécifié', icon: Icons.directions_car),
-                       _buildRow('Début', _safeFormatDate(reservation.rentalStartDate), icon: Icons.calendar_today),
-                       _buildRow('Fin', _safeFormatDate(reservation.rentalEndDate), icon: Icons.calendar_today),
-                     ]),
-                   const SizedBox(height: 16),
-                 ],
-               ),
-             ),
-              SizedBox(height: 85,),
+              Container(
+                child: Column(
+                  children: [
+                    _buildHeaderCard(primaryColor, establishmentName),
+                    const SizedBox(height: 16),
+                    _buildInfoCard('Informations générales', [
+                      _buildRow('Établissement', establishmentName, icon: Icons.store),
+                      _buildRow('Type', reservation.typeDisplayName, icon: Icons.category),
+                      _buildRow('Nom', reservation.customerName.isNotEmpty ? reservation.customerName : 'Non renseigné',
+                          icon: Icons.person),
+                      _buildRow('Téléphone',
+                          reservation.phoneNumber.isNotEmpty ? reservation.phoneNumber : 'Non renseigné',
+                          icon: Icons.phone),
+                    ]),
+                    const SizedBox(height: 16),
+                    if (reservation.type == 'restaurant')
+                      _buildInfoCard('Détails du restaurant', [
+                        _buildRow('Table', reservation.tableNumber ?? 'Non spécifiée', icon: Icons.table_restaurant),
+                        _buildRow('Date', _safeFormatDate(reservation.date), icon: Icons.calendar_today),
+                        _buildRow('Heure', _safeFormatTime(reservation.time), icon: Icons.access_time),
+                        _buildRow('Personnes', '${reservation.numberOfPeople ?? 0}', icon: Icons.people),
+                      ]),
+                    if (reservation.type == 'hotel')
+                      _buildInfoCard('Détails de l\'hôtel', [
+                        _buildRow('Chambre', reservation.roomType ?? 'Non spécifiée', icon: Icons.king_bed),
+                        _buildRow('Arrivée', _safeFormatDate(reservation.checkInDate), icon: Icons.calendar_today),
+                        _buildRow('Départ', _safeFormatDate(reservation.checkOutDate), icon: Icons.calendar_today),
+                        _buildRow('Chambres', '${reservation.numberOfRooms ?? 1}', icon: Icons.hotel),
+                        _buildRow('Personnes', '${reservation.numberOfGuests ?? 1}', icon: Icons.people),
+                      ]),
+                    if (reservation.type == 'car_rental')
+                      _buildInfoCard('Détails de la location', [
+                        _buildRow('Véhicule', reservation.vehicleType ?? 'Non spécifié', icon: Icons.directions_car),
+                        _buildRow('Début', _safeFormatDate(reservation.rentalStartDate), icon: Icons.calendar_today),
+                        _buildRow('Fin', _safeFormatDate(reservation.rentalEndDate), icon: Icons.calendar_today),
+                      ]),
+                    if (reservation.type == 'travel')
+                      _buildInfoCard('Détails du voyage', [
+                        _buildRow('Destination', reservation.destination ?? 'Non spécifiée', icon: Icons.location_on),
+                        _buildRow('Passagers', '${reservation.numberOfPassengers ?? 1}', icon: Icons.people),
+                      ]),
+                    if (reservation.type == 'spa')
+                      _buildInfoCard('Détails du spa', [
+                        _buildRow('Soin', reservation.treatmentType ?? 'Non spécifié', icon: Icons.spa),
+                        _buildRow('Date', _safeFormatDate(reservation.appointmentDate), icon: Icons.calendar_today),
+                        _buildRow('Thérapeute', reservation.therapistName ?? 'Non spécifié', icon: Icons.person_pin),
+                      ]),
+                    if (reservation.type == 'cinema')
+                      _buildInfoCard('Détails du cinéma', [
+                        _buildRow('Film', reservation.movieTitle ?? 'Non spécifié', icon: Icons.movie),
+                        _buildRow('Séance', _safeFormatDate(reservation.showtime), icon: Icons.calendar_today),
+                        _buildRow('Places', '${reservation.numberOfTickets ?? 0}', icon: Icons.confirmation_number),
+                      ]),
+                    if (reservation.type == 'toursime')
+                      _buildInfoCard('Détails du tourisme', [
+                        _buildRow('Activité', reservation.activitiName ?? 'Non spécifiée', icon: Icons.tour),
+                        _buildRow('Date', _safeFormatDate(reservation.day), icon: Icons.calendar_today),
+                        _buildRow('Participants', '${reservation.numberOfPassengers ?? 1}', icon: Icons.people),
+                      ]),
+                    const SizedBox(height: 16),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 80),
               _buildTotalCard(primaryColor, total),
-              SizedBox(height: 85,),
             ],
           ),
         ),
-      )
+      ),
     );
   }
 
   Widget _buildHeaderCard(Color primaryColor, String establishmentName) {
     return Container(
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [reservation.typeColor, AppColors.surface],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
+        color: reservation.typeColor.withOpacity(0.2),
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 10, offset: const Offset(0, 5)),
         ],
         border: Border.all(
           width: 2.5,
-          color: reservation.typeColor
-        )
+          color: reservation.typeColor,
+        ),
       ),
       width: double.infinity,
       child: Padding(
         padding: const EdgeInsets.all(20),
         child: Column(
           children: [
-            const Icon(Icons.receipt_long, size: 50, color: AppColors.primary),
+            Icon(Icons.receipt_long, size: 50, color: reservation.typeColor),
             const SizedBox(height: 10),
             Text(
               establishmentName,
-              style: const TextStyle(color: AppColors.primary, fontSize: 18, fontWeight: FontWeight.bold),
+              style: TextStyle(color: reservation.typeColor, fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 5),
             Text(
               'Réservation du ${DateFormat('dd/MM/yyyy à HH:mm').format(reservation.reservationDate)}',
-              style: const TextStyle(color: AppColors.primary),
+              style: const TextStyle(color: AppColors.secondaryLight),
             ),
           ],
         ),
@@ -153,6 +171,7 @@ class ReservationDetailPage extends StatelessWidget {
 
   Widget _buildInfoCard(String title, List<Widget> children) {
     return Card(
+      color: Colors.white,
       elevation: 4,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       child: Padding(
@@ -212,7 +231,7 @@ class ReservationDetailPage extends StatelessWidget {
             style: TextStyle(
               fontSize: 22,
               fontWeight: FontWeight.bold,
-              color: primaryColor,
+              color: reservation.typeColor,
             ),
           ),
         ],

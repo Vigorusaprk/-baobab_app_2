@@ -1,5 +1,6 @@
 import 'package:baobabe_0_2/core/themes/app_colors.dart';
 import 'package:baobabe_0_2/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:baobabe_0_2/features/auth/presentation/bloc/auth_state.dart';
 import 'package:baobabe_0_2/features/business_detail/data/models/room.dart';
 import 'package:baobabe_0_2/features/business_detail/presentation/bloc/business_detail_bloc.dart';
 import 'package:baobabe_0_2/features/favorites_page/data/models/reservation_model.dart';
@@ -92,7 +93,7 @@ class _RoomDetailPageState extends State<RoomDetailPage> {
 
     // Récupérer l'utilisateur connecté
     final authState = context.read<AuthBloc>().state;
-    if (authState is! AuthAuthenticated) {
+    if (authState is! AuthenticatedState) {
       context.go('/login');
       return;
     }
@@ -101,11 +102,13 @@ class _RoomDetailPageState extends State<RoomDetailPage> {
     final nights = _checkOut!.difference(_checkIn!).inDays;
     final totalAmount = widget.room.pricePerNight * nights * _roomsCount;
 
-    final reservation = ReservationModel(
+    final reservation = Reservation(
+      id: '',
       businessId: widget.hotel.id,
       userId: userId,
       type: "hotel",
       reservationDate: DateTime.now(),
+      createdAt: DateTime.now(),
       totalAmount: totalAmount,
       details: {
         "room_id": widget.room.id,

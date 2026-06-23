@@ -2,11 +2,11 @@ import 'package:baobabe_0_2/features/auth/domain/entities/user.dart';
 import 'package:baobabe_0_2/features/auth/domain/repositories/auth_repository.dart';
 
 class LoginUseCase {
-  final AuthRepository repository;
+  final AuthRepository authRepository;
 
-  LoginUseCase(this.repository);
+  LoginUseCase(this.authRepository);
 
-  Future<UserEntity> execute(String email, String password) {
-    return repository.login(email, password);
+  Future<UserEntity> call(String email, String password) {
+    return authRepository.login(email: email, password: password);
   }
 }

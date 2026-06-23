@@ -4,7 +4,7 @@ class Movie extends Equatable {
   final int id;
   final String businessId;
   final String title;
-  final int duration; // en minutes
+  final int duration;
   final String? genre;
   final DateTime? releaseDate;
   final String? synopsis;
@@ -32,17 +32,32 @@ class Movie extends Equatable {
         [];
 
     return Movie(
-      id: _toInt(json['id']) ?? 0,
+      id: movieToInt(json['id']) ?? 0,
       businessId: json['business_id']?.toString() ?? '',
       title: json['title']?.toString() ?? '',
-      duration: _toInt(json['duration']) ?? 0,
+      duration: movieToInt(json['duration']) ?? 0,
       genre: json['genre']?.toString(),
       releaseDate: json['release_date'] != null ? DateTime.tryParse(json['release_date'].toString()) : null,
       synopsis: json['synopsis']?.toString(),
       posterUrl: json['poster_url']?.toString(),
-      rating: _toDouble(json['rating']) ?? 0.0,
+      rating: movieToDouble(json['rating']) ?? 0.0,
       showtimes: showtimesList,
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'business_id': businessId,
+      'title': title,
+      'duration': duration,
+      'genre': genre,
+      'release_date': releaseDate?.toIso8601String(),
+      'synopsis': synopsis,
+      'poster_url': posterUrl,
+      'rating': rating,
+      'showtimes': showtimes.map((s) => s.toJson()).toList(),
+    };
   }
 
   @override
@@ -66,22 +81,31 @@ class Showtime extends Equatable {
 
   factory Showtime.fromJson(Map<String, dynamic> json) {
     return Showtime(
-      id: _toInt(json['id']) ?? 0,
+      id: movieToInt(json['id']) ?? 0,
       startTime: json['start_time'] != null
           ? DateTime.tryParse(json['start_time'].toString()) ?? DateTime.now()
           : DateTime.now(),
       room: json['room']?.toString() ?? '',
-      price: _toDouble(json['price']) ?? 0.0,
-      availableSeats: _toInt(json['available_seats']) ?? 0,
+      price: movieToDouble(json['price']) ?? 0.0,
+      availableSeats: movieToInt(json['available_seats']) ?? 0,
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'start_time': startTime.toIso8601String(),
+      'room': room,
+      'price': price,
+      'available_seats': availableSeats,
+    };
   }
 
   @override
   List<Object?> get props => [id, startTime];
 }
 
-// Fonctions utilitaires pour convertir en toute sécurité
-int? _toInt(dynamic value) {
+int? movieToInt(dynamic value) {
   if (value == null) return null;
   if (value is int) return value;
   if (value is double) return value.toInt();
@@ -89,7 +113,7 @@ int? _toInt(dynamic value) {
   return null;
 }
 
-double? _toDouble(dynamic value) {
+double? movieToDouble(dynamic value) {
   if (value == null) return null;
   if (value is double) return value;
   if (value is int) return value.toDouble();

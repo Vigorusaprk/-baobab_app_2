@@ -1,10 +1,9 @@
 import 'dart:ui';
-
 import 'package:baobabe_0_2/core/themes/app_colors.dart';
 import 'package:baobabe_0_2/features/auth/presentation/bloc/auth_bloc.dart';
-import 'package:baobabe_0_2/features/auth/presentation/screens/auth_screen.dart';
+import 'package:baobabe_0_2/features/auth/presentation/bloc/auth_event.dart';
+import 'package:baobabe_0_2/features/auth/presentation/bloc/auth_state.dart';
 import 'package:baobabe_0_2/features/auth/presentation/widgets/password_field.dart';
-import 'package:baobabe_0_2/features/main/presentation/screens/main_screen.dart';
 import 'package:baobabe_0_2/features/main/presentation/widgets/app_background.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -21,48 +20,42 @@ class SignUpPage extends StatefulWidget {
 class _SignUpPageState extends State<SignUpPage> {
   final _nameController = TextEditingController();
   final _emailController = TextEditingController();
+  final _phoneController = TextEditingController(); // ✅ Lié à la colonne phone du schéma SQL
   final _passwordController = TextEditingController();
+  final _formKey = GlobalKey<FormState>();
 
   @override
   void dispose() {
     _nameController.dispose();
     _emailController.dispose();
+    _phoneController.dispose();
     _passwordController.dispose();
     super.dispose();
   }
 
   void _signup() {
-    final name = _nameController.text.trim();
-    final email = _emailController.text.trim();
-    final password = _passwordController.text.trim();
-
-    if (name.isEmpty || email.isEmpty || password.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Veuillez remplir tous les champs'),
-          behavior: SnackBarBehavior.floating,
+    if (_formKey.currentState!.validate()) {
+      context.read<AuthBloc>().add(
+        SignUpSubmittedEvent(
+          name: _nameController.text.trim(),
+          email: _emailController.text.trim(),
+          password: _passwordController.text.trim(),
+          phone: _phoneController.text.trim().isEmpty ? null : _phoneController.text.trim(),
         ),
       );
-      return;
     }
-
-    context.read<AuthBloc>().add(AuthSignUpEvent(
-      name: name,
-      email: email,
-      password: password,
-    ));
   }
 
   @override
   Widget build(BuildContext context) {
     return BlocListener<AuthBloc, AuthState>(
       listener: (context, state) {
-        if (state is AuthAuthenticated) {
-          context.go('/home'); // ← Au lieu de Navigator.pushReplacement
-        } else if (state is AuthError) {
+        if (state is AuthenticatedState) {
+          context.go('/home');
+        } else if (state is AuthFailureState) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(state.message),
+              content: Text(state.errorMessage),
               backgroundColor: Colors.redAccent,
               behavior: SnackBarBehavior.floating,
             ),
@@ -71,96 +64,90 @@ class _SignUpPageState extends State<SignUpPage> {
       },
       child: authBackground(
         child: Scaffold(
-          backgroundColor: AppColors.transparent,
-          body: Center(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 24),
-              child: Column(
-                children: [
-                  _buildHeader(),
-                  const SizedBox(height: 30),
-
-                  // Conteneur du Formulaire
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(22),
-                    child: BackdropFilter(
-                      filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
-                      child: Container(
-                        padding: const EdgeInsets.all(24),
-                        decoration: BoxDecoration(
-                          color: AppColors.primary.withOpacity(0.25),
-                          borderRadius: BorderRadius.circular(28),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.05),
-                              blurRadius: 20,
-                              offset: const Offset(0, 10),
+          backgroundColor: Colors.transparent,
+          body: Stack(
+            children: [
+              Center(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                      children: [
+                        _buildHeader(),
+                        const SizedBox(height: 30),
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(22),
+                          child: BackdropFilter(
+                            filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
+                            child: Container(
+                              padding: const EdgeInsets.all(24),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(28),
+                                gradient: LinearGradient(
+                                  colors: [
+                                    AppColors.secondaryLight.withOpacity(0.5),
+                                    AppColors.primary.withOpacity(0.5)
+                                  ],
+                                  transform: const GradientRotation(2),
+                                ),
+                                border: Border.all(width: 2.5, color: AppColors.primaryDark),
+                              ),
+                              child: Column(
+                                children: [
+                                  _buildTextField(
+                                    controller: _nameController,
+                                    label: 'Nom complet',
+                                    iconPath: "assets/icons/user.svg",
+                                    validator: (value) => value == null || value.isEmpty ? 'Entrez votre nom' : null,
+                                  ),
+                                  const SizedBox(height: 16),
+                                  _buildTextField(
+                                    controller: _emailController,
+                                    label: 'Email',
+                                    iconPath: "assets/icons/mail-svgrepo-com.svg",
+                                    validator: (value) => value == null || value.isEmpty ? 'Entrez votre email' : null,
+                                  ),
+                                  const SizedBox(height: 16),
+                                  _buildTextField(
+                                    controller: _phoneController,
+                                    label: 'Téléphone (Optionnel)',
+                                    iconPath: "assets/icons/phone.svg",
+                                    validator: (value) => null, // Optionnel
+                                  ),
+                                  const SizedBox(height: 16),
+                                  PasswordField(
+                                    controller: _passwordController,
+                                    label: 'Mot de passe',
+                                    validator: (value) => value == null || value.length < 6 ? 'Minimum 6 caractères' : null,
+                                  ),
+                                  const SizedBox(height: 24),
+                                  _buildSignUpButton(),
+                                  const SizedBox(height: 20),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      const Text("Déjà inscrit ? ", style: TextStyle(color: AppColors.secondary)),
+                                      TextButton(
+                                        onPressed: () => context.go('/login'),
+                                        child: const Text(
+                                          'Se connecter',
+                                          style: TextStyle(color: AppColors.secondary, fontWeight: FontWeight.bold),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
                             ),
-                          ],
-                          border: Border.all(width: 2.5, color: AppColors.primary)
+                          ),
                         ),
-                        child: Column(
-                          children: [
-                            _buildTextField(
-                              controller: _nameController,
-                              label: 'Nom complet',
-                              iconPath: "assets/icons/profile-round-1346-svgrepo-com.svg",
-                            ),
-                            const SizedBox(height: 16),
-                            _buildTextField(
-                              controller: _emailController,
-                              label: 'Email',
-                              iconPath: "assets/icons/mail-svgrepo-com.svg",
-                            ),
-                            const SizedBox(height: 16),
-                            PasswordField(
-                              controller: _passwordController,
-                              label: 'Mot de passe',
-                              validator: (value) {
-                                if (value == null || value.isEmpty) {
-                                  return 'Veuillez saisir votre mot de passe';
-                                }
-                                return null;
-                              },
-                            ),
-                            const SizedBox(height: 24),
-                            _buildSignUpButton(),
-                          ],
-                        ),
-                      ),
+                      ],
                     ),
                   ),
-
-                  const SizedBox(height: 32),
-                  _buildDivider(),
-                  const SizedBox(height: 24),
-
-                  // Boutons Sociaux
-                  _buildSocialButton(label: 'Google', icon: "assets/icons/olive-svgrepo-com.svg"),
-                  const SizedBox(height: 12),
-                  _buildSocialButton(label: 'Facebook', icon: "assets/icons/olive-svgrepo-com.svg"),
-
-                  const SizedBox(height: 32),
-
-                  // Lien vers Connexion
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text("Déjà un compte ?", style: TextStyle(color: AppColors.primary)),
-                      TextButton(
-                        onPressed: () {
-                          context.go('/login');
-                        },
-                        child: const Text(
-                          'Connectez-vous',
-                          style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
+                ),
               ),
-            ),
+            ],
           ),
         ),
       ),
@@ -170,65 +157,38 @@ class _SignUpPageState extends State<SignUpPage> {
   Widget _buildHeader() {
     return Column(
       children: [
-        Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: AppColors.scaffoldBackground,
-          ),
-          child: SvgPicture.asset(
-            "assets/icons/olive-svgrepo-com.svg",
-            height: 48,
-            colorFilter: const ColorFilter.mode(Color(0xFF254D32), BlendMode.srcIn),
-          ),
+        SvgPicture.asset(
+          "assets/icons/olive-svgrepo-com.svg",
+          height: 48,
+          colorFilter: const ColorFilter.mode(AppColors.secondary, BlendMode.srcIn),
         ),
         const SizedBox(height: 16),
         const Text(
-          'Bienvenue',
-          style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, letterSpacing: -0.5, color: AppColors.scaffoldBackground),
+          'Inscription',
+          style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: AppColors.secondary),
         ),
-        Text(
-          'Crée vous un comptes',
-          style: TextStyle(fontSize: 16, color: AppColors.primary),
+        const Text(
+          'Créez votre compte en quelques instants !',
+          style: TextStyle(fontSize: 16, color: AppColors.secondary),
         ),
       ],
     );
   }
 
-
   Widget _buildTextField({
     required TextEditingController controller,
     required String label,
     required String iconPath,
-    bool isPassword = false,
+    required FormFieldValidator<String> validator,
   }) {
-    return TextField(
+    return TextFormField(
       controller: controller,
-      obscureText: isPassword,
+      validator: validator,
       decoration: InputDecoration(
         labelText: label,
-        labelStyle: TextStyle(color: Colors.grey[600], fontSize: 14),
-        prefixIcon: Padding(
-          padding: const EdgeInsets.all(12.0),
-          child: SvgPicture.asset(
-              iconPath,
-              colorFilter: const ColorFilter.mode(Color(0xFF254D32), BlendMode.srcIn)
-          ),
-        ),
         filled: true,
         fillColor: const Color(0xFFF1F3F4),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
-          borderSide: BorderSide.none,
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
-          borderSide: BorderSide.none,
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
-          borderSide: const BorderSide(color: Color(0xFF254D32), width: 1),
-        ),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
       ),
     );
   }
@@ -240,54 +200,17 @@ class _SignUpPageState extends State<SignUpPage> {
           width: double.infinity,
           height: 56,
           child: ElevatedButton(
-            onPressed: state is AuthLoading ? null : _signup,
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF254D32),
+              backgroundColor: AppColors.primaryDark,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-              elevation: 0,
             ),
-            child: state is AuthLoading
+            onPressed: state is AuthLoadingState ? null : _signup,
+            child: state is AuthLoadingState
                 ? const CircularProgressIndicator(color: Colors.white)
-                : const Text(
-              'S\'inscrire',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
-            ),
+                : const Text('S\'inscrire', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
           ),
         );
       },
-    );
-  }
-
-  Widget _buildSocialButton({required String label, required String icon}) {
-    return SizedBox(
-      width: double.infinity,
-      height: 54,
-      child: OutlinedButton.icon(
-        style: OutlinedButton.styleFrom(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-          side: BorderSide(color: Colors.grey.withOpacity(0.2)),
-          backgroundColor: AppColors.scaffoldBackground,
-        ),
-        icon: SvgPicture.asset(icon, height: 20),
-        label: Text(
-          'Continuer avec $label',
-          style: const TextStyle(color: Colors.black87, fontWeight: FontWeight.w500),
-        ),
-        onPressed: () {},
-      ),
-    );
-  }
-
-  Widget _buildDivider() {
-    return Row(
-      children: [
-        Expanded(child: Divider(color: AppColors.primary)),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: Text("OU", style: TextStyle(color: AppColors.primary, fontSize: 12, fontWeight: FontWeight.bold)),
-        ),
-        Expanded(child: Divider(color: AppColors.primary)),
-      ],
     );
   }
 }

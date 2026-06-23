@@ -1,5 +1,6 @@
 import 'package:baobabe_0_2/core/themes/app_colors.dart';
 import 'package:baobabe_0_2/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:baobabe_0_2/features/auth/presentation/bloc/auth_state.dart';
 import 'package:baobabe_0_2/features/business_detail/presentation/bloc/business_detail_bloc.dart';
 import 'package:baobabe_0_2/features/favorites_page/data/models/reservation_model.dart';
 import 'package:baobabe_0_2/features/home_page/domain/entities/business_entity.dart';
@@ -81,7 +82,21 @@ class _SpaReservationModalState extends State<SpaReservationModal> {
   final TextEditingController _fullNameController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _notesController = TextEditingController();
+  int _currentPage = 0;
   bool _isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _pageController.addListener(() {
+      if (_pageController.hasClients) {
+        final next = _pageController.page?.round() ?? 0;
+        if (next != _currentPage) {
+          setState(() => _currentPage = next);
+        }
+      }
+    });
+  }
 
   @override
   void dispose() {
@@ -93,11 +108,11 @@ class _SpaReservationModalState extends State<SpaReservationModal> {
   }
 
   void _nextPage() {
-    if (_pageController.page == 0 && _data.selectedTreatments.isEmpty) {
+    if (_currentPage == 0 && _data.selectedTreatments.isEmpty) {
       _showSnackBar('Veuillez sélectionner au moins un soin');
       return;
     }
-    if (_pageController.page == 1 && !_validateStep2()) {
+    if (_currentPage == 1 && !_validateStep2()) {
       _showSnackBar('Veuillez remplir tous les champs obligatoires');
       return;
     }
@@ -114,9 +129,13 @@ class _SpaReservationModalState extends State<SpaReservationModal> {
         _data.appointmentTime != null;
   }
 
-  void _showSnackBar(String message) {
+  void _showSnackBar(String message, {bool isSuccess = false}) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message), backgroundColor: Colors.red, behavior: SnackBarBehavior.floating),
+      SnackBar(
+          content: Text(message),
+          backgroundColor: isSuccess ? Colors.green : Colors.red,
+          behavior: SnackBarBehavior.floating
+      ),
     );
   }
 
@@ -136,7 +155,7 @@ class _SpaReservationModalState extends State<SpaReservationModal> {
 
   Future<void> _saveReservation() async {
     final authState = context.read<AuthBloc>().state;
-    if (authState is! AuthAuthenticated) {
+    if (authState is! AuthenticatedState) {
       _showSnackBar('Veuillez vous connecter');
       return;
     }
@@ -155,11 +174,13 @@ class _SpaReservationModalState extends State<SpaReservationModal> {
         _data.appointmentTime!.minute,
       );
 
-      final reservation = ReservationModel(
+      final reservation = Reservation(
+        id: '',
         businessId: widget.business.id,
         userId: userId,
         type: 'spa',
         reservationDate: DateTime.now(),
+        createdAt: DateTime.now(),
         totalAmount: totalAmount,
         details: {
           'customer_name': _fullNameController.text.trim(),
@@ -173,19 +194,16 @@ class _SpaReservationModalState extends State<SpaReservationModal> {
 
       context.read<BusinessDetailBloc>().add(MakeReservation(reservation));
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Réservation confirmée !'), backgroundColor: Colors.green),
-      );
+      _showSnackBar('Réservation confirmée !', isSuccess: true);
       Navigator.of(context).pop();
     } catch (e) {
       if (!mounted) return;
       _showSnackBar('Erreur : $e');
     } finally {
-      setState(() => _isLoading = false);
+      if (mounted) setState(() => _isLoading = false);
     }
   }
 
-  // Récupère la liste des traitements en toute sécurité
   List<dynamic> _getTreatmentsList() {
     final data = widget.business.specificData['treatments'];
     if (data is List) return data;
@@ -193,7 +211,6 @@ class _SpaReservationModalState extends State<SpaReservationModal> {
     return [];
   }
 
-  // Récupère la liste des thérapeutes (peut être une liste de strings ou de maps)
   List<String> _getTherapistNames() {
     final therapists = widget.business.specificData['therapists'];
     if (therapists is List) {
@@ -249,7 +266,7 @@ class _SpaReservationModalState extends State<SpaReservationModal> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          if (_pageController.hasClients && _pageController.page! > 0)
+          if (_currentPage > 0)
             IconButton(
               icon: Icon(Icons.arrow_back_ios_new, color: AppColors.primary, size: isSmallScreen ? 18 : 24),
               onPressed: () => _pageController.previousPage(duration: const Duration(milliseconds: 300), curve: Curves.easeIn),
@@ -260,7 +277,7 @@ class _SpaReservationModalState extends State<SpaReservationModal> {
             child: Column(
               children: [
                 Text(
-                  _getPageTitle(_pageController.hasClients ? _pageController.page!.round() : 0),
+                  _getPageTitle(_currentPage),
                   style: TextStyle(fontSize: titleFontSize, fontWeight: FontWeight.bold),
                   textAlign: TextAlign.center,
                 ),
@@ -289,14 +306,13 @@ class _SpaReservationModalState extends State<SpaReservationModal> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [0, 1, 2].map((index) {
-          final currentPage = _pageController.hasClients ? _pageController.page!.round() : 0;
           return Container(
             width: isSmallScreen ? 6 : 8,
             height: isSmallScreen ? 6 : 8,
             margin: EdgeInsets.symmetric(horizontal: isSmallScreen ? 3 : 4),
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: currentPage >= index ? Theme.of(context).colorScheme.primary : Colors.grey[300],
+              color: _currentPage >= index ? Theme.of(context).colorScheme.primary : Colors.grey[300],
             ),
           );
         }).toList(),
@@ -357,7 +373,7 @@ class _SpaReservationModalState extends State<SpaReservationModal> {
                               Text(name, style: TextStyle(fontSize: isSmallScreen ? 14 : 16, fontWeight: FontWeight.w500)),
                               const SizedBox(height: 4),
                               if (duration > 0) Text('Durée: $duration min', style: TextStyle(fontSize: isSmallScreen ? 11 : 13)),
-                              if (price > 0) Text('\$${price.toStringAsFixed(2)}', style: TextStyle(fontSize: isSmallScreen ? 12 : 14, fontWeight: FontWeight.bold, color: AppColors.primary)),
+                              if (price > 0) Text('\$$price', style: TextStyle(fontSize: isSmallScreen ? 12 : 14, fontWeight: FontWeight.bold, color: AppColors.primary)),
                               if (description.isNotEmpty) ...[
                                 const SizedBox(height: 4),
                                 Text(description, style: TextStyle(fontSize: isSmallScreen ? 10 : 12, color: Colors.grey), maxLines: 2, overflow: TextOverflow.ellipsis),
@@ -379,7 +395,7 @@ class _SpaReservationModalState extends State<SpaReservationModal> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text('${_data.selectedTreatments.length} soin(s) sélectionné(s)', style: TextStyle(fontWeight: FontWeight.bold, fontSize: isSmallScreen ? 14 : 16)),
-              Text('Total: ${_data.calculateTotal(treatments).toStringAsFixed(2)} €', style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.primary, fontSize: isSmallScreen ? 14 : 16)),
+              Text('Total: \$${_data.calculateTotal(treatments).toStringAsFixed(2)}', style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.primary, fontSize: isSmallScreen ? 14 : 16)),
             ],
           ),
         ),
@@ -583,7 +599,7 @@ class _SpaReservationModalState extends State<SpaReservationModal> {
                     const SizedBox(height: 12),
                     ...selectedTreatmentsWithPrices.map((item) => Padding(
                       padding: const EdgeInsets.only(bottom: 8),
-                      child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Expanded(child: Text(item['name'], style: const TextStyle(fontSize: 14))), Text('${item['price']} €', style: const TextStyle(fontWeight: FontWeight.w500))]),
+                      child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Expanded(child: Text(item['name'], style: const TextStyle(fontSize: 14))), Text('\$${item['price']}', style: const TextStyle(fontWeight: FontWeight.w500))]),
                     )).toList(),
                     const Divider(height: 20),
                     _buildPriceRow("Total", "\$${totalAmount.toStringAsFixed(2)}", isSmallScreen, isTotal: true),

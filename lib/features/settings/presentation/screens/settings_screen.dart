@@ -8,6 +8,7 @@ import 'package:baobabe_0_2/core/themes/app_colors.dart';
 import 'package:baobabe_0_2/core/themes/app_diemens.dart';
 import 'package:baobabe_0_2/core/themes/app_fonts.dart';
 import 'package:baobabe_0_2/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:baobabe_0_2/features/auth/presentation/bloc/auth_event.dart';
 import 'package:baobabe_0_2/features/main/presentation/widgets/main_background.dart';
 
 
@@ -55,7 +56,7 @@ class InfoTile extends StatelessWidget {
         padding: const EdgeInsets.symmetric(vertical: 8.0),
         child: Row(
           children: [
-            IconBadge(icon: icon, color: accentColor),
+            IconBadge(icon: icon, color: AppColors.secondary),
             const SizedBox(width: 16),
             Expanded(
               child: Text(subtitle, style: AppFonts.bodyMedium),
@@ -151,7 +152,7 @@ class SettingsScreen extends StatelessWidget {
                       onTap: () => _showLanguageDialog(context),
                       trailing: Text(
                         _getLanguageName(settingsState.locale.languageCode),
-                        style: AppFonts.bodySmall?.copyWith(color: AppColors.primary),
+                        style: AppFonts.bodySmall?.copyWith(color: AppColors.secondaryLight),
                       ),
                     ),
                     const Divider(color: Colors.grey),
@@ -161,7 +162,7 @@ class SettingsScreen extends StatelessWidget {
                       onTap: () => _showThemeDialog(context),
                       trailing: Text(
                         _getThemeName(settingsState.themeMode),
-                        style: AppFonts.bodySmall?.copyWith(color: AppColors.primary),
+                        style: AppFonts.bodySmall?.copyWith(color: AppColors.secondaryLight),
                       ),
                     ),
                   ],
@@ -298,6 +299,7 @@ class SettingsScreen extends StatelessWidget {
   void _showThemeDialog(BuildContext context) {
     final cubit = context.read<SettingsCubit>();
     showDialog(
+
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: AppColors.scaffoldBackground,
@@ -309,7 +311,7 @@ class SettingsScreen extends StatelessWidget {
             ListTile(
               title: Text("Clair"),
               trailing: cubit.state.themeMode == ThemeMode.light
-                  ? Icon(Icons.check, color: AppColors.primary)
+                  ? Icon(Icons.check, color: AppColors.secondaryLight)
                   : null,
               onTap: () {
                 cubit.setThemeMode(ThemeMode.light);
@@ -319,7 +321,7 @@ class SettingsScreen extends StatelessWidget {
             ListTile(
               title: Text("Sombre"),
               trailing: cubit.state.themeMode == ThemeMode.dark
-                  ? Icon(Icons.check, color: AppColors.primary)
+                  ? Icon(Icons.check, color: AppColors.secondaryLight)
                   : null,
               onTap: () {
                 cubit.setThemeMode(ThemeMode.dark);
@@ -329,7 +331,7 @@ class SettingsScreen extends StatelessWidget {
             ListTile(
               title: Text("Système"),
               trailing: cubit.state.themeMode == ThemeMode.system
-                  ? Icon(Icons.check, color: AppColors.primary)
+                  ? Icon(Icons.check, color: AppColors.secondaryLight)
                   : null,
               onTap: () {
                 cubit.setThemeMode(ThemeMode.system);
@@ -355,7 +357,7 @@ class SettingsScreen extends StatelessWidget {
           ),
           ElevatedButton(
             onPressed: () {
-              context.read<AuthBloc>().add(AuthLogoutEvent());
+              context.read<AuthBloc>().add(LogoutRequestedEvent());
               context.go('/login');
             },
             style: ElevatedButton.styleFrom(backgroundColor: AppColors.error),

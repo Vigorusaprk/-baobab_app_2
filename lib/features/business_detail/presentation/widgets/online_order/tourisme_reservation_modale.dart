@@ -1,13 +1,12 @@
 import 'package:baobabe_0_2/core/themes/app_colors.dart';
 import 'package:baobabe_0_2/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:baobabe_0_2/features/auth/presentation/bloc/auth_state.dart';
 import 'package:baobabe_0_2/features/business_detail/presentation/bloc/business_detail_bloc.dart';
 import 'package:baobabe_0_2/features/favorites_page/data/models/reservation_model.dart';
 import 'package:baobabe_0_2/features/home_page/domain/entities/business_entity.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 
-// Données de réservation
 class TourismReservationData {
   List<String> selectedActivities = [];
   DateTime? activityDate;
@@ -72,12 +71,24 @@ class TourismReservationModal extends StatefulWidget {
 class _TourismReservationModalState extends State<TourismReservationModal> {
   final PageController _pageController = PageController();
   final TourismReservationData _data = TourismReservationData();
-
   final TextEditingController _fullNameController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _notesController = TextEditingController();
-
+  int _currentPage = 0;
   bool _isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _pageController.addListener(() {
+      if (_pageController.hasClients) {
+        final next = _pageController.page?.round() ?? 0;
+        if (next != _currentPage) {
+          setState(() => _currentPage = next);
+        }
+      }
+    });
+  }
 
   @override
   void dispose() {
@@ -89,11 +100,11 @@ class _TourismReservationModalState extends State<TourismReservationModal> {
   }
 
   void _nextPage() {
-    if (_pageController.page == 0 && _data.selectedActivities.isEmpty) {
+    if (_currentPage == 0 && _data.selectedActivities.isEmpty) {
       _showSnackBar('Veuillez sélectionner au moins une activité');
       return;
     }
-    if (_pageController.page == 1 && !_validateStep2()) {
+    if (_currentPage == 1 && !_validateStep2()) {
       _showSnackBar('Veuillez remplir tous les champs obligatoires');
       return;
     }
@@ -109,11 +120,11 @@ class _TourismReservationModalState extends State<TourismReservationModal> {
         _data.activityDate != null;
   }
 
-  void _showSnackBar(String message) {
+  void _showSnackBar(String message, {bool isSuccess = false}) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
-        backgroundColor: Colors.red,
+        backgroundColor: isSuccess ? Colors.green : Colors.red,
         behavior: SnackBarBehavior.floating,
       ),
     );
@@ -121,19 +132,18 @@ class _TourismReservationModalState extends State<TourismReservationModal> {
 
   Future<DateTime?> _showDatePicker() async {
     final BuildContext rootContext = Navigator.of(context).context;
-    final DateTime? picked = await showDatePicker(
+    return await showDatePicker(
       context: rootContext,
       initialDate: DateTime.now(),
       firstDate: DateTime.now(),
       lastDate: DateTime(DateTime.now().year + 1),
       locale: const Locale('fr', 'FR'),
     );
-    return picked;
   }
 
   Future<void> _saveReservation() async {
     final authState = context.read<AuthBloc>().state;
-    if (authState is! AuthAuthenticated) {
+    if (authState is! AuthenticatedState) {
       _showSnackBar('Veuillez vous connecter');
       return;
     }
@@ -148,11 +158,13 @@ class _TourismReservationModalState extends State<TourismReservationModal> {
       final totalAmount = _data.calculateTotal(activities);
       final selectedActivitiesWithPrices = _data.getSelectedActivitiesWithPrices(activities);
 
-      final reservation = ReservationModel(
+      final reservation = Reservation(
+        id: '',
         businessId: widget.business.id,
         userId: authState.user.id,
-        type: 'toursime',
+        type: 'tourisme',
         reservationDate: _data.activityDate!,
+        createdAt: DateTime.now(),
         totalAmount: totalAmount,
         details: {
           'customer_name': _fullNameController.text.trim(),
@@ -165,16 +177,14 @@ class _TourismReservationModalState extends State<TourismReservationModal> {
       );
 
       context.read<BusinessDetailBloc>().add(MakeReservation(reservation));
+      if (!mounted) return;
+      _showSnackBar('Réservation confirmée !', isSuccess: true);
       Navigator.pop(context);
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Réservation confirmée !'), backgroundColor: Colors.green),
-      );
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Erreur : $e'), backgroundColor: Colors.red),
-      );
+      if (!mounted) return;
+      _showSnackBar('Erreur : $e');
     } finally {
-      setState(() => _isLoading = false);
+      if (mounted) setState(() => _isLoading = false);
     }
   }
 
@@ -194,13 +204,12 @@ class _TourismReservationModalState extends State<TourismReservationModal> {
           ),
           child: Column(
             children: [
-              // Header
               Padding(
                 padding: EdgeInsets.all(isSmallScreen ? 12.0 : 16.0),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    if (_pageController.hasClients && _pageController.page! > 0)
+                    if (_currentPage > 0)
                       IconButton(
                         icon: Icon(Icons.arrow_back_ios_new, color: AppColors.primary, size: isSmallScreen ? 18 : 24),
                         onPressed: () => _pageController.previousPage(
@@ -214,7 +223,7 @@ class _TourismReservationModalState extends State<TourismReservationModal> {
                       child: Column(
                         children: [
                           Text(
-                            _getPageTitle(_pageController.hasClients ? _pageController.page!.round() : 0),
+                            _getPageTitle(_currentPage),
                             style: TextStyle(fontSize: titleFontSize, fontWeight: FontWeight.bold),
                             textAlign: TextAlign.center,
                           ),
@@ -262,14 +271,13 @@ class _TourismReservationModalState extends State<TourismReservationModal> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [0, 1, 2].map((index) {
-          final currentPage = _pageController.hasClients ? _pageController.page!.round() : 0;
           return Container(
             width: isSmallScreen ? 6 : 8,
             height: isSmallScreen ? 6 : 8,
             margin: EdgeInsets.symmetric(horizontal: isSmallScreen ? 3 : 4),
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: currentPage >= index ? Theme.of(context).colorScheme.primary : Colors.grey[300],
+              color: _currentPage >= index ? Theme.of(context).colorScheme.primary : Colors.grey[300],
             ),
           );
         }).toList(),
@@ -286,7 +294,6 @@ class _TourismReservationModalState extends State<TourismReservationModal> {
     }
   }
 
-  // Page 1 : Sélection multiple des activités
   Widget _buildSelectActivitiesPage(bool isSmallScreen, double horizontalPadding) {
     final activities = widget.business.specificData['activities'] as List? ?? [];
 
@@ -343,7 +350,7 @@ class _TourismReservationModalState extends State<TourismReservationModal> {
                               const SizedBox(height: 4),
                               Row(children: [Icon(Icons.location_on, size: 14, color: Colors.grey), const SizedBox(width: 4), Text(location, style: TextStyle(fontSize: isSmallScreen ? 11 : 13))]),
                               Text('Durée: $duration min', style: TextStyle(fontSize: isSmallScreen ? 11 : 13)),
-                              Text('\$${price.toStringAsFixed(2)} / personne', style: TextStyle(fontSize: isSmallScreen ? 12 : 14, fontWeight: FontWeight.bold, color: AppColors.primary)),
+                              Text('\$$price / personne', style: TextStyle(fontSize: isSmallScreen ? 12 : 14, fontWeight: FontWeight.bold, color: AppColors.primary)),
                               if (description.isNotEmpty) ...[
                                 const SizedBox(height: 4),
                                 Text(description, style: TextStyle(fontSize: isSmallScreen ? 10 : 12, color: Colors.grey), maxLines: 2, overflow: TextOverflow.ellipsis),
@@ -359,14 +366,13 @@ class _TourismReservationModalState extends State<TourismReservationModal> {
             },
           ),
         ),
-        // Récapitulatif du panier
         Padding(
           padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text('${_data.selectedActivities.length} activité(s) sélectionnée(s)', style: TextStyle(fontWeight: FontWeight.bold, fontSize: isSmallScreen ? 14 : 16)),
-              Text('Total: ${_data.calculateTotal(activities).toStringAsFixed(2)} €', style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.primary, fontSize: isSmallScreen ? 14 : 16)),
+              Text('Total: \$${_data.calculateTotal(activities).toStringAsFixed(2)}', style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.primary, fontSize: isSmallScreen ? 14 : 16)),
             ],
           ),
         ),
@@ -391,7 +397,6 @@ class _TourismReservationModalState extends State<TourismReservationModal> {
     );
   }
 
-  // Page 2 : Informations personnelles, date, nombre de participants
   Widget _buildInformationPage(bool isSmallScreen, double horizontalPadding) {
     return SingleChildScrollView(
       padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
@@ -495,7 +500,6 @@ class _TourismReservationModalState extends State<TourismReservationModal> {
     );
   }
 
-  // Page 3 : Récapitulatif
   Widget _buildSummaryPage(bool isSmallScreen, double horizontalPadding) {
     final activities = widget.business.specificData['activities'] as List? ?? [];
     final totalAmount = _data.calculateTotal(activities);
@@ -513,7 +517,6 @@ class _TourismReservationModalState extends State<TourismReservationModal> {
             child: SingleChildScrollView(
               child: Column(
                 children: [
-                  // Informations client
                   Container(
                     padding: EdgeInsets.all(isSmallScreen ? 12 : 16),
                     decoration: BoxDecoration(color: Colors.grey[50], borderRadius: BorderRadius.circular(12), border: Border.all(color: Colors.grey[300]!)),
@@ -528,7 +531,6 @@ class _TourismReservationModalState extends State<TourismReservationModal> {
                     ),
                   ),
                   SizedBox(height: isSmallScreen ? 12 : 16),
-                  // Liste des activités sélectionnées
                   Container(
                     padding: EdgeInsets.all(isSmallScreen ? 12 : 16),
                     decoration: BoxDecoration(color: Colors.grey[50], borderRadius: BorderRadius.circular(12), border: Border.all(color: Colors.grey[300]!)),
@@ -540,14 +542,15 @@ class _TourismReservationModalState extends State<TourismReservationModal> {
                         ...selectedActivitiesWithPrices.map((item) => Padding(
                           padding: const EdgeInsets.only(bottom: 8),
                           child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Expanded(child: Text(item['name'], style: const TextStyle(fontSize: 14))), Text('${item['price']} €', style: const TextStyle(fontWeight: FontWeight.w500))]),
-                              if (item['location'] != null) Row(children: [Icon(Icons.location_on, size: 12, color: Colors.grey), const SizedBox(width: 4), Text(item['location'], style: TextStyle(fontSize: 12, color: Colors.grey))]),
+                              Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Expanded(child: Text(item['name'], style: const TextStyle(fontSize: 14))), Text('\$${item['price']}', style: const TextStyle(fontWeight: FontWeight.w500))]),
+                              if (item['location'] != null) Row(children: [Icon(Icons.location_on, size: 12, color: Colors.grey), const SizedBox(width: 4), Text(item['location'], style: const TextStyle(fontSize: 12, color: Colors.grey))]),
                             ],
                           ),
                         )),
                         const Divider(height: 20),
-                        _buildPriceRow("Total (x${_data.numberOfParticipants} participants)", "\$${totalAmount.toStringAsFixed(2)}", isSmallScreen, isTotal: true),
+                        _buildPriceRow("Total (${_data.numberOfParticipants} part.)", "\$${totalAmount.toStringAsFixed(2)}", isSmallScreen, isTotal: true),
                       ],
                     ),
                   ),
@@ -556,46 +559,7 @@ class _TourismReservationModalState extends State<TourismReservationModal> {
             ),
           ),
           SizedBox(height: isSmallScreen ? 12 : 16),
-          // Boutons
-          if (isSmallScreen)
-            Column(
-              children: [
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: _isLoading ? null : _saveReservation,
-                    style: ElevatedButton.styleFrom(backgroundColor: _isLoading ? Colors.grey : Colors.green, padding: EdgeInsets.symmetric(vertical: isSmallScreen ? 14 : 16), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
-                    child: _isLoading
-                        ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2, valueColor: AlwaysStoppedAnimation<Color>(Colors.white)))
-                        : Row(mainAxisAlignment: MainAxisAlignment.center, children: [Icon(Icons.check_circle, color: Colors.white, size: 20), const SizedBox(width: 8), Text("Confirmer la Réservation", style: TextStyle(fontSize: 16, color: Colors.white, fontWeight: FontWeight.bold))]),
-                  ),
-                ),
-                SizedBox(height: 8),
-                SizedBox(
-                  width: double.infinity,
-                  child: TextButton(
-                    onPressed: _isLoading ? null : () => _pageController.previousPage(duration: const Duration(milliseconds: 300), curve: Curves.easeIn),
-                    child: Text("Modifier les informations", style: TextStyle(fontSize: 14, color: Colors.grey)),
-                  ),
-                ),
-              ],
-            )
-          else
-            Row(
-              children: [
-                Expanded(child: TextButton(onPressed: _isLoading ? null : () => _pageController.previousPage(duration: const Duration(milliseconds: 300), curve: Curves.easeIn), style: TextButton.styleFrom(padding: EdgeInsets.symmetric(vertical: isSmallScreen ? 14 : 16)), child: Text("Modifier", style: TextStyle(fontSize: 16, color: Colors.grey)))),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: _isLoading ? null : _saveReservation,
-                    style: ElevatedButton.styleFrom(backgroundColor: _isLoading ? Colors.grey : Colors.green, padding: EdgeInsets.symmetric(vertical: isSmallScreen ? 14 : 16), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
-                    child: _isLoading
-                        ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2, valueColor: AlwaysStoppedAnimation<Color>(Colors.white)))
-                        : Row(mainAxisAlignment: MainAxisAlignment.center, children: [Icon(Icons.check_circle, color: Colors.white, size: 20), const SizedBox(width: 8), Text("Confirmer", style: TextStyle(fontSize: 16, color: Colors.white, fontWeight: FontWeight.bold))]),
-                  ),
-                ),
-              ],
-            ),
+          _buildActionButtons(isSmallScreen),
           SizedBox(height: isSmallScreen ? 8 : 12),
         ],
       ),
@@ -626,5 +590,48 @@ class _TourismReservationModalState extends State<TourismReservationModal> {
         ],
       ),
     );
+  }
+
+  Widget _buildActionButtons(bool isSmallScreen) {
+    if (isSmallScreen) {
+      return Column(
+        children: [
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: _isLoading ? null : _saveReservation,
+              style: ElevatedButton.styleFrom(backgroundColor: _isLoading ? Colors.grey : Colors.green, padding: const EdgeInsets.symmetric(vertical: 14), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
+              child: _isLoading
+                  ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2, valueColor: AlwaysStoppedAnimation<Color>(Colors.white)))
+                  : const Row(mainAxisAlignment: MainAxisAlignment.center, children: [Icon(Icons.check_circle, color: Colors.white, size: 20), SizedBox(width: 8), Text("Confirmer la Réservation", style: TextStyle(fontSize: 16, color: Colors.white, fontWeight: FontWeight.bold))]),
+            ),
+          ),
+          const SizedBox(height: 8),
+          SizedBox(
+            width: double.infinity,
+            child: TextButton(
+              onPressed: _isLoading ? null : () => _pageController.previousPage(duration: const Duration(milliseconds: 300), curve: Curves.easeIn),
+              child: Text("Modifier les informations", style: TextStyle(fontSize: 14, color: Colors.grey)),
+            ),
+          ),
+        ],
+      );
+    } else {
+      return Row(
+        children: [
+          Expanded(child: TextButton(onPressed: _isLoading ? null : () => _pageController.previousPage(duration: const Duration(milliseconds: 300), curve: Curves.easeIn), style: TextButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 16)), child: Text("Modifier", style: TextStyle(fontSize: 16, color: Colors.grey)))),
+          const SizedBox(width: 12),
+          Expanded(
+            child: ElevatedButton(
+              onPressed: _isLoading ? null : _saveReservation,
+              style: ElevatedButton.styleFrom(backgroundColor: _isLoading ? Colors.grey : Colors.green, padding: const EdgeInsets.symmetric(vertical: 16), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
+              child: _isLoading
+                  ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2, valueColor: AlwaysStoppedAnimation<Color>(Colors.white)))
+                  : const Row(mainAxisAlignment: MainAxisAlignment.center, children: [Icon(Icons.check_circle, color: Colors.white, size: 20), SizedBox(width: 8), Text("Confirmer", style: TextStyle(fontSize: 16, color: Colors.white, fontWeight: FontWeight.bold))]),
+            ),
+          ),
+        ],
+      );
+    }
   }
 }

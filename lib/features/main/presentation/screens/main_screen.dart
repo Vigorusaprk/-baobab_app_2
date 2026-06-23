@@ -11,10 +11,10 @@ class MainScreen extends StatelessWidget {
   // ⭐️ Définir les chemins des SVG pour chaque état et chaque icône
   // Format: [index][0] = outline, [index][1] = filled
   final List<List<String>> _svgPaths = const [
-    ['assets/icons/home-angle-2-svgrepo-com (2).svg', 'assets/icons/home-angle-2-svgrepo-com (3).svg'], // Home
-    ['assets/icons/calendar-date-svgrepo-com.svg', 'assets/icons/calendar-date-svgrepo-com (1).svg'], // Ma classe
+    ['assets/icons/home-angle-2-svgrepo-com (2).svg', 'assets/icons/home-angle-2-svgrepo-com (3).svg'],
+    ['assets/icons/calendar-date-svgrepo-com.svg', 'assets/icons/calendar-date-svgrepo-com (1).svg'],
     ['assets/icons/order.svg', 'assets/icons/order-svgrepo.svg'], // Booking
-    ['assets/icons/setting-gear-svgrepo-com.svg', 'assets/icons/setting-svgrepo-com.svg'], // Parametre
+    ['assets/icons/setting-gear-svgrepo-com.svg', 'assets/icons/setting-svgrepo-com.svg'],
   ];
 
   final List<String> _labels = const [
@@ -49,7 +49,7 @@ class MainScreen extends StatelessWidget {
               offset: const Offset(0, 4),
             ),
           ],
-          color: AppColors.primary,
+          color: AppColors.secondaryLight,
           borderRadius: BorderRadius.circular(20),
         ),
         child: Row(
@@ -77,9 +77,9 @@ class MainScreen extends StatelessWidget {
         required int index,
         required bool isSelected,
       }) {
-    final Color selectedBgColor = Theme.of(context).colorScheme.surface;
-    final Color selectedIconColor = AppColors.primary;
-    final Color unselectedIconColor = Theme.of(context).colorScheme.surface;
+    final Color selectedBgColor = AppColors.primary;
+    final Color selectedIconColor = AppColors.secondary;
+    final Color unselectedIconColor = AppColors.primary;
 
     return GestureDetector(
       onTap: () => _onItemTapped(index),

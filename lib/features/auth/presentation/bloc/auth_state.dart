@@ -1,32 +1,21 @@
-part of 'auth_bloc.dart';
+import 'package:baobabe_0_2/features/auth/domain/entities/user.dart';
 
-abstract class AuthState extends Equatable {
+abstract class AuthState {
   const AuthState();
-
-  @override
-  List<Object> get props => [];
 }
 
-class AuthInitial extends AuthState {}
+class AuthInitialState extends AuthState {}
 
-class AuthLoading extends AuthState {}
+class AuthLoadingState extends AuthState {}
 
-class AuthAuthenticated extends AuthState {
+class AuthenticatedState extends AuthState {
   final UserEntity user;
-
-  const AuthAuthenticated({required this.user});
-
-  @override
-  List<Object> get props => [user];
+  const AuthenticatedState({required this.user});
 }
 
-class AuthUnAuthenticated extends AuthState {}
+class UnauthenticatedState extends AuthState {}
 
-class AuthError extends AuthState {
-  final String message;
-
-  const AuthError({required this.message});
-
-  @override
-  List<Object> get props => [message];
+class AuthFailureState extends AuthState {
+  final String errorMessage;
+  const AuthFailureState({required this.errorMessage});
 }

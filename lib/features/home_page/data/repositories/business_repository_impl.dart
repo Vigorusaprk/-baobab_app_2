@@ -12,7 +12,7 @@ class BusinessRepositoryImpl implements BusinessRepository {
 
   // AJOUT DE LA MÉTHODE createReservation
   @override
-  Future<void> createReservation(ReservationModel reservation) async {
+  Future<void> createReservation(Reservation reservation) async {
     try {
       // Transmet la demande à la source de données remote
       await remoteDataSource.createReservation(reservation);

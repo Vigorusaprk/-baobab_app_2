@@ -1,17 +1,12 @@
-// File: check_auth_status_use_case.dart
 import 'package:baobabe_0_2/features/auth/domain/entities/user.dart';
 import 'package:baobabe_0_2/features/auth/domain/repositories/auth_repository.dart';
 
 class CheckAuthStatusUseCase {
-  final AuthRepository repository;
+  final AuthRepository authRepository;
 
-  CheckAuthStatusUseCase(this.repository);
+  CheckAuthStatusUseCase(this.authRepository);
 
-  Future<UserEntity?> execute() async {
-    final user = await repository.getCurrentUser();
-    if (user == null) return null;
-
-    final isAuthenticated = await repository.isAuthenticated();
-    return isAuthenticated ? user : null;
+  Future<UserEntity?> call() {
+    return authRepository.checkAuthStatus();
   }
 }

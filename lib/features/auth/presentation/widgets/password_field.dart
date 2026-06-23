@@ -1,6 +1,6 @@
 import 'package:baobabe_0_2/core/themes/app_colors.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+import 'package:flutter_svg/svg.dart';
 
 class PasswordField extends StatefulWidget {
   final TextEditingController controller;
@@ -28,47 +28,26 @@ class _PasswordFieldState extends State<PasswordField> {
     return TextFormField(
       controller: widget.controller,
       obscureText: _obscureText,
+      validator: widget.validator,
       decoration: InputDecoration(
+        prefixIcon: Container(
+          padding: EdgeInsets.all(8),
+          child: SvgPicture.asset(
+            "assets/icons/password.svg",
+            colorFilter: const ColorFilter.mode(AppColors.secondary, BlendMode.srcIn),
+          ),
+        ),
         labelText: widget.label,
         hintText: widget.hint,
         labelStyle: TextStyle(color: Colors.grey[600], fontSize: 14),
         filled: true,
         fillColor: const Color(0xFFF1F3F4),
-        prefixIcon: Padding(
-          padding: const EdgeInsets.all(10.0),
-          child: SvgPicture.asset(
-              "assets/icons/password-svgrepo-com.svg",
-              colorFilter: const ColorFilter.mode( AppColors.primary, BlendMode.srcIn)
-          ),
-        ),
         suffixIcon: IconButton(
-          icon: Icon(
-            _obscureText ? Icons.visibility_off : Icons.visibility,
-            color: Colors.grey,
-          ),
-          onPressed: () {
-            setState(() {
-              _obscureText = !_obscureText;
-            });
-          },
+          icon: Icon(_obscureText ? Icons.visibility_off : Icons.visibility, color: AppColors.secondary),
+          onPressed: () => setState(() => _obscureText = !_obscureText),
         ),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: Colors.grey.shade300),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: AppColors.primary, width: 2),
-        ),
-        errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: Colors.red),
-        ),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
       ),
-      validator: widget.validator,
     );
   }
 }

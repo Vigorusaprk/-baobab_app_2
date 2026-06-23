@@ -1,5 +1,6 @@
 import 'package:baobabe_0_2/core/themes/app_colors.dart';
 import 'package:baobabe_0_2/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:baobabe_0_2/features/auth/presentation/bloc/auth_state.dart';
 import 'package:baobabe_0_2/features/business_detail/domain/entities/movie.dart';
 import 'package:baobabe_0_2/features/business_detail/presentation/bloc/business_detail_bloc.dart';
 import 'package:baobabe_0_2/features/favorites_page/data/models/reservation_model.dart';
@@ -64,7 +65,7 @@ class _CinemaReservationModalState extends State<CinemaReservationModal> {
 
   void _book() async {
     final authState = context.read<AuthBloc>().state;
-    if (authState is! AuthAuthenticated) {
+    if (authState is! AuthenticatedState) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Veuillez vous connecter'), backgroundColor: Colors.red),
       );
@@ -79,11 +80,13 @@ class _CinemaReservationModalState extends State<CinemaReservationModal> {
 
     setState(() => _isLoading = true);
 
-    final reservation = ReservationModel(
+    final reservation = Reservation(
+      id: '',
       businessId: widget.cinema.id,
       userId: authState.user.id,
       type: 'cinema',
       reservationDate: widget.showtime.startTime,
+      createdAt: DateTime.now(),
       totalAmount: totalPrice,
       details: {
         'movie_id': widget.movie.id,

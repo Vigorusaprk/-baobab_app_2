@@ -11,5 +11,5 @@ abstract class BusinessRepository {
   Future<bool> isFavorite(String businessId);
   Future<List<Business>> searchBusinesses(String query);
   Future<List<MenuItem>> getMenuByBusiness(String businessId);
-  Future<void> createReservation(ReservationModel reservation);
+  Future<void> createReservation(Reservation reservation);
 }

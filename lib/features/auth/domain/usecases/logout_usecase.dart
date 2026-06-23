@@ -1,11 +1,11 @@
-import '../repositories/auth_repository.dart';
+import 'package:baobabe_0_2/features/auth/domain/repositories/auth_repository.dart';
 
 class LogoutUseCase {
-  final AuthRepository repository;
+  final AuthRepository authRepository;
 
-  LogoutUseCase(this.repository);
+  LogoutUseCase(this.authRepository);
 
-  Future<void> execute() {
-    return repository.logout();
+  Future<void> call() {
+    return authRepository.logout();
   }
 }

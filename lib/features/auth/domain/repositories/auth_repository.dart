@@ -1,9 +1,13 @@
 import 'package:baobabe_0_2/features/auth/domain/entities/user.dart';
 
 abstract class AuthRepository {
-  Future<UserEntity> login(String email, String password, {bool rememberMe = false});
-  Future<UserEntity> signUp(String name, String email, String password, {String? imgUrl});
-  Future<bool> isAuthenticated();
+  Future<UserEntity> login({required String email, required String password});
+  Future<UserEntity> signUp({
+    required String name,
+    required String email,
+    required String password,
+    String? phone,
+  });
   Future<void> logout();
-  Future<UserEntity?> getCurrentUser();
+  Future<UserEntity?> checkAuthStatus();
 }

@@ -1,11 +1,13 @@
+import 'dart:ui';
 import 'package:baobabe_0_2/core/themes/app_colors.dart';
+import 'package:baobabe_0_2/core/themes/app_fonts.dart' show AppFonts;
 import 'package:baobabe_0_2/features/business_detail/domain/entities/menu_restau.dart';
 import 'package:baobabe_0_2/features/business_detail/presentation/widgets/online_order/page/plat_detail.dart';
 import 'package:baobabe_0_2/features/home_page/data/models/ui_business.dart';
 import 'package:baobabe_0_2/features/home_page/domain/entities/business_entity.dart';
 import 'package:baobabe_0_2/features/order/domain/entities/cart_item.dart';
 import 'package:baobabe_0_2/features/order/presentation/bloc/cart_bloc.dart';
-import 'package:baobabe_0_2/features/order/presentation/screens/cart_page.dart';
+import 'package:baobabe_0_2/features/business_detail/presentation/widgets/online_order/page/cart_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
@@ -38,110 +40,138 @@ class MenuSection extends StatelessWidget {
 
     return BlocProvider(
       create: (context) => CartCubit(),
-      child: Scaffold(
-        backgroundColor: AppColors.scaffoldBackground,
-        appBar: AppBar(
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back_ios, color: AppColors.primary),
-            onPressed: () => Navigator.pop(context),
-          ),
-          title: Row(
+      child: DefaultTabController(
+        length: categories.length, // OBLIGATOIRE pour synchroniser la TabBar et le TabBarView
+        child: Scaffold(
+          backgroundColor: AppColors.scaffoldBackground,
+          body: Column(
             children: [
-              SvgPicture.asset(
-                'assets/icons/delivery-svgrepo-com.svg',
-                height: 35,
-                colorFilter: ColorFilter.mode(
-                  AppColors.primary,
-                  BlendMode.srcIn,
+              Padding(
+                padding: const EdgeInsets.only(top: 45, right: 10, left: 10),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Container(
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        gradient: LinearGradient(
+                          colors: [
+                            AppColors.secondaryLight,
+                            AppColors.secondaryDark,
+                          ],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                      ),
+                      child: IconButton(
+                        icon: const Icon(
+                          Icons.arrow_back_ios_new_rounded,
+                          color: AppColors.primaryLight,
+                        ),
+                        onPressed: () => Navigator.pop(context),
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Row(
+                      children: [
+                        SvgPicture.asset(
+                          'assets/icons/delivery-svgrepo-com.svg',
+                          height: 35,
+                          colorFilter: const ColorFilter.mode(
+                            AppColors.secondaryLight,
+                            BlendMode.srcIn,
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        const Text(
+                          'Commander',
+                          style: TextStyle(
+                            fontFamily: 'Poppins',
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.secondaryLight,
+                            decoration: TextDecoration.none,
+                          ),
+                        ),
+                      ],
+                    ),
+                    BlocBuilder<CartCubit, CartState>(
+                      builder: (context, state) {
+                        final totalItems = context.read<CartCubit>().totalItems;
+                        return Stack(
+                          clipBehavior: Clip.none,
+                          children: [
+                            Container(
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                gradient: LinearGradient(
+                                  colors: [
+                                    AppColors.secondaryLight,
+                                    AppColors.secondaryDark,
+                                  ],
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                ),
+                              ),
+                              child: IconButton(
+                                icon: const Icon(Icons.shopping_cart, color: AppColors.primary,),
+                                onPressed: () {
+                                  final cartCubit = context.read<CartCubit>();
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => BlocProvider.value(
+                                        value: cartCubit,
+                                        child: CartPage(
+                                          restaurantId: restaurantId,
+                                          restaurantName: restaurantName,
+                                          restaurantType: restaurantType,
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
+                            ),
+                            if (totalItems > 0)
+                              Positioned(
+                                right: 0.50,
+                                top: 0.50,
+                                child: Container(
+                                  padding: const EdgeInsets.all(5),
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: Colors.red,
+                                  ),
+                                  constraints: const BoxConstraints(minWidth: 16, minHeight: 16),
+                                  child: Text(
+                                    '$totalItems',
+                                    style: const TextStyle(color: Colors.white, fontSize: 10),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ),
+                              ),
+                          ],
+                        );
+                      },
+                    ),
+                  ],
                 ),
               ),
-              const SizedBox(width: 12),
-              Text(
-                'Commander',
-                style: TextStyle(
-                  fontFamily: 'Poppins',
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.primary,
-                  decoration: TextDecoration.none,
+              Expanded(
+                child: Container(
+                  decoration: const BoxDecoration(
+                    color: AppColors.transparent,
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(30),
+                      topRight: Radius.circular(30),
+                    ),
+                  ),
+                  child: _buildContent(context, categories, groupedItems),
                 ),
               ),
             ],
           ),
-          actions: [
-            BlocBuilder<CartCubit, CartState>(
-              builder: (context, state) {
-                final totalItems = context.read<CartCubit>().totalItems;
-                return Stack(
-                  clipBehavior: Clip.none,
-                  children: [
-                    IconButton(
-                      icon: const Icon(Icons.shopping_cart),
-                      onPressed: () {
-                        final cartCubit = context.read<CartCubit>();
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => BlocProvider.value(
-                              value: cartCubit,
-                              child: CartPage(
-                                restaurantId: restaurantId,
-                                restaurantName: restaurantName,
-                                restaurantType: restaurantType,
-                              ),
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-                    if (totalItems > 0)
-                      Positioned(
-                        right: 4,
-                        top: 4,
-                        child: Container(
-                          padding: const EdgeInsets.all(2),
-                          decoration: BoxDecoration(
-                            color: Colors.red,
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          constraints: const BoxConstraints(minWidth: 16, minHeight: 16),
-                          child: Text(
-                            '$totalItems',
-                            style: const TextStyle(color: Colors.white, fontSize: 10),
-                            textAlign: TextAlign.center,
-                          ),
-                        ),
-                      ),
-                  ],
-                );
-              },
-            ),
-          ],
-        ),
-        body: Column(
-          children: [
-            Expanded(
-              child: Container(
-                decoration: BoxDecoration(
-                  color: AppColors.white,
-                  borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(30),
-                    topRight: Radius.circular(30),
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.7),
-                      blurRadius: 20,
-                      offset: const Offset(0, 10),
-                    ),
-                  ],
-                ),
-                child: _buildContent(context, categories, groupedItems),
-              ),
-            ),
-          ],
         ),
       ),
     );
@@ -161,145 +191,232 @@ class MenuSection extends StatelessWidget {
       );
     }
 
-    return ListView.builder(
-      padding: const EdgeInsets.all(16),
-      itemCount: categories.length,
-      itemBuilder: (context, index) {
-        final category = categories[index];
-        final items = groupedItems[category]!;
-
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8),
-              child: Text(
-                category,
-                style: const TextStyle(
-                  fontFamily: 'Poppins',
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.primary,
-                  decoration: TextDecoration.none,
-                ),
+    return Column(
+      children: [
+        // 1. Barre de navigation stylisée avec le fond global demandé précédemment
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          child: Container(
+            width: double.infinity,
+            decoration: BoxDecoration(
+              color: AppColors.secondaryDark, // Couleur de fond sur toute la TabBar
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: TabBar(
+              indicatorSize: TabBarIndicatorSize.tab,
+              dividerColor: Colors.transparent,
+              isScrollable: true,
+              tabAlignment: TabAlignment.start,
+              indicatorColor: Colors.transparent, // Retrait de l'indicateur par défaut
+              labelColor: AppColors.primary, // Couleur du texte actif
+              unselectedLabelColor: AppColors.primaryDark.withOpacity(0.6),
+              labelStyle: const TextStyle(
+                fontFamily: AppFonts.primaryFontFamily,
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
               ),
+              unselectedLabelStyle: const TextStyle(
+                fontFamily: AppFonts.primaryFontFamily,
+                fontSize: 15,
+                fontWeight: FontWeight.normal,
+              ),
+              tabs: categories.map((category) => Tab(text: category)).toList(),
             ),
-            ListView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: items.length,
-              itemBuilder: (context, idx) {
-                final item = items[idx];
-                return _buildMenuItemCard(context, item);
-              },
-            ),
-            const SizedBox(height: 16),
-          ],
-        );
-      },
+          ),
+        ),
+
+        // 2. Le TabBarView prend directement sa place dans la Column via un Expanded
+        Expanded(
+          child: TabBarView(
+            children: categories.map((category) {
+              final items = groupedItems[category]!;
+
+              return ListView.builder(
+                padding: const EdgeInsets.all(16),
+                itemCount: items.length,
+                itemBuilder: (context, idx) {
+                  final item = items[idx];
+                  return _buildMenuItemCard(context, item); // AJOUT du mot-clé return ici !
+                },
+              );
+            }).toList(),
+          ),
+        ),
+      ],
     );
   }
 
   Widget _buildMenuItemCard(BuildContext context, MenuItem item) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      decoration: BoxDecoration(
-        color: AppColors.scaffoldBackground,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.5),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (_) => PlatDetail(
-                  menuItem: item,
-                  restaurantId: restaurantId,
-                  restaurantName: restaurantName,
-                  restaurantType: restaurantType,
-                  isOrderMode: true,
-                ),
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => PlatDetail(
+                menuItem: item,
+                restaurantId: restaurantId,
+                restaurantName: restaurantName,
+                restaurantType: restaurantType,
+                isOrderMode: true,
               ),
-            );
-          },
-          borderRadius: BorderRadius.circular(16),
-          child: Padding(
-            padding: const EdgeInsets.all(12),
-            child: Row(
+            ),
+          );
+        },
+        borderRadius: BorderRadius.circular(16),
+        child: Container(
+          margin: const EdgeInsets.only(bottom: 16),
+          width: 380,
+          height: 180,
+          decoration: BoxDecoration(
+            color: AppColors.scaffoldBackground,
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.04),
+                blurRadius: 24,
+                offset: const Offset(0, 8),
+              ),
+            ],
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(16), // Ajout pour éviter que l'image ne dépasse les angles de la carte
+            child: Stack(
               children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(12),
-                  child: Image.asset(
-                    item.imageUrl,
-                    width: 80,
-                    height: 80,
-                    fit: BoxFit.cover,
-                    errorBuilder: (_, __, ___) => Container(
-                      width: 80,
-                      height: 80,
-                      color: Colors.grey[300],
-                      child: const Icon(Icons.fastfood),
+                _buildBackgroundOrbes(item),
+
+                BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 1.5, sigmaY: 1.5),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.65),
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(
+                        color: AppColors.secondaryLight.withOpacity(0.7),
+                        width: 1.5,
+                      ),
                     ),
                   ),
                 ),
-                const SizedBox(width: 12),
-                Expanded(
+
+                Container(
+                  decoration: const BoxDecoration( // Ajout du const
+                    borderRadius: BorderRadius.only(topLeft: Radius.circular(16), bottomLeft: Radius.circular(16)),
+                    gradient: LinearGradient(
+                      colors: [
+                        AppColors.secondaryLight,
+                        AppColors.transparent,
+                      ],
+                      begin: Alignment.centerLeft,
+                      end: Alignment.centerRight,
+                    ),
+                  ),
+                ),
+
+                Padding(
+                  padding: const EdgeInsets.all(20.0),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
-                        item.itemName,
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                          decoration: TextDecoration.none,
-                        ),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            item.itemName,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.primary,
+                              height: 1.2,
+                            ),
+                          ),
+                          Text(
+                            '${item.price.toStringAsFixed(2)} €',
+                            style: const TextStyle( // Ajout du const
+                              color: AppColors.primary,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 14,
+                            ),
+                          ),
+                        ],
                       ),
-                      const SizedBox(height: 4),
                       Text(
                         item.description,
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          color: Colors.grey[600],
+                        style: const TextStyle( // Ajout du const
+                          color: AppColors.secondaryDark,
                           fontSize: 13,
                           decoration: TextDecoration.none,
                         ),
                       ),
-                      const SizedBox(height: 8),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Row( // Nettoyage du Container inutile autour du Row
+                            children: [
+                              SvgPicture.asset(
+                                "assets/icons/delivery-svgrepo-com.svg",
+                                height: 20,
+                                width: 20,
+                                colorFilter: const ColorFilter.mode( // Ajout du const
+                                  AppColors.primary,
+                                  BlendMode.srcIn,
+                                ),
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                "20-30 min",
+                                style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                                  fontSize: 12,
+                                  color: AppColors.primary,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(width: 12),
+                          GestureDetector(
+                            onTap: () {
+                              final cart = context.read<CartCubit>();
+                              cart.addItem(CartItem(menuItem: item, quantity: 1));
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text('${item.itemName} ajouté au panier', style: const TextStyle(color: Colors.black)),
+                                  duration: const Duration(seconds: 1),
+                                  behavior: SnackBarBehavior.floating,
+                                  backgroundColor: AppColors.primary,
+                                ),
+                              );
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(20),
+                                gradient: const LinearGradient( // Ajout du const
+                                  colors: [
+                                    AppColors.secondaryLight,
+                                    AppColors.secondaryDark,
+                                  ],
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                ),
+                              ),
+                              child: const Row( // Ajout du const
+                                children: [
+                                  Text("Ajouté au panier", style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.w600)),
+                                  SizedBox(width: 5),
+                                  Icon(Icons.add_shopping_cart, color: AppColors.primary, size: 24),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ],
-                  ),
-                ),
-                Container(
-                  decoration: BoxDecoration(
-                    color: AppColors.primary.withOpacity(0.1),
-                    shape: BoxShape.circle,
-                  ),
-                  child: IconButton(
-                    icon: const Icon(Icons.add_shopping_cart, color: AppColors.primary, size: 24),
-                    onPressed: () {
-                      final cart = context.read<CartCubit>();
-                      cart.addItem(CartItem(menuItem: item, quantity: 1));
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text('${item.itemName} ajouté au panier'),
-                          duration: const Duration(seconds: 1),
-                          behavior: SnackBarBehavior.floating,
-                          backgroundColor: AppColors.primary,
-                        ),
-                      );
-                    },
                   ),
                 ),
               ],
@@ -309,4 +426,44 @@ class MenuSection extends StatelessWidget {
       ),
     );
   }
+
+  Widget _buildBackgroundOrbes(dynamic item) {
+    return Stack(
+      children: [
+        ClipRRect(
+          borderRadius: BorderRadius.circular(16),
+          child: item.imageUrl.startsWith('http')
+              ? Image.network(
+            item.imageUrl,
+            height: 180,
+            width: double.infinity,
+            fit: BoxFit.cover,
+            errorBuilder: (_, __, ___) => _buildPlaceholder(),
+          )
+              : Image.asset(
+            item.imageUrl,
+            height: 180,
+            width: double.infinity,
+            fit: BoxFit.cover,
+            errorBuilder: (_, __, ___) => _buildPlaceholder(),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildPlaceholder() => Container(
+    height: 180,
+    color: Colors.grey[200],
+    width: double.infinity,
+    child: Stack(
+      children: [
+        Positioned(
+            right: 10,
+            bottom: 5,
+            child: const Icon(Icons.fastfood, color: Colors.grey, size:150)
+        ),
+      ],
+    ),
+  );
 }

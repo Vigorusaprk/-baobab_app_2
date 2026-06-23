@@ -22,8 +22,7 @@ class Room {
   });
 
   factory Room.fromJson(Map<String, dynamic> json) {
-    // Fonctions utilitaires
-    int _toInt(dynamic value) {
+    int toInt(dynamic value) {
       if (value == null) return 0;
       if (value is int) return value;
       if (value is double) return value.toInt();
@@ -31,7 +30,7 @@ class Room {
       return 0;
     }
 
-    double _toDouble(dynamic value) {
+    double toDouble(dynamic value) {
       if (value == null) return 0.0;
       if (value is double) return value;
       if (value is int) return value.toDouble();
@@ -40,15 +39,29 @@ class Room {
     }
 
     return Room(
-      id: _toInt(json['id']),
+      id: toInt(json['id']),
       businessId: json['business_id']?.toString() ?? '',
       roomType: json['room_type']?.toString() ?? '',
-      pricePerNight: _toDouble(json['price_per_night']),
-      capacity: _toInt(json['capacity']),
-      availableQuantity: _toInt(json['available_quantity']),
+      pricePerNight: toDouble(json['price_per_night']),
+      capacity: toInt(json['capacity']),
+      availableQuantity: toInt(json['available_quantity']),
       description: json['description']?.toString(),
       amenities: json['amenities'] is Map ? Map<String, dynamic>.from(json['amenities']) : null,
       images: json['images'] is List ? List<String>.from(json['images'].map((i) => i.toString())) : null,
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'business_id': businessId,
+      'room_type': roomType,
+      'price_per_night': pricePerNight,
+      'capacity': capacity,
+      'available_quantity': availableQuantity,
+      'description': description,
+      'amenities': amenities,
+      'images': images,
+    };
   }
 }

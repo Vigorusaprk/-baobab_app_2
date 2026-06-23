@@ -1,37 +1,45 @@
 import 'dart:async';
-
-import 'package:baobabe_0_2/features/auth/presentation/screens/forgot_password_screen.dart';
-import 'package:baobabe_0_2/features/business_detail/domain/entities/reservation.dart';
-import 'package:baobabe_0_2/features/business_detail/presentation/widgets/online_order/page/plat_detail.dart';
-import 'package:baobabe_0_2/features/favorites_page/presentation/screens/boking_detail_screen.dart';
-import 'package:baobabe_0_2/features/home_page/presentation/screens/search_page.dart';
-import 'package:baobabe_0_2/features/main/presentation/screens/main_screen.dart';
-import 'package:baobabe_0_2/features/order/domain/entities/order.dart';
-import 'package:baobabe_0_2/features/order/presentation/screens/order_detail_page.dart';
-import 'package:baobabe_0_2/features/settings/presentation/widgets/edit_profile_page.dart';
-import 'package:baobabe_0_2/features/settings/presentation/widgets/profil_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+
+// Injection & Blocs
+import 'package:baobabe_0_2/core/constants/injector.dart';
 import 'package:baobabe_0_2/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:baobabe_0_2/features/auth/presentation/bloc/auth_state.dart';
+
+// Écrans de la Feature Auth
 import 'package:baobabe_0_2/features/auth/presentation/screens/auth_screen.dart';
 import 'package:baobabe_0_2/features/auth/presentation/screens/sign_up_page.dart';
-import 'package:baobabe_0_2/features/business_detail/presentation/screens/business_detail_screen.dart';
-import 'package:baobabe_0_2/features/favorites_page/presentation/screens/favorites_page_screen.dart';
-import 'package:baobabe_0_2/features/home_page/presentation/screens/home_page_screen.dart';
-import 'package:baobabe_0_2/features/order/presentation/screens/order_screen.dart';
-import 'package:baobabe_0_2/features/settings/presentation/screens/settings_screen.dart';
-import 'package:baobabe_0_2/core/constants/injector.dart';
+import 'package:baobabe_0_2/features/auth/presentation/screens/forgot_password_screen.dart';
 
-// Écouteur pour GoRouter (réévalue le redirect à chaque changement d'état du AuthBloc)
-class AuthStateNotifier extends ChangeNotifier {
-  AuthStateNotifier() {
-    final authBloc = Injector.get<AuthBloc>();
-    _subscription = authBloc.stream.listen((_) {
-      notifyListeners();
-    });
+// Autres Écrans de l'application
+import 'package:baobabe_0_2/features/main/presentation/screens/main_screen.dart';
+import 'package:baobabe_0_2/features/home_page/presentation/screens/home_page_screen.dart';
+import 'package:baobabe_0_2/features/home_page/presentation/screens/search_page.dart';
+import 'package:baobabe_0_2/features/favorites_page/presentation/screens/favorites_page_screen.dart';
+import 'package:baobabe_0_2/features/favorites_page/presentation/screens/boking_detail_screen.dart';
+import 'package:baobabe_0_2/features/order/presentation/screens/order_screen.dart';
+import 'package:baobabe_0_2/features/order/presentation/screens/order_detail_page.dart';
+import 'package:baobabe_0_2/features/settings/presentation/screens/settings_screen.dart';
+import 'package:baobabe_0_2/features/settings/presentation/widgets/profil_page.dart';
+import 'package:baobabe_0_2/features/settings/presentation/widgets/edit_profile_page.dart';
+import 'package:baobabe_0_2/features/business_detail/presentation/screens/business_detail_screen.dart';
+import 'package:baobabe_0_2/features/business_detail/presentation/widgets/online_order/page/plat_detail.dart';
+
+// Modèles/Entités
+import 'package:baobabe_0_2/features/business_detail/domain/entities/reservation.dart';
+import 'package:baobabe_0_2/features/order/domain/entities/order.dart';
+
+/// Convertit le flux Stream du AuthBloc en un ChangeNotifier pour GoRouter
+class GoRouterRefreshStream extends ChangeNotifier {
+  late final StreamSubscription<dynamic> _subscription;
+
+  GoRouterRefreshStream(Stream<dynamic> stream) {
+    notifyListeners();
+    _subscription = stream.listen((_) => notifyListeners());
   }
-  late final StreamSubscription _subscription;
+
   @override
   void dispose() {
     _subscription.cancel();
@@ -39,36 +47,51 @@ class AuthStateNotifier extends ChangeNotifier {
   }
 }
 
-final _authStateNotifier = AuthStateNotifier();
-
 final GoRouter appRouter = GoRouter(
   initialLocation: '/',
-  refreshListenable: _authStateNotifier,
+  refreshListenable: GoRouterRefreshStream(Injector.get<AuthBloc>().stream),
   redirect: (context, state) {
     final authState = context.read<AuthBloc>().state;
-    if (authState is AuthInitial || authState is AuthLoading) return null;
-    final isLoggedIn = authState is AuthAuthenticated;
+
+    // Pendant l'initialisation ou les chargements internes, on ne force pas de redirection immédiate
+    if (authState is AuthInitialState || authState is AuthLoadingState) return null;
+
+    final isLoggedIn = authState is AuthenticatedState;
     final isAuthRoute = state.matchedLocation.startsWith('/login') ||
         state.matchedLocation.startsWith('/register') ||
         state.matchedLocation.startsWith('/forgot-password');
+
+    // 🔒 Redirection si l'utilisateur n'est pas connecté et accède à une page privée
     if (!isLoggedIn && !isAuthRoute) return '/login';
+
+    // 🔓 Redirection si l'utilisateur est connecté et accède à une page d'authentification
     if (isLoggedIn && isAuthRoute) return '/home';
+
     return null;
   },
   routes: [
-    // Route racine avec redirection conditionnelle
+    // Route racine adaptative
     GoRoute(
       path: '/',
       redirect: (context, state) {
         final authState = context.read<AuthBloc>().state;
-        if (authState is AuthInitial || authState is AuthLoading) return null;
-        return authState is AuthAuthenticated ? '/home' : '/login';
+
+        if (authState is AuthenticatedState) return '/home';
+        if (authState is UnauthenticatedState || authState is AuthFailureState) return '/login';
+
+        // En cas d'état initial non déterminé, on temporise sur le login
+        if (authState is AuthInitialState) return '/login';
+
+        return null;
       },
       pageBuilder: (context, state) => const MaterialPage(
-        child: Scaffold(body: Center(child: CircularProgressIndicator())),
+        child: Scaffold(
+          body: Center(child: CircularProgressIndicator()),
+        ),
       ),
     ),
-    // Routes publiques
+
+    // --- ROUTES D'AUTHENTIFICATION ---
     GoRoute(
       path: '/login',
       name: 'login',
@@ -84,7 +107,8 @@ final GoRouter appRouter = GoRouter(
       name: 'forgotPassword',
       pageBuilder: (context, state) => const MaterialPage(child: ForgotPasswordScreen()),
     ),
-    // Shell principal
+
+    // --- SHELL DE NAVIGATION PRINCIPAL ---
     StatefulShellRoute.indexedStack(
       builder: (context, state, navigationShell) {
         return MainScreen(navigationShell: navigationShell);
@@ -120,7 +144,8 @@ final GoRouter appRouter = GoRouter(
         ]),
       ],
     ),
-    // Autres routes protégées
+
+    // --- ROUTES DE DÉTAILS ET PARAMÈTRES ---
     GoRoute(
       path: '/business/:id',
       name: 'businessDetail',
@@ -168,17 +193,12 @@ final GoRouter appRouter = GoRouter(
     GoRoute(
       path: '/profil-page',
       name: 'profil-page',
-      pageBuilder: (context, state) {
-        return MaterialPage(child: ProfilPage());
-      },
+      pageBuilder: (context, state) => const MaterialPage(child: ProfilPage()),
     ),
-    
     GoRoute(
       path: '/edit-profile',
       name: 'edit-profile',
-      pageBuilder: (context, state){
-        return MaterialPage(child: EditProfilePage());
-      }  
-    )
+      pageBuilder: (context, state) => const MaterialPage(child: EditProfilePage()),
+    ),
   ],
 );

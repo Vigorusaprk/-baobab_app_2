@@ -10,7 +10,7 @@ part 'business_state.dart';
 
 class BusinessBloc extends Bloc<BusinessEvent, BusinessState> {
   final GetBusinesses getBusinesses;
-  final GetBusinessesByCategory getBusinessesByCategory;
+  final GetBusinessesByCategory getBusinessesByCategory; // Disponible si tu décides de repasser en remote plus tard
 
   List<Business> _allBusinesses = [];
 
@@ -32,21 +32,21 @@ class BusinessBloc extends Bloc<BusinessEvent, BusinessState> {
         currentCategory: BusinessType.all,
       ));
     } catch (e) {
-      emit(BusinessError("Erreur : ${e.toString()}"));
+      emit(BusinessError("Erreur lors du chargement : ${e.toString()}"));
     }
   }
 
   void _onLoadBusinessesByCategory(LoadBusinessesByCategory event, Emitter<BusinessState> emit) {
     emit(BusinessLoading());
 
-    // SI L'EVENT EST 'ALL' OU 'OTHER', ON AFFICHE TOUT
+    // Si la catégorie est 'all' ou 'other', on réinitialise l'affichage avec tout le cache local
     if (event.category == BusinessType.all || event.category == BusinessType.other) {
       emit(BusinessLoaded(
         businesses: List.from(_allBusinesses),
         currentCategory: event.category,
       ));
     } else {
-      // FILTRAGE ROBUSTE PAR NOM
+      // Filtrage synchrone en mémoire ultra rapide
       final filtered = _allBusinesses.where((business) {
         return business.type.name.toLowerCase() == event.category.name.toLowerCase();
       }).toList();

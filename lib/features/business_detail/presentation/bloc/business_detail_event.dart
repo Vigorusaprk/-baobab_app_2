@@ -16,7 +16,7 @@ class LoadBusinessDetail extends BusinessDetailEvent {
 
 // ✅ Événement pour créer une réservation
 class MakeReservation extends BusinessDetailEvent {
-  final ReservationModel reservation;
+  final Reservation reservation;
   const MakeReservation(this.reservation);
   @override
   List<Object> get props => [reservation];

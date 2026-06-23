@@ -13,7 +13,7 @@ class LocationAndProfile extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.secondaryLight,
           borderRadius: BorderRadius.circular(100),
           boxShadow: [
             BoxShadow(
@@ -47,7 +47,7 @@ class LocationAndProfile extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(15),
       decoration: BoxDecoration(
-        color: const Color(0xFF254D32),
+        color:  AppColors.primary,
         shape: BoxShape.circle,
         boxShadow: [
           BoxShadow(
@@ -62,7 +62,7 @@ class LocationAndProfile extends StatelessWidget {
         height: 20,
         width: 20,
         colorFilter: const ColorFilter.mode(
-          Colors.white,
+          AppColors.secondary,
           BlendMode.srcIn,
         ),
       ),
@@ -78,18 +78,18 @@ class LocationAndProfile extends StatelessWidget {
           "Current Location",
           style: TextStyle(
             fontSize: 11,
-            color: Colors.grey[500],
+            color: AppColors.textOnSecondary,
             fontWeight: FontWeight.w500,
             letterSpacing: 0.2,
           ),
         ),
-        const Text(
+        Text(
           "Miami Beach, FL 331..",
           overflow: TextOverflow.ellipsis,
           style: TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w700,
-            color: Color(0xFF1A1A1A),
+            color: AppColors.textOnSecondary,
           ),
         ),
       ],
@@ -103,7 +103,7 @@ class LocationAndProfile extends StatelessWidget {
         color: AppColors.primary,
         shape: BoxShape.circle,
       ),
-      child: const Icon(Icons.notifications_none_rounded, color: Colors.white, size: 22),
+      child: Icon(Icons.notifications_rounded, color: AppColors.secondary, size: 22),
     );
   }
 }

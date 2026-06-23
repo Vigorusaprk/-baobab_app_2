@@ -9,7 +9,6 @@ class GetMenuByBusiness implements UseCase<List<MenuItem>, String> {
 
   @override
   Future<List<MenuItem>> call(String businessId) async {
-    // businessId ici est l'identifiant VARCHAR(50) de votre table business
     return await repository.getMenuByBusiness(businessId);
   }
 }

@@ -72,10 +72,18 @@ class _SearchPageState extends State<SearchPage> {
                 padding: const EdgeInsets.all(8.0),
                 child: Row(
                   children: [
-                    IconButton(
-                      icon: Icon(Icons.arrow_back_ios_new_rounded, color: AppColors.scaffoldBackground,),
-                      onPressed: () => Navigator.pop(context),
+                    Container(
+                      decoration: BoxDecoration(
+                          color: AppColors.secondaryLight,
+                          borderRadius: BorderRadius.circular(AppDimens.BORDER_RADIUS_50)
+                      ),
+                      child: IconButton(
+                        icon: Icon(Icons.arrow_back_ios_new_rounded, color: AppColors.primary,),
+                        onPressed: () => Navigator.pop(context),
+                      ),
                     ),
+
+                    SizedBox(width: 5,),
                     Expanded(
                       child: SearchAppBar(
                         controller: _searchController,
@@ -88,11 +96,11 @@ class _SearchPageState extends State<SearchPage> {
                     SizedBox(width: 5,),
                     Container(
                       decoration: BoxDecoration(
-                        color: AppColors.primary,
+                        color: AppColors.secondaryLight,
                         borderRadius: BorderRadius.circular(AppDimens.BORDER_RADIUS_50)
                       ),
                       child: IconButton(
-                        icon: Icon(Icons.filter_list_rounded, color: AppColors.scaffoldBackground,),
+                        icon: Icon(Icons.filter_list_rounded, color: AppColors.primary,),
                         onPressed: () => _showFilterSheet(context),
                       ),
                     ),
@@ -188,7 +196,7 @@ class _SearchPageState extends State<SearchPage> {
               onPressed: () {
                 _searchBloc.add(SearchClearFilters());
               },
-              child: const Text('Tout effacer'),
+              child: Text('Tout effacer', style: TextStyle(color: AppColors.secondary),),
             ),
           ],
         ),
@@ -300,13 +308,13 @@ class _SearchPageState extends State<SearchPage> {
             children: [
               Text(
                 '${state.results.length} résultat(s)',
-                style: TextStyle(fontSize: 14, color: AppColors.primary, fontWeight: FontWeight.bold),
+                style: TextStyle(fontSize: 14, color: AppColors.secondary, fontWeight: FontWeight.bold),
               ),
               const Spacer(),
               Container(
                 padding: EdgeInsets.symmetric(horizontal: 10),
                 decoration: BoxDecoration(
-                  color: AppColors.primary,
+                  color: AppColors.secondaryLight,
                   borderRadius: BorderRadius.circular(AppDimens.BORDER_RADIUS_10)
                 ),
                   child: _buildSortDropdown(state),
@@ -342,14 +350,14 @@ class _SearchPageState extends State<SearchPage> {
   Widget _buildLoadingMore() {
     return const Padding(
       padding: EdgeInsets.symmetric(vertical: 16),
-      child: Center(child: CircularProgressIndicator()),
+      child: Center(child: CircularProgressIndicator(color: AppColors.secondary,)),
     );
   }
 
   Widget _buildSortDropdown(SearchResultsLoaded state) {
     return DropdownButton<SortBy>(
       borderRadius: BorderRadius.circular(AppDimens.BORDER_RADIUS_20),
-      dropdownColor: AppColors.primary,
+      dropdownColor: AppColors.secondaryLight,
       style: TextStyle(color: AppColors.scaffoldBackground),
       value: state.activeFilters.sortBy,
       underline: const SizedBox(),

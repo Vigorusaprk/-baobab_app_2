@@ -74,6 +74,7 @@ class Business extends Equatable {
   final String address;
   final String description;
   final String bgImg;
+  final String profilImg;
   final double rating;
   final int reviewCount;
   final Map<String, String> openingHours;
@@ -95,6 +96,7 @@ class Business extends Equatable {
     required this.address,
     required this.description,
     required this.bgImg,
+    required this.profilImg,
     required this.rating,
     required this.reviewCount,
     required this.openingHours,
@@ -118,6 +120,7 @@ class Business extends Equatable {
     address,
     description,
     bgImg,
+    profilImg,
     rating,
     reviewCount,
     openingHours,

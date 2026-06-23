@@ -1,8 +1,10 @@
 import 'package:baobabe_0_2/core/themes/app_colors.dart';
+import 'package:baobabe_0_2/features/auth/presentation/bloc/auth_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:baobabe_0_2/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:baobabe_0_2/features/favorites_page/data/models/reservation_service.dart';
+import 'package:baobabe_0_2/core/constants/injector.dart';
 import 'package:baobabe_0_2/features/order/data/models/vehicle_model.dart';
 
 class CarDetailPage extends StatefulWidget {
@@ -10,17 +12,17 @@ class CarDetailPage extends StatefulWidget {
   final Vehicle vehicle;
 
   const CarDetailPage({
+    super.key,
     required this.businessId,
     required this.vehicle,
-    Key? key,
-  }) : super(key: key);
+  });
 
   @override
   State<CarDetailPage> createState() => _CarDetailPageState();
 }
 
 class _CarDetailPageState extends State<CarDetailPage> {
-  final _reservationService = ReservationApiService();
+  final _reservationService = Injector.get<ReservationApiService>();
 
   DateTime? _startDate;
   DateTime? _endDate;
@@ -161,7 +163,7 @@ class _CarDetailPageState extends State<CarDetailPage> {
   @override
   Widget build(BuildContext context) {
     final authState = context.watch<AuthBloc>().state;
-    final isLoggedIn = authState is AuthAuthenticated;
+    final isLoggedIn = authState is AuthenticatedState;
     final userId = isLoggedIn ? authState.user.id : null;
 
     return Scaffold(
@@ -189,23 +191,23 @@ class _CarDetailPageState extends State<CarDetailPage> {
               color: Colors.grey[300],
               child: widget.vehicle.imageUrl.isNotEmpty
                   ? Image.network(
-                      widget.vehicle.imageUrl,
-                      fit: BoxFit.cover,
-                      errorBuilder: (_, __, ___) => Center(
-                        child: Icon(
-                          Icons.directions_car,
-                          size: 100,
-                          color: Colors.grey[600],
-                        ),
-                      ),
-                    )
+                widget.vehicle.imageUrl,
+                fit: BoxFit.cover,
+                errorBuilder: (_, __, ___) => Center(
+                  child: Icon(
+                    Icons.directions_car,
+                    size: 100,
+                    color: Colors.grey[600],
+                  ),
+                ),
+              )
                   : Center(
-                      child: Icon(
-                        Icons.directions_car,
-                        size: 100,
-                        color: Colors.grey[600],
-                      ),
-                    ),
+                child: Icon(
+                  Icons.directions_car,
+                  size: 100,
+                  color: Colors.grey[600],
+                ),
+              ),
             ),
             if (!isLoggedIn)
               Container(
@@ -557,23 +559,23 @@ class _CarDetailPageState extends State<CarDetailPage> {
                       ),
                       child: _isLoading
                           ? const SizedBox(
-                              height: 20,
-                              width: 20,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                valueColor: AlwaysStoppedAnimation<Color>(
-                                  Colors.white,
-                                ),
-                              ),
-                            )
+                        height: 20,
+                        width: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                            Colors.white,
+                          ),
+                        ),
+                      )
                           : const Text(
-                              'Réserver maintenant',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
-                              ),
-                            ),
+                        'Réserver maintenant',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
                     ),
                   ),
                   const SizedBox(height: 32),

@@ -1,7 +1,8 @@
-import 'package:baobabe_0_2/core/constants/injector.dart';
+import 'package:baobabe_0_2/core/themes/app_colors.dart';
 import 'package:baobabe_0_2/core/themes/app_diemens.dart';
 import 'package:baobabe_0_2/features/auth/domain/entities/user.dart';
 import 'package:baobabe_0_2/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:baobabe_0_2/features/auth/presentation/bloc/auth_state.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/bloc/search_bloc.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/screens/search_page.dart';
 import 'package:flutter/material.dart';
@@ -18,76 +19,56 @@ class HelloUserWidget extends StatelessWidget {
         String userName = 'Utilisateur';
         UserEntity? user;
 
-        if (state is AuthAuthenticated) {
-          user = state.user;
-          userName = user.name;
+        // 🛠️ FIX : Utilisation du bon nom d'état 'AuthenticatedState'
+        if (state is AuthenticatedState) {
+          final authenticatedUser = state.user;
+          if (authenticatedUser != null) {
+            user = authenticatedUser;
+            userName = authenticatedUser.name;
+          }
         }
 
         return Padding(
-          padding: const EdgeInsets.only(left: AppDimens.PADDING_20, right: AppDimens.PADDING_20),
+          padding: const EdgeInsets.only(
+            left: AppDimens.PADDING_20,
+            right: AppDimens.PADDING_20,
+            top: AppDimens.PADDING_16,
+          ),
           child: Container(
-            width: double.infinity,
-            decoration: BoxDecoration(
-              color: const Color(0xFF254D32),
-              borderRadius: BorderRadius.circular(28),
-              boxShadow: [
-                BoxShadow(
-                  color: const Color(0xFF254D32).withOpacity(0.15),
-                  blurRadius: 20,
-                  offset: const Offset(0, 10),
-                ),
-              ],
+            decoration: const BoxDecoration(
+              color: AppColors.secondaryLight,
             ),
-            padding: const EdgeInsets.all(24),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                Text(
+                  "Salut, $userName 👋",
+                  style: const TextStyle(
+                    fontFamily: 'Poppins',
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.textPrimary,
+                  ),
+                ),
+                const SizedBox(height: AppDimens.PADDING_4),
+                const Text(
+                  "Découvrez de nouveaux endroits !",
+                  style: TextStyle(
+                    fontFamily: 'Poppins',
+                    fontSize: 14,
+                    color: AppColors.grey,
+                  ),
+                ),
+                const SizedBox(height: AppDimens.PADDING_16),
+
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            "Bonjour,",
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: Colors.white.withOpacity(0.7),
-                              letterSpacing: 0.5,
-                            ),
-                          ),
-                          Text(
-                            userName,
-                            style: const TextStyle(
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                              letterSpacing: -0.5,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                        context.pushNamed('profil-page');
-                      },
-                        child: _buildProfileImage(user),
-                    ), // ← passe l'utilisateur
+                    _buildSearchField(context),
+                    const SizedBox(width: AppDimens.PADDING_16),
+                    _buildAvatar(user, userName, context),
                   ],
                 ),
-                const SizedBox(height: 8),
-                Text(
-                  _getCurrentDate(),
-                  style: TextStyle(
-                    color: Colors.white.withOpacity(0.5),
-                    fontSize: 12,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-                const SizedBox(height: 24),
-                _buildSearchField(context), // devient un bouton
               ],
             ),
           ),
@@ -96,103 +77,107 @@ class HelloUserWidget extends StatelessWidget {
     );
   }
 
-  String _getCurrentDate() {
-    final now = DateTime.now();
-    const days = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'];
-    const months = ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil', 'Aoû', 'Sep', 'Oct', 'Nov', 'Déc'];
-    return '${days[now.weekday - 1]}, ${now.day} ${months[now.month - 1]}';
+  Widget _buildSearchField(BuildContext context) {
+    return Expanded(
+      child: GestureDetector(
+        onTap: () {
+          final searchBloc = context.read<SearchBloc>();
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => BlocProvider.value(
+                value: searchBloc,
+                child: const SearchPage(),
+              ),
+            ),
+          );
+        },
+        child: Container(
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppDimens.PADDING_12,
+            vertical: AppDimens.PADDING_8,
+          ),
+          decoration: BoxDecoration(
+            color: AppColors.white,
+            borderRadius: BorderRadius.circular(AppDimens.BORDER_RADIUS_12),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.05),
+                blurRadius: 10,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Row(
+            children: [
+              const Icon(
+                Icons.search,
+                color: AppColors.grey,
+                size: 22,
+              ),
+              const SizedBox(width: AppDimens.PADDING_12),
+              const Expanded(
+                child: Text(
+                  "Où voulez-vous aller ?",
+                  style: TextStyle(
+                    fontFamily: 'Poppins',
+                    color: AppColors.grey,
+                    fontSize: 14,
+                  ),
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.all(AppDimens.PADDING_8),
+                decoration: BoxDecoration(
+                  color: AppColors.primary,
+                  borderRadius: BorderRadius.circular(AppDimens.BORDER_RADIUS_12),
+                ),
+                child: const Icon(
+                  Icons.tune_rounded,
+                  color: AppColors.white,
+                  size: 20,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
-  Widget _buildSearchField(BuildContext context) {
+  Widget _buildAvatar(UserEntity? user, String userName, BuildContext context) {
     return GestureDetector(
-      onTap: () {
-        context.pushNamed('search');
-      },
+      onTap: () => context.go('/profile'),
       child: Container(
+        width: 48,
+        height: 48,
         decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(25),
+          shape: BoxShape.circle,
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              blurRadius: 15,
-              offset: const Offset(0, 5),
+              color: Colors.black.withOpacity(0.08),
+              blurRadius: 8,
+              offset: const Offset(0, 3),
             ),
           ],
         ),
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
-        child: Row(
-          children: [
-            const Icon(Icons.search_rounded, color: Color(0xFF254D32), size: 22),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Text(
-                "Où voulez-vous aller ?",
-                style: TextStyle(color: Colors.grey[400], fontSize: 14),
-              ),
-            ),
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: const Color(0xFF254D32).withOpacity(0.1),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: const Icon(Icons.tune_rounded, color: Color(0xFF254D32), size: 20),
-            ),
-          ],
+        child: ClipOval(
+          child: _buildInitialsAvatar(userName),
         ),
       ),
     );
   }
 
-  // Construction de la photo de profil (image ou initiales)
-  Widget _buildProfileImage(UserEntity? user) {
-    if (user == null) {
-      return const SizedBox.shrink();
-    }
-
-    final hasProfile = user.imgUrl != null && user.imgUrl!.isNotEmpty;
-    final avatarColor = _getAvatarColor(user.name);
-    final initials = _getInitials(user.name);
-
+  Widget _buildInitialsAvatar(String name) {
+    final initials = _getInitials(name);
     return Container(
-      height: 65,
-      width: 65,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        border: Border.all(color: Colors.white, width: 3),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.3),
-            blurRadius: 6,
-            offset: const Offset(0, 3),
-          ),
-        ],
-      ),
-      child: ClipOval(
-        child: hasProfile
-            ? Image.network(
-          user.imgUrl!,
-          fit: BoxFit.cover,
-          errorBuilder: (context, error, stackTrace) {
-            return _buildInitialsAvatar(avatarColor, initials);
-          },
-        )
-            : _buildInitialsAvatar(avatarColor, initials),
-      ),
-    );
-  }
-
-  // Widget pour les initiales dans le cercle
-  Widget _buildInitialsAvatar(Color color, String initials) {
-    return Container(
-      color: color,
+      color: _getAvatarColor(name),
       child: Center(
         child: Text(
           initials,
           style: const TextStyle(
             color: Colors.white,
-            fontSize: 24,
+            fontSize: 18,
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -200,7 +185,6 @@ class HelloUserWidget extends StatelessWidget {
     );
   }
 
-  // Extrait les initiales du nom (ex: "Jean Dupont" -> "JD")
   String _getInitials(String name) {
     if (name.isEmpty || name.trim().isEmpty) return "?";
     final parts = name.trim().split(' ');
@@ -212,11 +196,8 @@ class HelloUserWidget extends StatelessWidget {
     }
   }
 
-  // Obtient une couleur cohérente à partir du nom
   Color _getAvatarColor(String name) {
     if (name.isEmpty) return Colors.blue;
-
-    // Utilisation d'une liste de couleurs prédéfinies
     final List<Color> colors = [
       Colors.red,
       Colors.pink,
@@ -228,18 +209,9 @@ class HelloUserWidget extends StatelessWidget {
       Colors.cyan,
       Colors.teal,
       Colors.green,
-      Colors.lightGreen,
-      Colors.lime,
-      Colors.yellow,
-      Colors.amber,
-      Colors.orange,
-      Colors.deepOrange,
-      Colors.brown,
-      Colors.grey,
-      Colors.blueGrey,
     ];
-
-    int index = name.codeUnitAt(0) % colors.length;
+    final int hash = name.hashCode;
+    final int index = hash.abs() % colors.length;
     return colors[index];
   }
 }

@@ -1,4 +1,6 @@
+import 'package:baobabe_0_2/core/themes/app_colors.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class Reservation {
   final String id;
@@ -34,7 +36,7 @@ class Reservation {
   final bool? includeInsurance;
   final bool? needDelivery;
 
-  // Voyage
+  // Voyage / Travel
   final String? destination;
   final int? numberOfPassengers;
   final String? departureTime;
@@ -51,14 +53,15 @@ class Reservation {
   final DateTime? showtime;
   final String? ticketType;
   final int? numberOfTickets;
-  final String? seatNumbers;
+  final List<String>? seatNumbers;
 
   // Tourisme
   final String? activitiName;
   final String? activiteType;
   final DateTime? day;
-  final List<Map<String, dynamic>>? selectedActivities;
+  final List<String>? selectedActivities;
 
+  // Constructeur principal
   Reservation({
     required this.id,
     this.businessId,
@@ -69,16 +72,22 @@ class Reservation {
     this.notes,
     required this.totalAmount,
     required this.reservationDate,
+
+    // Restaurant
     this.tableNumber,
     this.floor,
     this.date,
     this.time,
     this.numberOfPeople,
+
+    // Hôtel
     this.roomType,
     this.checkInDate,
     this.checkOutDate,
     this.numberOfRooms,
     this.numberOfGuests,
+
+    // Location
     this.vehicleType,
     this.rentalStartDate,
     this.rentalEndDate,
@@ -86,149 +95,44 @@ class Reservation {
     this.withDriver,
     this.includeInsurance,
     this.needDelivery,
+
+    // Voyage
     this.destination,
     this.numberOfPassengers,
     this.departureTime,
+
+    // Spa
     this.treatmentType,
     this.durationMinutes,
     this.therapistName,
     this.appointmentDate,
     this.selectedTreatments,
+
+    // Cinéma
     this.movieTitle,
     this.showtime,
     this.ticketType,
     this.numberOfTickets,
     this.seatNumbers,
+
+    // Tourisme
     this.activitiName,
     this.activiteType,
     this.day,
     this.selectedActivities,
   });
 
-  DateTime get displayDate {
-    if (reservationType == 'hotel') return checkInDate ?? reservationDate;
-    if (reservationType == 'car_rental') return rentalStartDate ?? reservationDate;
-    if (reservationType == 'spa') return appointmentDate ?? reservationDate;
-    if (reservationType == 'cinema') return showtime ?? reservationDate;
-    if (reservationType == 'toursime') return day ?? reservationDate;
-    return date ?? reservationDate;
-  }
-
-  String get typeDisplayName {
-    switch (reservationType) {
-      case 'hotel': return 'Hôtel';
-      case 'car_rental': return 'Location de véhicule';
-      case 'travel': return 'Voyage en bus';
-      case 'spa': return 'Spa & Bien-être';
-      case 'cinema': return 'Cinéma';
-      case 'toursime': return 'Tourisme';
-      default: return 'Restaurant';
-    }
-  }
-
-  IconData get typeIcon {
-    switch (reservationType) {
-      case 'hotel': return Icons.hotel;
-      case 'car_rental': return Icons.directions_car;
-      case 'travel': return Icons.directions_bus;
-      case 'spa': return Icons.spa;
-      case 'cinema': return Icons.movie;
-      case 'toursime': return Icons.tour;
-      default: return Icons.restaurant;
-    }
-  }
-
-  Color get typeColor {
-    switch (reservationType) {
-      case 'hotel': return const Color(0xFF009688);
-      case 'car_rental': return const Color(0xFF3F51B5);
-      case 'travel': return const Color(0xFF9C27B0);
-      case 'spa': return const Color(0xFFE91E63);
-      case 'cinema': return const Color(0xFF673AB7);
-      case 'toursime': return const Color(0xFF795548);
-      default: return Colors.orange;
-    }
-  }
-
-  factory Reservation.fromMap(Map<String, dynamic> map) {
-    final details = map['details'] as Map<String, dynamic>? ?? {};
-
-    DateTime? _parseDate(String? str) => str != null ? DateTime.tryParse(str) : null;
-    TimeOfDay? _parseTime(String? str) {
-      if (str == null) return null;
-      final parts = str.split(':');
-      if (parts.length != 2) return null;
-      return TimeOfDay(hour: int.parse(parts[0]), minute: int.parse(parts[1]));
-    }
-    int? _toInt(dynamic v) => v != null ? int.tryParse(v.toString()) : null;
-    double? _toDouble(dynamic v) => v != null ? double.tryParse(v.toString()) : null;
-    bool? _toBool(dynamic v) => v != null ? v.toString().toLowerCase() == 'true' : null;
-
-    return Reservation(
-      id: map['id']?.toString() ?? '',
-      businessId: map['business_id'],
-      establishmentName: map['establishment_name'] ?? '',
-      reservationType: map['type'] ?? '',
-      customerName: details['customer_name'] ?? map['customer_name'] ?? '',
-      phoneNumber: details['phone'] ?? map['phone_number'] ?? '',
-      notes: details['notes'] ?? map['notes'],
-      totalAmount: _toDouble(map['total_amount']) ?? 0.0,
-      reservationDate: _parseDate(map['reservation_date']) ?? DateTime.now(),
-      tableNumber: details['table_number'],
-      floor: details['floor'],
-      date: _parseDate(details['date']),
-      time: _parseTime(details['time']),
-      numberOfPeople: _toInt(details['guests']),
-      roomType: details['room_type'],
-      checkInDate: _parseDate(details['check_in_date']),
-      checkOutDate: _parseDate(details['check_out_date']),
-      numberOfRooms: _toInt(details['number_of_rooms']),
-      numberOfGuests: _toInt(details['number_of_guests']),
-      vehicleType: details['vehicle_type'],
-      rentalStartDate: _parseDate(details['rental_start_date']),
-      rentalEndDate: _parseDate(details['rental_end_date']),
-      rentalDays: _toInt(details['rental_days']),
-      withDriver: _toBool(details['with_driver']),
-      includeInsurance: _toBool(details['include_insurance']),
-      needDelivery: _toBool(details['need_delivery']),
-      destination: details['destination'],
-      numberOfPassengers: _toInt(details['number_of_passengers']),
-      departureTime: details['departure_time'],
-      treatmentType: details['treatment_type'],
-      durationMinutes: _toInt(details['duration_minutes']),
-      therapistName: details['therapist_name'],
-      appointmentDate: _parseDate(details['appointment_date']),
-      selectedTreatments: details['selected_treatments'] != null ? List<Map<String, dynamic>>.from(details['selected_treatments']) : null,
-      movieTitle: details['movie_title'],
-      showtime: _parseDate(details['showtime']),
-      ticketType: details['ticket_type'],
-      numberOfTickets: _toInt(details['tickets_count']),
-      seatNumbers: details['seat_numbers'],
-      activitiName: details['activity_name'],
-      activiteType: details['activity_type'],
-      day: _parseDate(details['day']),
-      selectedActivities: details['selected_activities'] != null ? List<Map<String, dynamic>>.from(details['selected_activities']) : null,
-    );
-  }
-
+  // Convertit l'objet en Map JSON pour l'envoi vers l'API / PostgreSQL
   Map<String, dynamic> toJson() {
-    final details = <String, dynamic>{};
+    Map<String, dynamic> details = {};
 
-    // Configuration commune
-    details['customer_name'] = customerName;
-    details['phone'] = phoneNumber;
-    details['notes'] = notes;
-
-    // Configuration spécifique par type de réservation
     switch (reservationType) {
-      case 'car_rental':
-        details['vehicle_type'] = vehicleType;
-        details['rental_start_date'] = rentalStartDate?.toIso8601String();
-        details['rental_end_date'] = rentalEndDate?.toIso8601String();
-        details['rental_days'] = rentalDays;
-        details['with_driver'] = withDriver;
-        details['include_insurance'] = includeInsurance;
-        details['need_delivery'] = needDelivery;
+      case 'restaurant':
+        details['table_number'] = tableNumber;
+        details['floor'] = floor;
+        details['date'] = date?.toIso8601String();
+        details['time'] = time != null ? '${time!.hour}:${time!.minute}' : null;
+        details['number_of_people'] = numberOfPeople;
         break;
 
       case 'hotel':
@@ -239,12 +143,14 @@ class Reservation {
         details['number_of_guests'] = numberOfGuests;
         break;
 
-      case 'restaurant':
-        details['table_number'] = tableNumber;
-        details['floor'] = floor;
-        details['date'] = date?.toIso8601String();
-        details['time'] = time != null ? '${time!.hour}:${time!.minute}' : null;
-        details['guests'] = numberOfPeople;
+      case 'location':
+        details['vehicle_type'] = vehicleType;
+        details['rental_start_date'] = rentalStartDate?.toIso8601String();
+        details['rental_end_date'] = rentalEndDate?.toIso8601String();
+        details['rental_days'] = rentalDays;
+        details['with_driver'] = withDriver;
+        details['include_insurance'] = includeInsurance;
+        details['need_delivery'] = needDelivery;
         break;
 
       case 'spa':
@@ -289,5 +195,163 @@ class Reservation {
       'reservation_date': reservationDate.toIso8601String(),
       'details': details,
     };
+  }
+
+  // Compatibility getters used across the app
+  String get type => reservationType;
+
+  String get typeDisplayName {
+    switch (reservationType) {
+      case 'hotel':
+        return 'Hôtel';
+      case 'restaurant':
+        return 'Restaurant';
+      case 'car_rental':
+        return 'Location de voiture';
+      case 'travel':
+        return 'Voyage';
+      case 'spa':
+        return 'Spa';
+      case 'cinema':
+        return 'Cinéma';
+      case 'toursime':
+        return 'Tourisme';
+      default:
+        return reservationType.isNotEmpty ? reservationType : 'Réservation';
+    }
+  }
+
+  Color get typeColor {
+    switch (reservationType) {
+      case 'hotel':
+        return AppColors.primary;
+      case 'restaurant':
+        return Colors.orange;
+      case 'car_rental':
+        return Colors.green;
+      case 'travel':
+        return Colors.purple;
+      case 'spa':
+        return Colors.teal;
+      case 'cinema':
+        return Colors.red;
+      case 'toursime':
+        return Colors.amber;
+      default:
+        return Colors.grey;
+    }
+  }
+
+  IconData get typeIcon {
+    switch (reservationType) {
+      case 'hotel':
+        return Icons.hotel;
+      case 'restaurant':
+        return Icons.restaurant;
+      case 'car_rental':
+        return Icons.directions_car;
+      case 'travel':
+        return Icons.flight_takeoff;
+      case 'spa':
+        return Icons.spa;
+      case 'cinema':
+        return Icons.movie;
+      case 'toursime':
+        return Icons.tour;
+      default:
+        return Icons.event;
+    }
+  }
+
+  DateTime get displayDate =>
+      date ?? checkInDate ?? rentalStartDate ?? appointmentDate ?? showtime ?? day ?? reservationDate;
+
+  String get displayDateLabel {
+    try {
+      return DateFormat('dd/MM/yyyy').format(displayDate.toLocal());
+    } catch (_) {
+      return displayDate.toIso8601String();
+    }
+  }
+
+  // Factory pour reconstruire l'objet depuis un JSON reçu de l'API
+  factory Reservation.fromJson(Map<String, dynamic> json) {
+    final details = json['details'] as Map<String, dynamic>? ?? {};
+    final type = json['type']?.toString() ?? '';
+
+    TimeOfDay? parsedTime;
+    if (details['time'] != null) {
+      final parts = details['time'].toString().split(':');
+      if (parts.length == 2) {
+        parsedTime = TimeOfDay(
+          hour: int.tryParse(parts[0]) ?? 0,
+          minute: int.tryParse(parts[1]) ?? 0,
+        );
+      }
+    }
+
+    return Reservation(
+      id: json['id']?.toString() ?? '',
+      businessId: json['business_id']?.toString(),
+      establishmentName: json['establishment_name']?.toString() ?? '',
+      reservationType: type,
+      customerName: json['customer_name']?.toString() ?? '',
+      phoneNumber: json['phone_number']?.toString() ?? '',
+      notes: json['notes']?.toString(),
+      totalAmount: (json['total_amount'] as num?)?.toDouble() ?? 0.0,
+      reservationDate: json['reservation_date'] != null
+          ? DateTime.parse(json['reservation_date'].toString())
+          : DateTime.now(),
+
+      // Restaurant
+      tableNumber: details['table_number']?.toString(),
+      floor: details['floor']?.toString(),
+      date: details['date'] != null ? DateTime.tryParse(details['date'].toString()) : null,
+      time: parsedTime,
+      numberOfPeople: details['number_of_people'] as int?,
+
+      // Hôtel
+      roomType: details['room_type']?.toString(),
+      checkInDate: details['check_in_date'] != null ? DateTime.tryParse(details['check_in_date'].toString()) : null,
+      checkOutDate: details['check_out_date'] != null ? DateTime.tryParse(details['check_out_date'].toString()) : null,
+      numberOfRooms: details['number_of_rooms'] as int?,
+      numberOfGuests: details['number_of_guests'] as int?,
+
+      // Location
+      vehicleType: details['vehicle_type']?.toString(),
+      rentalStartDate: details['rental_start_date'] != null ? DateTime.tryParse(details['rental_start_date'].toString()) : null,
+      rentalEndDate: details['rental_end_date'] != null ? DateTime.tryParse(details['rental_end_date'].toString()) : null,
+      rentalDays: details['rental_days'] as int?,
+      withDriver: details['with_driver'] as bool?,
+      includeInsurance: details['include_insurance'] as bool?,
+      needDelivery: details['need_delivery'] as bool?,
+
+      // Voyage
+      destination: details['destination']?.toString(),
+      numberOfPassengers: details['number_of_passengers'] as int?,
+      departureTime: details['departure_time']?.toString(),
+
+      // Spa
+      treatmentType: details['treatment_type']?.toString(),
+      durationMinutes: details['duration_minutes'] as int?,
+      therapistName: details['therapist_name']?.toString(),
+      appointmentDate: details['appointment_date'] != null ? DateTime.tryParse(details['appointment_date'].toString()) : null,
+      selectedTreatments: details['selected_treatments'] != null
+          ? List<Map<String, dynamic>>.from(details['selected_treatments'])
+          : null,
+
+      // Cinéma
+      movieTitle: details['movie_title']?.toString(),
+      showtime: details['showtime'] != null ? DateTime.tryParse(details['showtime'].toString()) : null,
+      ticketType: details['ticket_type']?.toString(),
+      numberOfTickets: details['tickets_count'] as int?,
+      seatNumbers: details['seat_numbers'] != null ? List<String>.from(details['seat_numbers']) : null,
+
+      // Tourisme
+      activitiName: details['activity_name']?.toString(),
+      activiteType: details['activity_type']?.toString(),
+      day: details['day'] != null ? DateTime.tryParse(details['day'].toString()) : null,
+      selectedActivities: details['selected_activities'] != null ? List<String>.from(details['selected_activities']) : null,
+    );
   }
 }

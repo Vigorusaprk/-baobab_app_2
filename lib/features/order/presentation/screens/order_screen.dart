@@ -1,4 +1,3 @@
-import 'dart:ui';
 import 'package:baobabe_0_2/features/order/presentation/widgets/order_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -11,8 +10,8 @@ import 'package:baobabe_0_2/core/themes/app_diemens.dart';
 import 'package:baobabe_0_2/core/themes/app_fonts.dart';
 import 'package:baobabe_0_2/features/main/presentation/widgets/main_background.dart';
 import 'package:baobabe_0_2/features/order/domain/entities/order.dart';
-import 'package:baobabe_0_2/features/home_page/domain/entities/business_entity.dart';
 import 'package:baobabe_0_2/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:baobabe_0_2/features/auth/presentation/bloc/auth_state.dart';
 
 
 class OrderScreen extends StatefulWidget {
@@ -57,7 +56,7 @@ class _OrderScreenState extends State<OrderScreen> with WidgetsBindingObserver {
 
   Future<void> _loadUserId() async {
     final authState = context.read<AuthBloc>().state;
-    if (authState is AuthAuthenticated) {
+    if (authState is AuthenticatedState) {
       _userId = authState.user.id;
       await _loadOrders();
     } else {
@@ -113,7 +112,7 @@ class _OrderScreenState extends State<OrderScreen> with WidgetsBindingObserver {
                     'assets/icons/order.svg',
                     height: 35,
                     colorFilter: const ColorFilter.mode(
-                      AppColors.scaffoldBackground,
+                      AppColors.secondary,
                       BlendMode.srcIn,
                     ),
                   ),
@@ -125,7 +124,7 @@ class _OrderScreenState extends State<OrderScreen> with WidgetsBindingObserver {
                         fontFamily: AppFonts.primaryFontFamily,
                         fontSize: 24,
                         fontWeight: AppFonts.bold,
-                        color: AppColors.scaffoldBackground,
+                        color: AppColors.secondaryLight,
                       ),
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -137,13 +136,13 @@ class _OrderScreenState extends State<OrderScreen> with WidgetsBindingObserver {
                         vertical: AppDimens.PADDING_6,
                       ),
                       decoration: BoxDecoration(
-                        color: AppColors.scaffoldBackground,
+                        color: AppColors.secondaryLight,
                         borderRadius: BorderRadius.circular(AppDimens.BORDER_RADIUS_16),
                       ),
                       child: Text(
                         '${_allOrders.length}',
                         style: TextStyle(
-                          color: AppColors.primary,
+                          color: AppColors.primaryDark,
                           fontWeight: AppFonts.semiBold,
                           fontSize: 14,
                         ),
@@ -213,9 +212,9 @@ class _OrderScreenState extends State<OrderScreen> with WidgetsBindingObserver {
         IconData? icon,
         VoidCallback? onTap,
       }) {
-    final effectiveSelectedColor = selectedColor ?? AppColors.primary;
+    final effectiveSelectedColor = selectedColor ?? AppColors.secondaryLight;
     final effectiveUnselectedColor = unselectedColor ?? AppColors.grey.withOpacity(0.3);
-    final effectiveLabelColor =   AppColors.scaffoldBackground;
+    final effectiveLabelColor =   AppColors.secondary;
     final effectiveSelectedLabelColor = selectedLabelColor ?? AppColors.scaffoldBackground;
     final effectiveFontSize = fontSize ?? 14;
     final effectiveFontWeight = fontWeight ?? FontWeight.w500;
@@ -244,15 +243,6 @@ class _OrderScreenState extends State<OrderScreen> with WidgetsBindingObserver {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              if (showIcon && status != null)
-                Padding(
-                  padding: const EdgeInsets.only(right: 6),
-                  child: Icon(
-                    icon ?? (isSelected ? Icons.check_circle : Icons.circle_outlined),
-                    size: 16,
-                    color: isSelected ? effectiveSelectedLabelColor : effectiveLabelColor,
-                  ),
-                ),
               Text(
                 label,
                 style: TextStyle(
@@ -308,7 +298,7 @@ class _OrderScreenState extends State<OrderScreen> with WidgetsBindingObserver {
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
-                        color: AppColors.scaffoldBackground,
+                        color: AppColors.secondaryLight,
                         fontFamily: AppFonts.primaryFontFamily,
                       ),
                     ),
@@ -328,8 +318,8 @@ class _OrderScreenState extends State<OrderScreen> with WidgetsBindingObserver {
                       child: OutlinedButton(
                         onPressed: () => _filterOrders(null),
                         style: OutlinedButton.styleFrom(
-                          foregroundColor: AppColors.primary,
-                          side: const BorderSide(color: AppColors.primary, width: 2),
+                          foregroundColor: AppColors.secondaryLight,
+                          side: const BorderSide(color: AppColors.secondaryLight, width: 2),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10),
                           ),

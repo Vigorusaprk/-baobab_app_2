@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:baobabe_0_2/core/themes/app_colors.dart';
 import 'package:baobabe_0_2/features/business_detail/domain/entities/menu_restau.dart';
 import 'package:baobabe_0_2/features/business_detail/presentation/widgets/online_order/page/plat_detail.dart';
@@ -35,107 +37,127 @@ class RestaurantInfoBigCard extends StatelessWidget {
       ),
       child: Container(
         margin: const EdgeInsets.only(bottom: 16),
+        // Dimensions de la carte
+        width: 380,
+        height: 180,
         decoration: BoxDecoration(
           color: AppColors.scaffoldBackground,
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.2),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
+              color: Colors.black.withOpacity(0.04),
+              blurRadius: 24,
+              offset: const Offset(0, 8),
             ),
           ],
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Image (hauteur fixe au lieu de Expanded)
-            ClipRRect(
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
-              child: item.imageUrl.startsWith('http')
-                  ? Image.network(
-                item.imageUrl,
-                height: 180,
-                width: double.infinity,
-                fit: BoxFit.cover,
-                errorBuilder: (_, __, ___) => _buildPlaceholder(),
-              )
-                  : Image.asset(
-                item.imageUrl,
-                height: 180,
-                width: double.infinity,
-                fit: BoxFit.cover,
-                errorBuilder: (_, __, ___) => _buildPlaceholder(),
+        child: ClipRRect(
+          child: Stack(
+            children: [
+              _buildBackgroundOrbes(),
+              BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 1.5, sigmaY: 1.5),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.65),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: AppColors.secondaryLight.withOpacity(0.7),
+                      width: 1.5,
+                    ),
+                  ),
+                ),
               ),
-            ),
-            // Contenu
-            Padding(
-              padding: const EdgeInsets.all(12),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    item.itemName,
-                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    '${item.price.toStringAsFixed(2)} €',
-                    style: TextStyle(
-                      color: AppColors.primary,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 14,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Row(
-                    children: [
-                      SvgPicture.string(
-                        "assets/icons/delivery-svgrepo-com.svg",
-                        height: 16,
-                        width: 16,
-                        colorFilter: ColorFilter.mode(
-                          Colors.grey,
-                          BlendMode.srcIn,
-                        ),
-                      ),
-                      const SizedBox(width: 4),
-                      Text(
-                        "20-30 min",
-                        style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                          fontSize: 12,
-                          color: Colors.grey,
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      SvgPicture.string(
-                        "assets/icons/delivery-svgrepo-com.svg",
-                        height: 16,
-                        width: 16,
-                        colorFilter: ColorFilter.mode(
-                          Colors.grey,
-                          BlendMode.srcIn,
-                        ),
-                      ),
-                      const SizedBox(width: 4),
-                      Text(
-                        isFreeDelivery ? "Livraison gratuite" : "Frais de livraison",
-                        style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                          fontSize: 12,
-                          color: Colors.grey,
-                        ),
-                      ),
+              Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(16),
+                  gradient: LinearGradient(
+                    colors: [
+                      AppColors.secondaryLight,
+                      AppColors.transparent,
                     ],
+                    begin: Alignment.centerLeft,
+                    end: Alignment.centerRight,
                   ),
-                ],
+                ),
               ),
-            ),
-          ],
+
+              Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          item.itemName,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.primary,
+                            height: 1.2,
+                          ),
+                        ),
+
+                        Text(
+                          '${item.price.toStringAsFixed(2)} €',
+                          style: TextStyle(
+                            color: AppColors.primary,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14,
+                          ),
+                        ),
+                      ],
+                    ),
+
+                    Row(
+                      children: [
+                        SvgPicture.asset(
+                          "assets/icons/delivery-svgrepo-com.svg",
+                          height: 20,
+                          width: 20,
+                          colorFilter: ColorFilter.mode(
+                            AppColors.primary,
+                            BlendMode.srcIn,
+                          ),
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          "20-30 min",
+                          style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                            fontSize: 12,
+                            color:  AppColors.primary,
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        SvgPicture.asset(
+                          "assets/icons/delivery-svgrepo-com.svg",
+                          height: 20,
+                          width: 20,
+                          colorFilter: ColorFilter.mode(
+                            AppColors.primaryLight,
+                            BlendMode.srcIn,
+                          ),
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          isFreeDelivery ? "Livraison gratuite" : "Frais de livraison",
+                          style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                            fontSize: 12,
+                            color:  AppColors.primary,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -145,6 +167,40 @@ class RestaurantInfoBigCard extends StatelessWidget {
     height: 180,
     color: Colors.grey[200],
     width: double.infinity,
-    child: const Icon(Icons.fastfood, color: Colors.grey, size: 50),
+    child: Stack(
+      children: [
+        Positioned(
+          right: 10,
+          bottom: 5,
+          child: const Icon(Icons.fastfood, color: Colors.grey, size:150)
+        ),
+      ],
+    ),
   );
+
+
+  Widget _buildBackgroundOrbes(){
+    return Stack(
+      children: [
+        ClipRRect(
+          borderRadius: BorderRadius.circular(16),
+          child: item.imageUrl.startsWith('http')
+              ? Image.network(
+            item.imageUrl,
+            height: 180,
+            width: double.infinity,
+            fit: BoxFit.cover,
+            errorBuilder: (_, __, ___) => _buildPlaceholder(),
+          )
+              : Image.asset(
+            item.imageUrl,
+            height: 180,
+            width: double.infinity,
+            fit: BoxFit.cover,
+            errorBuilder: (_, __, ___) => _buildPlaceholder(),
+          ),
+        ),
+      ],
+    );
+  }
 }

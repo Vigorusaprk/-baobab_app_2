@@ -1,20 +1,22 @@
+﻿import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:baobabe_0_2/features/business_detail/domain/entities/movie.dart';
-import 'package:dio/dio.dart';
-
 
 class MovieApiService {
-  final Dio _dio;
-  final String _baseUrl;
+  final SupabaseClient _supabase;
 
-  MovieApiService({Dio? dio, String baseUrl = 'http://10.0.2.2:3000/api'})
-      : _dio = dio ?? Dio(),
-        _baseUrl = baseUrl;
+  MovieApiService([SupabaseClient? supabase])
+      : _supabase = supabase ?? Supabase.instance.client;
 
   Future<List<Movie>> getMoviesByCinema(String cinemaId) async {
     try {
-      final response = await _dio.get('$_baseUrl/businesses/$cinemaId/movies');
-      final List data = response.data;
-      return data.map((json) => Movie.fromJson(json)).toList();
+      final response = await _supabase
+          .from('movies')
+          .select('*, showtimes(*)')
+          .eq('business_id', cinemaId);
+
+      return (response as List<dynamic>)
+          .map((json) => Movie.fromJson(json as Map<String, dynamic>))
+          .toList();
     } catch (e) {
       throw Exception('Erreur lors du chargement des films : $e');
     }

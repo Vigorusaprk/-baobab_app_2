@@ -15,35 +15,36 @@ class OrderDetailPage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: AppColors.primary,
+        backgroundColor: Colors.transparent,
         title: Text(
           'Détails de la commande',
           style: TextStyle(
               fontSize: 22,
               fontWeight: FontWeight.bold,
-              color: order.status.color,
+              color: AppColors.secondaryLight,
               fontFamily: 'Poppins'
           ),
         ),
 
         leading: IconButton(
-          icon: const Icon(
-            Icons.arrow_back_ios_new_rounded,
-            color: AppColors.scaffoldBackground,
+          icon: Container(
+            decoration: BoxDecoration(
+                color: AppColors.secondaryLight,
+                shape: BoxShape.circle
+            ),
+            child: Center(
+              child: const Icon(
+                Icons.arrow_back_ios_new_rounded,
+                color: AppColors.scaffoldBackground,
+              ),
+            ),
           ),
           onPressed: () => Navigator.pop(context),
         ),
       ),
       backgroundColor: AppColors.primary,
-      body: Container(
-        padding: const EdgeInsets.all(24),
-        decoration: BoxDecoration(
-          color: AppColors.scaffoldBackground,
-          borderRadius: const BorderRadius.only(
-            topLeft: Radius.circular(AppDimens.BORDER_RADIUS_30),
-            topRight: Radius.circular(AppDimens.BORDER_RADIUS_30),
-          ),
-        ),
+      body: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 24),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,

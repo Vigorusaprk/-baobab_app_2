@@ -1,14 +1,31 @@
 import 'package:baobabe_0_2/features/home_page/domain/entities/business_entity.dart';
 import 'package:flutter/material.dart';
 
-
 class BusinessHoursSection extends StatelessWidget {
   final Business business;
 
   const BusinessHoursSection({super.key, required this.business});
 
+  // Ordre souhaité des jours (commence par Lundi)
+  static const List<String> orderedDays = [
+    'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'
+  ];
+
   @override
   Widget build(BuildContext context) {
+    // Récupérer les entrées de la map et les trier selon l'ordre défini
+    final entries = business.openingHours.entries.toList();
+    entries.sort((a, b) {
+      final indexA = orderedDays.indexWhere(
+              (day) => day.toLowerCase() == a.key.trim().toLowerCase()
+      );
+      final indexB = orderedDays.indexWhere(
+              (day) => day.toLowerCase() == b.key.trim().toLowerCase()
+      );
+      // Si un jour n'est pas trouvé, le mettre à la fin (index 999)
+      return (indexA == -1 ? 999 : indexA).compareTo(indexB == -1 ? 999 : indexB);
+    });
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(20),
@@ -25,14 +42,13 @@ class BusinessHoursSection extends StatelessWidget {
         ],
       ),
       child: Column(
-        children: business.openingHours.entries.map((entry) {
+        children: entries.map((entry) {
           final bool isToday = _isToday(entry.key);
 
           return Container(
             margin: const EdgeInsets.only(bottom: 4),
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
             decoration: BoxDecoration(
-              // Mise en avant du jour actuel
               color: isToday ? const Color(0xFF254D32).withOpacity(0.08) : Colors.transparent,
               borderRadius: BorderRadius.circular(14),
             ),
@@ -72,7 +88,6 @@ class BusinessHoursSection extends StatelessWidget {
     );
   }
 
-  /// Vérifie si la clé du jour correspond au jour actuel de la semaine
   bool _isToday(String dayKey) {
     final now = DateTime.now();
     final daysInFrench = {
@@ -84,8 +99,6 @@ class BusinessHoursSection extends StatelessWidget {
       6: 'Samedi',
       7: 'Dimanche',
     };
-
-    // On normalise en minuscules pour éviter les erreurs de frappe dans les données
     return dayKey.trim().toLowerCase() == daysInFrench[now.weekday]?.toLowerCase();
   }
 }

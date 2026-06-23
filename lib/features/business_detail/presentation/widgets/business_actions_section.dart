@@ -1,29 +1,23 @@
 import 'package:baobabe_0_2/core/themes/app_colors.dart';
-import 'package:baobabe_0_2/features/auth/presentation/bloc/auth_bloc.dart';
-import 'package:baobabe_0_2/features/business_detail/data/review_api_service.dart';
 import 'package:baobabe_0_2/features/business_detail/presentation/widgets/online_order/page/car_list_page.dart';
 import 'package:baobabe_0_2/features/business_detail/presentation/widgets/online_order/page/cinema_list_screen.dart';
-// ✅ Import de la page de liste des chambres
 import 'package:baobabe_0_2/features/business_detail/presentation/widgets/online_order/page/hotel_rooms_list_page.dart';
 import 'package:baobabe_0_2/features/business_detail/presentation/widgets/online_order/page/reservation_modal.dart';
 import 'package:baobabe_0_2/features/business_detail/presentation/widgets/online_order/page/restaurant_menu_page.dart';
-import 'package:baobabe_0_2/features/business_detail/presentation/widgets/online_order/page/menu_section.dart' hide CarListPage;
+import 'package:baobabe_0_2/features/business_detail/presentation/widgets/online_order/page/menu_section.dart';
 import 'package:baobabe_0_2/features/business_detail/presentation/widgets/online_order/spa_reservation_modal.dart';
 import 'package:baobabe_0_2/features/business_detail/presentation/widgets/online_order/tourisme_reservation_modale.dart';
 import 'package:baobabe_0_2/features/order/presentation/bloc/cart_bloc.dart';
-// ✅ Import de la nouvelle page de liste des véhicules
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:baobabe_0_2/features/home_page/domain/entities/business_entity.dart';
-import 'package:baobabe_0_2/features/business_detail/domain/entities/menu_restau.dart';
+// menu_restau.dart import removed (unused)
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:baobabe_0_2/features/business_detail/presentation/bloc/business_detail_bloc.dart';
 import 'package:baobabe_0_2/features/home_page/data/models/ui_business.dart';
 import 'package:baobabe_0_2/features/home_page/domain/repositories/business_repository.dart';
 import 'package:baobabe_0_2/core/constants/injector.dart';
 import 'package:baobabe_0_2/features/business_detail/presentation/widgets/online_order/page/mall_stores_page.dart';
-import 'package:go_router/go_router.dart';
 
 class BusinessActionSection extends StatelessWidget {
   final Business business;
@@ -39,7 +33,6 @@ class BusinessActionSection extends StatelessWidget {
 
     const String resIcon = "assets/icons/calendar-date-svgrepo-com (1).svg";
 
-    // --- Réservation selon type ---
     if (business.type == BusinessType.restaurant && canReserve) {
       actions.add(_buildActionButton(
         context,
@@ -59,14 +52,14 @@ class BusinessActionSection extends StatelessWidget {
         context,
         icon: resIcon,
         label: "Réserver véhicule",
-        onTap: () => _showCarRentalList(context, business), // ✅ Nouvelle navigation
+        onTap: () => _showCarRentalList(context, business),
       ));
     } else if (business.type == BusinessType.travelAgency) {
       actions.add(_buildActionButton(
         context,
         icon: resIcon,
         label: "Réserver voyage",
-        onTap: () => _showReservationModal(context, business, 'travel'), // ou modal voyage
+        onTap: () => _showReservationModal(context, business, 'travel'),
       ));
     } else if (business.type == BusinessType.spa) {
       actions.add(_buildActionButton(
@@ -86,7 +79,6 @@ class BusinessActionSection extends StatelessWidget {
       actions.add(_buildMovieActionButton(context, business));
     }
 
-    // --- Restauration ---
     final bool isFood = business.type == BusinessType.restaurant || business.type == BusinessType.fastFood;
     if (isFood && hasDelivery) {
       actions.add(_buildActionButton(
@@ -103,7 +95,6 @@ class BusinessActionSection extends StatelessWidget {
       ));
     }
 
-    // --- Mall (centre commercial) ---
     if (business.type == BusinessType.mall) {
       actions.add(_buildActionButton(
         context,
@@ -112,7 +103,6 @@ class BusinessActionSection extends StatelessWidget {
         onTap: () => _showMallStores(context, business),
       ));
     }
-
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 20),
@@ -129,7 +119,7 @@ class BusinessActionSection extends StatelessWidget {
 
   Widget _buildActionButton(BuildContext context,
       {required String icon, required String label, required VoidCallback onTap}) {
-    final Color categoryColor = AppColors.primary;
+    final Color categoryColor = AppColors.secondary;
     return SizedBox(
       width: 100,
       child: Column(
@@ -229,9 +219,6 @@ class BusinessActionSection extends StatelessWidget {
         return SpaReservationModal(business: business);
       case 'tourism':
         return TourismReservationModal(business: business);
-      case 'travel':
-      // À remplacer par un modal dédié si nécessaire
-        return Container();
       default:
         return Container();
     }
@@ -260,7 +247,6 @@ class BusinessActionSection extends StatelessWidget {
     );
   }
 
-  // ✅ Nouvelle méthode pour la location de véhicules (liste)
   void _showCarRentalList(BuildContext context, Business business) {
     Navigator.push(
       context,
@@ -299,6 +285,7 @@ class BusinessActionSection extends StatelessWidget {
     try {
       final repository = Injector.get<BusinessRepository>();
       final items = await repository.getMenuByBusiness(business.id);
+      if (!context.mounted) return;
       if (items.isNotEmpty) {
         final bloc = context.read<BusinessDetailBloc>();
         Navigator.pop(context);
@@ -323,9 +310,8 @@ class BusinessActionSection extends StatelessWidget {
         _showSnackBar(context, 'Menu non disponible');
       }
     } catch (e) {
-      Navigator.pop(context);
+      if (context.mounted) Navigator.pop(context);
       _showSnackBar(context, 'Erreur de chargement du menu');
-      debugPrint('Erreur menu: $e');
     }
   }
 
@@ -339,6 +325,7 @@ class BusinessActionSection extends StatelessWidget {
     try {
       final repository = Injector.get<BusinessRepository>();
       final items = await repository.getMenuByBusiness(business.id);
+      if (!context.mounted) return;
       if (items.isNotEmpty) {
         final bloc = context.read<BusinessDetailBloc>();
         final uiBusiness = UIBusiness(business);
@@ -367,91 +354,9 @@ class BusinessActionSection extends StatelessWidget {
         _showSnackBar(context, 'Menu non disponible pour la commande');
       }
     } catch (e) {
-      Navigator.pop(context);
+      if (context.mounted) Navigator.pop(context);
       _showSnackBar(context, 'Erreur de chargement du menu');
-      debugPrint('Erreur commande: $e');
     }
-  }
-
-  void _showReviewDialog(BuildContext context, Business business) async {
-    final authState = context.read<AuthBloc>().state;
-    if (authState is! AuthAuthenticated) {
-      context.go('/login');
-      return;
-    }
-
-    int rating = 5;
-    final commentController = TextEditingController();
-
-    await showDialog(
-      context: context,
-      builder: (context) => StatefulBuilder(
-        builder: (context, setStateDialog) {
-          return AlertDialog(
-            backgroundColor: AppColors.surface,
-            title: Text('Donner votre avis sur ${business.name}'),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: List.generate(5, (index) {
-                    return IconButton(
-                      icon: Icon(index < rating ? Icons.star : Icons.star_border, color: Colors.amber),
-                      onPressed: () => setStateDialog(() => rating = index + 1),
-                    );
-                  }),
-                ),
-                TextField(
-                  controller: commentController,
-                  decoration: const InputDecoration(
-                    labelText: 'Votre commentaire (optionnel)',
-                    labelStyle: TextStyle(color: AppColors.surface),
-                  ),
-                  maxLines: 3,
-                ),
-              ],
-            ),
-            actions: [
-              TextButton(onPressed: () => Navigator.pop(context), child: const Text('Annuler')),
-              ElevatedButton(
-                onPressed: () async {
-                  try {
-                    final service = ReviewApiService(dio: Injector.get<Dio>());
-                    await service.submitReview(business.id, authState.user.id, rating, commentController.text);
-                    Navigator.pop(context);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Merci pour votre avis !')),
-                    );
-                  } catch (e) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Erreur: $e'), backgroundColor: Colors.red),
-                    );
-                  }
-                },
-                child: const Text('Envoyer'),
-              ),
-            ],
-          );
-        },
-      ),
-    );
-  }
-
-  List<MenuItem> _convertToMenuItemList(List<dynamic> data) {
-    return data.map((item) {
-      if (item is MenuItem) return item;
-      return MenuItem(
-        id: item['id'] as int? ?? 0,
-        businessId: item['business_id']?.toString() ?? '',
-        itemName: item['item_name'] as String? ?? 'Nom inconnu',
-        itemCategory: item['item_category'] as String? ?? 'Général',
-        price: (item['price'] as num?)?.toDouble() ?? 0.0,
-        description: item['description'] as String? ?? '',
-        imageUrl: item['image_url'] as String? ?? '',
-        ingredients: item['ingredients'] != null ? List<String>.from(item['ingredients'] as List) : [],
-      );
-    }).toList();
   }
 
   void _showSnackBar(BuildContext context, String message) {

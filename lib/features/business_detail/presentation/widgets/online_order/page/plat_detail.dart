@@ -38,9 +38,39 @@ class _PlatDetailState extends State<PlatDetail> {
     return Scaffold(
       backgroundColor: AppColors.scaffoldBackground,
       appBar: AppBar(
-        title: Text(menu.itemName),
+        title: Text(
+            menu.itemName,
+          style: TextStyle(
+            fontFamily: 'Poppins',
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+            color: AppColors.secondaryLight,
+            decoration: TextDecoration.none,
+          ),
+        ),
         backgroundColor: AppColors.primary,
         foregroundColor: Colors.white,
+        leading: Container(
+          margin: EdgeInsets.only(left: 15),
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            gradient: LinearGradient(
+              colors: [
+                AppColors.secondaryLight,
+                AppColors.secondaryDark,
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
+          child: IconButton(
+            icon: const Icon(
+              Icons.arrow_back_ios_new_rounded,
+              color: AppColors.primaryLight,
+            ),
+            onPressed: () => Navigator.pop(context),
+          ),
+        ),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
@@ -106,14 +136,31 @@ class _PlatDetailState extends State<PlatDetail> {
               const SizedBox(height: 8),
               Row(
                 children: [
-                  IconButton(
-                    icon: const Icon(Icons.remove),
-                    onPressed: _quantity > 1 ? () => setState(() => _quantity--) : null,
-                  ),
-                  Text('$_quantity', style: const TextStyle(fontSize: 18)),
-                  IconButton(
-                    icon: const Icon(Icons.add),
-                    onPressed: () => setState(() => _quantity++),
+                  Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(20),
+                      gradient: const LinearGradient( // Ajout du const
+                        colors: [
+                          AppColors.secondaryLight,
+                          AppColors.secondaryDark,
+                        ],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                    ),
+                    child: Row(
+                      children: [
+                        IconButton(
+                          icon: const Icon(Icons.remove, color: AppColors.primary,),
+                          onPressed: _quantity > 1 ? () => setState(() => _quantity--) : null,
+                        ),
+                        Text('$_quantity', style: const TextStyle(fontSize: 18, color: AppColors.primary)),
+                        IconButton(
+                          icon: const Icon(Icons.add, color: AppColors.primary,),
+                          onPressed: () => setState(() => _quantity++),
+                        ),
+                      ],
+                    ),
                   ),
                   const Spacer(),
                   Text(
@@ -148,7 +195,7 @@ class _PlatDetailState extends State<PlatDetail> {
           child: ElevatedButton(
             onPressed: _isLoading ? null : _placeOrder,
             style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primary,
+              backgroundColor: AppColors.secondaryLight,
               padding: const EdgeInsets.symmetric(vertical: 16),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             ),

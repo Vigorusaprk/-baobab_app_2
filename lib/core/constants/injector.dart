@@ -1,3 +1,6 @@
+// File: core/constants/injector.dart
+
+import 'package:baobabe_0_2/core/constants/supabase_client.dart';
 import 'package:baobabe_0_2/features/auth/data/data_sources/remote_datasource/auth_remote_datasource.dart';
 import 'package:baobabe_0_2/features/auth/data/repositories/auth_repository_impl.dart';
 import 'package:baobabe_0_2/features/auth/domain/repositories/auth_repository.dart';
@@ -6,27 +9,24 @@ import 'package:baobabe_0_2/features/auth/domain/usecases/login_usecase.dart';
 import 'package:baobabe_0_2/features/auth/domain/usecases/logout_usecase.dart';
 import 'package:baobabe_0_2/features/auth/domain/usecases/signup_usecase.dart';
 import 'package:baobabe_0_2/features/auth/presentation/bloc/auth_bloc.dart';
-import 'package:baobabe_0_2/features/auth/presentation/widgets/auth_interceptor.dart';
-import 'package:baobabe_0_2/features/business_detail/domain/usecases/get_business_detail.dart';
-import 'package:baobabe_0_2/features/business_detail/presentation/bloc/business_detail_bloc.dart';
 import 'package:baobabe_0_2/features/home_page/data/data_sources/remote_datasource/business_remote_datasource.dart';
 import 'package:baobabe_0_2/features/home_page/data/repositories/business_remote_datasource_impl.dart';
 import 'package:baobabe_0_2/features/home_page/data/repositories/business_repository_impl.dart';
 import 'package:baobabe_0_2/features/home_page/data/repositories/category_repository_impl.dart';
 import 'package:baobabe_0_2/features/home_page/data/repositories/search_repository_impl.dart';
+import 'package:baobabe_0_2/features/favorites_page/data/models/reservation_service.dart';
 import 'package:baobabe_0_2/features/home_page/domain/repositories/business_repository.dart';
 import 'package:baobabe_0_2/features/home_page/domain/repositories/category_repository.dart';
 import 'package:baobabe_0_2/features/home_page/domain/repositories/search_repository.dart';
 import 'package:baobabe_0_2/features/home_page/domain/usecases/get_businesses.dart';
 import 'package:baobabe_0_2/features/home_page/domain/usecases/get_businesses_by_category_use_case.dart';
-import 'package:baobabe_0_2/features/home_page/domain/usecases/toggle_favorite.dart';
-import 'package:baobabe_0_2/features/home_page/presentation/bloc/business_bloc.dart';
-import 'package:baobabe_0_2/features/home_page/presentation/bloc/category_bloc.dart';
-import 'package:baobabe_0_2/features/home_page/presentation/bloc/search_bloc.dart';
 import 'package:baobabe_0_2/features/main/presentation/bloc/main_screen_bloc.dart';
+import 'package:baobabe_0_2/features/home_page/presentation/bloc/category_bloc.dart';
+import 'package:baobabe_0_2/features/home_page/presentation/bloc/business_bloc.dart';
+import 'package:baobabe_0_2/features/home_page/presentation/bloc/search_bloc.dart';
 import 'package:baobabe_0_2/features/settings/presentation/bloc/settings_bloc.dart';
-import 'package:dio/dio.dart';
 import 'package:get_it/get_it.dart';
+import 'package:supabase_flutter/supabase_flutter.dart' show SupabaseClient;
 
 final getIt = GetIt.instance;
 
@@ -39,80 +39,60 @@ class Injector {
   }
 
   static void _registerDataSources() {
-    final dio = Dio(BaseOptions(
-      baseUrl: 'http://10.0.2.2:3000/api', // ✅ Ajout indispensable
-      connectTimeout: const Duration(seconds: 30),
-      receiveTimeout: const Duration(seconds: 30),
-    ));
-    dio.interceptors.add(AuthInterceptor());
-    getIt.registerLazySingleton<Dio>(() => dio);
+    final supabase = SupabaseClientWrapper.client;
+    getIt.registerLazySingleton<SupabaseClient>(() => supabase);
 
-    // Ensuite les autres data sources
-    getIt.registerLazySingleton<BusinessRemoteDataSource>(
-          () => BusinessRemoteDataSourceImpl(),
-    );
     getIt.registerLazySingleton<AuthRemoteDataSource>(
-          () => AuthRemoteDataSourceImpl(dio: getIt<Dio>()),
+          () => AuthRemoteDataSourceImpl(supabase: getIt<SupabaseClient>()),
+    );
+
+    getIt.registerLazySingleton<BusinessRemoteDataSource>(
+          () => BusinessRemoteDataSourceImpl(supabase: getIt<SupabaseClient>()),
+    );
+
+    getIt.registerLazySingleton<ReservationApiService>(
+          () => ReservationApiService(getIt<SupabaseClient>()),
     );
   }
 
   static void _registerRepositories() {
     getIt.registerLazySingleton<AuthRepository>(
-          () => AuthRepositoryImpl(
-        remoteDataSource: getIt<AuthRemoteDataSource>(),
-      ),
+          () => AuthRepositoryImpl(remoteDataSource: getIt<AuthRemoteDataSource>(),),
     );
+
+    getIt.registerLazySingleton<CategoryRepository>(() => CategoryRepositoryImpl());
 
     getIt.registerLazySingleton<BusinessRepository>(
-          () => BusinessRepositoryImpl(
-        remoteDataSource: getIt<BusinessRemoteDataSource>(),
-      ),
-    );
-
-    getIt.registerLazySingleton<CategoryRepository>(
-          () => CategoryRepositoryImpl(),
+          () => BusinessRepositoryImpl(remoteDataSource: getIt<BusinessRemoteDataSource>()),
     );
 
     getIt.registerLazySingleton<SearchRepository>(
-          () => SearchRepositoryImpl(localDataSource: getIt()),
+          () => SearchRepositoryImpl(localDataSource: getIt<BusinessRemoteDataSource>()),
     );
   }
 
   static void _registerUseCases() {
-    // Auth Use Cases
-    getIt.registerLazySingleton<LoginUseCase>(
-          () => LoginUseCase(getIt<AuthRepository>()),
-    );
-    getIt.registerLazySingleton<SignUpUseCase>(
-          () => SignUpUseCase(getIt<AuthRepository>()),
-    );
-    getIt.registerLazySingleton<LogoutUseCase>(
-          () => LogoutUseCase(getIt<AuthRepository>()),
-    );
-    getIt.registerLazySingleton<CheckAuthStatusUseCase>(
-          () => CheckAuthStatusUseCase(getIt<AuthRepository>()),
-    );
+    getIt.registerLazySingleton(() => LoginUseCase(getIt<AuthRepository>()));
+    getIt.registerLazySingleton(() => SignUpUseCase(getIt<AuthRepository>()));
+    getIt.registerLazySingleton(() => CheckAuthStatusUseCase(getIt<AuthRepository>()));
+    getIt.registerLazySingleton(() => LogoutUseCase(getIt<AuthRepository>()));
 
-    // Business Use Cases
-    getIt.registerLazySingleton<GetBusinesses>(
-          () => GetBusinesses(getIt<BusinessRepository>()),
-    );
-    getIt.registerLazySingleton<GetBusinessesByCategory>(
-          () => GetBusinessesByCategory(getIt<BusinessRepository>()),
-    );
-    getIt.registerLazySingleton<GetBusinessDetail>(
-          () => GetBusinessDetail(getIt<BusinessRepository>()),
-    );
-    getIt.registerLazySingleton<ToggleFavorite>(
-          () => ToggleFavorite(getIt<BusinessRepository>()),
-    );
+    getIt.registerLazySingleton(() => GetBusinesses(getIt<BusinessRepository>()));
+    getIt.registerLazySingleton(() => GetBusinessesByCategory(getIt<BusinessRepository>()));
   }
 
   static void _registerBlocs() {
-    // Auth Bloc
-    getIt.registerLazySingleton<AuthBloc>(() => AuthBloc(authRepository: getIt<AuthRepository>()));
+    getIt.registerFactory(() => AuthBloc(
+      loginUseCase: getIt<LoginUseCase>(),
+      signUpUseCase: getIt<SignUpUseCase>(),
+      logoutUseCase: getIt<LogoutUseCase>(),
+      checkAuthStatusUseCase: getIt<CheckAuthStatusUseCase>(),
+    ));
+    getIt.registerFactory<MainScreenBloc>(() => MainScreenBloc());
+    getIt.registerFactory<SettingsCubit>(() => SettingsCubit());
 
-    // Business Bloc
+    getIt.registerFactory<CategoryBloc>(() => CategoryBloc(categoryRepository: getIt<CategoryRepository>()));
+
     getIt.registerFactory<BusinessBloc>(
           () => BusinessBloc(
         getBusinesses: getIt<GetBusinesses>(),
@@ -120,35 +100,7 @@ class Injector {
       ),
     );
 
-    // Category Bloc
-    getIt.registerFactory<CategoryBloc>(
-          () => CategoryBloc(
-        categoryRepository: getIt<CategoryRepository>(),
-      ),
-    );
-
-    // Search Bloc
-    getIt.registerFactory<SearchBloc>(
-          () => SearchBloc(
-        searchRepository: getIt<SearchRepository>(),
-      ),
-    );
-
-    // Business Detail Bloc
-    getIt.registerFactory(
-          () => BusinessDetailBloc(
-        getBusinessDetail: getIt<GetBusinessDetail>(),
-        repository: getIt<BusinessRepository>(),
-        businessId: '', // sera remplacé lors de l'utilisation
-      ),
-    );
-
-    // Main Screen Bloc
-    getIt.registerFactory<MainScreenBloc>(
-          () => MainScreenBloc(),
-    );
-
-    getIt.registerFactory<SettingsCubit>(() => SettingsCubit());
+    getIt.registerFactory<SearchBloc>(() => SearchBloc(searchRepository: getIt<SearchRepository>()));
   }
 
   static T get<T extends Object>() {

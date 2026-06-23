@@ -2,7 +2,6 @@ import 'package:baobabe_0_2/core/themes/app_colors.dart';
 import 'package:baobabe_0_2/features/home_page/domain/entities/business_entity.dart';
 import 'package:flutter/material.dart';
 
-
 class UIBusiness {
   final Business business;
 
@@ -27,9 +26,9 @@ class UIBusiness {
       case BusinessType.spa:
         return AppColors.Spa;
       case BusinessType.cinema:
-        return AppColors.Cinema; // ou votre couleur
+        return AppColors.Cinema;
       case BusinessType.tourism:
-        return AppColors.Tourisme; // à définir dans AppColors
+        return AppColors.Tourisme;
       default:
         return Colors.grey;
     }
@@ -56,15 +55,11 @@ class UIBusiness {
       case BusinessType.cinema:
         return Icons.movie;
       case BusinessType.tourism:
-        return Icons.tour; // ou Icons.landscape, Icons.explore
+        return Icons.tour;
       default:
         return Icons.business;
     }
   }
 
-  bool get isOpen {
-    // Logique d'horaires d'ouverture déplacée ici (logique UI)
-    // ...
-    return true;
-  }
+  bool get isOpen => true;
 }

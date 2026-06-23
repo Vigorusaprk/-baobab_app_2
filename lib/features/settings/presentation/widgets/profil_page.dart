@@ -1,310 +1,144 @@
-import 'package:baobabe_0_2/core/themes/app_colors.dart';
-import 'package:baobabe_0_2/core/themes/app_diemens.dart';
-import 'package:baobabe_0_2/core/themes/app_fonts.dart';
-import 'package:baobabe_0_2/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:baobabe_0_2/core/bloc/settings_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_svg/svg.dart';
+import 'package:baobabe_0_2/features/settings/presentation/bloc/settings_bloc.dart' hide SettingsCubit, SettingsState;
 import 'package:go_router/go_router.dart';
 
-class ProfilPage extends StatelessWidget {
+class ProfilPage extends StatefulWidget {
   const ProfilPage({super.key});
+
+  @override
+  State<ProfilPage> createState() => _ProfilPageState();
+}
+
+class _ProfilPageState extends State<ProfilPage> {
+  @override
+  void initState() {
+    super.initState();
+    // ⚡ On déclenche le chargement dès l'ouverture de l'écran
+    context.read<SettingsCubit>().loadUserProfile();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.scaffoldBackground,
       appBar: AppBar(
-        backgroundColor: AppColors.primaryLight,
+        title: const Text('Mon Profil', style: TextStyle(fontWeight: FontWeight.bold)),
+        centerTitle: true,
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(
-            Icons.arrow_back_ios_new_rounded,
-            color: AppColors.scaffoldBackground,
-          ),
-          onPressed: () => Navigator.pop(context),
-        ),
-        title: Row(
-          children: [
-            SvgPicture.asset(
-              'assets/icons/profile-round-1346-svgrepo-com.svg',
-              height: 30,
-              colorFilter: const ColorFilter.mode(
-                AppColors.scaffoldBackground,
-                BlendMode.srcIn,
-              ),
-            ),
-            const SizedBox(width: AppDimens.PADDING_12),
-            const Text(
-              'Porfile',
-              style: TextStyle(
-                fontFamily: AppFonts.primaryFontFamily,
-                fontSize: 24,
-                fontWeight: AppFonts.bold,
-                color: AppColors.scaffoldBackground,
-              ),
-            ),
-          ],
-        ),
+        backgroundColor: Colors.transparent,
       ),
-      body: BlocBuilder<AuthBloc, AuthState>(
+      body: BlocBuilder<SettingsCubit, SettingsState>(
         builder: (context, state) {
-          if (state is AuthAuthenticated) {
-            final user = state.user;
-            return Container(
-              color: AppColors.primaryLight,
-              child: Container(
-                decoration: BoxDecoration(
-                  color: AppColors.scaffoldBackground,
-                  borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(AppDimens.BORDER_RADIUS_30),
-                    topRight: Radius.circular(AppDimens.BORDER_RADIUS_30),
-                  ),
-                ),
-                child: CustomScrollView(
-                  slivers: [
-                    SliverPadding(
-                      padding: EdgeInsets.symmetric(vertical: MediaQuery.of(context).size.height * 0.15, horizontal: MediaQuery.of(context).size.width * 0.05,),
-                      sliver: SliverList(
-                        delegate: SliverChildListDelegate([
-                          // Avatar (photo de profil)
-                          Center(
-                            child: Transform.translate(
-                              offset: const Offset(0, -60),
-                              child: Container(
-                                width: 120,
-                                height: 120,
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  border: Border.all(color: Colors.white, width: 4),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black.withOpacity(0.2),
-                                      blurRadius: 8,
-                                      offset: const Offset(0, 4),
-                                    ),
-                                  ],
-                                ),
-                                child: ClipOval(
-                                  child: user.imgUrl != null && user.imgUrl!.isNotEmpty
-                                      ? Image.network(
-                                    user.imgUrl!,
-                                    fit: BoxFit.cover,
-                                    errorBuilder: (_, __, ___) => _buildInitialsAvatar(user.name),
-                                  )
-                                      : _buildInitialsAvatar(user.name),
-                                ),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          // Nom et email
-                          Center(
-                            child: Column(
-                              children: [
-                                Text(
-                                  user.name,
-                                  style: const TextStyle(
-                                    fontSize: 24,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  user.email,
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    color: Colors.grey[600],
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(height: 32),
-              
-                          // Sections
-                          _buildSection(
-                            title: 'Activité',
-                            children: [
-                              _buildActionTile(
-                                icon: Icons.edit,
-                                label: 'Modifier le profil',
-                                onTap: () => context.pushNamed('edit-profile'),
-                              ),
-                              _buildActionTile(
-                                icon: Icons.shopping_bag_outlined,
-                                label: 'Mes commandes',
-                                onTap: () => context.go('/orders'),
-                              ),
-                              _buildActionTile(
-                                icon: Icons.calendar_today_outlined,
-                                label: 'Mes réservations',
-                                onTap: () => context.go('/favorites'),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 16),
-              
-                          _buildSection(
-                            title: 'Compte',
-                            children: [
-                              _buildActionTile(
-                                icon: Icons.person_outline,
-                                label: 'Informations personnelles',
-                                onTap: () {
-                                  // Aller à la page d'édition
-                                },
-                              ),
-                              _buildActionTile(
-                                icon: Icons.lock_outline,
-                                label: 'Sécurité',
-                                onTap: () {
-                                  // Changer mot de passe
-                                },
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 16),
-              
-                          _buildSection(
-                            title: 'Application',
-                            children: [
-                              _buildActionTile(
-                                icon: Icons.help_outline,
-                                label: 'Aide',
-                                onTap: () {},
-                              ),
-                              _buildActionTile(
-                                icon: Icons.info_outline,
-                                label: 'À propos',
-                                onTap: () {},
-                              ),
-                              _buildActionTile(
-                                icon: Icons.logout,
-                                label: 'Déconnexion',
-                                onTap: () {
-                                  context.read<AuthBloc>().add(AuthLogoutEvent());
-                                  context.go('/login');
-                                },
-                                color: Colors.red,
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 40),
-                        ]),
-                      ),
+          if (state is SettingsLoading) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          if (state is SettingsError) {
+            return Center(
+              child: Padding(
+                padding: const EdgeInsets.all(24.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(Icons.error_outline, color: Colors.red, size: 48),
+                    const SizedBox(height: 16),
+                    Text(state.message, textAlign: TextAlign.center, style: const TextStyle(color: Colors.red)),
+                    const SizedBox(height: 16),
+                    ElevatedButton(
+                      onPressed: () => context.read<SettingsCubit>().loadUserProfile(),
+                      child: const Text('Réessayer'),
                     ),
                   ],
                 ),
               ),
             );
           }
-          return const Center(child: CircularProgressIndicator());
+
+          if (state is SettingsLoaded) {
+            final profile = state.userProfile;
+            final auth = state.userAuth;
+
+            return SingleChildScrollView(
+              padding: const EdgeInsets.all(24.0),
+              child: Column(
+                children: [
+                  const CircleAvatar(
+                    radius: 50,
+                    backgroundColor: Colors.grey,
+                    child: Icon(Icons.person, size: 50, color: Colors.white),
+                  ),
+                  const SizedBox(height: 24),
+
+                  // --- CHAMP COMPTE (AUTH.USERS) ---
+                  _buildProfileField(
+                    label: 'Adresse Email',
+                    value: auth.email ?? 'Non renseignée',
+                    icon: Icons.email_outlined,
+                  ),
+                  const SizedBox(height: 16),
+
+                  // --- CHAMPS PROFILS (USER_PROFILE) ---
+                  _buildProfileField(
+                    label: 'Nom Complet',
+                    value: profile['name'] ?? profile['username'] ?? 'Nom inconnu',
+                    icon: Icons.badge_outlined,
+                  ),
+                  const SizedBox(height: 16),
+                  _buildProfileField(
+                    label: 'Téléphone',
+                    value: profile['phone'] ?? 'Aucun numéro enregistré',
+                    icon: Icons.phone_android_outlined,
+                  ),
+                  const SizedBox(height: 32),
+
+                  // Bouton d'édition vers la page de modification
+                  SizedBox(
+                    width: double.infinity,
+                    height: 54,
+                    child: ElevatedButton.icon(
+                      onPressed: () => context.push('/edit-profile'),
+                      icon: const Icon(Icons.edit),
+                      label: const Text('Modifier le profil', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                      style: ElevatedButton.styleFrom(
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }
+
+          return const SizedBox.shrink();
         },
       ),
     );
   }
 
-  Widget _buildSection({required String title, required List<Widget> children}) {
+  Widget _buildProfileField({required String label, required String value, required IconData icon}) {
     return Container(
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Colors.grey[100],
         borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Row(
         children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-            child: Text(
-              title,
-              style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: Colors.grey,
-              ),
+          Icon(icon, color: Colors.grey[600]),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(label, style: TextStyle(fontSize: 12, color: Colors.grey[500])),
+                const SizedBox(height: 4),
+                Text(value, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+              ],
             ),
           ),
-          ...children,
         ],
       ),
     );
-  }
-
-  Widget _buildActionTile({
-    required IconData icon,
-    required String label,
-    required VoidCallback onTap,
-    Color? color,
-  }) {
-    return ListTile(
-      leading: Icon(icon, color: color ?? AppColors.primary),
-      title: Text(
-        label,
-        style: TextStyle(
-          color: color ?? Colors.black87,
-          fontWeight: FontWeight.w500,
-        ),
-      ),
-      trailing: const Icon(Icons.chevron_right, color: Colors.grey),
-      onTap: onTap,
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16),
-    );
-  }
-
-  Widget _buildInitialsAvatar(String name) {
-    final initials = _getInitials(name);
-    return Container(
-      color: _getAvatarColor(name),
-      child: Center(
-        child: Text(
-          initials,
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 40,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-      ),
-    );
-  }
-
-  String _getInitials(String name) {
-    if (name.isEmpty) return '?';
-    final parts = name.trim().split(' ');
-    if (parts.isEmpty) return '?';
-    if (parts.length == 1) return parts[0][0].toUpperCase();
-    return (parts[0][0] + parts[1][0]).toUpperCase();
-  }
-
-  Color _getAvatarColor(String name) {
-    final List<Color> colors = [
-      Colors.red,
-      Colors.pink,
-      Colors.purple,
-      Colors.deepPurple,
-      Colors.indigo,
-      Colors.blue,
-      Colors.lightBlue,
-      Colors.cyan,
-      Colors.teal,
-      Colors.green,
-      Colors.lightGreen,
-      Colors.lime,
-      Colors.amber,
-      Colors.orange,
-      Colors.deepOrange,
-      Colors.brown,
-      Colors.blueGrey,
-    ];
-    final index = name.isNotEmpty ? name.codeUnitAt(0) % colors.length : 0;
-    return colors[index];
   }
 }

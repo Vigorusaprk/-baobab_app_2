@@ -24,7 +24,6 @@ class BusinessLoaded extends BusinessState {
   List<Object> get props => [businesses, currentCategory];
 }
 
-// AJOUTEZ CETTE CLASSE ICI :
 class BusinessError extends BusinessState {
   final String message;
 

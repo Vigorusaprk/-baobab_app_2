@@ -21,7 +21,7 @@ class AppFonts {
     fontFamily: primaryFontFamily,
     fontSize: 28,
     fontWeight: bold,
-    color: AppColors.scaffoldBackground,
+    color: AppColors.secondaryLight,
   );
 
   static const TextStyle titleMedium = TextStyle(
@@ -49,7 +49,7 @@ class AppFonts {
     fontFamily: primaryFontFamily,
     fontSize: 15,
     fontWeight: bold,
-    color: AppColors.scaffoldBackground,
+    color: AppColors.secondaryLight,
   );
 
   static const TextStyle button = TextStyle(

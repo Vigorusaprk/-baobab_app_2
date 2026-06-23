@@ -1,5 +1,6 @@
 import 'package:baobabe_0_2/core/themes/app_colors.dart';
 import 'package:baobabe_0_2/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:baobabe_0_2/features/auth/presentation/bloc/auth_state.dart';
 import 'package:baobabe_0_2/features/business_detail/presentation/bloc/business_detail_bloc.dart';
 import 'package:baobabe_0_2/features/favorites_page/data/models/reservation_model.dart';
 import 'package:baobabe_0_2/features/home_page/domain/entities/business_entity.dart';
@@ -146,7 +147,7 @@ class _ReservationModalState extends State<ReservationModal> {
 
     // Récupérer l'utilisateur connecté
     final authState = context.read<AuthBloc>().state;
-    if (authState is! AuthAuthenticated) {
+    if (authState is! AuthenticatedState) {
       _showSnackBar('Veuillez vous connecter');
       setState(() => _isLoading = false);
       return;
@@ -163,11 +164,13 @@ class _ReservationModalState extends State<ReservationModal> {
       _data.time!.minute,
     );
 
-    final reservation = ReservationModel(
+    final reservation = Reservation(
+      id: '',
       businessId: widget.business.id,
       userId: userId,
       type: 'restaurant',
       reservationDate: fullDateTime,
+      createdAt: DateTime.now(),
       totalAmount: _data.grandTotal,
       details: {
         "table_number": _data.selectedTable ?? "Non spécifiée",
@@ -287,7 +290,7 @@ class _ReservationModalState extends State<ReservationModal> {
             margin: const EdgeInsets.symmetric(horizontal: 4),
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: currentPage >= index ? AppColors.primary : Colors.grey[300],
+              color: currentPage >= index ? AppColors.secondary : Colors.grey[300],
             ),
           );
         }).toList(),
@@ -335,7 +338,7 @@ class _ReservationModalState extends State<ReservationModal> {
                       });
                     },
                     backgroundColor: Colors.grey[200],
-                    selectedColor: AppColors.primary,
+                    selectedColor: AppColors.secondary,
                     labelStyle: TextStyle(
                       color: isSelected ? Theme.of(context).canvasColor : Colors.black,
                       fontWeight: FontWeight.bold,
@@ -376,7 +379,7 @@ class _ReservationModalState extends State<ReservationModal> {
                   decoration: BoxDecoration(
                     color: isReserved
                         ? Colors.grey
-                        : (isSelected ? AppColors.primary : Colors.grey[200]),
+                        : (isSelected ? AppColors.secondary : Colors.grey[200]),
                     borderRadius: BorderRadius.circular(12),
                     border: isSelected ? Border.all(color: AppColors.primary, width: 2) : null,
                     boxShadow: [
@@ -448,7 +451,7 @@ class _ReservationModalState extends State<ReservationModal> {
             child: ElevatedButton(
               onPressed: _selectedTable != null ? _nextPage : null,
               style: ElevatedButton.styleFrom(
-                backgroundColor: _selectedTable != null ? AppColors.primary : Colors.grey[300],
+                backgroundColor: _selectedTable != null ? AppColors.secondary : Colors.grey[300],
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
                 elevation: 2,
@@ -536,7 +539,7 @@ class _ReservationModalState extends State<ReservationModal> {
             child: ElevatedButton(
               onPressed: _validateStep2() ? _nextPage : null,
               style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary,
+                backgroundColor: AppColors.secondary,
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
                 elevation: 2,
@@ -574,6 +577,10 @@ class _ReservationModalState extends State<ReservationModal> {
             prefixIcon: icon != null ? Icon(icon, size: 20) : null,
             filled: true,
             fillColor: Colors.grey[50],
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(color: AppColors.primaryDark, width: 2),
+            ),
           ),
           keyboardType: keyboardType,
           maxLines: maxLines,
@@ -688,7 +695,7 @@ class _ReservationModalState extends State<ReservationModal> {
             child: ElevatedButton(
               onPressed: _isLoading ? null : _saveReservation,
               style: ElevatedButton.styleFrom(
-                backgroundColor: _isLoading ? Colors.grey : AppColors.primary,
+                backgroundColor: _isLoading ? Colors.grey : AppColors.secondary,
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
                 elevation: 2,
@@ -773,7 +780,7 @@ class _ReservationModalState extends State<ReservationModal> {
             style: TextStyle(
               fontSize: isTotal ? 18 : 16,
               fontWeight: isTotal ? FontWeight.bold : FontWeight.normal,
-              color: isTotal ? Theme.of(context).colorScheme.primary : Colors.black,
+              color: isTotal ? AppColors.secondary : Colors.black,
             ),
           ),
         ],

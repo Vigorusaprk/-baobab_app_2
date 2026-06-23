@@ -7,5 +7,5 @@ abstract class BusinessRemoteDataSource {
   Future<BusinessModel> getBusinessDetail(String businessId);
   Future<List<BusinessModel>> getBusinessesByCategory(String category);
   Future<List<MenuItem>> getMenuByBusiness(String businessId);
-  Future<void> createReservation(ReservationModel reservation);
+  Future<void> createReservation(Reservation reservation);
 }
