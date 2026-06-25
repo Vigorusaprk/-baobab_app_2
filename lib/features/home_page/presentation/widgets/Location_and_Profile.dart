@@ -47,7 +47,7 @@ class LocationAndProfile extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(15),
       decoration: BoxDecoration(
-        color:  AppColors.primary,
+        color:  AppColors.canvasBackground,
         shape: BoxShape.circle,
         boxShadow: [
           BoxShadow(
@@ -100,10 +100,18 @@ class LocationAndProfile extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(15),
       decoration: BoxDecoration(
-        color: AppColors.primary,
+        color: AppColors.canvasBackground,
         shape: BoxShape.circle,
       ),
-      child: Icon(Icons.notifications_rounded, color: AppColors.secondary, size: 22),
+      child: SvgPicture.asset(
+        'assets/icons/notifications.svg',
+        height: 25,
+        width: 25,
+        colorFilter: const ColorFilter.mode(
+          AppColors.secondary,
+          BlendMode.srcIn,
+        ),
+      ),
     );
   }
 }

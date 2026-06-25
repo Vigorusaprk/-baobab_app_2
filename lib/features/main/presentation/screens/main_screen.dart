@@ -77,9 +77,9 @@ class MainScreen extends StatelessWidget {
         required int index,
         required bool isSelected,
       }) {
-    final Color selectedBgColor = AppColors.primary;
+    final Color selectedBgColor = AppColors.canvasBackground;
     final Color selectedIconColor = AppColors.secondary;
-    final Color unselectedIconColor = AppColors.primary;
+    final Color unselectedIconColor = AppColors.canvasBackground;
 
     return GestureDetector(
       onTap: () => _onItemTapped(index),

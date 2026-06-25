@@ -9,6 +9,8 @@ import 'package:baobabe_0_2/features/auth/domain/usecases/login_usecase.dart';
 import 'package:baobabe_0_2/features/auth/domain/usecases/logout_usecase.dart';
 import 'package:baobabe_0_2/features/auth/domain/usecases/signup_usecase.dart';
 import 'package:baobabe_0_2/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:baobabe_0_2/features/business_detail/domain/usecases/get_business_detail.dart';
+import 'package:baobabe_0_2/features/business_detail/domain/usecases/get_menu_by_business.dart';
 import 'package:baobabe_0_2/features/home_page/data/data_sources/remote_datasource/business_remote_datasource.dart';
 import 'package:baobabe_0_2/features/home_page/data/repositories/business_remote_datasource_impl.dart';
 import 'package:baobabe_0_2/features/home_page/data/repositories/business_repository_impl.dart';
@@ -79,6 +81,9 @@ class Injector {
 
     getIt.registerLazySingleton(() => GetBusinesses(getIt<BusinessRepository>()));
     getIt.registerLazySingleton(() => GetBusinessesByCategory(getIt<BusinessRepository>()));
+
+    getIt.registerLazySingleton(() => GetBusinessDetail(getIt<BusinessRepository>()));
+    getIt.registerLazySingleton(() => GetMenuByBusiness(getIt<BusinessRepository>()));
   }
 
   static void _registerBlocs() {

@@ -7,6 +7,7 @@ import 'package:baobabe_0_2/features/home_page/presentation/bloc/search_bloc.dar
 import 'package:baobabe_0_2/features/home_page/presentation/screens/search_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 
 class HelloUserWidget extends StatelessWidget {
@@ -35,40 +36,54 @@ class HelloUserWidget extends StatelessWidget {
             top: AppDimens.PADDING_16,
           ),
           child: Container(
-            decoration: const BoxDecoration(
+            decoration: BoxDecoration(
               color: AppColors.secondaryLight,
+              borderRadius: BorderRadius.all(Radius.circular(20))
             ),
+            padding: EdgeInsets.symmetric(horizontal: AppDimens.BORDER_RADIUS_15, vertical: AppDimens.BORDER_RADIUS_20),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  "Salut, $userName 👋",
-                  style: const TextStyle(
-                    fontFamily: 'Poppins',
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.textPrimary,
-                  ),
+                Row(
+                  children: [
+                    _buildAvatar(user, userName, context),
+                    const SizedBox(width: AppDimens.PADDING_10),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                            "Salut 👋,",
+                          style: const TextStyle(
+                            fontFamily: 'Poppins',
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.scaffoldBackground,
+                          ),
+                        ),
+                        Text(
+                          "$userName",
+                          style: const TextStyle(
+                            fontFamily: 'Poppins',
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.scaffoldBackground,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
                 const SizedBox(height: AppDimens.PADDING_4),
-                const Text(
+                Text(
                   "Découvrez de nouveaux endroits !",
                   style: TextStyle(
                     fontFamily: 'Poppins',
                     fontSize: 14,
-                    color: AppColors.grey,
+                    color: AppColors.scaffoldBackground,
                   ),
                 ),
                 const SizedBox(height: AppDimens.PADDING_16),
-
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    _buildSearchField(context),
-                    const SizedBox(width: AppDimens.PADDING_16),
-                    _buildAvatar(user, userName, context),
-                  ],
-                ),
+                _buildSearchField(context),
               ],
             ),
           ),
@@ -78,81 +93,121 @@ class HelloUserWidget extends StatelessWidget {
   }
 
   Widget _buildSearchField(BuildContext context) {
-    return Expanded(
-      child: GestureDetector(
-        onTap: () {
-          final searchBloc = context.read<SearchBloc>();
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => BlocProvider.value(
-                value: searchBloc,
-                child: const SearchPage(),
-              ),
-            ),
-          );
-        },
-        child: Container(
-          padding: const EdgeInsets.symmetric(
-            horizontal: AppDimens.PADDING_12,
-            vertical: AppDimens.PADDING_8,
-          ),
-          decoration: BoxDecoration(
-            color: AppColors.white,
-            borderRadius: BorderRadius.circular(AppDimens.BORDER_RADIUS_12),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.05),
-                blurRadius: 10,
-                offset: const Offset(0, 4),
-              ),
-            ],
-          ),
-          child: Row(
-            children: [
-              const Icon(
-                Icons.search,
-                color: AppColors.grey,
-                size: 22,
-              ),
-              const SizedBox(width: AppDimens.PADDING_12),
-              const Expanded(
-                child: Text(
-                  "Où voulez-vous aller ?",
-                  style: TextStyle(
-                    fontFamily: 'Poppins',
-                    color: AppColors.grey,
-                    fontSize: 14,
+    return Row(
+      children: [
+        Expanded(
+          child: GestureDetector(
+            onTap: () {
+              final searchBloc = context.read<SearchBloc>();
+
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => BlocProvider.value(
+                    value: searchBloc,
+                    child: const SearchPage(),
                   ),
                 ),
+              );
+            },
+            child: Container(
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppDimens.PADDING_12,
+                vertical: AppDimens.PADDING_8,
               ),
-              Container(
-                padding: const EdgeInsets.all(AppDimens.PADDING_8),
-                decoration: BoxDecoration(
-                  color: AppColors.primary,
-                  borderRadius: BorderRadius.circular(AppDimens.BORDER_RADIUS_12),
+              decoration: BoxDecoration(
+                color: AppColors.canvasBackground,
+                borderRadius: BorderRadius.circular(
+                  AppDimens.BORDER_RADIUS_12,
                 ),
-                child: const Icon(
-                  Icons.tune_rounded,
-                  color: AppColors.white,
-                  size: 20,
-                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.05),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
               ),
-            ],
+              child: Row(
+                children: [
+                  SvgPicture.asset(
+                    'assets/icons/search-normal.svg',
+                    height: 25,
+                    width: 25,
+                    colorFilter: const ColorFilter.mode(
+                      AppColors.secondary,
+                      BlendMode.srcIn,
+                    ),
+                  ),
+                  const SizedBox(width: AppDimens.PADDING_12),
+                  const Expanded(
+                    child: Text(
+                      "Où voulez-vous aller ?",
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontFamily: 'Poppins',
+                        color: AppColors.grey,
+                        fontSize: 14,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
         ),
-      ),
+
+        const SizedBox(width: AppDimens.PADDING_12),
+
+        GestureDetector(
+          onTap: () {
+            // TODO : ouvrir les filtres
+          },
+          child: Container(
+            padding: const EdgeInsets.all(
+              AppDimens.PADDING_12,
+            ),
+            decoration: BoxDecoration(
+              color: AppColors.canvasBackground,
+              borderRadius: BorderRadius.circular(
+                AppDimens.BORDER_RADIUS_12,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.05),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: SvgPicture.asset(
+              'assets/icons/filter.svg',
+              height: 20,
+              width: 20,
+              colorFilter: const ColorFilter.mode(
+                AppColors.secondary,
+                BlendMode.srcIn,
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
+
 
   Widget _buildAvatar(UserEntity? user, String userName, BuildContext context) {
     return GestureDetector(
       onTap: () => context.go('/profile'),
       child: Container(
-        width: 48,
-        height: 48,
+        width: 55,
+        height: 55,
         decoration: BoxDecoration(
           shape: BoxShape.circle,
+          border: Border.all(
+            color: AppColors.primary,
+            width: 2.5
+          ),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(0.08),

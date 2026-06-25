@@ -1,4 +1,5 @@
 import 'package:baobabe_0_2/core/themes/app_diemens.dart';
+import 'package:baobabe_0_2/features/home_page/domain/entities/business_entity.dart' show BusinessType, Business;
 import 'package:baobabe_0_2/features/home_page/domain/entities/search_filter_entity.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/bloc/search_bloc.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/bloc/search_event.dart';
@@ -12,8 +13,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:baobabe_0_2/core/themes/app_colors.dart';
 import 'package:baobabe_0_2/features/business_detail/presentation/screens/business_detail_screen.dart';
 import 'package:baobabe_0_2/features/home_page/data/models/ui_business.dart';
-import 'package:baobabe_0_2/features/home_page/domain/entities/business_entity.dart';
+import 'package:flutter_svg/svg.dart';
 
+import '../../../main/presentation/widgets/app_background.dart';
 
 class SearchPage extends StatefulWidget {
   const SearchPage({super.key});
@@ -61,7 +63,7 @@ class _SearchPageState extends State<SearchPage> {
 
   @override
   Widget build(BuildContext context) {
-    return MainBackground(
+    return authBackground(
       child: Scaffold(
         backgroundColor: AppColors.transparent,
         body: SafeArea(
@@ -78,7 +80,7 @@ class _SearchPageState extends State<SearchPage> {
                           borderRadius: BorderRadius.circular(AppDimens.BORDER_RADIUS_50)
                       ),
                       child: IconButton(
-                        icon: Icon(Icons.arrow_back_ios_new_rounded, color: AppColors.primary,),
+                        icon: Icon(Icons.arrow_back_ios_new_rounded, color: AppColors.canvasBackground,),
                         onPressed: () => Navigator.pop(context),
                       ),
                     ),
@@ -95,13 +97,19 @@ class _SearchPageState extends State<SearchPage> {
 
                     SizedBox(width: 5,),
                     Container(
+                      padding: EdgeInsets.symmetric(horizontal: AppDimens.PADDING_10, vertical: AppDimens.PADDING_10),
                       decoration: BoxDecoration(
                         color: AppColors.secondaryLight,
                         borderRadius: BorderRadius.circular(AppDimens.BORDER_RADIUS_50)
                       ),
-                      child: IconButton(
-                        icon: Icon(Icons.filter_list_rounded, color: AppColors.primary,),
-                        onPressed: () => _showFilterSheet(context),
+                      child: SvgPicture.asset(
+                        'assets/icons/filter.svg',
+                        height: 25,
+                        width: 25,
+                        colorFilter: const ColorFilter.mode(
+                          AppColors.canvasBackground,
+                          BlendMode.srcIn,
+                        ),
                       ),
                     ),
                   ],
@@ -285,7 +293,7 @@ class _SearchPageState extends State<SearchPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, size: 80, color: Colors.grey[400]),
+            Icon(icon, size: 80, color: AppColors.canvasBackground),
             const SizedBox(height: 16),
             Text(
               message,
@@ -389,7 +397,7 @@ class _SearchPageState extends State<SearchPage> {
       child: Container(
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.canvasBackground,
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
