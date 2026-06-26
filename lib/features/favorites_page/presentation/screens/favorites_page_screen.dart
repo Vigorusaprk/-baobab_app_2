@@ -2,6 +2,7 @@ import 'package:baobabe_0_2/features/auth/presentation/bloc/auth_state.dart';
 import 'package:baobabe_0_2/features/business_detail/domain/entities/reservation.dart';
 import 'package:baobabe_0_2/features/favorites_page/data/models/reservation_service.dart';
 import 'package:baobabe_0_2/core/constants/injector.dart';
+import 'package:baobabe_0_2/features/main/presentation/widgets/app_background.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
@@ -150,7 +151,7 @@ class _FavoritesPageScreenState extends State<FavoritesPageScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return MainBackground(
+    return authBackground(
       child: Scaffold(
         backgroundColor: Colors.transparent,
         body: Column(
