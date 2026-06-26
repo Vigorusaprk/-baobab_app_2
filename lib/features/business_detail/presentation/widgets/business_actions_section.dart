@@ -354,8 +354,9 @@ class BusinessActionSection extends StatelessWidget {
         _showSnackBar(context, 'Menu non disponible pour la commande');
       }
     } catch (e) {
+      debugPrint("ERREUR DE CHARGEMENT : $e"); // AJOUTEZ CECI
       if (context.mounted) Navigator.pop(context);
-      _showSnackBar(context, 'Erreur de chargement du menu');
+      _showSnackBar(context, 'Erreur de chargement: $e');
     }
   }
 

@@ -41,7 +41,7 @@ class _BusinessDetailScreenState extends State<BusinessDetailScreen> {
         businessId: widget.businessId,
       )..add(LoadBusinessDetail(widget.businessId)),
       child: Scaffold(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.canvasBackground,
         body: BlocConsumer<BusinessDetailBloc, BusinessDetailState>(
           listener: (context, state) {
             // Gestion des retours visuels (Toasts / SnackBars) pour les réservations

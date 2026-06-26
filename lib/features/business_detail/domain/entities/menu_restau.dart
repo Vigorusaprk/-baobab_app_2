@@ -1,5 +1,5 @@
 class MenuItem {
-  final int id;
+  final String id; // CHANGÉ de int à String
   final String businessId;
   final String itemName;
   final String itemCategory;
@@ -23,10 +23,11 @@ class MenuItem {
 
   factory MenuItem.fromJson(Map<String, dynamic> json) {
     return MenuItem(
-      id: json['id'] is int ? json['id'] : int.parse(json['id'].toString()),
+      // On convertit toujours l'ID en String pour accepter UUID ou int
+      id: json['id']?.toString() ?? '',
       businessId: json['business_id']?.toString() ?? '',
-      itemName: json['item_name'] ?? '',
-      itemCategory: json['item_category'] ?? '',
+      itemName: json['name'] ?? '', // CORRIGÉ : correspond au nom de colonne "name"
+      itemCategory: json['category'] ?? '', // CORRIGÉ : correspond au nom de colonne "category"
       price: (json['price'] is String)
           ? double.parse(json['price'])
           : (json['price'] as num).toDouble(),
@@ -43,8 +44,8 @@ class MenuItem {
     return {
       'id': id,
       'business_id': businessId,
-      'item_name': itemName,
-      'item_category': itemCategory,
+      'name': itemName,
+      'category': itemCategory,
       'price': price,
       'description': description,
       'image_url': imageUrl,
