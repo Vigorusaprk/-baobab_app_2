@@ -21,3 +21,13 @@ class MakeReservation extends BusinessDetailEvent {
   @override
   List<Object> get props => [reservation];
 }
+
+
+class AddToCart extends BusinessDetailEvent {
+  final OrderItem item;
+  const AddToCart(this.item);
+  @override
+  List<Object> get props => [item];
+}
+
+class LoadCart extends BusinessDetailEvent {}

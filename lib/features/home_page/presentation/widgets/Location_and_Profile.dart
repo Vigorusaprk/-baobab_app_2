@@ -13,7 +13,7 @@ class LocationAndProfile extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
         decoration: BoxDecoration(
-          color: AppColors.secondaryLight,
+          color: AppColors.accent700,
           borderRadius: BorderRadius.circular(100),
           boxShadow: [
             BoxShadow(
@@ -49,20 +49,13 @@ class LocationAndProfile extends StatelessWidget {
       decoration: BoxDecoration(
         color:  AppColors.canvasBackground,
         shape: BoxShape.circle,
-        boxShadow: [
-          BoxShadow(
-            color: const Color(0xFF254D32).withOpacity(0.2),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
       ),
       child: SvgPicture.asset(
         'assets/icons/location-svgrepo-com (1).svg',
         height: 20,
         width: 20,
         colorFilter: const ColorFilter.mode(
-          AppColors.secondary,
+          AppColors.accent700,
           BlendMode.srcIn,
         ),
       ),
@@ -108,7 +101,7 @@ class LocationAndProfile extends StatelessWidget {
         height: 25,
         width: 25,
         colorFilter: const ColorFilter.mode(
-          AppColors.secondary,
+          AppColors.accent700,
           BlendMode.srcIn,
         ),
       ),

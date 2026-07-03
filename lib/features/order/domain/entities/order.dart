@@ -62,6 +62,24 @@ class OrderItem {
     this.specialInstructions,
   });
 
+  // --- Partie modifiée : Ajout de la méthode copyWith ---
+  OrderItem copyWith({
+    String? menuItemId,
+    String? name,
+    double? price,
+    int? quantity,
+    String? specialInstructions,
+  }) {
+    return OrderItem(
+      menuItemId: menuItemId ?? this.menuItemId,
+      name: name ?? this.name,
+      price: price ?? this.price,
+      quantity: quantity ?? this.quantity,
+      specialInstructions: specialInstructions ?? this.specialInstructions,
+    );
+  }
+  // -----------------------------------------------------
+
   Map<String, dynamic> toMap() {
     return {
       'menu_item_id': menuItemId,
@@ -211,13 +229,13 @@ class Order {
 
   Color get typeColor {
     switch (establishmentType) {
-      case 'hotel': return AppColors.Hotel;
-      case 'car_rental': return AppColors.CarRental;
-      case 'travel': return  AppColors.TravelAgency;
-      case 'spa': return AppColors.Spa;
-      case 'cinema': return AppColors.Cinema;
-      case 'toursime': return AppColors.Tourisme;
-      case 'restaurant': return AppColors.Restaurant;
+      case 'hotel': return AppColors.hotel;
+      case 'car_rental': return AppColors.carRental;
+      case 'travel': return  AppColors.travelAgency;
+      case 'spa': return AppColors.spa;
+      case 'cinema': return AppColors.cinema;
+      case 'toursime': return AppColors.tourism;
+      case 'restaurant': return AppColors.restaurant;
       default: return Colors.grey;
     }
   }

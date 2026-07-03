@@ -30,7 +30,7 @@ class RestaurantMenuPage extends StatelessWidget {
     // Si le menu est vide, on affiche un état d'erreur simple hors du contrôleur
     if (menuItems.isEmpty) {
       return Scaffold(
-        backgroundColor: AppColors.secondaryLight,
+        backgroundColor: AppColors.scaffoldBackground,
         appBar: _buildSimpleAppBar(context),
         body: _buildEmptyState(),
       );
@@ -40,7 +40,7 @@ class RestaurantMenuPage extends StatelessWidget {
     return DefaultTabController(
       length: categories.length,
       child: Scaffold(
-        backgroundColor: AppColors.primary,
+        backgroundColor: AppColors.canvasBackground,
         body: Container(
           decoration: BoxDecoration(
             borderRadius: const BorderRadius.only(
@@ -69,20 +69,13 @@ class RestaurantMenuPage extends StatelessWidget {
                     children: [
                       Container(
                         decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          gradient: LinearGradient(
-                            colors: [
-                              AppColors.secondaryLight,
-                              AppColors.secondaryDark,
-                            ],
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                          ),
+                            shape: BoxShape.circle,
+                            border: Border.all(width: 3, color: AppColors.secondary)
                         ),
                         child: IconButton(
                           icon: const Icon(
                             Icons.arrow_back_ios_new_rounded,
-                            color: AppColors.primaryLight,
+                            color: AppColors.secondary,
                           ),
                           onPressed: () => Navigator.pop(context),
                         ),
@@ -94,7 +87,7 @@ class RestaurantMenuPage extends StatelessWidget {
                             'assets/icons/menu-food-svgrepo-com.svg',
                             height: 35,
                             colorFilter: const ColorFilter.mode(
-                              AppColors.secondaryLight,
+                              AppColors.secondary,
                               BlendMode.srcIn,
                             ),
                           ),
@@ -105,7 +98,7 @@ class RestaurantMenuPage extends StatelessWidget {
                               fontFamily: AppFonts.primaryFontFamily,
                               fontSize: 24,
                               fontWeight: AppFonts.bold,
-                              color: AppColors.secondaryLight,
+                              color: AppColors.secondary,
                             ),
                           ),
                         ],
@@ -127,8 +120,8 @@ class RestaurantMenuPage extends StatelessWidget {
                       isScrollable: true,
                       tabAlignment: TabAlignment.start,
                       indicatorColor: Colors.transparent, // Retrait de l'indicateur par défaut
-                      labelColor: AppColors.primary, // Couleur du texte actif
-                      unselectedLabelColor: AppColors.primaryDark.withOpacity(0.6),
+                      labelColor: AppColors.accent50, // Couleur du texte actif
+                      unselectedLabelColor: AppColors.accent50,
                       labelStyle: const TextStyle(
                         fontFamily: AppFonts.primaryFontFamily,
                         fontSize: 16,

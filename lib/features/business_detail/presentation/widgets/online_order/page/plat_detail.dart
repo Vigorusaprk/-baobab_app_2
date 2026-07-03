@@ -38,6 +38,7 @@ class _PlatDetailState extends State<PlatDetail> {
     return Scaffold(
       backgroundColor: AppColors.scaffoldBackground,
       appBar: AppBar(
+        backgroundColor: Colors.transparent,
         title: Text(
             menu.itemName,
           style: TextStyle(
@@ -48,25 +49,17 @@ class _PlatDetailState extends State<PlatDetail> {
             decoration: TextDecoration.none,
           ),
         ),
-        backgroundColor: AppColors.primary,
         foregroundColor: Colors.white,
         leading: Container(
-          margin: EdgeInsets.only(left: 15),
+          margin: EdgeInsets.only(left: 10),
           decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            gradient: LinearGradient(
-              colors: [
-                AppColors.secondaryLight,
-                AppColors.secondaryDark,
-              ],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
+              shape: BoxShape.circle,
+              border: Border.all(width: 3, color: AppColors.secondary)
           ),
           child: IconButton(
             icon: const Icon(
               Icons.arrow_back_ios_new_rounded,
-              color: AppColors.primaryLight,
+              color: AppColors.secondary,
             ),
             onPressed: () => Navigator.pop(context),
           ),
@@ -136,36 +129,23 @@ class _PlatDetailState extends State<PlatDetail> {
               const SizedBox(height: 8),
               Row(
                 children: [
-                  Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(20),
-                      gradient: const LinearGradient( // Ajout du const
-                        colors: [
-                          AppColors.secondaryLight,
-                          AppColors.secondaryDark,
-                        ],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
+                  Row(
+                    children: [
+                      IconButton(
+                        icon: const Icon(Icons.remove, color: AppColors.secondary,),
+                        onPressed: _quantity > 1 ? () => setState(() => _quantity--) : null,
                       ),
-                    ),
-                    child: Row(
-                      children: [
-                        IconButton(
-                          icon: const Icon(Icons.remove, color: AppColors.primary,),
-                          onPressed: _quantity > 1 ? () => setState(() => _quantity--) : null,
-                        ),
-                        Text('$_quantity', style: const TextStyle(fontSize: 18, color: AppColors.primary)),
-                        IconButton(
-                          icon: const Icon(Icons.add, color: AppColors.primary,),
-                          onPressed: () => setState(() => _quantity++),
-                        ),
-                      ],
-                    ),
+                      Text('$_quantity', style: const TextStyle(fontSize: 18, color: AppColors.secondary, fontWeight: FontWeight.bold)),
+                      IconButton(
+                        icon: const Icon(Icons.add, color: AppColors.secondary,),
+                        onPressed: () => setState(() => _quantity++),
+                      ),
+                    ],
                   ),
                   const Spacer(),
                   Text(
                     'Total : ${totalPrice.toStringAsFixed(2)} €',
-                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    style:  TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.secondary),
                   ),
                 ],
               ),

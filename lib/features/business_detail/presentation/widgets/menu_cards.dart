@@ -41,43 +41,34 @@ class RestaurantInfoBigCard extends StatelessWidget {
         width: 380,
         height: 180,
         decoration: BoxDecoration(
-          color: AppColors.scaffoldBackground,
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.04),
-              blurRadius: 24,
-              offset: const Offset(0, 8),
+              // 2. Ombre plus prononcée
+              color: Colors.black.withOpacity(0.25),
+              blurRadius: 15,
+              offset: const Offset(0, 6),
             ),
           ],
         ),
         child: ClipRRect(
           child: Stack(
             children: [
-              _buildBackgroundOrbes(),
+              _buildBackgroundOrbes(item),
+              Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+              ),
               BackdropFilter(
                 filter: ImageFilter.blur(sigmaX: 1.5, sigmaY: 1.5),
                 child: Container(
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.65),
                     borderRadius: BorderRadius.circular(16),
                     border: Border.all(
                       color: AppColors.secondaryLight.withOpacity(0.7),
                       width: 1.5,
                     ),
-                  ),
-                ),
-              ),
-              Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(16),
-                  gradient: LinearGradient(
-                    colors: [
-                      AppColors.secondaryLight,
-                      AppColors.transparent,
-                    ],
-                    begin: Alignment.centerLeft,
-                    end: Alignment.centerRight,
                   ),
                 ),
               ),
@@ -98,7 +89,7 @@ class RestaurantInfoBigCard extends StatelessWidget {
                           style: const TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
-                            color: AppColors.primary,
+                            color: AppColors.accent50,
                             height: 1.2,
                           ),
                         ),
@@ -106,7 +97,7 @@ class RestaurantInfoBigCard extends StatelessWidget {
                         Text(
                           '${item.price.toStringAsFixed(2)} €',
                           style: TextStyle(
-                            color: AppColors.primary,
+                            color: AppColors.accent50,
                             fontWeight: FontWeight.bold,
                             fontSize: 14,
                           ),
@@ -117,11 +108,11 @@ class RestaurantInfoBigCard extends StatelessWidget {
                     Row(
                       children: [
                         SvgPicture.asset(
-                          "assets/icons/delivery-svgrepo-com.svg",
+                          "assets/icons/cooking-pot-duotone.svg",
                           height: 20,
                           width: 20,
                           colorFilter: ColorFilter.mode(
-                            AppColors.primary,
+                            AppColors.accent50,
                             BlendMode.srcIn,
                           ),
                         ),
@@ -130,7 +121,7 @@ class RestaurantInfoBigCard extends StatelessWidget {
                           "20-30 min",
                           style: Theme.of(context).textTheme.labelSmall?.copyWith(
                             fontSize: 12,
-                            color:  AppColors.primary,
+                            color:  AppColors.accent50,
                           ),
                         ),
                         const SizedBox(width: 12),
@@ -139,7 +130,7 @@ class RestaurantInfoBigCard extends StatelessWidget {
                           height: 20,
                           width: 20,
                           colorFilter: ColorFilter.mode(
-                            AppColors.primaryLight,
+                            AppColors.accent50,
                             BlendMode.srcIn,
                           ),
                         ),
@@ -148,7 +139,7 @@ class RestaurantInfoBigCard extends StatelessWidget {
                           isFreeDelivery ? "Livraison gratuite" : "Frais de livraison",
                           style: Theme.of(context).textTheme.labelSmall?.copyWith(
                             fontSize: 12,
-                            color:  AppColors.primary,
+                            color:  AppColors.accent50,
                           ),
                         ),
                       ],
@@ -163,23 +154,7 @@ class RestaurantInfoBigCard extends StatelessWidget {
     );
   }
 
-  Widget _buildPlaceholder() => Container(
-    height: 180,
-    color: Colors.grey[200],
-    width: double.infinity,
-    child: Stack(
-      children: [
-        Positioned(
-          right: 10,
-          bottom: 5,
-          child: const Icon(Icons.fastfood, color: Colors.grey, size:150)
-        ),
-      ],
-    ),
-  );
-
-
-  Widget _buildBackgroundOrbes(){
+  Widget _buildBackgroundOrbes(dynamic item) {
     return Stack(
       children: [
         ClipRRect(
@@ -203,4 +178,26 @@ class RestaurantInfoBigCard extends StatelessWidget {
       ],
     );
   }
+
+  Widget _buildPlaceholder() => Container(
+    decoration: BoxDecoration(
+      // 1. NOUVEAU STYLE : Dégradé sombre élégant (comme la carte earnings)
+      gradient: const LinearGradient(
+        colors: [Color(0xFF1E2A3E), Color(0xFF0F172A)],
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+      ),
+    ),
+    height: 180,
+    width: double.infinity,
+    child: Stack(
+      children: [
+        Positioned(
+            right: 10,
+            bottom: 5,
+            child: const Icon(Icons.fastfood, color: Colors.white, size:150)
+        ),
+      ],
+    ),
+  );
 }

@@ -41,7 +41,6 @@ class BusinessHeroSection extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(horizontal: 10),
                   child: Container(
                     decoration: BoxDecoration(
-                      border: Border.all(color: uiBusiness.categoryColor.withOpacity(0.7), width: 5.5),
                       borderRadius: BorderRadius.circular(28),
                       boxShadow: [
                         BoxShadow(
@@ -59,6 +58,14 @@ class BusinessHeroSection extends StatelessWidget {
                           BackdropFilter(
                             filter: ImageFilter.blur(sigmaX: 15.0, sigmaY: 15.0),
                             child: Container(
+                              decoration: BoxDecoration(
+                                color: Colors.white.withOpacity(0.15),
+                                borderRadius: BorderRadius.circular(22),
+                                border: Border.all(
+                                  color: Colors.white.withOpacity(0.3),
+                                  width: 1,
+                                ),
+                              ),
                               padding: const EdgeInsets.all(16),
                               child: Column(
                                 children: [
@@ -130,7 +137,7 @@ class BusinessHeroSection extends StatelessWidget {
                       height: 100,
                       decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          image: DecorationImage(image: AssetImage(business.profilImg!), fit: BoxFit.cover)
+                          image: DecorationImage(image: NetworkImage(business.profilImg!), fit: BoxFit.cover)
                       ),
                     )
                         : Icon(uiBusiness.categoryIcon, size: 45, color: uiBusiness.categoryColor),

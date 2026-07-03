@@ -1,5 +1,7 @@
+import 'package:baobabe_0_2/core/themes/app_colors.dart';
 import 'package:baobabe_0_2/features/home_page/domain/entities/business_entity.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 
 class BusinessHoursSection extends StatelessWidget {
   final Business business;
@@ -49,7 +51,7 @@ class BusinessHoursSection extends StatelessWidget {
             margin: const EdgeInsets.only(bottom: 4),
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
             decoration: BoxDecoration(
-              color: isToday ? const Color(0xFF254D32).withOpacity(0.08) : Colors.transparent,
+              color: isToday ? AppColors.accent700.withOpacity(0.08) : Colors.transparent,
               borderRadius: BorderRadius.circular(14),
             ),
             child: Row(
@@ -58,16 +60,23 @@ class BusinessHoursSection extends StatelessWidget {
                 Row(
                   children: [
                     if (isToday)
-                      const Padding(
+                      Padding(
                         padding: EdgeInsets.only(right: 8),
-                        child: Icon(Icons.access_time_filled_rounded, size: 16, color: Color(0xFF254D32)),
+                        child: Container(
+                          child: SvgPicture.asset(
+                            "assets/icons/opening-hours.svg",
+                            width: 28,
+                            height: 28,
+                            colorFilter: ColorFilter.mode(AppColors.accent700, BlendMode.srcIn),
+                          ),
+                        )
                       ),
                     Text(
                       entry.key,
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: isToday ? FontWeight.w800 : FontWeight.w500,
-                        color: isToday ? const Color(0xFF254D32) : Colors.grey[700],
+                        color: isToday ? AppColors.accent700 : Colors.grey[700],
                       ),
                     ),
                   ],
@@ -77,7 +86,7 @@ class BusinessHoursSection extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: isToday ? FontWeight.bold : FontWeight.w600,
-                    color: isToday ? const Color(0xFF254D32) : Colors.black87,
+                    color: isToday ? AppColors.accent700 : Colors.black87,
                   ),
                 ),
               ],

@@ -25,16 +25,16 @@ class UICategory {
 
   Color get color {
     switch (category.type) { // Correction ici
-      case BusinessType.restaurant: return AppColors.Restaurant;
-      case BusinessType.fastFood: return AppColors.FastFood;
-      case BusinessType.hotel: return AppColors.Hotel;
-      case BusinessType.shopping: return AppColors.Shopping;
-      case BusinessType.mall: return AppColors.Mall;
-      case BusinessType.carRental: return AppColors.CarRental;
-      case BusinessType.travelAgency: return AppColors.TravelAgency;
-      case BusinessType.spa: return AppColors.Spa;
-      case BusinessType.cinema: return AppColors.Cinema;
-      case BusinessType.tourism: return AppColors.Tourisme;
+      case BusinessType.restaurant: return AppColors.restaurant;
+      case BusinessType.fastFood: return AppColors.fastFood;
+      case BusinessType.hotel: return AppColors.hotel;
+      case BusinessType.shopping: return AppColors.shopping;
+      case BusinessType.mall: return AppColors.mall;
+      case BusinessType.carRental: return AppColors.carRental;
+      case BusinessType.travelAgency: return AppColors.travelAgency;
+      case BusinessType.spa: return AppColors.spa;
+      case BusinessType.cinema: return AppColors.cinema;
+      case BusinessType.tourism: return AppColors.tourism;
       default: return Colors.blue;
     }
   }

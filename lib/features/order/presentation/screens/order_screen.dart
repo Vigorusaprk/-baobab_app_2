@@ -213,7 +213,7 @@ class _OrderScreenState extends State<OrderScreen> with WidgetsBindingObserver {
         VoidCallback? onTap,
       }) {
     final effectiveSelectedColor = selectedColor ?? AppColors.secondaryLight;
-    final effectiveUnselectedColor = unselectedColor ?? AppColors.grey.withOpacity(0.3);
+    final effectiveUnselectedColor = unselectedColor ?? Colors.grey.withOpacity(0.3);
     final effectiveLabelColor =   AppColors.secondary;
     final effectiveSelectedLabelColor = selectedLabelColor ?? AppColors.scaffoldBackground;
     final effectiveFontSize = fontSize ?? 14;

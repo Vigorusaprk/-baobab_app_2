@@ -10,25 +10,25 @@ class UIBusiness {
   Color get categoryColor {
     switch (business.type) {
       case BusinessType.restaurant:
-        return AppColors.Restaurant;
+        return AppColors.restaurant;
       case BusinessType.fastFood:
-        return AppColors.FastFood;
+        return AppColors.fastFood;
       case BusinessType.shopping:
-        return AppColors.Shopping;
+        return AppColors.shopping;
       case BusinessType.mall:
-        return AppColors.Mall;
+        return AppColors.mall;
       case BusinessType.hotel:
-        return AppColors.Hotel;
+        return AppColors.hotel;
       case BusinessType.carRental:
-        return AppColors.CarRental;
+        return AppColors.carRental;
       case BusinessType.travelAgency:
-        return AppColors.TravelAgency;
+        return AppColors.travelAgency;
       case BusinessType.spa:
-        return AppColors.Spa;
+        return AppColors.spa;
       case BusinessType.cinema:
-        return AppColors.Cinema;
+        return AppColors.cinema;
       case BusinessType.tourism:
-        return AppColors.Tourisme;
+        return AppColors.tourism;
       default:
         return Colors.grey;
     }

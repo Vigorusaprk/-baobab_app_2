@@ -2,10 +2,12 @@ import 'dart:ui';
 import 'package:baobabe_0_2/core/themes/app_colors.dart';
 import 'package:baobabe_0_2/core/themes/app_fonts.dart' show AppFonts;
 import 'package:baobabe_0_2/features/business_detail/domain/entities/menu_restau.dart';
+import 'package:baobabe_0_2/features/business_detail/presentation/bloc/business_detail_bloc.dart';
 import 'package:baobabe_0_2/features/business_detail/presentation/widgets/online_order/page/plat_detail.dart';
 import 'package:baobabe_0_2/features/home_page/data/models/ui_business.dart';
 import 'package:baobabe_0_2/features/home_page/domain/entities/business_entity.dart';
 import 'package:baobabe_0_2/features/order/domain/entities/cart_item.dart';
+import 'package:baobabe_0_2/features/order/domain/entities/order.dart';
 import 'package:baobabe_0_2/features/order/presentation/bloc/cart_bloc.dart';
 import 'package:baobabe_0_2/features/business_detail/presentation/widgets/online_order/page/cart_page.dart';
 import 'package:flutter/material.dart';
@@ -43,7 +45,7 @@ class MenuSection extends StatelessWidget {
       child: DefaultTabController(
         length: categories.length, // OBLIGATOIRE pour synchroniser la TabBar et le TabBarView
         child: Scaffold(
-          backgroundColor: AppColors.scaffoldBackground,
+          backgroundColor: AppColors.canvasBackground,
           body: Column(
             children: [
               Padding(
@@ -54,31 +56,23 @@ class MenuSection extends StatelessWidget {
                     Container(
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        gradient: LinearGradient(
-                          colors: [
-                            AppColors.secondaryLight,
-                            AppColors.secondaryDark,
-                          ],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        ),
+                        border: Border.all(width: 3, color: AppColors.secondary)
                       ),
                       child: IconButton(
                         icon: const Icon(
                           Icons.arrow_back_ios_new_rounded,
-                          color: AppColors.primaryLight,
+                          color: AppColors.secondary,
                         ),
                         onPressed: () => Navigator.pop(context),
                       ),
                     ),
-                    const SizedBox(width: 10),
                     Row(
                       children: [
                         SvgPicture.asset(
                           'assets/icons/delivery-svgrepo-com.svg',
                           height: 35,
                           colorFilter: const ColorFilter.mode(
-                            AppColors.secondaryLight,
+                            AppColors.secondary,
                             BlendMode.srcIn,
                           ),
                         ),
@@ -89,39 +83,40 @@ class MenuSection extends StatelessWidget {
                             fontFamily: 'Poppins',
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
-                            color: AppColors.secondaryLight,
+                            color: AppColors.secondary,
                             decoration: TextDecoration.none,
                           ),
                         ),
                       ],
                     ),
-                    BlocBuilder<CartCubit, CartState>(
+                    BlocBuilder<BusinessDetailBloc, BusinessDetailState>(
                       builder: (context, state) {
-                        final totalItems = context.read<CartCubit>().totalItems;
+                        // Calcul du total des articles via la liste du bloc
+                        final totalItems = state.cartItems.fold(0, (sum, item) => sum + item.quantity);
+
                         return Stack(
                           clipBehavior: Clip.none,
                           children: [
                             Container(
                               decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                gradient: LinearGradient(
-                                  colors: [
-                                    AppColors.secondaryLight,
-                                    AppColors.secondaryDark,
-                                  ],
-                                  begin: Alignment.topLeft,
-                                  end: Alignment.bottomRight,
-                                ),
+                                  shape: BoxShape.circle,
+                                  border: Border.all(width: 3, color: AppColors.secondary)
                               ),
                               child: IconButton(
-                                icon: const Icon(Icons.shopping_cart, color: AppColors.primary,),
+                                icon: SvgPicture.asset(
+                                  "assets/icons/shopping-cart.svg",
+                                  width: 28,
+                                  height: 28,
+                                  colorFilter: const ColorFilter.mode(AppColors.secondary, BlendMode.srcIn),
+                                ),
                                 onPressed: () {
-                                  final cartCubit = context.read<CartCubit>();
+                                  // On récupère le bloc existant
+                                  final bloc = context.read<BusinessDetailBloc>();
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
                                       builder: (context) => BlocProvider.value(
-                                        value: cartCubit,
+                                        value: bloc, // On passe l'instance existante à la nouvelle route
                                         child: CartPage(
                                           restaurantId: restaurantId,
                                           restaurantName: restaurantName,
@@ -138,8 +133,8 @@ class MenuSection extends StatelessWidget {
                                 right: 0.50,
                                 top: 0.50,
                                 child: Container(
-                                  padding: const EdgeInsets.all(5),
-                                  decoration: BoxDecoration(
+                                  padding: const EdgeInsets.all(7),
+                                  decoration: const BoxDecoration(
                                     shape: BoxShape.circle,
                                     color: Colors.red,
                                   ),
@@ -199,7 +194,7 @@ class MenuSection extends StatelessWidget {
           child: Container(
             width: double.infinity,
             decoration: BoxDecoration(
-              color: AppColors.secondaryDark, // Couleur de fond sur toute la TabBar
+              color: AppColors.secondary, // Couleur de fond sur toute la TabBar
               borderRadius: BorderRadius.circular(20),
             ),
             child: TabBar(
@@ -208,8 +203,8 @@ class MenuSection extends StatelessWidget {
               isScrollable: true,
               tabAlignment: TabAlignment.start,
               indicatorColor: Colors.transparent, // Retrait de l'indicateur par défaut
-              labelColor: AppColors.primary, // Couleur du texte actif
-              unselectedLabelColor: AppColors.primaryDark.withOpacity(0.6),
+              labelColor: AppColors.accent50, // Couleur du texte actif
+              unselectedLabelColor: AppColors.accent50,
               labelStyle: const TextStyle(
                 fontFamily: AppFonts.primaryFontFamily,
                 fontSize: 16,
@@ -246,6 +241,7 @@ class MenuSection extends StatelessWidget {
     );
   }
 
+
   Widget _buildMenuItemCard(BuildContext context, MenuItem item) {
     return Material(
       color: Colors.transparent,
@@ -270,43 +266,48 @@ class MenuSection extends StatelessWidget {
           width: 380,
           height: 180,
           decoration: BoxDecoration(
-            color: AppColors.scaffoldBackground,
             borderRadius: BorderRadius.circular(16),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.04),
-                blurRadius: 24,
-                offset: const Offset(0, 8),
+                // 2. Ombre plus prononcée
+                color: Colors.black.withOpacity(0.25),
+                blurRadius: 15,
+                offset: const Offset(0, 6),
               ),
             ],
           ),
           child: ClipRRect(
-            borderRadius: BorderRadius.circular(16), // Ajout pour éviter que l'image ne dépasse les angles de la carte
+            borderRadius: BorderRadius.circular(16),
             child: Stack(
               children: [
+                // Garde les orbes existants
                 _buildBackgroundOrbes(item),
 
+                // 3. Verre dépoli adapté au fond sombre
                 BackdropFilter(
                   filter: ImageFilter.blur(sigmaX: 1.5, sigmaY: 1.5),
                   child: Container(
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.65),
+                      color: Colors.black.withOpacity(0.3), // noir transparent
                       borderRadius: BorderRadius.circular(16),
                       border: Border.all(
-                        color: AppColors.secondaryLight.withOpacity(0.7),
+                        color: Colors.white.withOpacity(0.15), // bordure claire très fine
                         width: 1.5,
                       ),
                     ),
                   ),
                 ),
 
+                // 4. Overlay dégradé subtil sur la gauche (effet de lumière)
                 Container(
-                  decoration: const BoxDecoration( // Ajout du const
-                    borderRadius: BorderRadius.only(topLeft: Radius.circular(16), bottomLeft: Radius.circular(16)),
+                  decoration: const BoxDecoration(
+                    borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(16),
+                        bottomLeft: Radius.circular(16)),
                     gradient: LinearGradient(
                       colors: [
-                        AppColors.secondaryLight,
-                        AppColors.transparent,
+                        Colors.white10, // touche de brillance
+                        Colors.transparent,
                       ],
                       begin: Alignment.centerLeft,
                       end: Alignment.centerRight,
@@ -314,6 +315,7 @@ class MenuSection extends StatelessWidget {
                   ),
                 ),
 
+                // --- CONTENU (structure inchangée, couleurs adaptées) ---
                 Padding(
                   padding: const EdgeInsets.all(20.0),
                   child: Column(
@@ -330,14 +332,14 @@ class MenuSection extends StatelessWidget {
                             style: const TextStyle(
                               fontSize: 24,
                               fontWeight: FontWeight.bold,
-                              color: AppColors.primary,
+                              color: AppColors.accent100, // Blanc
                               height: 1.2,
                             ),
                           ),
                           Text(
                             '${item.price.toStringAsFixed(2)} €',
-                            style: const TextStyle( // Ajout du const
-                              color: AppColors.primary,
+                            style: const TextStyle(
+                              color: AppColors.accent50, // Blanc
                               fontWeight: FontWeight.bold,
                               fontSize: 14,
                             ),
@@ -348,8 +350,8 @@ class MenuSection extends StatelessWidget {
                         item.description,
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
-                        style: const TextStyle( // Ajout du const
-                          color: AppColors.secondaryDark,
+                        style: const TextStyle(
+                          color: AppColors.accent50, // Gris clair
                           fontSize: 13,
                           decoration: TextDecoration.none,
                         ),
@@ -357,59 +359,83 @@ class MenuSection extends StatelessWidget {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Row( // Nettoyage du Container inutile autour du Row
+                          Row(
                             children: [
                               SvgPicture.asset(
                                 "assets/icons/delivery-svgrepo-com.svg",
                                 height: 20,
                                 width: 20,
-                                colorFilter: const ColorFilter.mode( // Ajout du const
-                                  AppColors.primary,
+                                colorFilter: const ColorFilter.mode(
+                                  AppColors.accent50, // Icône blanche
                                   BlendMode.srcIn,
                                 ),
                               ),
                               const SizedBox(width: 4),
                               Text(
                                 "20-30 min",
-                                style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .labelSmall
+                                    ?.copyWith(
                                   fontSize: 12,
-                                  color: AppColors.primary,
+                                  color: AppColors.accent50,
                                 ),
                               ),
                             ],
                           ),
                           const SizedBox(width: 12),
-                          GestureDetector(
-                            onTap: () {
-                              final cart = context.read<CartCubit>();
-                              cart.addItem(CartItem(menuItem: item, quantity: 1));
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text('${item.itemName} ajouté au panier', style: const TextStyle(color: Colors.black)),
-                                  duration: const Duration(seconds: 1),
-                                  behavior: SnackBarBehavior.floating,
-                                  backgroundColor: AppColors.primary,
-                                ),
-                              );
-                            },
+                        GestureDetector(
+                              onTap: () {
+                                // 1. On récupère le bloc existant
+                                final bloc = context.read<BusinessDetailBloc>();
+
+                                // 2. On crée l'objet OrderItem (ajustez selon vos champs si nécessaire)
+                                final newItem = OrderItem(
+                                  menuItemId: item.id.toString(),
+                                  name: item.itemName,
+                                  price: item.price,
+                                  quantity: 1,
+                                );
+
+                                // 3. On déclenche l'événement AddToCart
+                                bloc.add(AddToCart(newItem));
+
+                                // 4. Feedback utilisateur
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(
+                                        '${item.itemName} ajouté au panier',
+                                        style: const TextStyle(color: Colors.black)),
+                                    duration: const Duration(seconds: 1),
+                                    behavior: SnackBarBehavior.floating,
+                                    backgroundColor: AppColors.secondary,
+                                  ),
+                                );
+                              },
                             child: Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 10, vertical: 5),
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(20),
-                                gradient: const LinearGradient( // Ajout du const
+                                // 5. Bouton en dégradé doré pour contraster sur fond sombre
+                                gradient:  LinearGradient(
                                   colors: [
-                                    AppColors.secondaryLight,
-                                    AppColors.secondaryDark,
+                                    AppColors.secondary300,
+                                    AppColors.secondary600,
                                   ],
                                   begin: Alignment.topLeft,
                                   end: Alignment.bottomRight,
                                 ),
                               ),
-                              child: const Row( // Ajout du const
+                              child: const Row(
                                 children: [
-                                  Text("Ajouté au panier", style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.w600)),
+                                  Text(
+                                    "Ajouté au panier",
+                                    style: TextStyle(
+                                        color: Colors.black,
+                                        fontWeight: FontWeight.w600),
+                                  ),
                                   SizedBox(width: 5),
-                                  Icon(Icons.add_shopping_cart, color: AppColors.primary, size: 24),
                                 ],
                               ),
                             ),
@@ -453,15 +479,22 @@ class MenuSection extends StatelessWidget {
   }
 
   Widget _buildPlaceholder() => Container(
+    decoration: BoxDecoration(
+      // 1. NOUVEAU STYLE : Dégradé sombre élégant (comme la carte earnings)
+      gradient: const LinearGradient(
+        colors: [Color(0xFF1E2A3E), Color(0xFF0F172A)],
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+      ),
+    ),
     height: 180,
-    color: Colors.grey[200],
     width: double.infinity,
     child: Stack(
       children: [
         Positioned(
             right: 10,
             bottom: 5,
-            child: const Icon(Icons.fastfood, color: Colors.grey, size:150)
+            child: const Icon(Icons.fastfood, color: Colors.white, size:150)
         ),
       ],
     ),

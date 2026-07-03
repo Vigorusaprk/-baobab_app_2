@@ -7,6 +7,7 @@ class BusinessDetailState extends Equatable {
   final Business? business;
   final BusinessDetailStatus detailStatus;
   final String? detailErrorMessage;
+  final List<OrderItem> cartItems;
 
   final ReservationStatus reservationStatus;
   final String? reservationErrorMessage;
@@ -17,6 +18,7 @@ class BusinessDetailState extends Equatable {
     this.detailErrorMessage,
     this.reservationStatus = ReservationStatus.initial,
     this.reservationErrorMessage,
+    this.cartItems = const [],
   });
 
   BusinessDetailState copyWith({
@@ -25,6 +27,7 @@ class BusinessDetailState extends Equatable {
     String? detailErrorMessage,
     ReservationStatus? reservationStatus,
     String? reservationErrorMessage,
+    List<OrderItem>? cartItems,
   }) {
     return BusinessDetailState(
       business: business ?? this.business,
@@ -32,6 +35,7 @@ class BusinessDetailState extends Equatable {
       detailErrorMessage: detailErrorMessage ?? this.detailErrorMessage,
       reservationStatus: reservationStatus ?? this.reservationStatus,
       reservationErrorMessage: reservationErrorMessage ?? this.reservationErrorMessage,
+      cartItems: cartItems ?? this.cartItems,
     );
   }
 
@@ -42,5 +46,6 @@ class BusinessDetailState extends Equatable {
     detailErrorMessage,
     reservationStatus,
     reservationErrorMessage,
+    cartItems,
   ];
 }

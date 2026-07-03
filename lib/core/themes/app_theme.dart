@@ -73,7 +73,7 @@ class AppTheme {
         vertical: 12,
       ),
       hintStyle: const TextStyle(
-        color: AppColors.grey,
+        color: Colors.grey,
         fontFamily: AppFonts.primaryFontFamily,
       ),
     ),
@@ -81,7 +81,7 @@ class AppTheme {
 
     dividerTheme: const DividerThemeData(
       thickness: AppDimens.THICKNESS_1,
-      color: AppColors.grey,
+      color: Colors.grey,
     ),
   );
 }

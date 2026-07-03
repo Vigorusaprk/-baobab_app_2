@@ -6,6 +6,7 @@ import 'package:baobabe_0_2/features/home_page/domain/entities/business_entity.d
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:baobabe_0_2/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:flutter_svg/svg.dart';
 
 class RestaurantReview extends StatefulWidget {
   final Business business;
@@ -74,7 +75,7 @@ class _RestaurantReviewState extends State<RestaurantReview> {
           children: [
             Container(
               decoration: BoxDecoration(
-                  border: Border.all(width: 2, color: AppColors.secondaryLight),
+                  border: Border.all(width: 2, color: AppColors.accent700),
                   borderRadius: BorderRadius.circular(100)
               ),
               child: Padding(
@@ -103,9 +104,16 @@ class _RestaurantReviewState extends State<RestaurantReview> {
                       ],
                     ),
                     FilledButton.icon(
-                      style: FilledButton.styleFrom(backgroundColor: AppColors.secondaryLight),
+                      style: FilledButton.styleFrom(backgroundColor: AppColors.accent700),
                       onPressed: () => _showReviewDialog(context),
-                      icon: const Icon(Icons.edit),
+                      icon: Container(
+                        child: SvgPicture.asset(
+                          "assets/icons/commen.svg",
+                          width: 28,
+                          height: 28,
+                          colorFilter: ColorFilter.mode(Colors.white, BlendMode.srcIn),
+                        ),
+                      ),
                       label: const Text('Écrire un avis'),
                     ),
                   ],
@@ -228,11 +236,7 @@ class _RestaurantReviewState extends State<RestaurantReview> {
             content: Container(
               width: MediaQuery.of(context).size.width * 0.85,
               decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [AppColors.secondaryLight, AppColors.secondaryDark],
-                ),
+                color: AppColors.accent700,
                 borderRadius: BorderRadius.circular(24),
                 border: Border.all(color: Colors.white.withOpacity(0.4), width: 3.5),
               ),
@@ -243,7 +247,7 @@ class _RestaurantReviewState extends State<RestaurantReview> {
                 children: [
                   Text(
                     'Donner votre avis sur ${widget.business.name}',
-                    style: const TextStyle(color: AppColors.primaryLight, fontSize: 18, fontWeight: FontWeight.bold),
+                    style: const TextStyle(color: AppColors.accent50, fontSize: 18, fontWeight: FontWeight.bold),
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 16),
@@ -276,13 +280,13 @@ class _RestaurantReviewState extends State<RestaurantReview> {
                     children: [
                       TextButton(
                         onPressed: () => Navigator.pop(context),
-                        child: const Text('Annuler', style: TextStyle(color: AppColors.primaryLight)),
+                        child: const Text('Annuler', style: TextStyle(color: AppColors.accent50)),
                       ),
                       const SizedBox(width: 12),
                       ElevatedButton(
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.primaryLight,
-                          foregroundColor: AppColors.secondaryDark,
+                          backgroundColor: AppColors.accent50,
+                          foregroundColor: AppColors.accent900,
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                         ),

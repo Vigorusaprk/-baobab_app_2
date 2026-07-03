@@ -63,7 +63,7 @@ class AppFonts {
     fontFamily: primaryFontFamily,
     fontSize: 12,
     fontWeight: regular,
-    color: AppColors.grey,
+    color: Colors.grey,
   );
 
   // Responsive font sizes

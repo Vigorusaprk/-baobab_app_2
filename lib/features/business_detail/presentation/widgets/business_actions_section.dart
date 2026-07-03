@@ -106,12 +106,20 @@ class BusinessActionSection extends StatelessWidget {
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 20),
-      child: Center(
-        child: Wrap(
-          spacing: 15,
-          runSpacing: 20,
-          alignment: WrapAlignment.center,
-          children: actions,
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(24),
+        ),
+        child: Center(
+          child: Wrap(
+            spacing: 15,
+            runSpacing: 20,
+            alignment: WrapAlignment.center,
+            children: actions,
+          ),
         ),
       ),
     );
@@ -119,7 +127,7 @@ class BusinessActionSection extends StatelessWidget {
 
   Widget _buildActionButton(BuildContext context,
       {required String icon, required String label, required VoidCallback onTap}) {
-    final Color categoryColor = AppColors.secondary;
+    final Color categoryColor = AppColors.accent700;
     return SizedBox(
       width: 100,
       child: Column(

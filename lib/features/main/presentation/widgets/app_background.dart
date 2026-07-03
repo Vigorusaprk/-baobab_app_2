@@ -16,9 +16,9 @@ class authBackground extends StatelessWidget {
           decoration: BoxDecoration(
             gradient: LinearGradient(
               colors: const [
-                AppColors.primaryLight, // beige clair
-                AppColors.primary,      // beige moyen
-                AppColors.primaryDark,  // beige foncé
+                AppColors.canvasBackground, // beige clair
+                AppColors.accent100,      // beige moyen
+                AppColors.accent200,  // beige foncé
               ],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
@@ -85,7 +85,7 @@ class authBackground extends StatelessWidget {
       height: size,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        color: Colors.white.withOpacity(opacity),
+        color: Colors.white,
         boxShadow: [
           BoxShadow(
             color: Colors.white.withOpacity(opacity * 0.6),

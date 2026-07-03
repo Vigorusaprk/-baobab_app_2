@@ -1,3 +1,4 @@
+import 'package:baobabe_0_2/core/themes/app_colors.dart';
 import 'package:baobabe_0_2/features/home_page/domain/entities/business_entity.dart';
 import 'package:flutter/material.dart';
 
@@ -21,13 +22,17 @@ class BusinessSpecificSection extends StatelessWidget {
         children: [
           const Padding(
             padding: EdgeInsets.only(left: 4, bottom: 16),
-            child: Text(
-              "Commodités & Services",
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Color(0xFF254D32),
-              ),
+            child: Row(
+              children: [
+                Text(
+                  "Commodités & Services",
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.accent700,
+                  ),
+                ),
+              ],
             ),
           ),
           // Grille Wrap pour un affichage fluide des badges
@@ -60,7 +65,7 @@ class BusinessSpecificSection extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(feature.icon, size: 18, color: const Color(0xFF254D32)),
+          Icon(feature.icon, size: 18, color: AppColors.accent700),
           const SizedBox(width: 8),
           Text(
             feature.label,

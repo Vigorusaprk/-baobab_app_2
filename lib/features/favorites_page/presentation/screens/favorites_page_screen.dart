@@ -253,7 +253,7 @@ class _FavoritesPageScreenState extends State<FavoritesPageScreen> {
           vertical: AppDimens.PADDING_8,
         ),
         decoration: BoxDecoration(
-          color: isSelected ? AppColors.secondaryLight : AppColors.grey.withOpacity(0.3),
+          color: isSelected ? AppColors.secondaryLight : Colors.grey.withOpacity(0.3),
           borderRadius: BorderRadius.circular(AppDimens.BORDER_RADIUS_20),
           border: isSelected ? Border.all(color: AppColors.primary) : null,
           boxShadow: isSelected
@@ -631,7 +631,7 @@ class _FavoritesPageScreenState extends State<FavoritesPageScreen> {
                                     _getReservationSubtitle(reservation),
                                     style: TextStyle(
                                       fontSize: 14,
-                                      color: AppColors.grey,
+                                      color: Colors.grey,
                                       fontFamily: AppFonts.primaryFontFamily,
                                     ),
                                     maxLines: 1,
@@ -671,7 +671,7 @@ class _FavoritesPageScreenState extends State<FavoritesPageScreen> {
                           IconButton(
                             icon: Icon(
                               Icons.delete_outline,
-                              color: AppColors.grey,
+                              color: Colors.grey,
                               size: 20,
                             ),
                             onPressed: () => _showDeleteDialog(reservation),
@@ -1052,7 +1052,7 @@ class _FavoritesPageScreenState extends State<FavoritesPageScreen> {
       padding: const EdgeInsets.symmetric(vertical: AppDimens.PADDING_4),
       child: Row(
         children: [
-          Icon(icon, size: 16, color: AppColors.grey),
+          Icon(icon, size: 16, color: Colors.grey),
           const SizedBox(width: AppDimens.PADDING_12),
           Expanded(
             child: Text(
@@ -1107,7 +1107,7 @@ class _FavoritesPageScreenState extends State<FavoritesPageScreen> {
 
   Color _getStatusColor(DateTime reservationDate) {
     final now = DateTime.now();
-    if (reservationDate.isBefore(now)) return AppColors.grey;
+    if (reservationDate.isBefore(now)) return Colors.grey;
     if (reservationDate.difference(now).inDays <= 1) return AppColors.warning;
     return AppColors.success;
   }

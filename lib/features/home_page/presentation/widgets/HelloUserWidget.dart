@@ -37,7 +37,7 @@ class HelloUserWidget extends StatelessWidget {
           ),
           child: Container(
             decoration: BoxDecoration(
-              color: AppColors.secondaryLight,
+              color:  AppColors.accent700,
               borderRadius: BorderRadius.all(Radius.circular(20))
             ),
             padding: EdgeInsets.symmetric(horizontal: AppDimens.BORDER_RADIUS_15, vertical: AppDimens.BORDER_RADIUS_20),
@@ -75,7 +75,7 @@ class HelloUserWidget extends StatelessWidget {
                 ),
                 const SizedBox(height: AppDimens.PADDING_4),
                 Text(
-                  "Découvrez de nouveaux endroits !",
+                  "Découvrez des nouveaux endroits !",
                   style: TextStyle(
                     fontFamily: 'Poppins',
                     fontSize: 14,
@@ -135,7 +135,7 @@ class HelloUserWidget extends StatelessWidget {
                     height: 25,
                     width: 25,
                     colorFilter: const ColorFilter.mode(
-                      AppColors.secondary,
+                      AppColors.accent700,
                       BlendMode.srcIn,
                     ),
                   ),
@@ -146,7 +146,7 @@ class HelloUserWidget extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
                         fontFamily: 'Poppins',
-                        color: AppColors.grey,
+                        color: Colors.grey,
                         fontSize: 14,
                       ),
                     ),
@@ -185,7 +185,7 @@ class HelloUserWidget extends StatelessWidget {
               height: 20,
               width: 20,
               colorFilter: const ColorFilter.mode(
-                AppColors.secondary,
+                AppColors.accent700,
                 BlendMode.srcIn,
               ),
             ),
@@ -205,7 +205,7 @@ class HelloUserWidget extends StatelessWidget {
         decoration: BoxDecoration(
           shape: BoxShape.circle,
           border: Border.all(
-            color: AppColors.primary,
+            color:  AppColors.accent100,
             width: 2.5
           ),
           boxShadow: [
