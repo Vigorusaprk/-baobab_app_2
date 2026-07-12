@@ -1,3 +1,4 @@
+import 'package:baobabe_0_2/core/themes/app_colors.dart';
 import 'package:flutter/material.dart';
 
 class Reservation {
@@ -18,33 +19,48 @@ class Reservation {
     required this.reservationDate,
     required this.totalAmount,
     required this.details,
-    required this.createdAt,
-  });
+    DateTime? createdAt,
+  }) : this.createdAt = createdAt ?? DateTime.now();
 
-  factory Reservation.fromMap(Map<String, dynamic> map) {
+  // Correction : factory renommée fromJson pour correspondre à votre service
+  factory Reservation.fromJson(Map<String, dynamic> map) {
     return Reservation(
-      id: map['id'] ?? '',
+      id: (map['id'] ?? '').toString(),
       businessId: map['business_id'] ?? '',
       userId: map['user_id'] ?? '',
       type: map['type'] ?? '',
-      reservationDate: DateTime.parse(map['reservation_date'] ?? DateTime.now().toIso8601String()),
+      reservationDate: map['reservation_date'] != null
+          ? DateTime.parse(map['reservation_date'])
+          : DateTime.now(),
       totalAmount: (map['total_amount'] ?? 0.0).toDouble(),
       details: Map<String, dynamic>.from(map['details'] ?? {}),
-      createdAt: DateTime.parse(map['created_at'] ?? DateTime.now().toIso8601String()),
+      createdAt: map['created_at'] != null
+          ? DateTime.parse(map['created_at'])
+          : DateTime.now(),
     );
   }
 
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
+  /// Méthode pour Supabase
+  /// Si [isNew] est true, l'ID est ignoré pour laisser la BDD s'auto-incrémenter.
+  Map<String, dynamic> toJson({bool isNew = false}) {
+    final Map<String, dynamic> data = {
       'business_id': businessId,
       'user_id': userId,
       'type': type,
       'reservation_date': reservationDate.toIso8601String(),
       'total_amount': totalAmount,
-      'details': details,
+      'details': {
+        ...details,
+        'establishment_name': establishmentName,
+      },
       'created_at': createdAt.toIso8601String(),
     };
+
+    if (!isNew && id.isNotEmpty) {
+      data['id'] = id;
+    }
+
+    return data;
   }
 
   // ========== Getters spécifiques (extraits de `details`) ==========
@@ -171,13 +187,13 @@ class Reservation {
 
   Color get typeColor {
     switch (type) {
-      case 'hotel': return Colors.blue;
-      case 'restaurant': return Colors.orange;
-      case 'car_rental': return Colors.green;
-      case 'travel': return Colors.purple;
-      case 'spa': return Colors.teal;
-      case 'cinema': return Colors.red;
-      case 'toursime': return Colors.amber;
+      case 'hotel': return AppColors.hotel;
+      case 'restaurant': return AppColors.restaurant;
+      case 'car_rental': return AppColors.carRental;
+      case 'travel': return AppColors.travelAgency;
+      case 'spa': return AppColors.spa;
+      case 'cinema': return AppColors.cinema;
+      case 'toursime': return AppColors.tourism;
       default: return Colors.grey;
     }
   }

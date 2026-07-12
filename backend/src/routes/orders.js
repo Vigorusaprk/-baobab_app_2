@@ -49,6 +49,12 @@ function createOrdersRouter({ pool, isBusinessOwner }) {
     try {
       const orders = await pool.query(
         `SELECT o.*, b.name AS establishment_name,
+                json_build_object(
+                  'id', u.id,
+                  'name', u.name,
+                  'email', u.email,
+                  'phone', u.phone
+                ) AS customer,
                 json_agg(json_build_object(
                   'menu_item_id', oi.menu_item_id,
                   'name', mi.item_name,
@@ -58,10 +64,11 @@ function createOrdersRouter({ pool, isBusinessOwner }) {
                 )) as items
          FROM orders o
          LEFT JOIN business b ON o.business_id = b.id
+         LEFT JOIN users u ON o.user_id = u.id
          LEFT JOIN order_items oi ON oi.order_id = o.id
          LEFT JOIN menu_items mi ON oi.menu_item_id = mi.id
          WHERE o.user_id = $1
-         GROUP BY o.id, b.name
+         GROUP BY o.id, b.name, u.id, u.name, u.email, u.phone
          ORDER BY o.created_at DESC`,
         [user_id]
       );
@@ -93,13 +100,16 @@ function createOrdersRouter({ pool, isBusinessOwner }) {
     const { status, page = 1, limit = 20 } = req.query;
     const offset = (page - 1) * limit;
     try {
-      let query = 'SELECT * FROM orders WHERE business_id = $1';
+      let query = `SELECT o.*, json_build_object('id', u.id, 'name', u.name, 'email', u.email, 'phone', u.phone) AS customer
+                   FROM orders o
+                   LEFT JOIN users u ON o.user_id = u.id
+                   WHERE o.business_id = $1`;
       const params = [businessId];
       if (status) {
-        query += ' AND status = $2';
+        query += ' AND o.status = $2';
         params.push(status);
       }
-      query += ' ORDER BY created_at DESC LIMIT $' + (params.length + 1) + ' OFFSET $' + (params.length + 2);
+      query += ' ORDER BY o.created_at DESC LIMIT $' + (params.length + 1) + ' OFFSET $' + (params.length + 2);
       params.push(limit, offset);
       const result = await pool.query(query, params);
       const countResult = await pool.query('SELECT COUNT(*) FROM orders WHERE business_id = $1', [businessId]);

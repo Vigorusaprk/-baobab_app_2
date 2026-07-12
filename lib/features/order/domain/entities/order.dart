@@ -91,10 +91,15 @@ class OrderItem {
   }
 
   factory OrderItem.fromMap(Map<String, dynamic> map) {
+    final menuItem = map['menu_items'] is Map ? map['menu_items'] as Map<String, dynamic> : null;
     return OrderItem(
-      menuItemId: map['menu_item_id']?.toString() ?? '',
-      name: map['name']?.toString() ?? map['item_name']?.toString() ?? '',
-      price: _toDouble(map['unit_price']) ?? 0.0,
+      menuItemId: map['menu_item_id']?.toString() ?? menuItem?['id']?.toString() ?? '',
+      name: map['name']?.toString() ??
+          map['item_name']?.toString() ??
+          menuItem?['item_name']?.toString() ??
+          menuItem?['name']?.toString() ??
+          '',
+      price: _toDouble(map['unit_price'] ?? map['price'] ?? menuItem?['price']) ?? 0.0,
       quantity: _toInt(map['quantity']) ?? 0,
       specialInstructions: map['special_instructions']?.toString(),
     );
@@ -107,6 +112,10 @@ class Order {
   final String id;
   final String establishmentId;
   final String establishmentName;
+  final String? customerId;
+  final String? customerName;
+  final String? customerEmail;
+  final String? customerPhone;
   final BusinessType? establishmentType;
   final DateTime orderDate;
   final List<OrderItem> items;
@@ -123,6 +132,10 @@ class Order {
     required this.id,
     required this.establishmentId,
     required this.establishmentName,
+    this.customerId,
+    this.customerName,
+    this.customerEmail,
+    this.customerPhone,
     this.establishmentType,
     required this.orderDate,
     required this.items,
@@ -159,13 +172,28 @@ class Order {
     try {
       // Items
       List<OrderItem> itemsList = [];
-      if (map['items'] is List) {
-        itemsList = (map['items'] as List)
+      final dynamic itemsValue = map['items'] ?? map['order_items'];
+      if (itemsValue is List) {
+        itemsList = itemsValue
             .where((item) => item != null)
-            .map((item) => OrderItem.fromMap(item as Map<String, dynamic>))
+            .map((item) {
+              if (item is Map<String, dynamic>) {
+                return OrderItem.fromMap(item);
+              }
+              return OrderItem.fromMap(Map<String, dynamic>.from(item as Map));
+            })
             .toList();
-      } else if (map['items'] != null) {
-        print('items n\'est pas une liste: ${map['items']}');
+      } else if (itemsValue is Map<String, dynamic>) {
+        itemsList = [OrderItem.fromMap(itemsValue)];
+      } else if (itemsValue != null) {
+        final normalized = _normalizeToList(itemsValue);
+        if (normalized != null) {
+          itemsList = normalized
+              .map((item) => OrderItem.fromMap(item))
+              .toList();
+        } else {
+          print('Order.fromMap: items n\'est pas une liste: $itemsValue');
+        }
       }
 
       // Calcul du sous‑total si non fourni
@@ -177,15 +205,18 @@ class Order {
       return Order(
         id: map['id']?.toString() ?? '',
         establishmentId: map['business_id']?.toString() ?? '',
-        establishmentName: map['establishment_name']?.toString() ?? '',
-        establishmentType: map['establishment_type'] != null
-            ? BusinessType.values[map['establishment_type'] as int]
-            : null,
-        orderDate: DateTime.tryParse(map['order_date']?.toString() ?? '') ?? DateTime.now(),
+        establishmentName: map['establishment_name']?.toString() ?? map['business_name']?.toString() ?? map['name']?.toString() ?? '',
+        customerId: map['customer'] is Map ? map['customer']['id']?.toString() : map['user_id']?.toString(),
+        customerName: map['customer'] is Map ? map['customer']['name']?.toString() : map['customer_name']?.toString(),
+        customerEmail: map['customer'] is Map ? map['customer']['email']?.toString() : null,
+        customerPhone: map['customer'] is Map ? map['customer']['phone']?.toString() : null,
+        establishmentType: _parseBusinessType(map['establishment_type']),
+        orderDate: DateTime.tryParse(map['order_date']?.toString() ?? map['created_at']?.toString() ?? '') ?? DateTime.now(),
         items: itemsList,
         subtotal: _toDouble(map['subtotal']) ?? computedSubtotal,
         tax: _toDouble(map['tax']) ?? 0.0,
-        totalAmount: _toDouble(map['total_amount']) ?? 0.0,
+        // Support databases that use either `total_amount` or `total_price`
+        totalAmount: _toDouble(map['total_amount'] ?? map['total_price']) ?? 0.0,
         status: _parseOrderStatus(map['status']),
         notes: map['notes']?.toString(),
         deliveryAddress: map['delivery_address']?.toString(),
@@ -202,43 +233,151 @@ class Order {
 
   String get typeName {
     switch (establishmentType) {
-      case 'hotel': return 'Hôtel';
-      case 'car_rental': return 'Location de véhicule';
-      case 'travel': return 'Voyage en bus';
-      case 'spa': return 'Spa & Bien-être';
-      case 'cinema': return 'Cinéma';
-      case 'toursime': return 'Tourisme';
-      case 'restaurant': return 'Restaurant';
-      default: return 'Business';
+      case BusinessType.hotel:
+        return 'Hôtel';
+      case BusinessType.carRental:
+        return 'Location de véhicule';
+      case BusinessType.travelAgency:
+        return 'Voyage en bus';
+      case BusinessType.spa:
+        return 'Spa & Bien-être';
+      case BusinessType.cinema:
+        return 'Cinéma';
+      case BusinessType.tourism:
+        return 'Tourisme';
+      case BusinessType.restaurant:
+        return 'Restaurant';
+      case BusinessType.fastFood:
+        return 'Fast Food';
+      case BusinessType.shopping:
+        return 'Shopping';
+      case BusinessType.mall:
+        return 'Centre Commercial';
+      case BusinessType.other:
+        return 'Business';
+      default:
+        return 'Business';
     }
+  }
+
+  static List<Map<String, dynamic>>? _normalizeToList(dynamic value) {
+    if (value is List) {
+      return value
+          .where((item) => item is Map)
+          .map((item) => Map<String, dynamic>.from(item as Map))
+          .toList();
+    }
+    return null;
   }
 
 
   IconData get typeIcon {
     switch (establishmentType) {
-      case 'hotel': return Icons.hotel;
-      case 'car_rental': return Icons.directions_car;
-      case 'travel': return Icons.directions_bus;
-      case 'spa': return Icons.spa;
-      case 'cinema': return Icons.movie;
-      case 'toursime': return Icons.tour;
-      case 'restaurant': return Icons.restaurant;
-      default: return Icons.business;
+      case BusinessType.hotel:
+        return Icons.hotel;
+      case BusinessType.carRental:
+        return Icons.directions_car;
+      case BusinessType.travelAgency:
+        return Icons.directions_bus;
+      case BusinessType.spa:
+        return Icons.spa;
+      case BusinessType.cinema:
+        return Icons.movie;
+      case BusinessType.tourism:
+        return Icons.tour;
+      case BusinessType.restaurant:
+        return Icons.restaurant;
+      case BusinessType.fastFood:
+        return Icons.fastfood;
+      case BusinessType.shopping:
+        return Icons.store;
+      case BusinessType.mall:
+        return Icons.apartment;
+      case BusinessType.other:
+        return Icons.business;
+      default:
+        return Icons.business;
     }
   }
 
   Color get typeColor {
     switch (establishmentType) {
-      case 'hotel': return AppColors.hotel;
-      case 'car_rental': return AppColors.carRental;
-      case 'travel': return  AppColors.travelAgency;
-      case 'spa': return AppColors.spa;
-      case 'cinema': return AppColors.cinema;
-      case 'toursime': return AppColors.tourism;
-      case 'restaurant': return AppColors.restaurant;
-      default: return Colors.grey;
+      case BusinessType.hotel:
+        return AppColors.hotel;
+      case BusinessType.carRental:
+        return AppColors.carRental;
+      case BusinessType.travelAgency:
+        return AppColors.travelAgency;
+      case BusinessType.spa:
+        return AppColors.spa;
+      case BusinessType.cinema:
+        return AppColors.cinema;
+      case BusinessType.tourism:
+        return AppColors.tourism;
+      case BusinessType.restaurant:
+        return AppColors.restaurant;
+      case BusinessType.fastFood:
+        return AppColors.fastFood;
+      case BusinessType.shopping:
+        return AppColors.shopping;
+      case BusinessType.mall:
+        return AppColors.mall;
+      case BusinessType.other:
+        return Colors.grey;
+      default:
+        return Colors.grey;
     }
   }
+}
+
+BusinessType? _parseBusinessType(dynamic value) {
+  if (value == null) return null;
+  if (value is int) {
+    if (value >= 0 && value < BusinessType.values.length) {
+      return BusinessType.values[value];
+    }
+  }
+
+  if (value is String) {
+    final normalized = value.trim().toLowerCase();
+    for (final type in BusinessType.values) {
+      if (type.name.toLowerCase() == normalized) {
+        return type;
+      }
+    }
+
+    switch (normalized) {
+      case 'car_rental':
+      case 'car rental':
+        return BusinessType.carRental;
+      case 'travel_agency':
+      case 'travel agency':
+      case 'travel':
+        return BusinessType.travelAgency;
+      case 'fast_food':
+      case 'fast food':
+        return BusinessType.fastFood;
+      case 'shopping':
+        return BusinessType.shopping;
+      case 'mall':
+        return BusinessType.mall;
+      case 'hotel':
+        return BusinessType.hotel;
+      case 'cinema':
+        return BusinessType.cinema;
+      case 'spa':
+        return BusinessType.spa;
+      case 'tourism':
+      case 'toursime':
+        return BusinessType.tourism;
+      case 'restaurant':
+        return BusinessType.restaurant;
+      default:
+        return BusinessType.other;
+    }
+  }
+
+  return null;
 }
 
 

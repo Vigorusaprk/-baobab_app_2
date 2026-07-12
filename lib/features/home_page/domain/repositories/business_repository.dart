@@ -1,5 +1,5 @@
 import 'package:baobabe_0_2/features/business_detail/domain/entities/menu_restau.dart';
-import 'package:baobabe_0_2/features/favorites_page/data/models/reservation_model.dart';
+import 'package:baobabe_0_2/features/booking_page/data/models/reservation_model.dart';
 import 'package:baobabe_0_2/features/home_page/domain/entities/business_entity.dart';
 
 abstract class BusinessRepository {

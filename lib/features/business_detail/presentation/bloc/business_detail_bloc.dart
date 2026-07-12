@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:baobabe_0_2/features/favorites_page/data/models/reservation_model.dart';
+import 'package:baobabe_0_2/features/booking_page/data/models/reservation_model.dart';
 import 'package:baobabe_0_2/features/home_page/domain/entities/business_entity.dart';
 import 'package:baobabe_0_2/features/home_page/domain/repositories/business_repository.dart';
 import 'package:baobabe_0_2/features/order/domain/entities/order.dart';

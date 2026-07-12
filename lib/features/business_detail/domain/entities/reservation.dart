@@ -12,6 +12,8 @@ class Reservation {
   final String? notes;
   final double totalAmount;
   final DateTime reservationDate;
+  final String? userId;
+  final DateTime? createdAt;
 
   // Restaurant
   final String? tableNumber;
@@ -72,6 +74,8 @@ class Reservation {
     this.notes,
     required this.totalAmount,
     required this.reservationDate,
+    this.userId,
+    this.createdAt,
 
     // Restaurant
     this.tableNumber,
@@ -123,7 +127,7 @@ class Reservation {
   });
 
   // Convertit l'objet en Map JSON pour l'envoi vers l'API / PostgreSQL
-  Map<String, dynamic> toJson() {
+  Map<String, dynamic> toJson({bool isNew = false}) {
     Map<String, dynamic> details = {};
 
     switch (reservationType) {
@@ -183,18 +187,35 @@ class Reservation {
         break;
     }
 
-    return {
-      'id': id,
+    final payload = <String, dynamic>{
       'business_id': businessId,
-      'establishment_name': establishmentName,
       'type': reservationType,
-      'customer_name': customerName,
-      'phone_number': phoneNumber,
-      'notes': notes,
       'total_amount': totalAmount,
       'reservation_date': reservationDate.toIso8601String(),
-      'details': details,
+      'details': {
+        ...details,
+        'establishment_name': establishmentName,
+        'customer_name': customerName,
+        'phone_number': phoneNumber,
+        'notes': notes,
+      },
     };
+
+    final _userId = userId;
+    if (_userId != null && _userId.isNotEmpty) {
+      payload['user_id'] = _userId;
+    }
+
+    if (!isNew && id.isNotEmpty) {
+      payload['id'] = id;
+    }
+
+    final _createdAt = createdAt;
+    if (!isNew && _createdAt != null) {
+      payload['created_at'] = _createdAt.toIso8601String();
+    }
+
+    return payload;
   }
 
   // Compatibility getters used across the app
@@ -224,19 +245,19 @@ class Reservation {
   Color get typeColor {
     switch (reservationType) {
       case 'hotel':
-        return AppColors.primary;
+        return AppColors.hotel;
       case 'restaurant':
-        return Colors.orange;
+        return AppColors.restaurant;
       case 'car_rental':
-        return Colors.green;
+        return AppColors.carRental;
       case 'travel':
-        return Colors.purple;
+        return AppColors.travelAgency;
       case 'spa':
-        return Colors.teal;
+        return AppColors.spa;
       case 'cinema':
-        return Colors.red;
+        return AppColors.cinema;
       case 'toursime':
-        return Colors.amber;
+        return AppColors.tourism;
       default:
         return Colors.grey;
     }
@@ -279,6 +300,11 @@ class Reservation {
     final details = json['details'] as Map<String, dynamic>? ?? {};
     final type = json['type']?.toString() ?? '';
 
+    // Récupération de la date de réservation principale
+    final DateTime mainResDate = json['reservation_date'] != null
+        ? DateTime.parse(json['reservation_date'].toString())
+        : DateTime.now();
+
     TimeOfDay? parsedTime;
     if (details['time'] != null) {
       final parts = details['time'].toString().split(':');
@@ -288,27 +314,44 @@ class Reservation {
           minute: int.tryParse(parts[1]) ?? 0,
         );
       }
+    } else {
+      // Fallback sur l'heure de la date principale
+      parsedTime = TimeOfDay(hour: mainResDate.hour, minute: mainResDate.minute);
+    }
+
+    var establishmentName = (json['establishment_name']?.toString() ?? '').isNotEmpty
+        ? json['establishment_name'].toString()
+        : (json['business'] is Map ? json['business']['name']?.toString() ?? '' : '');
+
+    if (establishmentName.isEmpty) {
+      establishmentName = details['establishment_name']?.toString() ?? 
+                         details['establishmentName']?.toString() ?? '';
     }
 
     return Reservation(
       id: json['id']?.toString() ?? '',
       businessId: json['business_id']?.toString(),
-      establishmentName: json['establishment_name']?.toString() ?? '',
+      establishmentName: establishmentName,
       reservationType: type,
-      customerName: json['customer_name']?.toString() ?? '',
-      phoneNumber: json['phone_number']?.toString() ?? '',
-      notes: json['notes']?.toString(),
+      customerName: json['customer_name']?.toString() ?? 
+                    details['customer_name']?.toString() ?? 
+                    details['fullName']?.toString() ?? '',
+      phoneNumber: json['phone_number']?.toString() ?? 
+                   json['phone']?.toString() ?? 
+                   details['phone']?.toString() ?? 
+                   details['phone_number']?.toString() ?? '',
+      notes: json['notes']?.toString() ?? details['notes']?.toString(),
       totalAmount: (json['total_amount'] as num?)?.toDouble() ?? 0.0,
-      reservationDate: json['reservation_date'] != null
-          ? DateTime.parse(json['reservation_date'].toString())
-          : DateTime.now(),
+      userId: json['user_id']?.toString(),
+      createdAt: json['created_at'] != null ? DateTime.tryParse(json['created_at'].toString()) : null,
+      reservationDate: mainResDate,
 
       // Restaurant
-      tableNumber: details['table_number']?.toString(),
+      tableNumber: details['table_number']?.toString() ?? details['selectedTable']?.toString(),
       floor: details['floor']?.toString(),
-      date: details['date'] != null ? DateTime.tryParse(details['date'].toString()) : null,
+      date: details['date'] != null ? DateTime.tryParse(details['date'].toString()) : mainResDate,
       time: parsedTime,
-      numberOfPeople: details['number_of_people'] as int?,
+      numberOfPeople: details['number_of_people'] as int? ?? details['guests'] as int? ?? details['numberOfPeople'] as int?,
 
       // Hôtel
       roomType: details['room_type']?.toString(),

@@ -17,8 +17,8 @@ import 'package:baobabe_0_2/features/auth/presentation/screens/forgot_password_s
 import 'package:baobabe_0_2/features/main/presentation/screens/main_screen.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/screens/home_page_screen.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/screens/search_page.dart';
-import 'package:baobabe_0_2/features/favorites_page/presentation/screens/favorites_page_screen.dart';
-import 'package:baobabe_0_2/features/favorites_page/presentation/screens/boking_detail_screen.dart';
+import 'package:baobabe_0_2/features/booking_page/presentation/screens/favorites_page_screen.dart';
+import 'package:baobabe_0_2/features/booking_page/presentation/screens/boking_detail_screen.dart';
 import 'package:baobabe_0_2/features/order/presentation/screens/order_screen.dart';
 import 'package:baobabe_0_2/features/order/presentation/screens/order_detail_page.dart';
 import 'package:baobabe_0_2/features/settings/presentation/screens/settings_screen.dart';

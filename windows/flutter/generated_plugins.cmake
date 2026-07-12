@@ -4,8 +4,8 @@
 
 list(APPEND FLUTTER_PLUGIN_LIST
   app_links
+  connectivity_plus
   flutter_localization
-  passkeys_windows
   share_plus
   url_launcher_windows
 )

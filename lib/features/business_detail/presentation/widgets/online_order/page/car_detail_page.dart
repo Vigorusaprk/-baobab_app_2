@@ -3,17 +3,19 @@ import 'package:baobabe_0_2/features/auth/presentation/bloc/auth_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:baobabe_0_2/features/auth/presentation/bloc/auth_bloc.dart';
-import 'package:baobabe_0_2/features/favorites_page/data/models/reservation_service.dart';
+import 'package:baobabe_0_2/features/booking_page/data/models/reservation_service.dart';
 import 'package:baobabe_0_2/core/constants/injector.dart';
 import 'package:baobabe_0_2/features/order/data/models/vehicle_model.dart';
 
 class CarDetailPage extends StatefulWidget {
   final String businessId;
+  final String? businessName;
   final Vehicle vehicle;
 
   const CarDetailPage({
     super.key,
     required this.businessId,
+    this.businessName,
     required this.vehicle,
   });
 
@@ -112,6 +114,7 @@ class _CarDetailPageState extends State<CarDetailPage> {
         reservationDate: DateTime.now(),
         totalAmount: totalAmount,
         details: details,
+        establishmentName: widget.businessName,
       );
 
       if (mounted) {

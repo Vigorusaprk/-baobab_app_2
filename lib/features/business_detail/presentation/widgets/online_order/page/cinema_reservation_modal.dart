@@ -3,7 +3,7 @@ import 'package:baobabe_0_2/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:baobabe_0_2/features/auth/presentation/bloc/auth_state.dart';
 import 'package:baobabe_0_2/features/business_detail/domain/entities/movie.dart';
 import 'package:baobabe_0_2/features/business_detail/presentation/bloc/business_detail_bloc.dart';
-import 'package:baobabe_0_2/features/favorites_page/data/models/reservation_model.dart';
+import 'package:baobabe_0_2/features/booking_page/data/models/reservation_model.dart';
 import 'package:baobabe_0_2/features/home_page/domain/entities/business_entity.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -98,6 +98,7 @@ class _CinemaReservationModalState extends State<CinemaReservationModal> {
         'customer_name': _fullNameController.text.trim(),
         'phone': _phoneController.text.trim(),
         'notes': _notesController.text.trim().isEmpty ? null : _notesController.text.trim(),
+        'establishment_name': widget.cinema.name,
       },
     );
 

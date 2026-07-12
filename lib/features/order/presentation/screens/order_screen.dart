@@ -1,3 +1,4 @@
+import 'package:baobabe_0_2/features/main/presentation/widgets/app_background.dart';
 import 'package:baobabe_0_2/features/order/presentation/widgets/order_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -98,7 +99,7 @@ class _OrderScreenState extends State<OrderScreen> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-    return MainBackground(
+    return authBackground(
       child: Scaffold(
         backgroundColor: Colors.transparent,
         body: Column(

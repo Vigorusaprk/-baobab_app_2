@@ -13,6 +13,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 
 import 'core/routes/app_router.dart';
+import 'core/services/sync_service.dart';
 import 'features/home_page/presentation/bloc/search_bloc.dart';
 import 'features/settings/presentation/bloc/settings_bloc.dart';
 
@@ -24,6 +25,9 @@ void main() async {
   // Initialisation asynchrone des configurations globales[cite: 4]
   await SupabaseClientWrapper.initialize();
   Injector.setup();
+
+  // Démarrer le SyncManager pour écouter la connectivité
+  Injector.get<SyncManager>();
 
   runApp(const MyApp());
 }

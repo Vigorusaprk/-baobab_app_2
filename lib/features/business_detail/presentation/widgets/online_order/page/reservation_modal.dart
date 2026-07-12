@@ -2,7 +2,7 @@ import 'package:baobabe_0_2/core/themes/app_colors.dart';
 import 'package:baobabe_0_2/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:baobabe_0_2/features/auth/presentation/bloc/auth_state.dart';
 import 'package:baobabe_0_2/features/business_detail/presentation/bloc/business_detail_bloc.dart';
-import 'package:baobabe_0_2/features/favorites_page/data/models/reservation_model.dart';
+import 'package:baobabe_0_2/features/booking_page/data/models/reservation_model.dart';
 import 'package:baobabe_0_2/features/home_page/domain/entities/business_entity.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -145,7 +145,6 @@ class _ReservationModalState extends State<ReservationModal> {
   Future<void> _saveReservation() async {
     setState(() => _isLoading = true);
 
-    // Récupérer l'utilisateur connecté
     final authState = context.read<AuthBloc>().state;
     if (authState is! AuthenticatedState) {
       _showSnackBar('Veuillez vous connecter');
@@ -153,15 +152,25 @@ class _ReservationModalState extends State<ReservationModal> {
       return;
     }
 
+    // --- CORRECTION ICI : Vérification de la nullité ---
+    final selectedDate = _data.date;
+    final selectedTime = _data.time;
+
+    if (selectedDate == null || selectedTime == null) {
+      _showSnackBar('Veuillez sélectionner une date et une heure');
+      setState(() => _isLoading = false);
+      return;
+    }
+
     final userId = authState.user.id;
 
-    // Construire la date/heure complète
+    // Maintenant, Dart sait que ces valeurs ne sont pas nulles
     final fullDateTime = DateTime(
-      _data.date!.year,
-      _data.date!.month,
-      _data.date!.day,
-      _data.time!.hour,
-      _data.time!.minute,
+      selectedDate.year,
+      selectedDate.month,
+      selectedDate.day,
+      selectedTime.hour,
+      selectedTime.minute,
     );
 
     final reservation = Reservation(
@@ -170,33 +179,28 @@ class _ReservationModalState extends State<ReservationModal> {
       userId: userId,
       type: 'restaurant',
       reservationDate: fullDateTime,
-      createdAt: DateTime.now(),
       totalAmount: _data.grandTotal,
       details: {
         "table_number": _data.selectedTable ?? "Non spécifiée",
         "floor": _selectedFloor,
         "customer_name": _fullNameController.text,
-        "phone": _phoneController.text,
-        "date": _data.date!.toIso8601String(),
-        "time": "${_data.time!.hour}:${_data.time!.minute}",
-        "guests": int.tryParse(_peopleController.text) ?? 1,
+        "phone_number": _phoneController.text,
+        "number_of_people": int.tryParse(_peopleController.text) ?? 1,
+        "date": selectedDate.toIso8601String(),
+        "time": "${selectedTime.hour}:${selectedTime.minute}",
         "notes": _notesController.text.isNotEmpty ? _notesController.text : null,
+        "establishment_name": widget.business.name,
       },
+      createdAt: DateTime.now(),
     );
 
     try {
       context.read<BusinessDetailBloc>().add(MakeReservation(reservation));
       Navigator.pop(context);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Réservation confirmée pour la table ${_data.selectedTable} chez ${widget.business.name}!'),
-          backgroundColor: Colors.green,
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
+      _showSnackBar('Réservation confirmée !');
     } catch (e) {
       print("Erreur lors de la réservation: $e");
-      _showSnackBar('Erreur lors de la réservation: $e');
+      _showSnackBar('Erreur: $e');
     } finally {
       setState(() => _isLoading = false);
     }

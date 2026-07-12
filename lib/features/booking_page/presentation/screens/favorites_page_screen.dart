@@ -1,6 +1,8 @@
+import 'dart:async';
+
 import 'package:baobabe_0_2/features/auth/presentation/bloc/auth_state.dart';
 import 'package:baobabe_0_2/features/business_detail/domain/entities/reservation.dart';
-import 'package:baobabe_0_2/features/favorites_page/data/models/reservation_service.dart';
+import 'package:baobabe_0_2/features/booking_page/data/models/reservation_service.dart';
 import 'package:baobabe_0_2/core/constants/injector.dart';
 import 'package:baobabe_0_2/features/main/presentation/widgets/app_background.dart';
 import 'package:flutter/material.dart';
@@ -24,15 +26,31 @@ class _FavoritesPageScreenState extends State<FavoritesPageScreen> {
   List<Reservation> _allReservations = [];
   List<Reservation> _displayedReservations = [];
   bool _isLoading = true;
+  bool _hasLoadedReservations = false;
   String _selectedFilter = 'Tous';
   String _userId = "";
   late final ReservationApiService _apiService = Injector.get<ReservationApiService>();
+  StreamSubscription<AuthState>? _authSubscription;
 
   @override
   void initState() {
     super.initState();
     _selectedFilter = 'Tous';
+    _authSubscription = context.read<AuthBloc>().stream.listen((state) {
+      if (state is AuthenticatedState) {
+        if (_userId != state.user.id || !_hasLoadedReservations) {
+          _userId = state.user.id;
+          _loadReservations();
+        }
+      }
+    });
     WidgetsBinding.instance.addPostFrameCallback((_) => _loadUserId());
+  }
+
+  @override
+  void dispose() {
+    _authSubscription?.cancel();
+    super.dispose();
   }
 
   Future<void> _loadUserId() async {
@@ -40,6 +58,10 @@ class _FavoritesPageScreenState extends State<FavoritesPageScreen> {
     if (authState is AuthenticatedState) {
       _userId = authState.user.id;
       await _loadReservations();
+    } else if (authState is AuthLoadingState || authState is AuthInitialState) {
+      setState(() {
+        _isLoading = true;
+      });
     } else {
       context.go('/login');
     }
@@ -48,46 +70,68 @@ class _FavoritesPageScreenState extends State<FavoritesPageScreen> {
   Future<void> _loadReservations() async {
     setState(() => _isLoading = true);
     try {
-      final reservations = await _apiService.getReservations(userId: _userId);
-      print('📦 Nombre total de réservations : ${reservations.length}');
-      for (var r in reservations) {
-        print('  - Type: ${r.time}, Établissement: ${r.establishmentName}');
+      final authState = context.read<AuthBloc>().state;
+      if (authState is! AuthenticatedState) {
+        print('FavoritesPageScreen._loadReservations skipped: authState=${authState.runtimeType}');
+        return;
       }
-      setState(() {
-        _allReservations = reservations;
-        _displayedReservations = reservations;
-      });
+
+      _userId = authState.user.id;
+      print('FavoritesPageScreen._loadReservations: authState=AuthenticatedState, userId=$_userId');
+
+      final reservations = await _apiService.getReservations(userId: _userId);
+      print('📦 Chargement réussi. Nombre de réservations reçues : ${reservations.length}');
+
+      for (var r in reservations) {
+        print('  - ID: ${r.id}, Type brut: "${r.type}", Établissement: ${r.establishmentName}');
+      }
+
+      if (mounted) {
+        setState(() {
+          _allReservations = reservations;
+          _displayedReservations = reservations;
+          _hasLoadedReservations = true;
+        });
+      }
     } catch (e) {
-      print('❌ Erreur chargement : $e');
+      print('❌ Erreur critique lors du chargement : $e');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Erreur : $e'), backgroundColor: Colors.red),
         );
       }
     } finally {
-      setState(() => _isLoading = false);
+      if (mounted) setState(() => _isLoading = false);
     }
   }
 
-  void _filterReservations(String type) {
+  void _filterReservations(String filterName) {
     setState(() {
-      _selectedFilter = type;
-      if (type == 'Tous') {
+      _selectedFilter = filterName;
+
+      if (filterName == 'Tous') {
         _displayedReservations = _allReservations;
-      } else if (type == 'Hôtels') {
-        _displayedReservations = _allReservations.where((r) => r.type == 'hotel').toList();
-      } else if (type == 'Restaurants') {
-        _displayedReservations = _allReservations.where((r) => r.type == 'restaurant').toList();
-      } else if (type == 'Locations') {
-        _displayedReservations = _allReservations.where((r) => r.type == 'car_rental').toList();
-      } else if (type == 'Voyages') {
-        _displayedReservations = _allReservations.where((r) => r.type == 'travel').toList();
-      } else if (type == 'Spas') {
-        _displayedReservations = _allReservations.where((r) => r.type == 'spa').toList();
-      } else if (type == 'Cinémas') {
-        _displayedReservations = _allReservations.where((r) => r.type == 'cinema').toList();
-      } else if (type == 'Tourisme') {
-        _displayedReservations = _allReservations.where((r) => r.type == 'toursime').toList();
+      } else {
+        // Mapping des noms cliqués (labels) vers les types réels stockés dans Supabase
+        // Attention : vérifiez bien l'orthographe dans votre base (ex: 'toursime' vs 'tourisme')
+        final typeMap = {
+          'Hôtels': 'hotel',
+          'Restaurants': 'restaurant',
+          'Locations': 'car_rental',
+          'Voyages': 'travel',
+          'Spas': 'spa',
+          'Cinémas': 'cinema',
+          'Tourisme': 'toursime',
+        };
+
+        final targetType = typeMap[filterName];
+
+        _displayedReservations = _allReservations.where((r) {
+          return r.type.toLowerCase() == targetType?.toLowerCase();
+        }).toList();
+
+        print('🔍 Filtrage pour $filterName (type cible: $targetType). '
+            'Trouvés : ${_displayedReservations.length}');
       }
     });
   }
@@ -151,10 +195,20 @@ class _FavoritesPageScreenState extends State<FavoritesPageScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return authBackground(
-      child: Scaffold(
-        backgroundColor: Colors.transparent,
-        body: Column(
+    return BlocListener<AuthBloc, AuthState>(
+      listenWhen: (previous, current) {
+        return current is AuthenticatedState && _userId.isEmpty;
+      },
+      listener: (context, state) {
+        if (state is AuthenticatedState) {
+          _userId = state.user.id;
+          _loadReservations();
+        }
+      },
+      child: authBackground(
+        child: Scaffold(
+          backgroundColor: Colors.transparent,
+          body: Column(
           children: [
             Padding(
               padding: const EdgeInsets.fromLTRB(20, 55, 20, 20),
@@ -164,7 +218,7 @@ class _FavoritesPageScreenState extends State<FavoritesPageScreen> {
                     'assets/icons/calendar-date-svgrepo-com (1).svg',
                     height: 35,
                     colorFilter: ColorFilter.mode(
-                      AppColors.secondaryLight,
+                      AppColors.accent700,
                       BlendMode.srcIn,
                     ),
                   ),
@@ -175,7 +229,7 @@ class _FavoritesPageScreenState extends State<FavoritesPageScreen> {
                       fontFamily: AppFonts.primaryFontFamily,
                       fontSize: 24,
                       fontWeight: AppFonts.bold,
-                      color: AppColors.secondaryLight,
+                      color: AppColors.accent700,
                     ),
                   ),
                   const Spacer(),
@@ -187,12 +241,12 @@ class _FavoritesPageScreenState extends State<FavoritesPageScreen> {
                       ),
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: AppColors.secondaryLight,
+                        color: AppColors.accent700,
                       ),
                       child: Text(
                         '${_allReservations.length}',
                         style: TextStyle(
-                          color: AppColors.primary,
+                          color: AppColors.accent50,
                           fontWeight: AppFonts.semiBold,
                           fontSize: 14,
                           fontFamily: 'Poppins',
@@ -240,8 +294,9 @@ class _FavoritesPageScreenState extends State<FavoritesPageScreen> {
           ],
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 
   Widget _buildFilterChip(String label, VoidCallback onTap) {
     final isSelected = _selectedFilter == label;
@@ -253,9 +308,8 @@ class _FavoritesPageScreenState extends State<FavoritesPageScreen> {
           vertical: AppDimens.PADDING_8,
         ),
         decoration: BoxDecoration(
-          color: isSelected ? AppColors.secondaryLight : Colors.grey.withOpacity(0.3),
+          color: isSelected ? AppColors.accent500 : AppColors.accent.withOpacity(0.3),
           borderRadius: BorderRadius.circular(AppDimens.BORDER_RADIUS_20),
-          border: isSelected ? Border.all(color: AppColors.primary) : null,
           boxShadow: isSelected
               ? [
             BoxShadow(
@@ -272,7 +326,7 @@ class _FavoritesPageScreenState extends State<FavoritesPageScreen> {
             fontSize: 14,
             fontWeight: AppFonts.medium,
             fontFamily: AppFonts.primaryFontFamily,
-            color: isSelected ? AppColors.primaryLight : AppColors.secondaryLight,
+            color: isSelected ? AppColors.accent50 : AppColors.accent,
           ),
         ),
       ),
@@ -439,11 +493,15 @@ class _FavoritesPageScreenState extends State<FavoritesPageScreen> {
                 gradient: LinearGradient(
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
-                  colors: [AppColors.secondaryLight, AppColors.secondaryDark],
+                  colors: [
+                    AppColors.accent50,
+                    AppColors.accent700,
+                    AppColors.accent50,
+                  ],
                 ),
                 borderRadius: BorderRadius.circular(24),
                 border: Border.all(
-                  color: AppColors.primary.withOpacity(0.3),
+                  color: AppColors.accent900.withOpacity(0.3),
                   width: 2,
                 ),
                 boxShadow: [
@@ -460,14 +518,14 @@ class _FavoritesPageScreenState extends State<FavoritesPageScreen> {
                   Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: AppColors.primaryLight.withOpacity(0.1),
+                      color: AppColors.accent50.withOpacity(0.2),
                       borderRadius: BorderRadius.circular(16),
                     ),
                     child: SvgPicture.asset(
                       'assets/icons/calendar-date-svgrepo-com (1).svg',
                       height: 80,
                       colorFilter: ColorFilter.mode(
-                        AppColors.primary,
+                        AppColors.accent50,
                         BlendMode.srcIn,
                       ),
                     ),
@@ -488,7 +546,7 @@ class _FavoritesPageScreenState extends State<FavoritesPageScreen> {
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 14,
-                      color: AppColors.primaryDark,
+                      color: AppColors.accent50,
                       fontFamily: AppFonts.primaryFontFamily,
                       height: 1.5,
                     ),
@@ -499,7 +557,7 @@ class _FavoritesPageScreenState extends State<FavoritesPageScreen> {
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 13,
-                      color: AppColors.primaryDark,
+                      color: AppColors.accent50,
                       fontFamily: AppFonts.primaryFontFamily,
                     ),
                   ),
@@ -509,17 +567,16 @@ class _FavoritesPageScreenState extends State<FavoritesPageScreen> {
                     height: 48,
                     child: ElevatedButton.icon(
                       onPressed: () => context.go('/home'),
-                      icon: const Icon(Icons.storefront_outlined, size: 20),
                       label: const Text(
                         'Découvrir les commerces',
                         style: TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.w600,
-                          color: AppColors.secondaryDark,
+                          color: AppColors.accent50,
                         ),
                       ),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.primary,
+                        backgroundColor: AppColors.secondary600,
                         foregroundColor: AppColors.scaffoldBackground,
                         elevation: 0,
                         shape: RoundedRectangleBorder(
@@ -702,7 +759,7 @@ class _FavoritesPageScreenState extends State<FavoritesPageScreen> {
                   Container(
                     padding: const EdgeInsets.all(AppDimens.PADDING_12),
                     decoration: BoxDecoration(
-                      color: AppColors.secondaryLight.withOpacity(0.2),
+                      color: reservation.typeColor.withOpacity(0.2),
                       border: Border.all(width: 2, color: AppColors.secondary),
                       borderRadius: BorderRadius.circular(
                         AppDimens.BORDER_RADIUS_12,
@@ -716,7 +773,7 @@ class _FavoritesPageScreenState extends State<FavoritesPageScreen> {
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: AppFonts.semiBold,
-                            color: AppColors.success,
+                            color: reservation.typeColor,
                             fontFamily: AppFonts.primaryFontFamily,
                           ),
                         ),
@@ -725,7 +782,7 @@ class _FavoritesPageScreenState extends State<FavoritesPageScreen> {
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: AppFonts.bold,
-                            color: AppColors.success,
+                            color: reservation.typeColor,
                             fontFamily: AppFonts.primaryFontFamily,
                           ),
                         ),

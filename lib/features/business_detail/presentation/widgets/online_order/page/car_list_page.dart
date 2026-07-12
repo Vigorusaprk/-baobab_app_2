@@ -181,6 +181,7 @@ class _CarListPageState extends State<CarListPage> {
           MaterialPageRoute(
             builder: (context) => CarDetailPage(
               businessId: widget.businessId,
+              businessName: widget.businessName,
               vehicle: vehicle,
             ),
           ),

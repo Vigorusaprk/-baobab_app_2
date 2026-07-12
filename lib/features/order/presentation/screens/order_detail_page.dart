@@ -64,9 +64,15 @@ class OrderDetailPage extends StatelessWidget {
                       _buildDetailRow('Passée le', dateFormat.format(order.orderDate)),
                     ]),
                     _buildDetailSection('Articles', [
-                      ...order.items.map((item) => Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 4),
-                        child: Row(
+                      if (order.items.isEmpty)
+                        const Padding(
+                          padding: EdgeInsets.symmetric(vertical: 12),
+                          child: Text('Aucun article de commande disponible.'),
+                        )
+                      else
+                        ...order.items.map((item) => Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 4),
+                          child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Expanded(child: Text('${item.quantity}x ${item.name}')),

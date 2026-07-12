@@ -2,7 +2,7 @@ import 'package:baobabe_0_2/core/themes/app_colors.dart';
 import 'package:baobabe_0_2/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:baobabe_0_2/features/auth/presentation/bloc/auth_state.dart';
 import 'package:baobabe_0_2/features/business_detail/presentation/bloc/business_detail_bloc.dart';
-import 'package:baobabe_0_2/features/favorites_page/data/models/reservation_model.dart';
+import 'package:baobabe_0_2/features/booking_page/data/models/reservation_model.dart';
 import 'package:baobabe_0_2/features/home_page/domain/entities/business_entity.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -189,6 +189,7 @@ class _SpaReservationModalState extends State<SpaReservationModal> {
           'selected_treatments': selectedTreatmentsWithPrices,
           'therapist_name': _data.selectedTherapist,
           'notes': _notesController.text.trim().isEmpty ? null : _notesController.text.trim(),
+          'establishment_name': widget.business.name,
         },
       );
 

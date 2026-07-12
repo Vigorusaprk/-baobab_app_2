@@ -1,7 +1,7 @@
 import 'package:baobabe_0_2/core/themes/app_colors.dart';
 import 'package:baobabe_0_2/features/business_detail/domain/entities/movie.dart';
 import 'package:baobabe_0_2/features/business_detail/presentation/bloc/business_detail_bloc.dart';
-import 'package:baobabe_0_2/features/business_detail/presentation/widgets/movie_api_service.dart';
+import 'package:baobabe_0_2/features/business_detail/presentation/widgets/service/movie_api_service.dart';
 import 'package:flutter/material.dart';
 import 'package:baobabe_0_2/features/home_page/domain/entities/business_entity.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';

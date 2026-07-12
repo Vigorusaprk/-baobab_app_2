@@ -1,5 +1,3 @@
-// File: core/constants/injector.dart
-
 import 'package:baobabe_0_2/core/constants/supabase_client.dart';
 import 'package:baobabe_0_2/features/auth/data/data_sources/remote_datasource/auth_remote_datasource.dart';
 import 'package:baobabe_0_2/features/auth/data/repositories/auth_repository_impl.dart';
@@ -16,7 +14,7 @@ import 'package:baobabe_0_2/features/home_page/data/repositories/business_remote
 import 'package:baobabe_0_2/features/home_page/data/repositories/business_repository_impl.dart';
 import 'package:baobabe_0_2/features/home_page/data/repositories/category_repository_impl.dart';
 import 'package:baobabe_0_2/features/home_page/data/repositories/search_repository_impl.dart';
-import 'package:baobabe_0_2/features/favorites_page/data/models/reservation_service.dart';
+import 'package:baobabe_0_2/features/booking_page/data/models/reservation_service.dart';
 import 'package:baobabe_0_2/features/home_page/domain/repositories/business_repository.dart';
 import 'package:baobabe_0_2/features/home_page/domain/repositories/category_repository.dart';
 import 'package:baobabe_0_2/features/home_page/domain/repositories/search_repository.dart';
@@ -27,6 +25,8 @@ import 'package:baobabe_0_2/features/home_page/presentation/bloc/category_bloc.d
 import 'package:baobabe_0_2/features/home_page/presentation/bloc/business_bloc.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/bloc/search_bloc.dart';
 import 'package:baobabe_0_2/features/settings/presentation/bloc/settings_bloc.dart';
+import 'package:baobabe_0_2/core/database/database_helper.dart';
+import 'package:baobabe_0_2/core/services/sync_service.dart';
 import 'package:get_it/get_it.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' show SupabaseClient;
 
@@ -37,12 +37,15 @@ class Injector {
     _registerDataSources();
     _registerRepositories();
     _registerUseCases();
+    _registerServices();
     _registerBlocs();
   }
 
   static void _registerDataSources() {
     final supabase = SupabaseClientWrapper.client;
     getIt.registerLazySingleton<SupabaseClient>(() => supabase);
+
+    getIt.registerLazySingleton<DatabaseHelper>(() => DatabaseHelper.instance);
 
     getIt.registerLazySingleton<AuthRemoteDataSource>(
           () => AuthRemoteDataSourceImpl(supabase: getIt<SupabaseClient>()),
@@ -84,6 +87,15 @@ class Injector {
 
     getIt.registerLazySingleton(() => GetBusinessDetail(getIt<BusinessRepository>()));
     getIt.registerLazySingleton(() => GetMenuByBusiness(getIt<BusinessRepository>()));
+  }
+
+  static void _registerServices() {
+    getIt.registerLazySingleton<SyncService>(
+      () => SyncService(getIt<ReservationApiService>()),
+    );
+    getIt.registerLazySingleton<SyncManager>(
+      () => SyncManager(getIt<SyncService>(), getIt<ReservationApiService>()),
+    );
   }
 
   static void _registerBlocs() {

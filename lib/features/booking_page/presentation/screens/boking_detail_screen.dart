@@ -26,7 +26,7 @@ class ReservationDetailPage extends StatelessWidget {
     final total = reservation.totalAmount.toStringAsFixed(2);
 
     return Scaffold(
-      backgroundColor: AppColors.primary,
+      backgroundColor: AppColors.scaffoldBackground,
       appBar: AppBar(
         title: Text(
           'Détails de la réservation',
@@ -34,7 +34,7 @@ class ReservationDetailPage extends StatelessWidget {
             fontFamily: AppFonts.primaryFontFamily,
             fontSize: 24,
             fontWeight: AppFonts.bold,
-            color: AppColors.secondaryLight,
+            color: AppColors.accent500,
           ),
         ),
         centerTitle: true,
@@ -42,13 +42,13 @@ class ReservationDetailPage extends StatelessWidget {
         leading: IconButton(
           icon: Container(
             decoration: BoxDecoration(
-              color: AppColors.secondaryLight,
-              shape: BoxShape.circle,
+              border: Border.all(color: AppColors.accent500, width: 2.5),
+              shape: BoxShape.circle
             ),
             child: const Center(
               child: Icon(
                 Icons.arrow_back_ios_new_rounded,
-                color: AppColors.scaffoldBackground,
+                color: AppColors.accent500,
               ),
             ),
           ),
@@ -137,10 +137,10 @@ class ReservationDetailPage extends StatelessWidget {
   Widget _buildHeaderCard(Color primaryColor, String establishmentName) {
     return Container(
       decoration: BoxDecoration(
-        color: reservation.typeColor.withOpacity(0.2),
+        color: AppColors.surface,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 10, offset: const Offset(0, 5)),
+          BoxShadow(color: Colors.black.withOpacity(0.3), blurRadius: 7, offset: const Offset(0, 1)),
         ],
         border: Border.all(
           width: 2.5,
@@ -171,7 +171,7 @@ class ReservationDetailPage extends StatelessWidget {
 
   Widget _buildInfoCard(String title, List<Widget> children) {
     return Card(
-      color: Colors.white,
+      color: AppColors.surface,
       elevation: 4,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       child: Padding(

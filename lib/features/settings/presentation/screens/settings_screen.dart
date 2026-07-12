@@ -1,3 +1,4 @@
+import 'package:baobabe_0_2/features/main/presentation/widgets/app_background.dart';
 import 'package:baobabe_0_2/features/settings/presentation/bloc/settings_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -113,7 +114,7 @@ class SettingsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<SettingsCubit, SettingsState>(
       builder: (context, settingsState) {
-        return MainBackground(
+        return authBackground(
           child: Scaffold(
             backgroundColor: AppColors.transparent,
             appBar: AppBar(
