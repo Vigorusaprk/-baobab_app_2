@@ -40,14 +40,14 @@ En clair : ce n’est pas uniquement une appli “pour commander”, mais une pl
 
 ### 4) Commandes & opérations (selon le type de commerce)
 - Création d’une commande avec :
-    - l’utilisateur
-    - l’établissement
-    - la liste des items (quantités, prix unitaires)
-    - les informations de paiement
-    - les notes/instructions (si besoin)
-    - des frais éventuels (ex. options spécifiques selon le commerce)
+  - l’utilisateur
+  - l’établissement
+  - la liste des items (quantités, prix unitaires)
+  - les informations de paiement
+  - les notes/instructions (si besoin)
+  - des frais éventuels (ex. options spécifiques selon le commerce)
 - Suivi d’un cycle de statut (logique présente côté API backend) :
-    - **pending, confirmed, preparing, ready, delivered, cancelled**
+  - **pending, confirmed, preparing, ready, delivered, cancelled**
 
 
 ### 5) Réservation
@@ -114,6 +114,12 @@ Actuellement, le backend expose déjà les routes et la logique nécessaires pou
 
 ## 🛠️ Installation (repères pour l’équipe)
 
+### Prérequis
+- Flutter SDK
+- (facultatif) Node.js/npm
+- PostgreSQL (si utilisé dans l’écosystème)
+
+- Docker (optionnel, utile pour le backend)
 
 ### Backend
 - Configurer Supabase (projet, auth, database, policies).
@@ -133,5 +139,5 @@ Baobabe a été construit pour **itérer rapidement**. L’objectif n’est pas 
 2. récolter des retours ;
 3. améliorer et étendre progressivement le produit.
 
-
+Ce document sert de référence d’ensemble pour l’équipe, afin de garder la cohérence produit/technique sur l’ensemble du cycle de vie du projet.
 
