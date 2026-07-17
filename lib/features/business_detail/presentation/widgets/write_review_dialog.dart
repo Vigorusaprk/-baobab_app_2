@@ -1,5 +1,6 @@
 import 'package:baobabe_0_2/core/themes/app_colors.dart';
 import 'package:baobabe_0_2/core/services/session_service.dart';
+import 'package:baobabe_0_2/core/widgets/auth_required_card.dart';
 import 'package:baobabe_0_2/features/business_detail/data/review_api_service.dart';
 import 'package:baobabe_0_2/features/home_page/domain/entities/business_entity.dart';
 import 'package:flutter/material.dart';
@@ -16,9 +17,7 @@ Future<void> showWriteReviewDialog(
   final sessionUser = SessionService.instance.currentUser;
 
   if (sessionUser == null) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Veuillez vous connecter pour laisser un avis.')),
-    );
+    showAuthRequiredCard(context, message: 'Connectez-vous pour laisser un avis.');
     return;
   }
 

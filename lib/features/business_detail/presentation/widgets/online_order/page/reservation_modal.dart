@@ -1,5 +1,6 @@
 import 'package:baobabe_0_2/core/themes/app_colors.dart';
 import 'package:baobabe_0_2/core/services/session_service.dart';
+import 'package:baobabe_0_2/core/widgets/auth_required_card.dart';
 import 'package:baobabe_0_2/features/business_detail/presentation/bloc/business_detail_bloc.dart';
 import 'package:baobabe_0_2/features/business_detail/presentation/widgets/online_order/page/reservation_modal/reservation_modal_pages.dart';
 import 'package:baobabe_0_2/features/business_detail/presentation/widgets/online_order/page/reservation_modal/reservation_modal_header.dart';
@@ -149,8 +150,8 @@ class _ReservationModalState extends State<ReservationModal> {
 
     final sessionUser = SessionService.instance.currentUser;
     if (sessionUser == null) {
-      _showSnackBar('Veuillez vous connecter');
       setState(() => _isLoading = false);
+      showAuthRequiredCard(context, message: 'Connectez-vous pour réserver cette table.');
       return;
     }
 

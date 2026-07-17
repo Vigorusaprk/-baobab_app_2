@@ -1,5 +1,6 @@
 import 'package:baobabe_0_2/core/themes/app_colors.dart';
 import 'package:baobabe_0_2/core/services/session_service.dart';
+import 'package:baobabe_0_2/core/widgets/auth_required_card.dart';
 import 'package:baobabe_0_2/features/business_detail/presentation/bloc/business_detail_bloc.dart';
 import 'package:baobabe_0_2/features/business_detail/presentation/widgets/online_order/spa_reservation_modal/spa_modal_chrome.dart';
 import 'package:baobabe_0_2/features/business_detail/presentation/widgets/online_order/spa_reservation_modal/spa_modal_pages.dart';
@@ -111,7 +112,7 @@ class _SpaReservationModalState extends State<SpaReservationModal> {
   Future<void> _saveReservation() async {
     final sessionUser = SessionService.instance.currentUser;
     if (sessionUser == null) {
-      _showSnackBar('Veuillez vous connecter');
+      showAuthRequiredCard(context, message: 'Connectez-vous pour réserver ce soin.');
       return;
     }
     final userId = sessionUser.id;

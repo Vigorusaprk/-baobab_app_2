@@ -41,6 +41,13 @@ class GoRouterRefreshStream extends ChangeNotifier {
   }
 }
 
+/// Routes that require an authenticated account, e.g. because they show or
+/// edit user-specific data (own reservations, own orders, profile/settings).
+/// Plain browsing (home, search, business detail) never requires login —
+/// account creation is only prompted when the user attempts an action that
+/// needs one.
+const _authRequiredPaths = ['/favorites', '/orders', '/settings', '/profil-page', '/edit-profile'];
+
 final GoRouter appRouter = GoRouter(
   initialLocation: '/',
   refreshListenable: GoRouterRefreshStream(SessionService.instance.authStateChanges),
@@ -50,9 +57,10 @@ final GoRouter appRouter = GoRouter(
         state.matchedLocation.startsWith('/login') ||
         state.matchedLocation.startsWith('/register') ||
         state.matchedLocation.startsWith('/forgot-password');
+    final requiresAuth = _authRequiredPaths.any((path) => state.matchedLocation.startsWith(path));
 
-    // 🔒 Redirection si l'utilisateur n'est pas connecté et accède à une page privée
-    if (!isLoggedIn && !isAuthRoute) return '/login';
+    // 🔒 Redirection uniquement pour les pages qui nécessitent réellement un compte
+    if (!isLoggedIn && requiresAuth) return '/login';
 
     // 🔓 Redirection si l'utilisateur est connecté et accède à une page d'authentification
     if (isLoggedIn && isAuthRoute) return '/home';
@@ -60,12 +68,10 @@ final GoRouter appRouter = GoRouter(
     return null;
   },
   routes: [
-    // Route racine adaptative
+    // Route racine : navigation libre, sans compte requis
     GoRoute(
       path: '/',
-      redirect: (context, state) {
-        return SessionService.instance.isLoggedIn ? '/home' : '/login';
-      },
+      redirect: (context, state) => '/home',
       pageBuilder: (context, state) => const MaterialPage(
         child: Scaffold(body: Center(child: CircularProgressIndicator())),
       ),

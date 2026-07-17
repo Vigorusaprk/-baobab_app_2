@@ -8,6 +8,7 @@ import 'package:baobabe_0_2/features/auth/presentation/widgets/auth_form.dart';
 import 'package:baobabe_0_2/features/auth/presentation/widgets/auth_header.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -22,7 +23,23 @@ class _LoginPageState extends State<LoginPage> {
     return BlocListener<AuthBloc, AuthState>(
       listener: (context, state) {},
       child: Scaffold(
-        appBar: AppBar(elevation: 0),
+        appBar: AppBar(
+          elevation: 0,
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back_ios_new_rounded),
+            onPressed: () {
+              // On arrive ici soit en poussant l'écran (bouton normal),
+              // soit via une redirection du router (rien à dépiler) :
+              // dans ce second cas on revient simplement à l'accueil,
+              // pour que la connexion reste optionnelle, pas un mur.
+              if (context.canPop()) {
+                context.pop();
+              } else {
+                context.go('/home');
+              }
+            },
+          ),
+        ),
         body: Center(
           child: SingleChildScrollView(
             child: Column(

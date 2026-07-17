@@ -1,5 +1,6 @@
 import 'package:baobabe_0_2/core/themes/app_colors.dart';
 import 'package:baobabe_0_2/core/services/session_service.dart';
+import 'package:baobabe_0_2/core/widgets/auth_required_card.dart';
 import 'package:baobabe_0_2/features/business_detail/presentation/bloc/business_detail_bloc.dart';
 import 'package:baobabe_0_2/features/booking_page/data/models/reservation_model.dart';
 import 'package:baobabe_0_2/features/home_page/domain/entities/business_entity.dart';
@@ -118,7 +119,7 @@ class _TourismReservationModalState extends State<TourismReservationModal> {
   Future<void> _saveReservation() async {
     final sessionUser = SessionService.instance.currentUser;
     if (sessionUser == null) {
-      _showSnackBar('Veuillez vous connecter');
+      showAuthRequiredCard(context, message: 'Connectez-vous pour réserver cette activité.');
       return;
     }
     if (_fullNameController.text.trim().isEmpty || _phoneController.text.trim().isEmpty || _data.activityDate == null) {

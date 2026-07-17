@@ -72,6 +72,12 @@ SessionService.instance.authStateChanges; // raw Supabase AuthState stream, used
 
 `AuthBloc` itself is still the right tool for *performing* auth actions (`RequestEmailOtpEvent`, `VerifyEmailOtpEvent`, `AuthWithGoogleEvent`, `AuthWithAppleEvent`, `SignOutEvent`) — e.g. `context.read<AuthBloc>().add(SignOutEvent())` to sign out from Settings.
 
+### Guest browsing — login is action-gated, not navigation-gated
+
+The app must never force login just to browse. `lib/core/routes/app_router.dart` only redirects to `/login` for routes in `_authRequiredPaths` (currently `/favorites`, `/orders`, `/settings`, `/profil-page`, `/edit-profile` — screens that inherently show or edit the current user's own data). Root `/`, `/home`, `/search`, `/business/:id`, and other browsing routes are reachable without an account.
+
+For actions inside a public screen that need an account (making a reservation, adding to cart/checkout, leaving a review, etc.), gate the action itself — check `SessionService.instance.currentUser`, and if null, prompt sign-in (snackbar + `context.go('/login')`, or similar) at the moment the action is attempted. This pattern is already used throughout `business_detail/presentation/widgets/online_order/`. Do not reintroduce a global "redirect everything to /login when logged out" rule.
+
 ## Sensitive Areas
 
 Be careful when editing these areas:
@@ -112,6 +118,13 @@ Mandatory checks after any meaningful code change:
 6. Preserve the existing UI language (`AppColors`, `AppDimens`, `AppFonts`) — a full design-system rewrite is tracked separately and has not started yet; do not redesign screens incidentally while doing unrelated work.
 7. Run `flutter analyze` on the files/features you touched before considering a task complete, and fix any errors you introduced.
 8. When in doubt about scope (e.g. whether a fix belongs in `add_fund`-style adjacent features), ask rather than guessing — this project has several overlapping booking/order flows (`booking_page`, `order`, `business_detail/online_order`) that must stay distinct.
+9. **Never recreate a component, color, or spacing value that already exists.** Before writing a button, bottom sheet, loading indicator, card, spacing value, color, or font style, check:
+   - `lib/core/widgets/` (e.g. `button/custom_button.dart`, `button/custom_auth_icon_button.dart`, `button/outlined_button_with_icon.dart`, `custom_bottom_sheet.dart`, `custom_loading.dart`) for existing shared widgets.
+   - `lib/core/themes/app_colors.dart` (`AppColors`) for every color — never hardcode a `Color(0x...)`/`Colors.xxx` literal when an equivalent `AppColors` constant exists.
+   - `lib/core/themes/app_diemens.dart` (`AppDimens`) for every spacing/padding/radius/size value — never hardcode a raw number when an equivalent `AppDimens` constant exists.
+   - `lib/core/themes/app_fonts.dart` (`AppFonts`) for font family/weight/size — never hardcode `TextStyle` values that duplicate an existing `AppFonts` constant.
+   - The relevant feature's own `presentation/widgets/` folder for a feature-local widget that already does the same job (e.g. reservation cards, filter chips, empty states already extracted during the 300-line cleanup).
+   - **Always import and reuse the existing component/constant instead of duplicating it.** Only create a new shared widget/constant when nothing existing covers the need, and prefer adding it to `lib/core/widgets` or the theme files so it becomes reusable rather than duplicating it inline in a feature file.
 
 ## UI And Design System
 

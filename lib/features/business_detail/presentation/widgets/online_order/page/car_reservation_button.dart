@@ -2,13 +2,11 @@ import 'package:baobabe_0_2/core/themes/app_colors.dart';
 import 'package:flutter/material.dart';
 
 class CarReservationButton extends StatelessWidget {
-  final bool isLoggedIn;
   final bool isLoading;
   final VoidCallback onPressed;
 
   const CarReservationButton({
     super.key,
-    required this.isLoggedIn,
     required this.isLoading,
     required this.onPressed,
   });
@@ -19,7 +17,7 @@ class CarReservationButton extends StatelessWidget {
       width: double.infinity,
       height: 50,
       child: ElevatedButton(
-        onPressed: (!isLoggedIn || isLoading) ? null : onPressed,
+        onPressed: isLoading ? null : onPressed,
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.primaryLight,
           disabledBackgroundColor: Colors.grey[400],

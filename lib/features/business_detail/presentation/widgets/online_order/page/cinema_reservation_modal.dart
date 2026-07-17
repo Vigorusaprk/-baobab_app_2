@@ -1,5 +1,6 @@
 import 'package:baobabe_0_2/core/themes/app_colors.dart';
 import 'package:baobabe_0_2/core/services/session_service.dart';
+import 'package:baobabe_0_2/core/widgets/auth_required_card.dart';
 import 'package:baobabe_0_2/features/business_detail/domain/entities/movie.dart';
 import 'package:baobabe_0_2/features/business_detail/presentation/bloc/business_detail_bloc.dart';
 import 'package:baobabe_0_2/features/booking_page/data/models/reservation_model.dart';
@@ -65,9 +66,7 @@ class _CinemaReservationModalState extends State<CinemaReservationModal> {
   void _book() async {
     final sessionUser = SessionService.instance.currentUser;
     if (sessionUser == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Veuillez vous connecter'), backgroundColor: Colors.red),
-      );
+      showAuthRequiredCard(context, message: 'Connectez-vous pour réserver vos places.');
       return;
     }
     if (_fullNameController.text.trim().isEmpty || _phoneController.text.trim().isEmpty) {

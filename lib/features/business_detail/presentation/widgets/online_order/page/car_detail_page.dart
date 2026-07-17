@@ -1,5 +1,6 @@
 import 'package:baobabe_0_2/core/services/session_service.dart';
 import 'package:baobabe_0_2/core/themes/app_colors.dart';
+import 'package:baobabe_0_2/core/widgets/auth_required_card.dart';
 import 'package:flutter/material.dart';
 import 'package:baobabe_0_2/features/booking_page/data/models/reservation_service.dart';
 import 'package:baobabe_0_2/features/order/data/models/vehicle_model.dart';
@@ -71,7 +72,11 @@ class _CarDetailPageState extends State<CarDetailPage> {
     return _endDate!.difference(_startDate!).inDays + 1;
   }
 
-  Future<void> _submitReservation(String userId) async {
+  Future<void> _submitReservation() async {
+    if (SessionService.instance.currentUser == null) {
+      showAuthRequiredCard(context, message: 'Connectez-vous pour réserver ce véhicule.');
+      return;
+    }
     if (_startDate == null || _endDate == null) {
       _showSnackBar('Veuillez sélectionner les dates', Colors.red);
       return;
@@ -169,10 +174,6 @@ class _CarDetailPageState extends State<CarDetailPage> {
 
   @override
   Widget build(BuildContext context) {
-    final sessionUser = SessionService.instance.currentUser;
-    final isLoggedIn = sessionUser != null;
-    final userId = sessionUser?.id;
-
     return Scaffold(
       backgroundColor: AppColors.scaffoldBackground,
       appBar: AppBar(
@@ -191,10 +192,7 @@ class _CarDetailPageState extends State<CarDetailPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            CarImageHeader(
-              imageUrl: widget.vehicle.imageUrl,
-              isLoggedIn: isLoggedIn,
-            ),
+            CarImageHeader(imageUrl: widget.vehicle.imageUrl),
             Padding(
               padding: const EdgeInsets.all(16),
               child: Column(
@@ -244,9 +242,8 @@ class _CarDetailPageState extends State<CarDetailPage> {
                   ),
                   const SizedBox(height: 24),
                   CarReservationButton(
-                    isLoggedIn: isLoggedIn,
                     isLoading: _isLoading,
-                    onPressed: () => _submitReservation(userId!),
+                    onPressed: _submitReservation,
                   ),
                   const SizedBox(height: 32),
                 ],

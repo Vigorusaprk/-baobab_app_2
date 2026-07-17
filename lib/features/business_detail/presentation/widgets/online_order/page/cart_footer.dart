@@ -1,9 +1,9 @@
 import 'package:baobabe_0_2/core/services/session_service.dart';
 import 'package:baobabe_0_2/core/themes/app_colors.dart';
+import 'package:baobabe_0_2/core/widgets/auth_required_card.dart';
 import 'package:baobabe_0_2/features/business_detail/presentation/bloc/business_detail_bloc.dart';
 import 'package:baobabe_0_2/features/order/presentation/widgets/order_service.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 
 class CartFooter extends StatelessWidget {
   final BusinessDetailState state;
@@ -81,7 +81,7 @@ class CartFooter extends StatelessWidget {
   ) async {
     final sessionUser = SessionService.instance.currentUser;
     if (sessionUser == null) {
-      context.go('/login');
+      showAuthRequiredCard(context, message: 'Connectez-vous pour valider votre commande.');
       return;
     }
 
