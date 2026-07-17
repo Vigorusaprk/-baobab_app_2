@@ -60,7 +60,7 @@ class BusinessInfoSection extends StatelessWidget {
         style: TextStyle(
           fontSize: 18,
           fontWeight: FontWeight.bold,
-          color: AppColors.accent700,
+          color: AppColors.primary50,
         ),
       ),
     );

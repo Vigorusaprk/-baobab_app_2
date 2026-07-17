@@ -21,7 +21,7 @@ class ReservationsPageHeader extends StatelessWidget {
             'assets/icons/calendar-date-svgrepo-com (1).svg',
             height: 35,
             colorFilter: ColorFilter.mode(
-              AppColors.accent700,
+              AppColors.primary50,
               BlendMode.srcIn,
             ),
           ),
@@ -32,7 +32,7 @@ class ReservationsPageHeader extends StatelessWidget {
               fontFamily: AppFonts.primaryFontFamily,
               fontSize: 24,
               fontWeight: AppFonts.bold,
-              color: AppColors.accent700,
+              color: AppColors.primary50,
             ),
           ),
           const Spacer(),
@@ -44,12 +44,12 @@ class ReservationsPageHeader extends StatelessWidget {
               ),
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: AppColors.accent700,
+                color: AppColors.primary50,
               ),
               child: Text(
                 '$reservationCount',
                 style: TextStyle(
-                  color: AppColors.accent50,
+                  color: AppColors.primary50,
                   fontWeight: AppFonts.semiBold,
                   fontSize: 14,
                   fontFamily: 'Poppins',

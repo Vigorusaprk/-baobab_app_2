@@ -120,8 +120,8 @@ class RestaurantMenuPage extends StatelessWidget {
                       isScrollable: true,
                       tabAlignment: TabAlignment.start,
                       indicatorColor: Colors.transparent, // Retrait de l'indicateur par défaut
-                      labelColor: AppColors.accent50, // Couleur du texte actif
-                      unselectedLabelColor: AppColors.accent50,
+                      labelColor: AppColors.primary50, // Couleur du texte actif
+                      unselectedLabelColor: AppColors.primary50,
                       labelStyle: const TextStyle(
                         fontFamily: AppFonts.primaryFontFamily,
                         fontSize: 16,

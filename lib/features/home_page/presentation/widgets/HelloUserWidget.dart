@@ -26,57 +26,50 @@ class HelloUserWidget extends StatelessWidget {
             right: AppDimens.PADDING_20,
             top: AppDimens.PADDING_16,
           ),
-          child: Container(
-            decoration: BoxDecoration(
-              color:  AppColors.accent700,
-              borderRadius: BorderRadius.all(Radius.circular(20))
-            ),
-            padding: EdgeInsets.symmetric(horizontal: AppDimens.BORDER_RADIUS_15, vertical: AppDimens.BORDER_RADIUS_20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    _buildAvatar(user, userName, context),
-                    const SizedBox(width: AppDimens.PADDING_10),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                            "Salut 👋,",
-                          style: const TextStyle(
-                            fontFamily: 'Poppins',
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.scaffoldBackground,
-                          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  _buildAvatar(user, userName, context),
+                  const SizedBox(width: AppDimens.PADDING_10),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                          "Salut,",
+                        style: const TextStyle(
+                          fontFamily: 'Poppins',
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.primary,
                         ),
-                        Text(
-                          "$userName",
-                          style: const TextStyle(
-                            fontFamily: 'Poppins',
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.scaffoldBackground,
-                          ),
+                      ),
+                      Text(
+                        "$userName",
+                        style: const TextStyle(
+                          fontFamily: 'Poppins',
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.primary,
                         ),
-                      ],
-                    ),
-                  ],
-                ),
-                const SizedBox(height: AppDimens.PADDING_4),
-                Text(
-                  "Découvrez des nouveaux endroits !",
-                  style: TextStyle(
-                    fontFamily: 'Poppins',
-                    fontSize: 14,
-                    color: AppColors.scaffoldBackground,
+                      ),
+                    ],
                   ),
+                ],
+              ),
+              const SizedBox(height: AppDimens.PADDING_4),
+              Text(
+                "Découvrez des nouveaux endroits aujordhui!",
+                style: TextStyle(
+                  fontFamily: 'Poppins',
+                  fontSize: 14,
+                  color: AppColors.primary,
                 ),
-                const SizedBox(height: AppDimens.PADDING_16),
-                _buildSearchField(context),
-              ],
-            ),
+              ),
+              const SizedBox(height: AppDimens.PADDING_16),
+              _buildSearchField(context),
+            ],
           ),
         );
       },
@@ -107,7 +100,7 @@ class HelloUserWidget extends StatelessWidget {
                 vertical: AppDimens.PADDING_8,
               ),
               decoration: BoxDecoration(
-                color: AppColors.canvasBackground,
+                color: AppColors.surface,
                 borderRadius: BorderRadius.circular(
                   AppDimens.BORDER_RADIUS_12,
                 ),
@@ -126,7 +119,7 @@ class HelloUserWidget extends StatelessWidget {
                     height: 25,
                     width: 25,
                     colorFilter: const ColorFilter.mode(
-                      AppColors.accent700,
+                      AppColors.primary,
                       BlendMode.srcIn,
                     ),
                   ),
@@ -159,7 +152,7 @@ class HelloUserWidget extends StatelessWidget {
               AppDimens.PADDING_12,
             ),
             decoration: BoxDecoration(
-              color: AppColors.canvasBackground,
+              color: AppColors.primary,
               borderRadius: BorderRadius.circular(
                 AppDimens.BORDER_RADIUS_12,
               ),
@@ -176,7 +169,7 @@ class HelloUserWidget extends StatelessWidget {
               height: 20,
               width: 20,
               colorFilter: const ColorFilter.mode(
-                AppColors.accent700,
+                AppColors.primary50,
                 BlendMode.srcIn,
               ),
             ),
@@ -196,7 +189,7 @@ class HelloUserWidget extends StatelessWidget {
         decoration: BoxDecoration(
           shape: BoxShape.circle,
           border: Border.all(
-            color:  AppColors.accent100,
+            color:  AppColors.primary,
             width: 2.5
           ),
           boxShadow: [

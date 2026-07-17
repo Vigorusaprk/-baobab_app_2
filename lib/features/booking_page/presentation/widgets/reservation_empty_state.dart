@@ -23,14 +23,14 @@ class ReservationEmptyState extends StatelessWidget {
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                   colors: [
-                    AppColors.accent50,
-                    AppColors.accent700,
-                    AppColors.accent50,
+                    AppColors.primary50,
+                    AppColors.primary50,
+                    AppColors.primary50,
                   ],
                 ),
                 borderRadius: BorderRadius.circular(24),
                 border: Border.all(
-                  color: AppColors.accent900.withOpacity(0.3),
+                  color: AppColors.primary50.withOpacity(0.3),
                   width: 2,
                 ),
                 boxShadow: [
@@ -47,14 +47,14 @@ class ReservationEmptyState extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: AppColors.accent50.withOpacity(0.2),
+                      color: AppColors.primary50.withOpacity(0.2),
                       borderRadius: BorderRadius.circular(16),
                     ),
                     child: SvgPicture.asset(
                       'assets/icons/calendar-date-svgrepo-com (1).svg',
                       height: 80,
                       colorFilter: ColorFilter.mode(
-                        AppColors.accent50,
+                        AppColors.primary50,
                         BlendMode.srcIn,
                       ),
                     ),
@@ -75,7 +75,7 @@ class ReservationEmptyState extends StatelessWidget {
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 14,
-                      color: AppColors.accent50,
+                      color: AppColors.primary50,
                       fontFamily: AppFonts.primaryFontFamily,
                       height: 1.5,
                     ),
@@ -86,7 +86,7 @@ class ReservationEmptyState extends StatelessWidget {
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 13,
-                      color: AppColors.accent50,
+                      color: AppColors.primary50,
                       fontFamily: AppFonts.primaryFontFamily,
                     ),
                   ),
@@ -101,7 +101,7 @@ class ReservationEmptyState extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.w600,
-                          color: AppColors.accent50,
+                          color: AppColors.primary50,
                         ),
                       ),
                       style: ElevatedButton.styleFrom(

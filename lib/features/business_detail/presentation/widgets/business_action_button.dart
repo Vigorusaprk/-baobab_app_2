@@ -20,7 +20,7 @@ class BusinessActionButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Color categoryColor = color ?? AppColors.accent700;
+    final Color categoryColor = color ?? AppColors.primary50;
     return SizedBox(
       width: 100,
       child: Column(

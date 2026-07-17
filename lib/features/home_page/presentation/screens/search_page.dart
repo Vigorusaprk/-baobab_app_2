@@ -73,7 +73,7 @@ class _SearchPageState extends State<SearchPage> {
                   children: [
                     Container(
                       decoration: BoxDecoration(
-                          color: AppColors.secondaryLight,
+                          color: AppColors.primary,
                           borderRadius: BorderRadius.circular(AppDimens.BORDER_RADIUS_50)
                       ),
                       child: IconButton(

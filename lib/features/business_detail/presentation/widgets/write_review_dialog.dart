@@ -36,7 +36,7 @@ Future<void> showWriteReviewDialog(
           content: Container(
             width: MediaQuery.of(context).size.width * 0.85,
             decoration: BoxDecoration(
-              color: AppColors.accent700,
+              color: AppColors.primary50,
               borderRadius: BorderRadius.circular(24),
               border: Border.all(color: Colors.white.withOpacity(0.4), width: 3.5),
             ),
@@ -47,7 +47,7 @@ Future<void> showWriteReviewDialog(
               children: [
                 Text(
                   'Donner votre avis sur ${business.name}',
-                  style: const TextStyle(color: AppColors.accent50, fontSize: 18, fontWeight: FontWeight.bold),
+                  style: const TextStyle(color: AppColors.primary50, fontSize: 18, fontWeight: FontWeight.bold),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 16),
@@ -80,13 +80,13 @@ Future<void> showWriteReviewDialog(
                   children: [
                     TextButton(
                       onPressed: () => Navigator.pop(context),
-                      child: const Text('Annuler', style: TextStyle(color: AppColors.accent50)),
+                      child: const Text('Annuler', style: TextStyle(color: AppColors.primary50)),
                     ),
                     const SizedBox(width: 12),
                     ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.accent50,
-                        foregroundColor: AppColors.accent900,
+                        backgroundColor: AppColors.primary50,
+                        foregroundColor: AppColors.primary50,
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                       ),

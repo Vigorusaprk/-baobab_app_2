@@ -7,7 +7,6 @@ import 'package:visibility_detector/visibility_detector.dart';
 import 'package:baobabe_0_2/core/themes/app_colors.dart';
 import 'package:baobabe_0_2/core/themes/app_diemens.dart';
 import 'package:baobabe_0_2/core/themes/app_fonts.dart';
-import 'package:baobabe_0_2/features/main/presentation/widgets/main_background.dart';
 import 'package:baobabe_0_2/features/order/domain/entities/order.dart';
 import 'package:baobabe_0_2/core/services/session_service.dart';
 import 'package:baobabe_0_2/features/order/presentation/widgets/order_card.dart';

@@ -26,7 +26,7 @@ class ReservationFilterChip extends StatelessWidget {
           vertical: AppDimens.PADDING_8,
         ),
         decoration: BoxDecoration(
-          color: isSelected ? AppColors.accent500 : AppColors.accent.withOpacity(0.3),
+          color: isSelected ? AppColors.primary50 : AppColors.primary50.withOpacity(0.3),
           borderRadius: BorderRadius.circular(AppDimens.BORDER_RADIUS_20),
           boxShadow: isSelected
               ? [
@@ -44,7 +44,7 @@ class ReservationFilterChip extends StatelessWidget {
             fontSize: 14,
             fontWeight: AppFonts.medium,
             fontFamily: AppFonts.primaryFontFamily,
-            color: isSelected ? AppColors.accent50 : AppColors.accent,
+            color: isSelected ? AppColors.primary50 : AppColors.primary50,
           ),
         ),
       ),

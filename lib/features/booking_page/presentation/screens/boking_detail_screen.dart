@@ -34,7 +34,7 @@ class ReservationDetailPage extends StatelessWidget {
             fontFamily: AppFonts.primaryFontFamily,
             fontSize: 24,
             fontWeight: AppFonts.bold,
-            color: AppColors.accent500,
+            color: AppColors.secondary,
           ),
         ),
         centerTitle: true,
@@ -42,13 +42,13 @@ class ReservationDetailPage extends StatelessWidget {
         leading: IconButton(
           icon: Container(
             decoration: BoxDecoration(
-              border: Border.all(color: AppColors.accent500, width: 2.5),
+              border: Border.all(color: AppColors.secondary50, width: 2.5),
               shape: BoxShape.circle
             ),
             child: const Center(
               child: Icon(
                 Icons.arrow_back_ios_new_rounded,
-                color: AppColors.accent500,
+                color: AppColors.secondary100,
               ),
             ),
           ),

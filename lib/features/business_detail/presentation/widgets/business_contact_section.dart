@@ -64,7 +64,7 @@ class BusinessContactSection extends StatelessWidget {
           icon,
           width: 28,
           height: 28,
-          colorFilter: ColorFilter.mode(AppColors.accent700, BlendMode.srcIn),
+          colorFilter: ColorFilter.mode(AppColors.primary50, BlendMode.srcIn),
         ),
       ),
       title: Text(

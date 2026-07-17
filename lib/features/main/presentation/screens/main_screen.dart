@@ -49,7 +49,7 @@ class MainScreen extends StatelessWidget {
               offset: const Offset(0, 4),
             ),
           ],
-          color: AppColors.accent800,
+          color: AppColors.primary50,
           borderRadius: BorderRadius.circular(20),
         ),
         child: Row(
@@ -78,7 +78,7 @@ class MainScreen extends StatelessWidget {
         required bool isSelected,
       }) {
     final Color selectedBgColor = AppColors.surface;
-    final Color selectedIconColor = AppColors.accent600;
+    final Color selectedIconColor = AppColors.primary50;
     final Color unselectedIconColor = AppColors.canvasBackground;
 
     return GestureDetector(

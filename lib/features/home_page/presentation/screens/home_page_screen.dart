@@ -10,7 +10,6 @@ import 'package:baobabe_0_2/features/home_page/presentation/widgets/Category_Ico
 import 'package:baobabe_0_2/features/home_page/presentation/widgets/HelloUserWidget.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/widgets/Location_and_Profile.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/widgets/business_cards_widget.dart';
-import 'package:baobabe_0_2/features/main/presentation/widgets/main_background.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 

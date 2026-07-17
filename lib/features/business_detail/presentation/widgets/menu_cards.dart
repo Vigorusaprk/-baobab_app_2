@@ -89,7 +89,7 @@ class RestaurantInfoBigCard extends StatelessWidget {
                           style: const TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
-                            color: AppColors.accent50,
+                            color: AppColors.primary50,
                             height: 1.2,
                           ),
                         ),
@@ -97,7 +97,7 @@ class RestaurantInfoBigCard extends StatelessWidget {
                         Text(
                           '${item.price.toStringAsFixed(2)} €',
                           style: TextStyle(
-                            color: AppColors.accent50,
+                            color: AppColors.primary50,
                             fontWeight: FontWeight.bold,
                             fontSize: 14,
                           ),
@@ -112,7 +112,7 @@ class RestaurantInfoBigCard extends StatelessWidget {
                           height: 20,
                           width: 20,
                           colorFilter: ColorFilter.mode(
-                            AppColors.accent50,
+                            AppColors.primary50,
                             BlendMode.srcIn,
                           ),
                         ),
@@ -121,7 +121,7 @@ class RestaurantInfoBigCard extends StatelessWidget {
                           "20-30 min",
                           style: Theme.of(context).textTheme.labelSmall?.copyWith(
                             fontSize: 12,
-                            color:  AppColors.accent50,
+                            color:  AppColors.primary50,
                           ),
                         ),
                         const SizedBox(width: 12),
@@ -130,7 +130,7 @@ class RestaurantInfoBigCard extends StatelessWidget {
                           height: 20,
                           width: 20,
                           colorFilter: ColorFilter.mode(
-                            AppColors.accent50,
+                            AppColors.primary50,
                             BlendMode.srcIn,
                           ),
                         ),
@@ -139,7 +139,7 @@ class RestaurantInfoBigCard extends StatelessWidget {
                           isFreeDelivery ? "Livraison gratuite" : "Frais de livraison",
                           style: Theme.of(context).textTheme.labelSmall?.copyWith(
                             fontSize: 12,
-                            color:  AppColors.accent50,
+                            color:  AppColors.primary50,
                           ),
                         ),
                       ],

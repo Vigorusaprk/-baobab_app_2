@@ -51,7 +51,7 @@ class BusinessHoursSection extends StatelessWidget {
             margin: const EdgeInsets.only(bottom: 4),
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
             decoration: BoxDecoration(
-              color: isToday ? AppColors.accent700.withOpacity(0.08) : Colors.transparent,
+              color: isToday ? AppColors.primary50.withOpacity(0.08) : Colors.transparent,
               borderRadius: BorderRadius.circular(14),
             ),
             child: Row(
@@ -67,7 +67,7 @@ class BusinessHoursSection extends StatelessWidget {
                             "assets/icons/opening-hours.svg",
                             width: 28,
                             height: 28,
-                            colorFilter: ColorFilter.mode(AppColors.accent700, BlendMode.srcIn),
+                            colorFilter: ColorFilter.mode(AppColors.primary50, BlendMode.srcIn),
                           ),
                         )
                       ),
@@ -76,7 +76,7 @@ class BusinessHoursSection extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: isToday ? FontWeight.w800 : FontWeight.w500,
-                        color: isToday ? AppColors.accent700 : Colors.grey[700],
+                        color: isToday ? AppColors.primary50 : Colors.grey[700],
                       ),
                     ),
                   ],
@@ -86,7 +86,7 @@ class BusinessHoursSection extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: isToday ? FontWeight.bold : FontWeight.w600,
-                    color: isToday ? AppColors.accent700 : Colors.black87,
+                    color: isToday ? AppColors.primary50 : Colors.black87,
                   ),
                 ),
               ],

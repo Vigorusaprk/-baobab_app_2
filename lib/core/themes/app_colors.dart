@@ -25,82 +25,68 @@ class AppColors {
   // Indigo moderne
   // ===============================================================
 
+  // ... (garder le début du fichier original jusqu'à PRIMARY)
+
+  // ===============================================================
+  // PRIMARY (Identité de Baobab)
+  // Vert profond (#0F2E20)
+  // ===============================================================
+
   static const Color primary = Color(0xFF0F2E20);
-  static const Color primaryLight = Color(0xFF0F2E20);
+  static const Color primaryLight = Color(0xFF2E7D54);
   static const Color primaryDark = Color(0xFF0F2E20);
 
   // Variantes
 
-  static const Color primary50 = Color(0xFFF1EFFF);
-  static const Color primary100 = Color(0xFFDED9FF);
-  static const Color primary200 = Color(0xFFC8C1FF);
-  static const Color primary300 = Color(0xFFAEA5FF);
-  static const Color primary400 = Color(0xFF897DFF);
+  static const Color primary50 = Color(0xFFE8EFEB);
+  static const Color primary100 = Color(0xFFC6D1CB);
+  static const Color primary200 = Color(0xFFA1B3A9);
+  static const Color primary300 = Color(0xFF7C9588);
+  static const Color primary400 = Color(0xFF456353);
   static const Color primary500 = primary;
-  static const Color primary600 = Color(0xFF3D31E8);
-  static const Color primary700 = Color(0xFF3026C8);
-  static const Color primary800 = Color(0xFF251D9D);
-  static const Color primary900 = Color(0xFF1C1676);
+  static const Color primary600 = Color(0xFF0D281C);
+  static const Color primary700 = Color(0xFF0A2016);
+  static const Color primary800 = Color(0xFF081811);
+  static const Color primary900 = Color(0xFF05100B);
 
   // ===============================================================
   // SECONDARY
-  // Orange coucher de soleil
+  // Vert clair (#2E7D54)
   // ===============================================================
 
-  static const Color secondary = Color(0xFFFF8A3D);
-  static const Color secondaryLight = Color(0xFFFFB47A);
-  static const Color secondaryDark = Color(0xFFD96A20);
+  static const Color secondary = Color(0xFF2E7D54);
+  static const Color secondaryLight = Color(0xFFA3C9A5);
+  static const Color secondaryDark = Color(0xFF2E7D54);
 
-  static const Color secondary50 = Color(0xFFFFF4EB);
-  static const Color secondary100 = Color(0xFFFFE4CC);
-  static const Color secondary200 = Color(0xFFFFD1A8);
-  static const Color secondary300 = Color(0xFFFFBB80);
-  static const Color secondary400 = Color(0xFFFFA35A);
+  static const Color secondary50 = Color(0xFFE8F3ED);
+  static const Color secondary100 = Color(0xFFC6E1D3);
+  static const Color secondary200 = Color(0xFFA1CEB6);
+  static const Color secondary300 = Color(0xFF7CBB98);
+  static const Color secondary400 = Color(0xFF55A476);
   static const Color secondary500 = secondary;
-  static const Color secondary600 = Color(0xFFE67022);
-  static const Color secondary700 = Color(0xFFC85B11);
-  static const Color secondary800 = Color(0xFFA54808);
-  static const Color secondary900 = Color(0xFF813603);
+  static const Color secondary600 = Color(0xFF29704B);
+  static const Color secondary700 = Color(0xFF236343);
+  static const Color secondary800 = Color(0xFF1D5538);
+  static const Color secondary900 = Color(0xFF16422C);
 
-  // ===============================================================
-  // ACCENT
-  // Cyan moderne
-  // ===============================================================
-
-  static const Color accent = Color(0xFF2EC9FF);
-
-  static const Color accent50 = Color(0xFFE8FBFF);
-  static const Color accent100 = Color(0xFFC7F3FF);
-  static const Color accent200 = Color(0xFF9BEAFF);
-  static const Color accent300 = Color(0xFF6CDFFF);
-  static const Color accent400 = Color(0xFF46D5FF);
-  static const Color accent500 = accent;
-  static const Color accent600 = Color(0xFF17B5EA);
-  static const Color accent700 = Color(0xFF0699C8);
-  static const Color accent800 = Color(0xFF027CA2);
-  static const Color accent900 = Color(0xFF005C77);
+// ... (garder ACCENT inchangé)
 
   // ===============================================================
   // COULEURS DE FOND
   // ===============================================================
 
   /// Fond général de l'application
-  static const Color scaffoldBackground = Color(0xFFF8F8FC);
+  static const Color scaffoldBackground = Color(0xFFF2F4F3); // Gris neutre (#F2F4F3)
 
   /// Fond des pages secondaires
-  static const Color canvasBackground = Color(0xFFF2F3F8);
+  static const Color canvasBackground = Color(0xFFF2F4F3);
 
   /// Surface principale (Cards)
   static const Color surface = Colors.white;
 
   /// Surface légèrement contrastée
-  static const Color surfaceVariant = Color(0xFFF7F7FA);
+  static const Color surfaceVariant = Color(0xFFF2F4F3);
 
-  /// Dialogues
-  static const Color dialogBackground = Colors.white;
-
-  /// Bottom Sheet
-  static const Color bottomSheet = Colors.white;
 
   // ===============================================================
   // TEXTE

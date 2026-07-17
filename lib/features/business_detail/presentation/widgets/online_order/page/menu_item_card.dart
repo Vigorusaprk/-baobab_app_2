@@ -114,14 +114,14 @@ class MenuItemCard extends StatelessWidget {
                             style: const TextStyle(
                               fontSize: 24,
                               fontWeight: FontWeight.bold,
-                              color: AppColors.accent100, // Blanc
+                              color: AppColors.primary50, // Blanc
                               height: 1.2,
                             ),
                           ),
                           Text(
                             '${item.price.toStringAsFixed(2)} €',
                             style: const TextStyle(
-                              color: AppColors.accent50, // Blanc
+                              color: AppColors.primary50, // Blanc
                               fontWeight: FontWeight.bold,
                               fontSize: 14,
                             ),
@@ -133,7 +133,7 @@ class MenuItemCard extends StatelessWidget {
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
-                          color: AppColors.accent50, // Gris clair
+                          color: AppColors.primary50, // Gris clair
                           fontSize: 13,
                           decoration: TextDecoration.none,
                         ),
@@ -148,7 +148,7 @@ class MenuItemCard extends StatelessWidget {
                                 height: 20,
                                 width: 20,
                                 colorFilter: const ColorFilter.mode(
-                                  AppColors.accent50, // Icône blanche
+                                  AppColors.primary50, // Icône blanche
                                   BlendMode.srcIn,
                                 ),
                               ),
@@ -160,7 +160,7 @@ class MenuItemCard extends StatelessWidget {
                                     .labelSmall
                                     ?.copyWith(
                                   fontSize: 12,
-                                  color: AppColors.accent50,
+                                  color: AppColors.primary50,
                                 ),
                               ),
                             ],

@@ -14,15 +14,7 @@ class authBackground extends StatelessWidget {
         // 🔹 Dégradé 3 couleurs (avec les couleurs de l'app)
         Container(
           decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: const [
-                AppColors.canvasBackground, // beige clair
-                AppColors.accent100,      // beige moyen
-                AppColors.accent200,  // beige foncé
-              ],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
+            color: AppColors.scaffoldBackground
           ),
         ),
 

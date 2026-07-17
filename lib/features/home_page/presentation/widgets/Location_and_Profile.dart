@@ -10,35 +10,20 @@ class LocationAndProfile extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(left: AppDimens.PADDING_20, right: AppDimens.PADDING_20, top: AppDimens.PADDING_20),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-        decoration: BoxDecoration(
-          color: AppColors.accent700,
-          borderRadius: BorderRadius.circular(100),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.04),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Expanded(
+            child: Row(
+              children: [
+                _buildLocationIcon(),
+                const SizedBox(width: 12),
+                _buildLocationText(),
+              ],
             ),
-          ],
-          border: Border.all(color: Colors.grey.withOpacity(0.1), width: 1),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Expanded(
-              child: Row(
-                children: [
-                  _buildLocationIcon(),
-                  const SizedBox(width: 12),
-                  _buildLocationText(),
-                ],
-              ),
-            ),
-            _buildHeaderNotification()
-          ],
-        ),
+          ),
+          _buildHeaderNotification()
+        ],
       ),
     );
   }
@@ -47,7 +32,7 @@ class LocationAndProfile extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(15),
       decoration: BoxDecoration(
-        color:  AppColors.canvasBackground,
+        color:  AppColors.primary,
         shape: BoxShape.circle,
       ),
       child: SvgPicture.asset(
@@ -55,7 +40,7 @@ class LocationAndProfile extends StatelessWidget {
         height: 20,
         width: 20,
         colorFilter: const ColorFilter.mode(
-          AppColors.accent700,
+          AppColors.primary50,
           BlendMode.srcIn,
         ),
       ),
@@ -71,7 +56,7 @@ class LocationAndProfile extends StatelessWidget {
           "Current Location",
           style: TextStyle(
             fontSize: 11,
-            color: AppColors.textOnSecondary,
+            color: AppColors.primary,
             fontWeight: FontWeight.w500,
             letterSpacing: 0.2,
           ),
@@ -82,7 +67,7 @@ class LocationAndProfile extends StatelessWidget {
           style: TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w700,
-            color: AppColors.textOnSecondary,
+            color: AppColors.primary,
           ),
         ),
       ],
@@ -93,7 +78,7 @@ class LocationAndProfile extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(15),
       decoration: BoxDecoration(
-        color: AppColors.canvasBackground,
+        color: AppColors.primary,
         shape: BoxShape.circle,
       ),
       child: SvgPicture.asset(
@@ -101,7 +86,7 @@ class LocationAndProfile extends StatelessWidget {
         height: 25,
         width: 25,
         colorFilter: const ColorFilter.mode(
-          AppColors.accent700,
+          AppColors.primary50,
           BlendMode.srcIn,
         ),
       ),
