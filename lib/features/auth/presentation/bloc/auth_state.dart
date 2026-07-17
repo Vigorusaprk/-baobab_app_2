@@ -1,21 +1,59 @@
-import 'package:baobabe_0_2/features/auth/domain/entities/user.dart';
+part of 'auth_bloc.dart';
 
-abstract class AuthState {
-  const AuthState();
+abstract class AuthState {}
+
+class AuthInitial extends AuthState {}
+
+class RequestEmailOtpLoading extends AuthState {}
+
+class RequestEmailOtpSuccess extends AuthState {
+  RequestEmailOtpSuccess({required this.email});
+
+  final String email;
 }
 
-class AuthInitialState extends AuthState {}
+class RequestEmailOtpFailure extends AuthState {
+  RequestEmailOtpFailure({required this.error});
 
-class AuthLoadingState extends AuthState {}
-
-class AuthenticatedState extends AuthState {
-  final UserEntity user;
-  const AuthenticatedState({required this.user});
+  final String error;
 }
 
-class UnauthenticatedState extends AuthState {}
+class VerifyEmailOtpLoading extends AuthState {}
 
-class AuthFailureState extends AuthState {
-  final String errorMessage;
-  const AuthFailureState({required this.errorMessage});
+class VerifyEmailOtpSuccess extends AuthState {}
+
+class VerifyEmailOtpFailure extends AuthState {
+  VerifyEmailOtpFailure({required this.error});
+
+  final String error;
+}
+
+class AuthWithGoogleLoading extends AuthState {}
+
+class AuthWithGoogleSuccess extends AuthState {}
+
+class AuthWithGoogleFailure extends AuthState {
+  AuthWithGoogleFailure({required this.error});
+
+  final String error;
+}
+
+class AuthWithAppleLoading extends AuthState {}
+
+class AuthWithAppleSuccess extends AuthState {}
+
+class AuthWithAppleFailure extends AuthState {
+  AuthWithAppleFailure({required this.error});
+
+  final String error;
+}
+
+class SignOutLoading extends AuthState {}
+
+class SignOutSuccess extends AuthState {}
+
+class SignOutFailure extends AuthState {
+  SignOutFailure({required this.error});
+
+  final String error;
 }

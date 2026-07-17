@@ -1,3 +1,4 @@
+import 'package:baobabe_0_2/core/constants/icon_link.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
@@ -16,7 +17,7 @@ class AuthHeader extends StatelessWidget {
             color: theme.scaffoldBackgroundColor,
           ),
           child: SvgPicture.asset(
-            "assets/icons/olive-svgrepo-com.svg",
+            IconLink.appIcon,
             height: 48,
             colorFilter: ColorFilter.mode(
               theme.primaryColor,

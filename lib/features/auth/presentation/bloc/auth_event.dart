@@ -1,28 +1,22 @@
-abstract class AuthEvent {
-  const AuthEvent();
-}
+part of 'auth_bloc.dart';
 
-class CheckAuthStatusEvent extends AuthEvent {}
+abstract class AuthEvent {}
 
-class LoginSubmittedEvent extends AuthEvent {
+class RequestEmailOtpEvent extends AuthEvent {
+  RequestEmailOtpEvent({required this.email});
+
   final String email;
-  final String password;
-
-  const LoginSubmittedEvent({required this.email, required this.password});
 }
 
-class SignUpSubmittedEvent extends AuthEvent {
-  final String name;
+class VerifyEmailOtpEvent extends AuthEvent {
+  VerifyEmailOtpEvent({required this.email, required this.code});
+
   final String email;
-  final String password;
-  final String? phone;
-
-  const SignUpSubmittedEvent({
-    required this.name,
-    required this.email,
-    required this.password,
-    this.phone,
-  });
+  final String code;
 }
 
-class LogoutRequestedEvent extends AuthEvent {}
+class AuthWithGoogleEvent extends AuthEvent {}
+
+class AuthWithAppleEvent extends AuthEvent {}
+
+class SignOutEvent extends AuthEvent {}

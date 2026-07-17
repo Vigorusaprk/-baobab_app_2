@@ -99,3 +99,11 @@ class InitFailure extends Failure {
   @override
   List<Object?> get props => [];
 }
+
+class AuthFailure extends Failure {
+  final String message;
+  const AuthFailure({this.message = 'Authentication failure'});
+
+  @override
+  List<Object?> get props => [message];
+}

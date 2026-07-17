@@ -4,7 +4,6 @@ import 'package:baobabe_0_2/core/themes/app_diemens.dart';
 import 'package:baobabe_0_2/core/widgets/button/outlined_button_with_icon.dart';
 import 'package:baobabe_0_2/core/widgets/custom_bottom_sheet.dart';
 import 'package:baobabe_0_2/features/auth/presentation/bloc/auth_bloc.dart';
-import 'package:baobabe_0_2/features/auth/presentation/bloc/auth_state.dart';
 import 'package:baobabe_0_2/features/auth/presentation/widgets/auth_form.dart';
 import 'package:baobabe_0_2/features/auth/presentation/widgets/auth_header.dart';
 import 'package:flutter/material.dart';
