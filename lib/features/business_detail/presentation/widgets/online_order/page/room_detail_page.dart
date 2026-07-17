@@ -1,14 +1,16 @@
 import 'package:baobabe_0_2/core/themes/app_colors.dart';
-import 'package:baobabe_0_2/features/auth/presentation/bloc/auth_bloc.dart';
-import 'package:baobabe_0_2/features/auth/presentation/bloc/auth_state.dart';
+import 'package:baobabe_0_2/core/services/session_service.dart';
 import 'package:baobabe_0_2/features/business_detail/data/models/room.dart';
 import 'package:baobabe_0_2/features/business_detail/presentation/bloc/business_detail_bloc.dart';
 import 'package:baobabe_0_2/features/booking_page/data/models/reservation_model.dart';
+import 'package:baobabe_0_2/features/business_detail/presentation/widgets/online_order/page/room_booking_summary.dart';
+import 'package:baobabe_0_2/features/business_detail/presentation/widgets/online_order/page/room_counter_row.dart';
+import 'package:baobabe_0_2/features/business_detail/presentation/widgets/online_order/page/room_date_selectors.dart';
+import 'package:baobabe_0_2/features/business_detail/presentation/widgets/online_order/page/room_info_header.dart';
 import 'package:baobabe_0_2/features/home_page/domain/entities/business_entity.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
 
 class RoomDetailPage extends StatefulWidget {
   final Business hotel;
@@ -92,12 +94,12 @@ class _RoomDetailPageState extends State<RoomDetailPage> {
     }
 
     // Récupérer l'utilisateur connecté
-    final authState = context.read<AuthBloc>().state;
-    if (authState is! AuthenticatedState) {
+    final sessionUser = SessionService.instance.currentUser;
+    if (sessionUser == null) {
       context.go('/login');
       return;
     }
-    final userId = authState.user.id;
+    final userId = sessionUser.id;
 
     final nights = _checkOut!.difference(_checkIn!).inDays;
     final totalAmount = widget.room.pricePerNight * nights * _roomsCount;
@@ -154,94 +156,46 @@ class _RoomDetailPageState extends State<RoomDetailPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Image principale
-            Container(
-              height: 250,
-              width: double.infinity,
-              decoration: BoxDecoration(
-                color: AppColors.primary.withOpacity(0.1),
-                image: widget.room.images != null && widget.room.images!.isNotEmpty
-                    ? DecorationImage(
-                  image: NetworkImage(widget.room.images!.first),
-                  fit: BoxFit.cover,
-                )
-                    : null,
-              ),
-              child: widget.room.images == null || widget.room.images!.isEmpty
-                  ? const Icon(Icons.hotel, size: 80, color: Colors.grey)
-                  : null,
-            ),
+            RoomImageHeader(room: widget.room),
             Padding(
               padding: const EdgeInsets.all(16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    widget.room.roomType,
-                    style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    '${widget.room.pricePerNight.toStringAsFixed(2)} € / nuit',
-                    style: TextStyle(fontSize: 18, color: AppColors.primary, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 8),
-                  Text('Capacité: ${widget.room.capacity} personnes'),
-                  const SizedBox(height: 4),
-                  Text('Disponibles: ${widget.room.availableQuantity} chambres'),
-                  if (widget.room.description != null) ...[
-                    const SizedBox(height: 16),
-                    const Text('Description', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                    const SizedBox(height: 8),
-                    Text(widget.room.description!),
-                  ],
-                  if (widget.room.amenities != null && widget.room.amenities!.isNotEmpty) ...[
-                    const SizedBox(height: 16),
-                    const Text('Équipements', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                    const SizedBox(height: 8),
-                    Wrap(
-                      spacing: 8,
-                      children: widget.room.amenities!.entries.map((entry) {
-                        if (entry.value == true) {
-                          return Chip(
-                            label: Text(entry.key),
-                            backgroundColor: AppColors.primary.withOpacity(0.1),
-                          );
-                        }
-                        return const SizedBox();
-                      }).toList(),
-                    ),
-                  ],
+                  RoomInfoHeader(room: widget.room),
                   const SizedBox(height: 24),
                   const Text('Réservation', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
                   const SizedBox(height: 16),
-                  // Dates
-                  Row(
-                    children: [
-                      Expanded(
-                        child: _dateTile(
-                          label: 'Arrivée',
-                          date: _checkIn,
-                          onTap: () => _selectDate(_checkIn, true),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: _dateTile(
-                          label: 'Départ',
-                          date: _checkOut,
-                          onTap: () => _selectDate(_checkOut, false),
-                        ),
-                      ),
-                    ],
+                  RoomDateSelectors(
+                    checkIn: _checkIn,
+                    checkOut: _checkOut,
+                    onSelectCheckIn: () => _selectDate(_checkIn, true),
+                    onSelectCheckOut: () => _selectDate(_checkOut, false),
                   ),
                   const SizedBox(height: 16),
-                  // Nombre de chambres
-                  _counterRow('Chambres', _roomsCount, (v) => setState(() => _roomsCount = v), 1, widget.room.availableQuantity),
+                  RoomCounterRow(
+                    label: 'Chambres',
+                    value: _roomsCount,
+                    onChanged: (v) => setState(() => _roomsCount = v),
+                    min: 1,
+                    max: widget.room.availableQuantity,
+                  ),
                   const SizedBox(height: 16),
-                  _counterRow('Adultes', _adults, (v) => setState(() => _adults = v), 1, 10),
+                  RoomCounterRow(
+                    label: 'Adultes',
+                    value: _adults,
+                    onChanged: (v) => setState(() => _adults = v),
+                    min: 1,
+                    max: 10,
+                  ),
                   const SizedBox(height: 16),
-                  _counterRow('Enfants', _children, (v) => setState(() => _children = v), 0, 5),
+                  RoomCounterRow(
+                    label: 'Enfants',
+                    value: _children,
+                    onChanged: (v) => setState(() => _children = v),
+                    min: 0,
+                    max: 5,
+                  ),
                   const SizedBox(height: 24),
                   // Informations client
                   TextField(
@@ -261,90 +215,13 @@ class _RoomDetailPageState extends State<RoomDetailPage> {
                     maxLines: 2,
                   ),
                   const SizedBox(height: 24),
-                  // Total et bouton
-                  Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: AppColors.primary.withOpacity(0.05),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Text('Total', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                        Text(
-                          '${totalPrice.toStringAsFixed(2)} €',
-                          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.primary),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: _book,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.primary,
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                      ),
-                      child: const Text('Confirmer la réservation', style: TextStyle(fontSize: 16)),
-                    ),
-                  ),
+                  RoomBookingSummary(totalPrice: totalPrice, onBook: _book),
                 ],
               ),
             ),
           ],
         ),
       ),
-    );
-  }
-
-  Widget _dateTile({required String label, required DateTime? date, required VoidCallback onTap}) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 12),
-        decoration: BoxDecoration(
-          border: Border.all(color: Colors.grey.shade300),
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: Row(
-          children: [
-            Icon(Icons.calendar_today, size: 16, color: AppColors.primary),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Text(
-                date != null ? DateFormat('dd/MM/yyyy').format(date) : label,
-                style: TextStyle(color: date != null ? Colors.black : Colors.grey),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _counterRow(String label, int value, ValueChanged<int> onChanged, int min, int max) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(label, style: const TextStyle(fontSize: 16)),
-        Row(
-          children: [
-            IconButton(
-              onPressed: value > min ? () => onChanged(value - 1) : null,
-              icon: const Icon(Icons.remove_circle_outline),
-            ),
-            Text('$value', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-            IconButton(
-              onPressed: value < max ? () => onChanged(value + 1) : null,
-              icon: const Icon(Icons.add_circle_outline),
-            ),
-          ],
-        ),
-      ],
     );
   }
 }

@@ -2,6 +2,9 @@ import 'package:baobabe_0_2/core/themes/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
+part 'reservation_json_mapper.dart';
+part 'reservation_display_extensions.dart';
+
 class Reservation {
   final String id;
   final String? businessId;
@@ -126,175 +129,6 @@ class Reservation {
     this.selectedActivities,
   });
 
-  // Convertit l'objet en Map JSON pour l'envoi vers l'API / PostgreSQL
-  Map<String, dynamic> toJson({bool isNew = false}) {
-    Map<String, dynamic> details = {};
-
-    switch (reservationType) {
-      case 'restaurant':
-        details['table_number'] = tableNumber;
-        details['floor'] = floor;
-        details['date'] = date?.toIso8601String();
-        details['time'] = time != null ? '${time!.hour}:${time!.minute}' : null;
-        details['number_of_people'] = numberOfPeople;
-        break;
-
-      case 'hotel':
-        details['room_type'] = roomType;
-        details['check_in_date'] = checkInDate?.toIso8601String();
-        details['check_out_date'] = checkOutDate?.toIso8601String();
-        details['number_of_rooms'] = numberOfRooms;
-        details['number_of_guests'] = numberOfGuests;
-        break;
-
-      case 'location':
-        details['vehicle_type'] = vehicleType;
-        details['rental_start_date'] = rentalStartDate?.toIso8601String();
-        details['rental_end_date'] = rentalEndDate?.toIso8601String();
-        details['rental_days'] = rentalDays;
-        details['with_driver'] = withDriver;
-        details['include_insurance'] = includeInsurance;
-        details['need_delivery'] = needDelivery;
-        break;
-
-      case 'spa':
-        details['treatment_type'] = treatmentType;
-        details['duration_minutes'] = durationMinutes;
-        details['therapist_name'] = therapistName;
-        details['appointment_date'] = appointmentDate?.toIso8601String();
-        details['selected_treatments'] = selectedTreatments;
-        break;
-
-      case 'cinema':
-        details['movie_title'] = movieTitle;
-        details['showtime'] = showtime?.toIso8601String();
-        details['ticket_type'] = ticketType;
-        details['tickets_count'] = numberOfTickets;
-        details['seat_numbers'] = seatNumbers;
-        break;
-
-      case 'travel':
-        details['destination'] = destination;
-        details['number_of_passengers'] = numberOfPassengers;
-        details['departure_time'] = departureTime;
-        break;
-
-      case 'toursime':
-        details['activity_name'] = activitiName;
-        details['activity_type'] = activiteType;
-        details['day'] = day?.toIso8601String();
-        details['selected_activities'] = selectedActivities;
-        break;
-    }
-
-    final payload = <String, dynamic>{
-      'business_id': businessId,
-      'type': reservationType,
-      'total_amount': totalAmount,
-      'reservation_date': reservationDate.toIso8601String(),
-      'details': {
-        ...details,
-        'establishment_name': establishmentName,
-        'customer_name': customerName,
-        'phone_number': phoneNumber,
-        'notes': notes,
-      },
-    };
-
-    final _userId = userId;
-    if (_userId != null && _userId.isNotEmpty) {
-      payload['user_id'] = _userId;
-    }
-
-    if (!isNew && id.isNotEmpty) {
-      payload['id'] = id;
-    }
-
-    final _createdAt = createdAt;
-    if (!isNew && _createdAt != null) {
-      payload['created_at'] = _createdAt.toIso8601String();
-    }
-
-    return payload;
-  }
-
-  // Compatibility getters used across the app
-  String get type => reservationType;
-
-  String get typeDisplayName {
-    switch (reservationType) {
-      case 'hotel':
-        return 'Hôtel';
-      case 'restaurant':
-        return 'Restaurant';
-      case 'car_rental':
-        return 'Location de voiture';
-      case 'travel':
-        return 'Voyage';
-      case 'spa':
-        return 'Spa';
-      case 'cinema':
-        return 'Cinéma';
-      case 'toursime':
-        return 'Tourisme';
-      default:
-        return reservationType.isNotEmpty ? reservationType : 'Réservation';
-    }
-  }
-
-  Color get typeColor {
-    switch (reservationType) {
-      case 'hotel':
-        return AppColors.hotel;
-      case 'restaurant':
-        return AppColors.restaurant;
-      case 'car_rental':
-        return AppColors.carRental;
-      case 'travel':
-        return AppColors.travelAgency;
-      case 'spa':
-        return AppColors.spa;
-      case 'cinema':
-        return AppColors.cinema;
-      case 'toursime':
-        return AppColors.tourism;
-      default:
-        return Colors.grey;
-    }
-  }
-
-  IconData get typeIcon {
-    switch (reservationType) {
-      case 'hotel':
-        return Icons.hotel;
-      case 'restaurant':
-        return Icons.restaurant;
-      case 'car_rental':
-        return Icons.directions_car;
-      case 'travel':
-        return Icons.flight_takeoff;
-      case 'spa':
-        return Icons.spa;
-      case 'cinema':
-        return Icons.movie;
-      case 'toursime':
-        return Icons.tour;
-      default:
-        return Icons.event;
-    }
-  }
-
-  DateTime get displayDate =>
-      date ?? checkInDate ?? rentalStartDate ?? appointmentDate ?? showtime ?? day ?? reservationDate;
-
-  String get displayDateLabel {
-    try {
-      return DateFormat('dd/MM/yyyy').format(displayDate.toLocal());
-    } catch (_) {
-      return displayDate.toIso8601String();
-    }
-  }
-
   // Factory pour reconstruire l'objet depuis un JSON reçu de l'API
   factory Reservation.fromJson(Map<String, dynamic> json) {
     final details = json['details'] as Map<String, dynamic>? ?? {};
@@ -324,7 +158,7 @@ class Reservation {
         : (json['business'] is Map ? json['business']['name']?.toString() ?? '' : '');
 
     if (establishmentName.isEmpty) {
-      establishmentName = details['establishment_name']?.toString() ?? 
+      establishmentName = details['establishment_name']?.toString() ??
                          details['establishmentName']?.toString() ?? '';
     }
 
@@ -333,12 +167,12 @@ class Reservation {
       businessId: json['business_id']?.toString(),
       establishmentName: establishmentName,
       reservationType: type,
-      customerName: json['customer_name']?.toString() ?? 
-                    details['customer_name']?.toString() ?? 
+      customerName: json['customer_name']?.toString() ??
+                    details['customer_name']?.toString() ??
                     details['fullName']?.toString() ?? '',
-      phoneNumber: json['phone_number']?.toString() ?? 
-                   json['phone']?.toString() ?? 
-                   details['phone']?.toString() ?? 
+      phoneNumber: json['phone_number']?.toString() ??
+                   json['phone']?.toString() ??
+                   details['phone']?.toString() ??
                    details['phone_number']?.toString() ?? '',
       notes: json['notes']?.toString() ?? details['notes']?.toString(),
       totalAmount: (json['total_amount'] as num?)?.toDouble() ?? 0.0,

@@ -1,8 +1,6 @@
+import 'package:baobabe_0_2/core/services/session_service.dart';
 import 'package:baobabe_0_2/core/themes/app_colors.dart';
 import 'package:baobabe_0_2/core/themes/app_diemens.dart';
-import 'package:baobabe_0_2/features/auth/domain/entities/user.dart';
-import 'package:baobabe_0_2/features/auth/presentation/bloc/auth_bloc.dart';
-import 'package:baobabe_0_2/features/auth/presentation/bloc/auth_state.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/bloc/search_bloc.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/screens/search_page.dart';
 import 'package:flutter/material.dart';
@@ -15,19 +13,12 @@ class HelloUserWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<AuthBloc, AuthState>(
-      builder: (context, state) {
-        String userName = 'Utilisateur';
-        UserEntity? user;
-
-        // 🛠️ FIX : Utilisation du bon nom d'état 'AuthenticatedState'
-        if (state is AuthenticatedState) {
-          final authenticatedUser = state.user;
-          if (authenticatedUser != null) {
-            user = authenticatedUser;
-            userName = authenticatedUser.name;
-          }
-        }
+    return StreamBuilder<AppSessionUser?>(
+      initialData: SessionService.instance.currentUser,
+      stream: SessionService.instance.userChanges,
+      builder: (context, snapshot) {
+        final user = snapshot.data;
+        final userName = user?.name ?? 'Utilisateur';
 
         return Padding(
           padding: const EdgeInsets.only(
@@ -196,7 +187,7 @@ class HelloUserWidget extends StatelessWidget {
   }
 
 
-  Widget _buildAvatar(UserEntity? user, String userName, BuildContext context) {
+  Widget _buildAvatar(AppSessionUser? user, String userName, BuildContext context) {
     return GestureDetector(
       onTap: () => context.go('/profile'),
       child: Container(

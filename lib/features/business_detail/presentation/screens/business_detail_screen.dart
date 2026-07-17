@@ -1,5 +1,6 @@
-import 'package:baobabe_0_2/core/constants/injector.dart';
 import 'package:baobabe_0_2/core/themes/app_colors.dart';
+import 'package:baobabe_0_2/features/home_page/data/repositories/business_remote_datasource_impl.dart';
+import 'package:baobabe_0_2/features/home_page/data/repositories/business_repository_impl.dart';
 import 'package:baobabe_0_2/features/business_detail/domain/usecases/get_business_detail.dart';
 import 'package:baobabe_0_2/features/business_detail/presentation/bloc/business_detail_bloc.dart';
 import 'package:baobabe_0_2/features/business_detail/presentation/widgets/business_actions_section.dart';
@@ -35,11 +36,16 @@ class _BusinessDetailScreenState extends State<BusinessDetailScreen> {
   @override
   Widget build(BuildContext context) {
     return BlocProvider<BusinessDetailBloc>(
-      create: (context) => BusinessDetailBloc(
-        getBusinessDetail: Injector.get<GetBusinessDetail>(),
-        repository: Injector.get<BusinessRepository>(),
-        businessId: widget.businessId,
-      )..add(LoadBusinessDetail(widget.businessId)),
+      create: (context) {
+        final repository = BusinessRepositoryImpl(
+          remoteDataSource: BusinessRemoteDataSourceImpl(),
+        );
+        return BusinessDetailBloc(
+          getBusinessDetail: GetBusinessDetail(repository),
+          repository: repository,
+          businessId: widget.businessId,
+        )..add(LoadBusinessDetail(widget.businessId));
+      },
       child: Scaffold(
         backgroundColor: AppColors.canvasBackground,
         body: BlocConsumer<BusinessDetailBloc, BusinessDetailState>(

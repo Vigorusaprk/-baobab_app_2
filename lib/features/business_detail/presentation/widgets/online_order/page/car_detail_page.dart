@@ -1,11 +1,15 @@
+import 'package:baobabe_0_2/core/services/session_service.dart';
 import 'package:baobabe_0_2/core/themes/app_colors.dart';
-import 'package:baobabe_0_2/features/auth/presentation/bloc/auth_state.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:baobabe_0_2/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:baobabe_0_2/features/booking_page/data/models/reservation_service.dart';
-import 'package:baobabe_0_2/core/constants/injector.dart';
 import 'package:baobabe_0_2/features/order/data/models/vehicle_model.dart';
+import 'package:baobabe_0_2/features/business_detail/presentation/widgets/online_order/page/car_customer_form.dart';
+import 'package:baobabe_0_2/features/business_detail/presentation/widgets/online_order/page/car_date_range_section.dart';
+import 'package:baobabe_0_2/features/business_detail/presentation/widgets/online_order/page/car_image_header.dart';
+import 'package:baobabe_0_2/features/business_detail/presentation/widgets/online_order/page/car_options_section.dart';
+import 'package:baobabe_0_2/features/business_detail/presentation/widgets/online_order/page/car_price_summary.dart';
+import 'package:baobabe_0_2/features/business_detail/presentation/widgets/online_order/page/car_reservation_button.dart';
+import 'package:baobabe_0_2/features/business_detail/presentation/widgets/online_order/page/car_vehicle_header.dart';
 
 class CarDetailPage extends StatefulWidget {
   final String businessId;
@@ -24,7 +28,7 @@ class CarDetailPage extends StatefulWidget {
 }
 
 class _CarDetailPageState extends State<CarDetailPage> {
-  final _reservationService = Injector.get<ReservationApiService>();
+  final _reservationService = ReservationApiService();
 
   DateTime? _startDate;
   DateTime? _endDate;
@@ -165,9 +169,9 @@ class _CarDetailPageState extends State<CarDetailPage> {
 
   @override
   Widget build(BuildContext context) {
-    final authState = context.watch<AuthBloc>().state;
-    final isLoggedIn = authState is AuthenticatedState;
-    final userId = isLoggedIn ? authState.user.id : null;
+    final sessionUser = SessionService.instance.currentUser;
+    final isLoggedIn = sessionUser != null;
+    final userId = sessionUser?.id;
 
     return Scaffold(
       backgroundColor: AppColors.scaffoldBackground,
@@ -187,399 +191,62 @@ class _CarDetailPageState extends State<CarDetailPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Image
-            Container(
-              height: 250,
-              width: double.infinity,
-              color: Colors.grey[300],
-              child: widget.vehicle.imageUrl.isNotEmpty
-                  ? Image.network(
-                widget.vehicle.imageUrl,
-                fit: BoxFit.cover,
-                errorBuilder: (_, __, ___) => Center(
-                  child: Icon(
-                    Icons.directions_car,
-                    size: 100,
-                    color: Colors.grey[600],
-                  ),
-                ),
-              )
-                  : Center(
-                child: Icon(
-                  Icons.directions_car,
-                  size: 100,
-                  color: Colors.grey[600],
-                ),
-              ),
+            CarImageHeader(
+              imageUrl: widget.vehicle.imageUrl,
+              isLoggedIn: isLoggedIn,
             ),
-            if (!isLoggedIn)
-              Container(
-                margin: const EdgeInsets.all(16),
-                padding: const EdgeInsets.all(12),
-                color: Colors.orange.shade100,
-                child: const Row(
-                  children: [
-                    Icon(Icons.warning_amber, color: Colors.orange),
-                    SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        'Veuillez vous connecter pour réserver',
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
             Padding(
               padding: const EdgeInsets.all(16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            widget.vehicle.name,
-                            style: const TextStyle(
-                              fontSize: 22,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          Text(
-                            widget.vehicle.type,
-                            style: TextStyle(color: Colors.grey[600]),
-                          ),
-                        ],
-                      ),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 12,
-                        ),
-                        decoration: BoxDecoration(
-                          color: AppColors.primaryLight,
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Text(
-                          '${widget.vehicle.dailyPrice.toStringAsFixed(0)}€/jour',
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    ],
+                  CarVehicleHeader(
+                    name: widget.vehicle.name,
+                    type: widget.vehicle.type,
+                    dailyPrice: widget.vehicle.dailyPrice,
                   ),
                   const SizedBox(height: 24),
                   const Divider(),
-                  const Text(
-                    'Dates de location',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  CarDateRangeSection(
+                    startDate: _startDate,
+                    endDate: _endDate,
+                    rentalDays: _getRentalDays(),
+                    onSelectStartDate: () => _selectDate(true),
+                    onSelectEndDate: () => _selectDate(false),
                   ),
-                  const SizedBox(height: 12),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: GestureDetector(
-                          onTap: () => _selectDate(true),
-                          child: Container(
-                            padding: const EdgeInsets.all(12),
-                            decoration: BoxDecoration(
-                              border: Border.all(color: Colors.grey[400]!),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const Text(
-                                  'Début',
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    color: Colors.grey,
-                                  ),
-                                ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  _startDate != null
-                                      ? '${_startDate!.day}/${_startDate!.month}/${_startDate!.year}'
-                                      : 'Sélectionner',
-                                  style: const TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: GestureDetector(
-                          onTap: () => _selectDate(false),
-                          child: Container(
-                            padding: const EdgeInsets.all(12),
-                            decoration: BoxDecoration(
-                              border: Border.all(color: Colors.grey[400]!),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const Text(
-                                  'Fin',
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    color: Colors.grey,
-                                  ),
-                                ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  _endDate != null
-                                      ? '${_endDate!.day}/${_endDate!.month}/${_endDate!.year}'
-                                      : 'Sélectionner',
-                                  style: const TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  if (_startDate != null && _endDate != null)
-                    Padding(
-                      padding: const EdgeInsets.only(top: 12),
-                      child: Text(
-                        '→ ${_getRentalDays()} jour(s) de location',
-                        style: const TextStyle(
-                          fontSize: 12,
-                          color: Color(0xFF3F51B5),
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
                   const SizedBox(height: 24),
                   const Divider(),
-                  const Text(
-                    'Options supplémentaires',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 8),
-                  CheckboxListTile(
-                    contentPadding: EdgeInsets.zero,
-                    title: const Text('Avec chauffeur'),
-                    subtitle: const Text('+50€/jour'),
-                    value: _withDriver,
-                    onChanged: (v) => setState(() => _withDriver = v ?? false),
-                  ),
-                  CheckboxListTile(
-                    contentPadding: EdgeInsets.zero,
-                    title: const Text('Assurance complète'),
-                    subtitle: const Text('+30€/jour'),
-                    value: _includeInsurance,
-                    onChanged: (v) =>
+                  CarOptionsSection(
+                    withDriver: _withDriver,
+                    includeInsurance: _includeInsurance,
+                    needDelivery: _needDelivery,
+                    onWithDriverChanged: (v) => setState(() => _withDriver = v ?? false),
+                    onIncludeInsuranceChanged: (v) =>
                         setState(() => _includeInsurance = v ?? false),
-                  ),
-                  CheckboxListTile(
-                    contentPadding: EdgeInsets.zero,
-                    title: const Text('Livraison'),
-                    subtitle: const Text('+100€ une fois'),
-                    value: _needDelivery,
-                    onChanged: (v) =>
+                    onNeedDeliveryChanged: (v) =>
                         setState(() => _needDelivery = v ?? false),
                   ),
                   const SizedBox(height: 24),
                   const Divider(),
-                  const Text(
-                    'Vos coordonnées',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 12),
-                  TextField(
-                    controller: _customerNameController,
-                    decoration: InputDecoration(
-                      labelText: 'Nom complet *',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      prefixIcon: const Icon(Icons.person),
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  TextField(
-                    controller: _phoneNumberController,
-                    decoration: InputDecoration(
-                      labelText: 'Téléphone *',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      prefixIcon: const Icon(Icons.phone),
-                    ),
-                    keyboardType: TextInputType.phone,
-                  ),
-                  const SizedBox(height: 12),
-                  TextField(
-                    controller: _notesController,
-                    maxLines: 3,
-                    decoration: InputDecoration(
-                      labelText: 'Notes (optionnel)',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      alignLabelWithHint: true,
-                    ),
+                  CarCustomerForm(
+                    nameController: _customerNameController,
+                    phoneController: _phoneNumberController,
+                    notesController: _notesController,
                   ),
                   const SizedBox(height: 24),
-                  Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: Colors.grey[100],
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          'Résumé',
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(height: 12),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              'Tarif journalier × ${_getRentalDays()} jour(s)',
-                              style: const TextStyle(fontSize: 12),
-                            ),
-                            Text(
-                              '${(widget.vehicle.dailyPrice * _getRentalDays()).toStringAsFixed(2)}€',
-                              style: const TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ],
-                        ),
-                        if (_withDriver) ...[
-                          const SizedBox(height: 8),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              const Text(
-                                'Chauffeur',
-                                style: TextStyle(fontSize: 12),
-                              ),
-                              Text(
-                                '${(50 * _getRentalDays()).toStringAsFixed(2)}€',
-                                style: const TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                        if (_includeInsurance) ...[
-                          const SizedBox(height: 8),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              const Text(
-                                'Assurance',
-                                style: TextStyle(fontSize: 12),
-                              ),
-                              Text(
-                                '${(30 * _getRentalDays()).toStringAsFixed(2)}€',
-                                style: const TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                        if (_needDelivery) ...[
-                          const SizedBox(height: 8),
-                          const Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text('Livraison', style: TextStyle(fontSize: 12)),
-                              Text('100.00€', style: TextStyle(fontSize: 12)),
-                            ],
-                          ),
-                        ],
-                        const SizedBox(height: 12),
-                        const Divider(height: 1),
-                        const SizedBox(height: 12),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            const Text(
-                              'TOTAL',
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            Text(
-                              '${_calculateTotalPrice().toStringAsFixed(2)}€',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                color: AppColors.primary,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
+                  CarPriceSummary(
+                    dailyPrice: widget.vehicle.dailyPrice,
+                    rentalDays: _getRentalDays(),
+                    withDriver: _withDriver,
+                    includeInsurance: _includeInsurance,
+                    needDelivery: _needDelivery,
+                    totalPrice: _calculateTotalPrice(),
                   ),
                   const SizedBox(height: 24),
-                  SizedBox(
-                    width: double.infinity,
-                    height: 50,
-                    child: ElevatedButton(
-                      onPressed: (!isLoggedIn || _isLoading)
-                          ? null
-                          : () => _submitReservation(userId!),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.primaryLight,
-                        disabledBackgroundColor: Colors.grey[400],
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
-                      child: _isLoading
-                          ? const SizedBox(
-                        height: 20,
-                        width: 20,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          valueColor: AlwaysStoppedAnimation<Color>(
-                            Colors.white,
-                          ),
-                        ),
-                      )
-                          : const Text(
-                        'Réserver maintenant',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
+                  CarReservationButton(
+                    isLoggedIn: isLoggedIn,
+                    isLoading: _isLoading,
+                    onPressed: () => _submitReservation(userId!),
                   ),
                   const SizedBox(height: 32),
                 ],

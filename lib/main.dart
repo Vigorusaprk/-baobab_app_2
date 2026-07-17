@@ -1,8 +1,15 @@
-import 'package:baobabe_0_2/core/constants/injector.dart';
 import 'package:baobabe_0_2/core/constants/supabase_client.dart';
 import 'package:baobabe_0_2/core/themes/app_theme.dart';
+import 'package:baobabe_0_2/features/auth/data/data_sources/remote_datasource/auth_remote_datasource_impl.dart';
+import 'package:baobabe_0_2/features/auth/data/repositories/auth_repository_impl.dart';
 import 'package:baobabe_0_2/features/auth/presentation/bloc/auth_bloc.dart';
-import 'package:baobabe_0_2/features/business_detail/presentation/bloc/business_detail_bloc.dart';
+import 'package:baobabe_0_2/features/booking_page/data/models/reservation_service.dart';
+import 'package:baobabe_0_2/features/home_page/data/repositories/business_remote_datasource_impl.dart';
+import 'package:baobabe_0_2/features/home_page/data/repositories/business_repository_impl.dart';
+import 'package:baobabe_0_2/features/home_page/data/repositories/category_repository_impl.dart';
+import 'package:baobabe_0_2/features/home_page/data/repositories/search_repository_impl.dart';
+import 'package:baobabe_0_2/features/home_page/domain/usecases/get_businesses.dart';
+import 'package:baobabe_0_2/features/home_page/domain/usecases/get_businesses_by_category_use_case.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/bloc/business_bloc.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/bloc/category_bloc.dart';
 import 'package:baobabe_0_2/features/main/presentation/bloc/main_screen_bloc.dart';
@@ -16,67 +23,90 @@ import 'core/services/sync_service.dart';
 import 'features/home_page/presentation/bloc/search_bloc.dart';
 import 'features/settings/presentation/bloc/settings_bloc.dart';
 
+/// Kept alive for the app lifetime so its connectivity listener keeps running.
+late final SyncManager _syncManager;
+
 void main() async {
-  // Initialisation unique et propre des liaisons Flutter
   final widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
 
-  // Initialisation asynchrone des configurations globales[cite: 4]
   await SupabaseClientWrapper.initialize();
-  Injector.setup();
 
-  // Démarrer le SyncManager pour écouter la connectivité
-  Injector.get<SyncManager>();
+  final reservationApiService = ReservationApiService(SupabaseClientWrapper.client);
+  _syncManager = SyncManager(SyncService(reservationApiService), reservationApiService);
 
   runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
 
   @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  @override
+  void initState() {
+    super.initState();
+    // The Supabase session is already resolved synchronously by the time
+    // runApp() is called, so the splash screen can be released right away.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      FlutterNativeSplash.remove();
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final businessRemoteDataSource = BusinessRemoteDataSourceImpl(
+      supabase: SupabaseClientWrapper.client,
+    );
+    final businessRepository = BusinessRepositoryImpl(
+      remoteDataSource: businessRemoteDataSource,
+    );
+
     return MultiBlocProvider(
       providers: [
-        // ⚡ Déclenchement synchrone immédiat du check d'authentification Supabase[cite: 4]
         BlocProvider<AuthBloc>(
-          create: (_) => Injector.get<AuthBloc>()..add(CheckAuthStatusEvent()),
+          create: (_) => AuthBloc(
+            authRepository: AuthRepositoryImpl(
+              AuthRemoteDataSourceImpl(SupabaseClientWrapper.client),
+            ),
+          ),
         ),
-        BlocProvider<CategoryBloc>(create: (_) => Injector.get<CategoryBloc>()),
-        BlocProvider<BusinessBloc>(create: (_) => Injector.get<BusinessBloc>()),
-        BlocProvider<MainScreenBloc>(create: (_) => Injector.get<MainScreenBloc>()),
-        BlocProvider<SearchBloc>(create: (_) => Injector.get<SearchBloc>()),
-        BlocProvider<SettingsCubit>(create: (_) => Injector.get<SettingsCubit>()),
-
-        // 🛒 Chargement automatique du panier au démarrage[cite: 4]
-        BlocProvider<BusinessDetailBloc>(
-          create: (_) => Injector.get<BusinessDetailBloc>()..add(LoadCart()),
-        )
+        BlocProvider<CategoryBloc>(
+          create: (_) => CategoryBloc(categoryRepository: CategoryRepositoryImpl()),
+        ),
+        BlocProvider<BusinessBloc>(
+          create: (_) => BusinessBloc(
+            getBusinesses: GetBusinesses(businessRepository),
+            getBusinessesByCategory: GetBusinessesByCategory(businessRepository),
+          ),
+        ),
+        BlocProvider<MainScreenBloc>(create: (_) => MainScreenBloc()),
+        BlocProvider<SearchBloc>(
+          create: (_) => SearchBloc(
+            searchRepository: SearchRepositoryImpl(
+              localDataSource: businessRemoteDataSource,
+            ),
+          ),
+        ),
+        BlocProvider<SettingsCubit>(create: (_) => SettingsCubit()),
       ],
-      child: BlocListener<AuthBloc, AuthState>(
-        listener: (context, state) {
-          // 🔓 Libération absolue de l'écran natif dès que l'état d'authentification est déterminé[cite: 4]
-          if (state is AuthenticatedState ||
-              state is UnauthenticatedState ||
-              state is AuthFailureState) {
-            FlutterNativeSplash.remove();
-          }
-        },
-        child: MaterialApp.router(
-          debugShowCheckedModeBanner: false,
-          routerConfig: appRouter,
-          theme: AppTheme.silvaTheme,
-          localizationsDelegates: const [
-            GlobalMaterialLocalizations.delegate,
-            GlobalWidgetsLocalizations.delegate,
-            GlobalCupertinoLocalizations.delegate,
-          ],
-          supportedLocales: const [
-            Locale('fr', 'FR'),
-            Locale('en', 'US'),
-            Locale('ln', 'CD'),
-          ],
-        ),
+      child: MaterialApp.router(
+        debugShowCheckedModeBanner: false,
+        routerConfig: appRouter,
+        theme: AppTheme.silvaTheme,
+        localizationsDelegates: const [
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        supportedLocales: const [
+          Locale('fr', 'FR'),
+          Locale('en', 'US'),
+          Locale('ln', 'CD'),
+        ],
       ),
     );
   }

@@ -1,12 +1,8 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
-// Injection & Blocs
-import 'package:baobabe_0_2/core/constants/injector.dart';
-import 'package:baobabe_0_2/features/auth/presentation/bloc/auth_bloc.dart';
-import 'package:baobabe_0_2/features/auth/presentation/bloc/auth_state.dart';
+import 'package:baobabe_0_2/core/services/session_service.dart';
 
 // Écrans de la Feature Auth
 import 'package:baobabe_0_2/features/auth/presentation/screens/auth_screen.dart';
@@ -47,15 +43,9 @@ class GoRouterRefreshStream extends ChangeNotifier {
 
 final GoRouter appRouter = GoRouter(
   initialLocation: '/',
-  refreshListenable: GoRouterRefreshStream(Injector.get<AuthBloc>().stream),
+  refreshListenable: GoRouterRefreshStream(SessionService.instance.authStateChanges),
   redirect: (context, state) {
-    final authState = context.read<AuthBloc>().state;
-
-    // Pendant l'initialisation ou les chargements internes, on ne force pas de redirection immédiate
-    if (authState is AuthInitialState || authState is AuthLoadingState)
-      return null;
-
-    final isLoggedIn = authState is AuthenticatedState;
+    final isLoggedIn = SessionService.instance.isLoggedIn;
     final isAuthRoute =
         state.matchedLocation.startsWith('/login') ||
         state.matchedLocation.startsWith('/register') ||
@@ -74,16 +64,7 @@ final GoRouter appRouter = GoRouter(
     GoRoute(
       path: '/',
       redirect: (context, state) {
-        final authState = context.read<AuthBloc>().state;
-
-        if (authState is AuthenticatedState) return '/home';
-        if (authState is UnauthenticatedState || authState is AuthFailureState)
-          return '/login';
-
-        // En cas d'état initial non déterminé, on temporise sur le login
-        if (authState is AuthInitialState) return '/login';
-
-        return null;
+        return SessionService.instance.isLoggedIn ? '/home' : '/login';
       },
       pageBuilder: (context, state) => const MaterialPage(
         child: Scaffold(body: Center(child: CircularProgressIndicator())),

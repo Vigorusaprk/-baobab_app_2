@@ -1,6 +1,5 @@
 import 'package:baobabe_0_2/core/themes/app_colors.dart';
-import 'package:baobabe_0_2/features/auth/presentation/bloc/auth_bloc.dart';
-import 'package:baobabe_0_2/features/auth/presentation/bloc/auth_state.dart';
+import 'package:baobabe_0_2/core/services/session_service.dart';
 import 'package:baobabe_0_2/features/business_detail/presentation/bloc/business_detail_bloc.dart';
 import 'package:baobabe_0_2/features/booking_page/data/models/reservation_model.dart';
 import 'package:baobabe_0_2/features/home_page/domain/entities/business_entity.dart';
@@ -111,8 +110,8 @@ class _TravelReservationModalState extends State<TravelReservationModal> {
   }
 
   Future<void> _saveReservation() async {
-    final authState = context.read<AuthBloc>().state;
-    if (authState is! AuthenticatedState) {
+    final sessionUser = SessionService.instance.currentUser;
+    if (sessionUser == null) {
       _showSnackBar('Veuillez vous connecter');
       return;
     }
@@ -124,7 +123,7 @@ class _TravelReservationModalState extends State<TravelReservationModal> {
       final reservation = Reservation(
         id: '',
         businessId: widget.business.id,
-        userId: authState.user.id,
+        userId: sessionUser.id,
         type: 'voyage',
         reservationDate: DateTime.now(),
         createdAt: DateTime.now(),

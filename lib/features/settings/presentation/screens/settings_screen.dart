@@ -1,111 +1,16 @@
 import 'package:baobabe_0_2/features/main/presentation/widgets/app_background.dart';
 import 'package:baobabe_0_2/features/settings/presentation/bloc/settings_bloc.dart';
+import 'package:baobabe_0_2/features/settings/presentation/widgets/language_picker_dialog.dart';
+import 'package:baobabe_0_2/features/settings/presentation/widgets/logout_confirmation_dialog.dart';
+import 'package:baobabe_0_2/features/settings/presentation/widgets/settings_tiles.dart';
+import 'package:baobabe_0_2/features/settings/presentation/widgets/theme_picker_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:baobabe_0_2/core/themes/app_colors.dart';
-import 'package:baobabe_0_2/core/themes/app_diemens.dart';
 import 'package:baobabe_0_2/core/themes/app_fonts.dart';
-import 'package:baobabe_0_2/features/auth/presentation/bloc/auth_bloc.dart';
-import 'package:baobabe_0_2/features/auth/presentation/bloc/auth_event.dart';
-import 'package:baobabe_0_2/features/main/presentation/widgets/main_background.dart';
-
-
-// Classes internes (définies avant utilisation)
-class IconBadge extends StatelessWidget {
-  final IconData icon;
-  final Color color;
-  const IconBadge({super.key, required this.icon, required this.color});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(10),
-      decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Icon(icon, color: color, size: 22),
-    );
-  }
-}
-
-class InfoTile extends StatelessWidget {
-  final String subtitle;
-  final IconData icon;
-  final Color accentColor;
-  final VoidCallback? onTap;
-  final Widget? trailing;
-
-  const InfoTile({
-    super.key,
-    required this.subtitle,
-    required this.icon,
-    this.accentColor = AppColors.primary,
-    this.onTap,
-    this.trailing,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(12),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8.0),
-        child: Row(
-          children: [
-            IconBadge(icon: icon, color: AppColors.secondary),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Text(subtitle, style: AppFonts.bodyMedium),
-            ),
-            if (trailing != null) trailing!,
-            if (onTap != null && trailing == null)
-              Icon(Icons.chevron_right, color: Colors.grey[400]),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class DetailSection extends StatelessWidget {
-  final String sectionTitle;
-  final List<Widget> children;
-
-  const DetailSection({super.key, required this.sectionTitle, required this.children});
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
-          child: Text(sectionTitle, style: AppFonts.bodySmall),
-        ),
-        Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(24),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.03),
-                blurRadius: 20,
-                offset: const Offset(0, 8),
-              )
-            ],
-          ),
-          child: Column(children: children),
-        ),
-      ],
-    );
-  }
-}
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
@@ -150,7 +55,7 @@ class SettingsScreen extends StatelessWidget {
                     InfoTile(
                       subtitle: "Langue",
                       icon: Icons.language_outlined,
-                      onTap: () => _showLanguageDialog(context),
+                      onTap: () => showLanguagePickerDialog(context),
                       trailing: Text(
                         _getLanguageName(settingsState.locale.languageCode),
                         style: AppFonts.bodySmall?.copyWith(color: AppColors.secondaryLight),
@@ -160,7 +65,7 @@ class SettingsScreen extends StatelessWidget {
                     InfoTile(
                       subtitle: "Thème",
                       icon: Icons.brightness_6_outlined,
-                      onTap: () => _showThemeDialog(context),
+                      onTap: () => showThemePickerDialog(context),
                       trailing: Text(
                         _getThemeName(settingsState.themeMode),
                         style: AppFonts.bodySmall?.copyWith(color: AppColors.secondaryLight),
@@ -192,7 +97,7 @@ class SettingsScreen extends StatelessWidget {
                       subtitle: "Déconnexion",
                       icon: Icons.logout,
                       accentColor: AppColors.error,
-                      onTap: () => _showLogoutDialog(context),
+                      onTap: () => showLogoutConfirmationDialog(context),
                     ),
                   ],
                 ),
@@ -248,124 +153,6 @@ class SettingsScreen extends StatelessWidget {
           ),
         );
       },
-    );
-  }
-
-  void _showLanguageDialog(BuildContext context) {
-    final cubit = context.read<SettingsCubit>();
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: AppColors.scaffoldBackground,
-        title: Text("Choisir la langue", style: AppFonts.titleMedium),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            ListTile(
-              title: Text("Français"),
-              trailing: cubit.state.locale.languageCode == 'fr'
-                  ? Icon(Icons.check, color: AppColors.primary)
-                  : null,
-              onTap: () {
-                cubit.setLocale(const Locale('fr', 'FR'));
-                Navigator.pop(context);
-              },
-            ),
-            ListTile(
-              title: Text("English"),
-              trailing: cubit.state.locale.languageCode == 'en'
-                  ? Icon(Icons.check, color: AppColors.primary)
-                  : null,
-              onTap: () {
-                cubit.setLocale(const Locale('en', 'US'));
-                Navigator.pop(context);
-              },
-            ),
-            ListTile(
-              title: Text("Lingala"),
-              trailing: cubit.state.locale.languageCode == 'ln'
-                  ? Icon(Icons.check, color: AppColors.primary)
-                  : null,
-              onTap: () {
-                cubit.setLocale(const Locale('ln', 'CD'));
-                Navigator.pop(context);
-              },
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  void _showThemeDialog(BuildContext context) {
-    final cubit = context.read<SettingsCubit>();
-    showDialog(
-
-      context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: AppColors.scaffoldBackground,
-
-        title: Text("Choisir le thème", style: AppFonts.titleMedium),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            ListTile(
-              title: Text("Clair"),
-              trailing: cubit.state.themeMode == ThemeMode.light
-                  ? Icon(Icons.check, color: AppColors.secondaryLight)
-                  : null,
-              onTap: () {
-                cubit.setThemeMode(ThemeMode.light);
-                Navigator.pop(context);
-              },
-            ),
-            ListTile(
-              title: Text("Sombre"),
-              trailing: cubit.state.themeMode == ThemeMode.dark
-                  ? Icon(Icons.check, color: AppColors.secondaryLight)
-                  : null,
-              onTap: () {
-                cubit.setThemeMode(ThemeMode.dark);
-                Navigator.pop(context);
-              },
-            ),
-            ListTile(
-              title: Text("Système"),
-              trailing: cubit.state.themeMode == ThemeMode.system
-                  ? Icon(Icons.check, color: AppColors.secondaryLight)
-                  : null,
-              onTap: () {
-                cubit.setThemeMode(ThemeMode.system);
-                Navigator.pop(context);
-              },
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  void _showLogoutDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text("Déconnexion", style: AppFonts.titleMedium),
-        content: Text("Êtes-vous sûr de vouloir vous déconnecter ?"),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text("Annuler"),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              context.read<AuthBloc>().add(LogoutRequestedEvent());
-              context.go('/login');
-            },
-            style: ElevatedButton.styleFrom(backgroundColor: AppColors.error),
-            child: Text("Se déconnecter"),
-          ),
-        ],
-      ),
     );
   }
 

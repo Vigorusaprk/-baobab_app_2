@@ -1,7 +1,9 @@
 import 'package:baobabe_0_2/core/themes/app_colors.dart';
-import 'package:baobabe_0_2/features/auth/presentation/bloc/auth_bloc.dart';
-import 'package:baobabe_0_2/features/auth/presentation/bloc/auth_state.dart';
+import 'package:baobabe_0_2/core/services/session_service.dart';
 import 'package:baobabe_0_2/features/business_detail/presentation/bloc/business_detail_bloc.dart';
+import 'package:baobabe_0_2/features/business_detail/presentation/widgets/online_order/page/reservation_modal/reservation_modal_pages.dart';
+import 'package:baobabe_0_2/features/business_detail/presentation/widgets/online_order/page/reservation_modal/reservation_modal_header.dart';
+import 'package:baobabe_0_2/features/business_detail/presentation/widgets/online_order/page/reservation_modal/reservation_progress_indicator.dart';
 import 'package:baobabe_0_2/features/booking_page/data/models/reservation_model.dart';
 import 'package:baobabe_0_2/features/home_page/domain/entities/business_entity.dart';
 import 'package:flutter/material.dart';
@@ -145,8 +147,8 @@ class _ReservationModalState extends State<ReservationModal> {
   Future<void> _saveReservation() async {
     setState(() => _isLoading = true);
 
-    final authState = context.read<AuthBloc>().state;
-    if (authState is! AuthenticatedState) {
+    final sessionUser = SessionService.instance.currentUser;
+    if (sessionUser == null) {
       _showSnackBar('Veuillez vous connecter');
       setState(() => _isLoading = false);
       return;
@@ -162,7 +164,7 @@ class _ReservationModalState extends State<ReservationModal> {
       return;
     }
 
-    final userId = authState.user.id;
+    final userId = sessionUser.id;
 
     // Maintenant, Dart sait que ces valeurs ne sont pas nulles
     final fullDateTime = DateTime(
@@ -216,88 +218,73 @@ class _ReservationModalState extends State<ReservationModal> {
       ),
       child: Column(
         children: [
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                if (_pageController.hasClients && _pageController.page! > 0)
-                  IconButton(
-                    icon: const Icon(Icons.arrow_back_ios_new, color: Colors.black),
-                    onPressed: () {
-                      _pageController.previousPage(
-                        duration: const Duration(milliseconds: 300),
-                        curve: Curves.easeIn,
-                      );
-                    },
-                  ),
-                if (!(_pageController.hasClients && _pageController.page! > 0))
-                  const SizedBox(width: 48),
-
-                Column(
-                  children: [
-                    Text(
-                      _getPageTitle(_pageController.hasClients ? _pageController.page!.round() : 0),
-                      style: const TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    Text(
-                      widget.business.name,
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Colors.grey[600],
-                      ),
-                    ),
-                  ],
-                ),
-
-                IconButton(
-                  icon: const Icon(Icons.close, color: Colors.black),
-                  onPressed: () => Navigator.of(context).pop(),
-                ),
-              ],
-            ),
+          ReservationModalHeader(
+            title: _getPageTitle(_pageController.hasClients ? _pageController.page!.round() : 0),
+            businessName: widget.business.name,
+            showBack: _pageController.hasClients && _pageController.page! > 0,
+            onBack: () {
+              _pageController.previousPage(
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.easeIn,
+              );
+            },
+            onClose: () => Navigator.of(context).pop(),
           ),
           const Divider(height: 1, color: Colors.grey),
 
-          _buildProgressIndicator(),
+          ReservationProgressIndicator(
+            currentPage: _pageController.hasClients ? _pageController.page!.round() : 0,
+          ),
           const SizedBox(height: 16),
 
           Expanded(
-            child: PageView(
-              controller: _pageController,
-              physics: const NeverScrollableScrollPhysics(),
-              children: [
-                _buildSelectTablePage(),
-                _buildInformationDetailPage(),
-                _buildOrderSummaryPage(),
-              ],
+            child: ReservationModalPages(
+              pageController: _pageController,
+              floors: _floors,
+              selectedFloor: _selectedFloor,
+              onFloorSelected: (floor) => setState(() => _selectedFloor = floor),
+              selectedTable: _selectedTable,
+              onTableSelected: (table) => setState(() {
+                _selectedTable = table;
+                _data.selectedTable = table;
+              }),
+              onSelectTableNext: _selectedTable != null ? _nextPage : null,
+              fullNameController: _fullNameController,
+              phoneController: _phoneController,
+              peopleController: _peopleController,
+              notesController: _notesController,
+              date: _data.date,
+              time: _data.time,
+              onPickDate: () async {
+                final selectedDate = await _showDatePicker();
+                setState(() {
+                  _data.date = selectedDate;
+                });
+              },
+              onPickTime: () async {
+                final selectedTime = await _showTimePicker();
+                setState(() {
+                  _data.time = selectedTime;
+                });
+              },
+              onFieldChanged: () => setState(() {}),
+              canContinue: _validateStep2(),
+              onContinue: _nextPage,
+              businessName: widget.business.name,
+              subtotal: _data.subtotal,
+              tax: _data.tax,
+              grandTotal: _data.grandTotal,
+              isLoading: _isLoading,
+              onConfirm: _saveReservation,
+              onEditInfo: () {
+                _pageController.previousPage(
+                  duration: const Duration(milliseconds: 300),
+                  curve: Curves.easeIn,
+                );
+              },
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildProgressIndicator() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [0, 1, 2].map((index) {
-          final currentPage = _pageController.hasClients ? _pageController.page!.round() : 0;
-          return Container(
-            width: 8,
-            height: 8,
-            margin: const EdgeInsets.symmetric(horizontal: 4),
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: currentPage >= index ? AppColors.secondary : Colors.grey[300],
-            ),
-          );
-        }).toList(),
       ),
     );
   }
@@ -309,486 +296,5 @@ class _ReservationModalState extends State<ReservationModal> {
       case 2: return 'Récapitulatif';
       default: return '';
     }
-  }
-
-  Widget _buildSelectTablePage() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0),
-          child: Text(
-            'Choisissez votre table préférée',
-            style: TextStyle(fontSize: 16, color: Colors.grey[600]),
-          ),
-        ),
-        const SizedBox(height: 10),
-
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0),
-          child: SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              children: _floors.map((floor) {
-                bool isSelected = _selectedFloor == floor;
-                return Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 4.0),
-                  child: FilterChip(
-                    label: Text(floor),
-                    selected: isSelected,
-                    onSelected: (selected) {
-                      setState(() {
-                        _selectedFloor = floor;
-                      });
-                    },
-                    backgroundColor: Colors.grey[200],
-                    selectedColor: AppColors.secondary,
-                    labelStyle: TextStyle(
-                      color: isSelected ? Theme.of(context).canvasColor : Colors.black,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                );
-              }).toList(),
-            ),
-          ),
-        ),
-        const SizedBox(height: 20),
-
-        Expanded(
-          child: GridView.builder(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 3,
-              crossAxisSpacing: 12,
-              mainAxisSpacing: 12,
-              childAspectRatio: 1.3,
-            ),
-            itemCount: 12,
-            itemBuilder: (context, index) {
-              final tableNumber = 1 + index;
-              final isSelected = _selectedTable == tableNumber.toString();
-              final isReserved = [2, 5, 8].contains(tableNumber);
-
-              return GestureDetector(
-                onTap: isReserved
-                    ? null
-                    : () {
-                  setState(() {
-                    _selectedTable = tableNumber.toString();
-                    _data.selectedTable = _selectedTable;
-                  });
-                },
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: isReserved
-                        ? Colors.grey
-                        : (isSelected ? AppColors.secondary : Colors.grey[200]),
-                    borderRadius: BorderRadius.circular(12),
-                    border: isSelected ? Border.all(color: AppColors.primary, width: 2) : null,
-                    boxShadow: [
-                      BoxShadow(
-                          color: Colors.black.withOpacity(0.1),
-                          blurRadius: 4,
-                          offset: const Offset(0, 2)),
-                    ],
-                  ),
-                  child: Stack(
-                    children: [
-                      Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              Icons.table_restaurant,
-                              size: 30,
-                              color: isReserved
-                                  ? Colors.white
-                                  : (isSelected ? Colors.white : Colors.black),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              'Table $tableNumber',
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.bold,
-                                color: isReserved
-                                    ? Colors.white
-                                    : (isSelected ? Colors.white : Colors.black),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      if (isReserved)
-                        Positioned(
-                          top: 4,
-                          right: 4,
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                            decoration: BoxDecoration(
-                              color: Colors.red,
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: const Text(
-                              'Réservée',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 10,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                        ),
-                    ],
-                  ),
-                ),
-              );
-            },
-          ),
-        ),
-
-        Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: SizedBox(
-            width: double.infinity,
-            child: ElevatedButton(
-              onPressed: _selectedTable != null ? _nextPage : null,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: _selectedTable != null ? AppColors.secondary : Colors.grey[300],
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-                elevation: 2,
-              ),
-              child: Text(
-                "Réserver une table",
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: _selectedTable != null ? Colors.white : Colors.grey[600],
-                ),
-              ),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildInformationDetailPage() {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Padding(
-            padding: EdgeInsets.only(bottom: 16.0),
-            child: Text(
-              'Vos informations de réservation',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-          ),
-
-          _buildTextField("Nom complet", "Votre nom complet", _fullNameController,
-              icon: Icons.person, isRequired: true),
-
-          _buildTextField("Numéro de téléphone", "Entrez votre numéro", _phoneController,
-              icon: Icons.phone, keyboardType: TextInputType.phone, isRequired: true),
-
-          Row(
-            children: [
-              Expanded(
-                child: _buildDateOrTimePicker(
-                  "Date d'arrivée",
-                  "Sélectionnez la date",
-                  Icons.calendar_today,
-                  _data.date != null
-                      ? "${_data.date!.day}/${_data.date!.month}/${_data.date!.year}"
-                      : "",
-                      () async {
-                    final selectedDate = await _showDatePicker();
-                    setState(() {
-                      _data.date = selectedDate;
-                    });
-                  },
-                ),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: _buildDateOrTimePicker(
-                  "Heure d'arrivée",
-                  "Sélectionnez l'heure",
-                  Icons.access_time,
-                  _data.time != null ? _data.time!.format(context) : "",
-                      () async {
-                    final selectedTime = await _showTimePicker();
-                    setState(() {
-                      _data.time = selectedTime;
-                    });
-                  },
-                ),
-              ),
-            ],
-          ),
-
-          _buildTextField("Nombre de personnes", "Combien de personnes", _peopleController,
-              icon: Icons.people, keyboardType: TextInputType.number, isRequired: true),
-
-          _buildTextField("Notes", "Ex: Besoin de 2 chaises bébé...", _notesController,
-              icon: Icons.note, maxLines: 3),
-
-          const SizedBox(height: 20),
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton(
-              onPressed: _validateStep2() ? _nextPage : null,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.secondary,
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-                elevation: 2,
-              ),
-              child: const Text(
-                "Continuer",
-                style: TextStyle(fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold),
-              ),
-            ),
-          ),
-          const SizedBox(height: 10),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildTextField(String label, String hint, TextEditingController controller,
-      {IconData? icon, TextInputType? keyboardType, int maxLines = 1, bool isRequired = false}) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-            Text(label, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-            if (isRequired) const Text(' *', style: TextStyle(color: Colors.red, fontSize: 16)),
-          ],
-        ),
-        const SizedBox(height: 8),
-        TextFormField(
-          controller: controller,
-          decoration: InputDecoration(
-            hintText: hint,
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            prefixIcon: icon != null ? Icon(icon, size: 20) : null,
-            filled: true,
-            fillColor: Colors.grey[50],
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(color: AppColors.primaryDark, width: 2),
-            ),
-          ),
-          keyboardType: keyboardType,
-          maxLines: maxLines,
-          onChanged: (value) => setState(() {}),
-        ),
-        const SizedBox(height: 16),
-      ],
-    );
-  }
-
-  Widget _buildDateOrTimePicker(String label, String hint, IconData icon, String value, VoidCallback onTap) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-            Text(label, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-            const Text(' *', style: TextStyle(color: Colors.red, fontSize: 16)),
-          ],
-        ),
-        const SizedBox(height: 8),
-        GestureDetector(
-          onTap: onTap,
-          child: AbsorbPointer(
-            child: TextFormField(
-              decoration: InputDecoration(
-                hintText: hint,
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                prefixIcon: Icon(icon, size: 20),
-                filled: true,
-                fillColor: Colors.grey[50],
-              ),
-              controller: TextEditingController(text: value),
-            ),
-          ),
-        ),
-        const SizedBox(height: 16),
-      ],
-    );
-  }
-
-  Widget _buildOrderSummaryPage() {
-    return Padding(
-      padding: const EdgeInsets.all(20.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            'Récapitulatif de votre réservation',
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-          ),
-          Text(
-            'Chez ${widget.business.name}',
-            style: TextStyle(fontSize: 16, color: Colors.grey[600]),
-          ),
-          const SizedBox(height: 20),
-
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: Colors.grey[50],
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: Colors.grey),
-            ),
-            child: Column(
-              children: [
-                _buildSummaryRow("Nom", _fullNameController.text.isNotEmpty
-                    ? _fullNameController.text
-                    : "Non renseigné"),
-                _buildSummaryRow("Téléphone", _phoneController.text.isNotEmpty
-                    ? _phoneController.text
-                    : "Non renseigné"),
-                _buildSummaryRow("Date", _data.date != null
-                    ? "${_data.date!.day}/${_data.date!.month}/${_data.date!.year}"
-                    : "Non renseignée"),
-                _buildSummaryRow("Heure", _data.time != null
-                    ? _data.time!.format(context)
-                    : "Non renseignée"),
-                _buildSummaryRow("Nombre de personnes", _peopleController.text.isNotEmpty
-                    ? _peopleController.text
-                    : "Non renseigné"),
-                _buildSummaryRow("Table", _data.selectedTable?.toString() ?? "Non sélectionnée"),
-                _buildSummaryRow("Étage", _selectedFloor),
-                if (_notesController.text.isNotEmpty) _buildSummaryRow("Notes", _notesController.text),
-              ],
-            ),
-          ),
-
-          const Spacer(),
-
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: Colors.grey[50],
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: Colors.grey),
-            ),
-            child: Column(
-              children: [
-                _buildPriceRow("Sous-total", "\$${_data.subtotal.toStringAsFixed(2)}"),
-                _buildPriceRow("Taxe", "\$${_data.tax.toStringAsFixed(2)}"),
-                const SizedBox(height: 10),
-                const Divider(),
-                _buildPriceRow("Total", "\$${_data.grandTotal.toStringAsFixed(2)}", isTotal: true),
-              ],
-            ),
-          ),
-
-          const SizedBox(height: 20),
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton(
-              onPressed: _isLoading ? null : _saveReservation,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: _isLoading ? Colors.grey : AppColors.secondary,
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-                elevation: 2,
-              ),
-              child: _isLoading
-                  ? const SizedBox(
-                height: 20,
-                width: 20,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                ),
-              )
-                  : const Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.check_circle, color: Colors.white),
-                  SizedBox(width: 8),
-                  Text(
-                    "Payer et Réserver",
-                    style: TextStyle(fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          const SizedBox(height: 10),
-          SizedBox(
-            width: double.infinity,
-            child: TextButton(
-              onPressed: _isLoading
-                  ? null
-                  : () {
-                _pageController.previousPage(
-                  duration: const Duration(milliseconds: 300),
-                  curve: Curves.easeIn,
-                );
-              },
-              child: const Text(
-                "Modifier les informations",
-                style: TextStyle(fontSize: 16, color: Colors.grey),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildSummaryRow(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(label, style: const TextStyle(color: Colors.grey, fontSize: 16)),
-          Text(
-            value,
-            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-            textAlign: TextAlign.end,
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildPriceRow(String label, String value, {bool isTotal = false}) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: isTotal ? 18 : 16,
-              fontWeight: isTotal ? FontWeight.bold : FontWeight.normal,
-            ),
-          ),
-          Text(
-            value,
-            style: TextStyle(
-              fontSize: isTotal ? 18 : 16,
-              fontWeight: isTotal ? FontWeight.bold : FontWeight.normal,
-              color: isTotal ? AppColors.secondary : Colors.black,
-            ),
-          ),
-        ],
-      ),
-    );
   }
 }

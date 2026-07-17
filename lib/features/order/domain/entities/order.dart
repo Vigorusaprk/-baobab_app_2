@@ -1,112 +1,12 @@
 import 'package:baobabe_0_2/core/themes/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:baobabe_0_2/features/home_page/domain/entities/business_entity.dart';
+import 'package:baobabe_0_2/features/order/domain/entities/order_item.dart';
+import 'package:baobabe_0_2/features/order/domain/entities/order_parsing_utils.dart';
+import 'package:baobabe_0_2/features/order/domain/entities/order_status.dart';
 
-enum OrderStatus {
-  pending,
-  confirmed,
-  preparing,
-  ready,
-  delivered,
-  cancelled,
-}
-
-extension OrderStatusExtension on OrderStatus {
-  String get displayName {
-    switch (this) {
-      case OrderStatus.pending:
-        return 'En attente';
-      case OrderStatus.confirmed:
-        return 'Confirmée';
-      case OrderStatus.preparing:
-        return 'En préparation';
-      case OrderStatus.ready:
-        return 'Prête';
-      case OrderStatus.delivered:
-        return 'Livrée';
-      case OrderStatus.cancelled:
-        return 'Annulée';
-    }
-  }
-
-  Color get color {
-    switch (this) {
-      case OrderStatus.pending:
-        return Colors.orange;
-      case OrderStatus.confirmed:
-        return Colors.blue;
-      case OrderStatus.preparing:
-        return Colors.purple;
-      case OrderStatus.ready:
-        return Colors.teal;
-      case OrderStatus.delivered:
-        return Colors.green;
-      case OrderStatus.cancelled:
-        return Colors.red;
-    }
-  }
-}
-
-class OrderItem {
-  final String menuItemId;
-  final String name;
-  final double price;
-  final int quantity;
-  final String? specialInstructions;
-
-  OrderItem({
-    required this.menuItemId,
-    required this.name,
-    required this.price,
-    required this.quantity,
-    this.specialInstructions,
-  });
-
-  // --- Partie modifiée : Ajout de la méthode copyWith ---
-  OrderItem copyWith({
-    String? menuItemId,
-    String? name,
-    double? price,
-    int? quantity,
-    String? specialInstructions,
-  }) {
-    return OrderItem(
-      menuItemId: menuItemId ?? this.menuItemId,
-      name: name ?? this.name,
-      price: price ?? this.price,
-      quantity: quantity ?? this.quantity,
-      specialInstructions: specialInstructions ?? this.specialInstructions,
-    );
-  }
-  // -----------------------------------------------------
-
-  Map<String, dynamic> toMap() {
-    return {
-      'menu_item_id': menuItemId,
-      'name': name,
-      'price': price,
-      'quantity': quantity,
-      'special_instructions': specialInstructions,
-    };
-  }
-
-  factory OrderItem.fromMap(Map<String, dynamic> map) {
-    final menuItem = map['menu_items'] is Map ? map['menu_items'] as Map<String, dynamic> : null;
-    return OrderItem(
-      menuItemId: map['menu_item_id']?.toString() ?? menuItem?['id']?.toString() ?? '',
-      name: map['name']?.toString() ??
-          map['item_name']?.toString() ??
-          menuItem?['item_name']?.toString() ??
-          menuItem?['name']?.toString() ??
-          '',
-      price: _toDouble(map['unit_price'] ?? map['price'] ?? menuItem?['price']) ?? 0.0,
-      quantity: _toInt(map['quantity']) ?? 0,
-      specialInstructions: map['special_instructions']?.toString(),
-    );
-  }
-
-  double get total => price * quantity;
-}
+export 'package:baobabe_0_2/features/order/domain/entities/order_item.dart';
+export 'package:baobabe_0_2/features/order/domain/entities/order_status.dart';
 
 class Order {
   final String id;
@@ -210,17 +110,17 @@ class Order {
         customerName: map['customer'] is Map ? map['customer']['name']?.toString() : map['customer_name']?.toString(),
         customerEmail: map['customer'] is Map ? map['customer']['email']?.toString() : null,
         customerPhone: map['customer'] is Map ? map['customer']['phone']?.toString() : null,
-        establishmentType: _parseBusinessType(map['establishment_type']),
+        establishmentType: parseBusinessType(map['establishment_type']),
         orderDate: DateTime.tryParse(map['order_date']?.toString() ?? map['created_at']?.toString() ?? '') ?? DateTime.now(),
         items: itemsList,
-        subtotal: _toDouble(map['subtotal']) ?? computedSubtotal,
-        tax: _toDouble(map['tax']) ?? 0.0,
+        subtotal: toDoubleOrNull(map['subtotal']) ?? computedSubtotal,
+        tax: toDoubleOrNull(map['tax']) ?? 0.0,
         // Support databases that use either `total_amount` or `total_price`
-        totalAmount: _toDouble(map['total_amount'] ?? map['total_price']) ?? 0.0,
-        status: _parseOrderStatus(map['status']),
+        totalAmount: toDoubleOrNull(map['total_amount'] ?? map['total_price']) ?? 0.0,
+        status: parseOrderStatus(map['status']),
         notes: map['notes']?.toString(),
         deliveryAddress: map['delivery_address']?.toString(),
-        deliveryFee: _toDouble(map['delivery_fee']),
+        deliveryFee: toDoubleOrNull(map['delivery_fee']),
         paymentMethod: map['payment_method']?.toString(),
       );
     } catch (e, stack) {
@@ -328,91 +228,4 @@ class Order {
         return Colors.grey;
     }
   }
-}
-
-BusinessType? _parseBusinessType(dynamic value) {
-  if (value == null) return null;
-  if (value is int) {
-    if (value >= 0 && value < BusinessType.values.length) {
-      return BusinessType.values[value];
-    }
-  }
-
-  if (value is String) {
-    final normalized = value.trim().toLowerCase();
-    for (final type in BusinessType.values) {
-      if (type.name.toLowerCase() == normalized) {
-        return type;
-      }
-    }
-
-    switch (normalized) {
-      case 'car_rental':
-      case 'car rental':
-        return BusinessType.carRental;
-      case 'travel_agency':
-      case 'travel agency':
-      case 'travel':
-        return BusinessType.travelAgency;
-      case 'fast_food':
-      case 'fast food':
-        return BusinessType.fastFood;
-      case 'shopping':
-        return BusinessType.shopping;
-      case 'mall':
-        return BusinessType.mall;
-      case 'hotel':
-        return BusinessType.hotel;
-      case 'cinema':
-        return BusinessType.cinema;
-      case 'spa':
-        return BusinessType.spa;
-      case 'tourism':
-      case 'toursime':
-        return BusinessType.tourism;
-      case 'restaurant':
-        return BusinessType.restaurant;
-      default:
-        return BusinessType.other;
-    }
-  }
-
-  return null;
-}
-
-
-
-OrderStatus _parseOrderStatus(dynamic value) {
-  if (value is String) {
-    final normalized = value.trim().toLowerCase();
-    for (final status in OrderStatus.values) {
-      if (status.name == normalized) {
-        return status;
-      }
-    }
-  }
-
-  final index = _toInt(value);
-  if (index != null && index >= 0 && index < OrderStatus.values.length) {
-    return OrderStatus.values[index];
-  }
-
-  return OrderStatus.pending;
-}
-
-// Fonctions utilitaires
-double? _toDouble(dynamic value) {
-  if (value == null) return null;
-  if (value is double) return value;
-  if (value is int) return value.toDouble();
-  if (value is String) return double.tryParse(value);
-  return null;
-}
-
-int? _toInt(dynamic value) {
-  if (value == null) return null;
-  if (value is int) return value;
-  if (value is double) return value.toInt();
-  if (value is String) return int.tryParse(value);
-  return null;
 }

@@ -1,10 +1,8 @@
+import 'package:baobabe_0_2/core/services/session_service.dart';
 import 'package:baobabe_0_2/core/themes/app_colors.dart';
 import 'package:baobabe_0_2/core/themes/app_diemens.dart';
 import 'package:baobabe_0_2/core/themes/app_fonts.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:baobabe_0_2/features/auth/presentation/bloc/auth_bloc.dart';
-import 'package:baobabe_0_2/features/auth/presentation/bloc/auth_state.dart';
 
 
 class EditProfilePage extends StatefulWidget {
@@ -21,9 +19,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
   @override
   void initState() {
     super.initState();
-    final user = (context.read<AuthBloc>().state as AuthenticatedState).user;
-    _nameController = TextEditingController(text: user.name);
-    _emailController = TextEditingController(text: user.email);
+    final user = SessionService.instance.currentUser;
+    _nameController = TextEditingController(text: user?.name ?? '');
+    _emailController = TextEditingController(text: user?.email ?? '');
   }
 
   @override
