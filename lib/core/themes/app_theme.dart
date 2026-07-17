@@ -32,24 +32,8 @@ class AppTheme {
 
     cardColor: AppColors.surface,
 
-    elevatedButtonTheme: ElevatedButtonThemeData(
-      style: ElevatedButton.styleFrom(
-        backgroundColor: AppColors.primary,
-        foregroundColor: AppColors.textOnPrimary,
-        textStyle: AppFonts.button,
-        padding: const EdgeInsets.symmetric(
-          horizontal: 24,
-          vertical: 12,
-        ),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(AppDimens.BORDER_RADIUS_12),
-        ),
-        elevation: AppDimens.ELEVATION_2,
-      ),
-    ),
-
     appBarTheme: const AppBarTheme(
-      backgroundColor: AppColors.primary,
+      backgroundColor: AppColors.scaffoldBackground,
       foregroundColor: AppColors.textOnPrimary,
       elevation: AppDimens.ELEVATION_2,
       centerTitle: true,
@@ -65,19 +49,40 @@ class AppTheme {
       filled: true,
       fillColor: AppColors.inputBackground,
       border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(AppDimens.BORDER_RADIUS_10),
+        borderRadius: BorderRadius.circular(AppDimens.inputBorderRadius),
         borderSide: BorderSide.none,
       ),
-      contentPadding: const EdgeInsets.symmetric(
-        horizontal: 16,
-        vertical: 12,
-      ),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       hintStyle: const TextStyle(
-        color: Colors.grey,
+        color: AppColors.grey,
         fontFamily: AppFonts.primaryFontFamily,
       ),
     ),
 
+    elevatedButtonTheme: ElevatedButtonThemeData(
+      style: ElevatedButton.styleFrom(
+        backgroundColor: AppColors.primary,
+        foregroundColor: AppColors.textOnPrimary,
+        textStyle: AppFonts.button,
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppDimens.borderButton),
+        ),
+        elevation: AppDimens.ELEVATION_2,
+      ),
+    ),
+
+    outlinedButtonTheme: OutlinedButtonThemeData(
+      style: OutlinedButton.styleFrom(
+        foregroundColor: AppColors.primary,
+        textStyle: AppFonts.button,
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppDimens.borderButton),
+        ),
+        side: BorderSide(color: AppColors.primary.withValues(alpha: 0.2)),
+      ),
+    ),
 
     dividerTheme: const DividerThemeData(
       thickness: AppDimens.THICKNESS_1,

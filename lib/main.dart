@@ -1,5 +1,6 @@
 import 'package:baobabe_0_2/core/constants/injector.dart';
 import 'package:baobabe_0_2/core/constants/supabase_client.dart';
+import 'package:baobabe_0_2/core/themes/app_theme.dart';
 import 'package:baobabe_0_2/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:baobabe_0_2/features/auth/presentation/bloc/auth_event.dart';
 import 'package:baobabe_0_2/features/auth/presentation/bloc/auth_state.dart';
@@ -66,7 +67,7 @@ class MyApp extends StatelessWidget {
         child: MaterialApp.router(
           debugShowCheckedModeBanner: false,
           routerConfig: appRouter,
-          theme: ThemeData(fontFamily: 'Poppins'),
+          theme: AppTheme.silvaTheme,
           localizationsDelegates: const [
             GlobalMaterialLocalizations.delegate,
             GlobalWidgetsLocalizations.delegate,

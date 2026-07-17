@@ -10,8 +10,6 @@ import 'package:baobabe_0_2/features/auth/presentation/bloc/auth_state.dart';
 
 // Écrans de la Feature Auth
 import 'package:baobabe_0_2/features/auth/presentation/screens/auth_screen.dart';
-import 'package:baobabe_0_2/features/auth/presentation/screens/sign_up_page.dart';
-import 'package:baobabe_0_2/features/auth/presentation/screens/forgot_password_screen.dart';
 
 // Autres Écrans de l'application
 import 'package:baobabe_0_2/features/main/presentation/screens/main_screen.dart';
@@ -54,10 +52,12 @@ final GoRouter appRouter = GoRouter(
     final authState = context.read<AuthBloc>().state;
 
     // Pendant l'initialisation ou les chargements internes, on ne force pas de redirection immédiate
-    if (authState is AuthInitialState || authState is AuthLoadingState) return null;
+    if (authState is AuthInitialState || authState is AuthLoadingState)
+      return null;
 
     final isLoggedIn = authState is AuthenticatedState;
-    final isAuthRoute = state.matchedLocation.startsWith('/login') ||
+    final isAuthRoute =
+        state.matchedLocation.startsWith('/login') ||
         state.matchedLocation.startsWith('/register') ||
         state.matchedLocation.startsWith('/forgot-password');
 
@@ -77,7 +77,8 @@ final GoRouter appRouter = GoRouter(
         final authState = context.read<AuthBloc>().state;
 
         if (authState is AuthenticatedState) return '/home';
-        if (authState is UnauthenticatedState || authState is AuthFailureState) return '/login';
+        if (authState is UnauthenticatedState || authState is AuthFailureState)
+          return '/login';
 
         // En cas d'état initial non déterminé, on temporise sur le login
         if (authState is AuthInitialState) return '/login';
@@ -85,9 +86,7 @@ final GoRouter appRouter = GoRouter(
         return null;
       },
       pageBuilder: (context, state) => const MaterialPage(
-        child: Scaffold(
-          body: Center(child: CircularProgressIndicator()),
-        ),
+        child: Scaffold(body: Center(child: CircularProgressIndicator())),
       ),
     ),
 
@@ -97,16 +96,6 @@ final GoRouter appRouter = GoRouter(
       name: 'login',
       pageBuilder: (context, state) => const MaterialPage(child: LoginPage()),
     ),
-    GoRoute(
-      path: '/register',
-      name: 'register',
-      pageBuilder: (context, state) => const MaterialPage(child: SignUpPage()),
-    ),
-    GoRoute(
-      path: '/forgot-password',
-      name: 'forgotPassword',
-      pageBuilder: (context, state) => const MaterialPage(child: ForgotPasswordScreen()),
-    ),
 
     // --- SHELL DE NAVIGATION PRINCIPAL ---
     StatefulShellRoute.indexedStack(
@@ -114,34 +103,46 @@ final GoRouter appRouter = GoRouter(
         return MainScreen(navigationShell: navigationShell);
       },
       branches: [
-        StatefulShellBranch(routes: [
-          GoRoute(
-            path: '/home',
-            name: 'home',
-            pageBuilder: (context, state) => const NoTransitionPage(child: HomePageScreen()),
-          ),
-        ]),
-        StatefulShellBranch(routes: [
-          GoRoute(
-            path: '/favorites',
-            name: 'favorites',
-            pageBuilder: (context, state) => const NoTransitionPage(child: FavoritesPageScreen()),
-          ),
-        ]),
-        StatefulShellBranch(routes: [
-          GoRoute(
-            path: '/orders',
-            name: 'orders',
-            pageBuilder: (context, state) => const NoTransitionPage(child: OrderScreen()),
-          ),
-        ]),
-        StatefulShellBranch(routes: [
-          GoRoute(
-            path: '/settings',
-            name: 'settings',
-            pageBuilder: (context, state) => const NoTransitionPage(child: SettingsScreen()),
-          ),
-        ]),
+        StatefulShellBranch(
+          routes: [
+            GoRoute(
+              path: '/home',
+              name: 'home',
+              pageBuilder: (context, state) =>
+                  const NoTransitionPage(child: HomePageScreen()),
+            ),
+          ],
+        ),
+        StatefulShellBranch(
+          routes: [
+            GoRoute(
+              path: '/favorites',
+              name: 'favorites',
+              pageBuilder: (context, state) =>
+                  const NoTransitionPage(child: FavoritesPageScreen()),
+            ),
+          ],
+        ),
+        StatefulShellBranch(
+          routes: [
+            GoRoute(
+              path: '/orders',
+              name: 'orders',
+              pageBuilder: (context, state) =>
+                  const NoTransitionPage(child: OrderScreen()),
+            ),
+          ],
+        ),
+        StatefulShellBranch(
+          routes: [
+            GoRoute(
+              path: '/settings',
+              name: 'settings',
+              pageBuilder: (context, state) =>
+                  const NoTransitionPage(child: SettingsScreen()),
+            ),
+          ],
+        ),
       ],
     ),
 
@@ -151,7 +152,9 @@ final GoRouter appRouter = GoRouter(
       name: 'businessDetail',
       pageBuilder: (context, state) {
         final businessId = state.pathParameters['id']!;
-        return MaterialPage(child: BusinessDetailScreen(businessId: businessId));
+        return MaterialPage(
+          child: BusinessDetailScreen(businessId: businessId),
+        );
       },
     ),
     GoRoute(
@@ -187,7 +190,9 @@ final GoRouter appRouter = GoRouter(
       name: 'reservationDetail',
       pageBuilder: (context, state) {
         final reservation = state.extra as Reservation;
-        return MaterialPage(child: ReservationDetailPage(reservation: reservation));
+        return MaterialPage(
+          child: ReservationDetailPage(reservation: reservation),
+        );
       },
     ),
     GoRoute(
@@ -198,7 +203,8 @@ final GoRouter appRouter = GoRouter(
     GoRoute(
       path: '/edit-profile',
       name: 'edit-profile',
-      pageBuilder: (context, state) => const MaterialPage(child: EditProfilePage()),
+      pageBuilder: (context, state) =>
+          const MaterialPage(child: EditProfilePage()),
     ),
   ],
 );

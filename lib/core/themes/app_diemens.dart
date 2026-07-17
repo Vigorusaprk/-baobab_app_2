@@ -1,8 +1,8 @@
-// ignore_for_file: constant_identifier_names
 import 'package:flutter/material.dart';
 
-
 class AppDimens {
+  static const double borderRadiusFull = 100.0;
+  static const double bottomSheet = 30.0;
   static const double BORDER_RADIUS_0 = 0.0;
   static const double BORDER_RADIUS_4 = 4.0;
   static const double BORDER_RADIUS_5 = 5.0;
@@ -47,9 +47,7 @@ class AppDimens {
   static const double PADDING_60 = 60.0;
   static const double PADDING_65 = 65.0;
 
-
-
-  static const double MARGIN_4 = 4.0;
+  static const double marginExtraSmall = 4.0;
   static const double MARGIN_6 = 6.0;
   static const double MARGIN_8 = 8.0;
 
@@ -102,12 +100,10 @@ class AppDimens {
   // *** PADDING *** //
 
   //** ALL **//
-  static const paddingAll16 = EdgeInsets.all(16);
-  static const paddingAll32 = EdgeInsets.all(32);
+  static const allPadding8 = EdgeInsets.all(8);
 
   //** SYMMETRIC **//
-  static const paddingV20H32 = EdgeInsets.symmetric(vertical: 20, horizontal: 32);
-  static const paddingH16 = EdgeInsets.symmetric(horizontal: 16);
+  static const appPadding = EdgeInsets.symmetric(horizontal: 24);
 
   //** ONLY **//
   static const paddingTop4Bottom10 = EdgeInsets.only(top: 4, bottom: 10);
@@ -122,4 +118,16 @@ class AppDimens {
 
   // ** VERTICAL **//
   static final radiusTop25 = BorderRadius.vertical(top: Radius.circular(25));
+
+  // *** Button *** //
+  static const double borderButton = 20.0;
+  static const double borderRadiusAuthIconButton = 16.0;
+
+  // *** Input field *** //
+  static const double inputBorderRadius = 20.0;
+
+  // *** Spacer *** //
+  static const Widget spacerSmall = SizedBox(height: 8.0);
+  static const Widget spacerMedium = SizedBox(height: 16.0);
+  static const Widget spacerLarge = SizedBox(height: 24.0);
 }

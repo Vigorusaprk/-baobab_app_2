@@ -25,9 +25,9 @@ class AppColors {
   // Indigo moderne
   // ===============================================================
 
-  static const Color primary = Color(0xFF4B3EFF);
-  static const Color primaryLight = Color(0xFF6F63FF);
-  static const Color primaryDark = Color(0xFF3026C8);
+  static const Color primary = Color(0xFF0F2E20);
+  static const Color primaryLight = Color(0xFF0F2E20);
+  static const Color primaryDark = Color(0xFF0F2E20);
 
   // Variantes
 
@@ -105,7 +105,8 @@ class AppColors {
   // ===============================================================
   // TEXTE
   // ===============================================================
-
+  static const Color textColor = Color(0xFF1A1F1C);
+  
   static const Color textPrimary = Color(0xFF1C2235);
 
   static const Color textSecondary = Color(0xFF4A5168);
@@ -247,4 +248,6 @@ class AppColors {
   static const Color black = Colors.black;
 
   static const Color transparent = Colors.transparent;
+
+    static const Color grey = Color(0xFF9E9E9E);
 }
