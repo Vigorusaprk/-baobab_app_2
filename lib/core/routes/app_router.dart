@@ -84,10 +84,16 @@ final GoRouter appRouter = GoRouter(
       pageBuilder: (context, state) => const MaterialPage(child: LoginPage()),
     ),
 
-    // --- SHELL DE NAVIGATION PRINCIPAL ---
+    // --- SHELL DE NAVIGATION PRINCIPAL (avec bottom bar) ---
     StatefulShellRoute.indexedStack(
       builder: (context, state, navigationShell) {
-        return MainScreen(navigationShell: navigationShell);
+        return MainScreen(
+          navigationShell: navigationShell,
+          showBottomBar: state.matchedLocation == '/home' ||
+              state.matchedLocation == '/favorites' ||
+              state.matchedLocation == '/orders' ||
+              state.matchedLocation == '/settings',
+        );
       },
       branches: [
         StatefulShellBranch(

@@ -5,8 +5,13 @@ import 'package:go_router/go_router.dart';
 
 class MainScreen extends StatelessWidget {
   final StatefulNavigationShell navigationShell;
+  final bool showBottomBar;
 
-  const MainScreen({super.key, required this.navigationShell});
+  const MainScreen({
+    super.key,
+    required this.navigationShell,
+    required this.showBottomBar,
+  });
 
   // ⭐️ Définir les chemins des SVG pour chaque état et chaque icône
   // Format: [index][0] = outline, [index][1] = filled
@@ -37,35 +42,25 @@ class MainScreen extends StatelessWidget {
       extendBody: true,
       backgroundColor: Colors.white,
       body: navigationShell, // Affiche la branche courante
-      bottomNavigationBar: Container(
-        margin: const EdgeInsets.only(left: 16, right: 16, bottom: 16),
-        height: 70,
-        decoration: BoxDecoration(
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.2),
-              spreadRadius: 0,
-              blurRadius: 10,
-              offset: const Offset(0, 4),
-            ),
-          ],
-          color: AppColors.primary50,
-          borderRadius: BorderRadius.circular(20),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: List.generate(4, (index) {
-            return _buildNavItem(
-              context,
-              svgOutlinePath: _svgPaths[index][0],
-              svgFilledPath: _svgPaths[index][1],
-              label: _labels[index],
-              index: index,
-              isSelected: navigationShell.currentIndex == index,
-            );
-          }),
-        ),
-      ),
+      bottomNavigationBar: showBottomBar
+          ? Container(
+              margin: const EdgeInsets.only(left: 16, right: 16, bottom: 16),
+              height: 70,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: List.generate(4, (index) {
+                  return _buildNavItem(
+                    context,
+                    svgOutlinePath: _svgPaths[index][0],
+                    svgFilledPath: _svgPaths[index][1],
+                    label: _labels[index],
+                    index: index,
+                    isSelected: navigationShell.currentIndex == index,
+                  );
+                }),
+              ),
+            )
+          : null,
     );
   }
 
@@ -77,9 +72,9 @@ class MainScreen extends StatelessWidget {
         required int index,
         required bool isSelected,
       }) {
-    final Color selectedBgColor = AppColors.surface;
+    final Color selectedBgColor = AppColors.primary;
     final Color selectedIconColor = AppColors.primary50;
-    final Color unselectedIconColor = AppColors.canvasBackground;
+    final Color unselectedIconColor = AppColors.primary;
 
     return GestureDetector(
       onTap: () => _onItemTapped(index),
