@@ -1,3 +1,4 @@
+import 'package:baobabe_0_2/core/themes/app_diemens.dart';
 import 'package:baobabe_0_2/features/business_detail/presentation/screens/business_detail_screen.dart';
 import 'package:baobabe_0_2/features/home_page/data/models/ui_business.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/bloc/business_bloc.dart';
@@ -8,7 +9,17 @@ import 'package:go_router/go_router.dart';
 import './business_card_widget.dart';
 
 class BusinessCardsWidget extends StatefulWidget {
-  const BusinessCardsWidget({super.key});
+  /// Titre de la section affiché au-dessus du carrousel.
+  final String title;
+
+  /// Callback optionnel pour un lien "Voir tout" à droite du titre.
+  final VoidCallback? onSeeAllTap;
+
+  const BusinessCardsWidget({
+    super.key,
+    this.title = 'Découvrir',
+    this.onSeeAllTap,
+  });
 
   @override
   State<BusinessCardsWidget> createState() => _BusinessCardsWidgetState();
@@ -50,6 +61,53 @@ class _BusinessCardsWidgetState extends State<BusinessCardsWidget> {
 
   @override
   Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(
+            left: AppDimens.PADDING_20,
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                widget.title,
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w800,
+                  fontFamily: "Poppins",
+                  color: Colors.black,
+                ),
+              ),
+
+                Padding(
+                  padding: const EdgeInsets.only(
+                    right: AppDimens.PADDING_20,
+                  ),
+                  child: GestureDetector(
+                    onTap: widget.onSeeAllTap,
+                    child: const Text(
+                      'Voir tout',
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        fontFamily: "Poppins",
+                        color: Colors.green,
+                      ),
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 12),
+        _buildContent(),
+      ],
+    );
+  }
+
+  Widget _buildContent() {
     // On écoute le CategoryBloc sans condition de rebuild (peu coûteux)
     return BlocBuilder<CategoryBloc, CategoryState>(
       builder: (context, categoryState) {
@@ -141,13 +199,14 @@ class _BusinessCardsWidgetState extends State<BusinessCardsWidget> {
         physics: const BouncingScrollPhysics(),
         itemBuilder: (context, index) {
           final distance = (index - _pageOffset).abs().clamp(0.0, 1.0);
-          final gauss = Curves.easeInOutCubic.transform(1 - distance);
+          final focus = Curves.easeInOutCubic.transform(1 - distance);
 
-          final verticalOffset = _verticalOffsetFactor * (1 - gauss);
-          final scale = _baseScale + (gauss * _scaleFactor);
-          final opacity = _baseOpacity + (gauss * _opacityFactor);
+          final verticalOffset = _verticalOffsetFactor * (1 - focus);
+          final scale = _baseScale + (focus * _scaleFactor);
+          final opacity = _baseOpacity + (focus * _opacityFactor);
 
           return Transform.translate(
+            key: ValueKey(uiBusinesses[index].business.id),
             offset: Offset(0, verticalOffset),
             child: Transform.scale(
               scale: scale,
@@ -169,20 +228,15 @@ class _BusinessCardsWidgetState extends State<BusinessCardsWidget> {
   }
 
   Widget _buildPerspectiveCard(UIBusiness uiBusiness) {
-    return GestureDetector(
-      onTap: () => _navigateToBusinessDetail(context, uiBusiness.business.id),
-      child: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(32),
-          // Ombre légère constante (peut être retirée si vous préférez)
-          boxShadow: [
-            BoxShadow(
-              color: const Color(0xFF254D32).withOpacity(0.1),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
+    // Style flat : pas de glow coloré, pas d'ombre supplémentaire ici —
+    // BusinessCardWidget porte déjà sa propre ombre discrète (0.06
+    // d'opacité). On garde juste le tap + le ripple.
+    return Material(
+      color: Colors.transparent,
+      borderRadius: BorderRadius.circular(24),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(24),
+        onTap: () => _navigateToBusinessDetail(context, uiBusiness.business.id),
         child: BusinessCardWidget(uiBusiness: uiBusiness),
       ),
     );

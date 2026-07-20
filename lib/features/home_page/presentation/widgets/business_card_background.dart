@@ -16,7 +16,7 @@ class BusinessCardBackground extends StatelessWidget {
 
     return Container(
       width: double.infinity,
-      height: 200,
+      height: 100,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(28),
         color: hasImage ? null : color,
@@ -51,7 +51,7 @@ class _InitialsContainer extends StatelessWidget {
         borderRadius: BorderRadius.circular(28),
       ),
       width: double.infinity,
-      height: 200,
+      height: 100,
       child: Center(
         child: Icon(
           uiBusiness.categoryIcon,

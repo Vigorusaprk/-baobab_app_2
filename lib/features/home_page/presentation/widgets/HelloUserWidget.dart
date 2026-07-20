@@ -30,23 +30,21 @@ class HelloUserWidget extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  _buildAvatar(user, userName, context),
-                  const SizedBox(width: AppDimens.PADDING_10),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                          "Salut,",
+                          "bonjours,",
                         style: const TextStyle(
                           fontFamily: 'Poppins',
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
+                          fontSize: 15,
                           color: AppColors.primary,
                         ),
                       ),
                       Text(
-                        "$userName",
+                        "Ou alons nous ajordhui ?",
                         style: const TextStyle(
                           fontFamily: 'Poppins',
                           fontSize: 20,
@@ -56,16 +54,39 @@ class HelloUserWidget extends StatelessWidget {
                       ),
                     ],
                   ),
+
+                    Container(
+                      child: Row(
+                        children: [
+                          Container(
+                            padding: EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withOpacity(0.05),
+                                    blurRadius: 10,
+                                    offset: const Offset(0, 4),
+                                  ),
+                                ],
+                              borderRadius: BorderRadius.circular(10),
+                              color: AppColors.surface
+                            ),
+                            child: SvgPicture.asset(
+                              'assets/icons/notifications.svg',
+                              height: 30,
+                              width: 30,
+                              colorFilter: const ColorFilter.mode(
+                                AppColors.primary,
+                                BlendMode.srcIn,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: AppDimens.PADDING_10),
+                          _buildAvatar(user, userName, context),
+                        ],
+                      ),
+                    ),
                 ],
-              ),
-              const SizedBox(height: AppDimens.PADDING_4),
-              Text(
-                "Découvrez des nouveaux endroits aujordhui!",
-                style: TextStyle(
-                  fontFamily: 'Poppins',
-                  fontSize: 14,
-                  color: AppColors.primary,
-                ),
               ),
               const SizedBox(height: AppDimens.PADDING_16),
               _buildSearchField(context),
@@ -184,14 +205,10 @@ class HelloUserWidget extends StatelessWidget {
     return GestureDetector(
       onTap: () => context.go('/profile'),
       child: Container(
-        width: 55,
-        height: 55,
+        width: 45,
+        height: 45,
         decoration: BoxDecoration(
           shape: BoxShape.circle,
-          border: Border.all(
-            color:  AppColors.primary,
-            width: 2.5
-          ),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(0.08),

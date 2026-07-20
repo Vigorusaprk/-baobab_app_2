@@ -41,6 +41,43 @@ class GoRouterRefreshStream extends ChangeNotifier {
   }
 }
 
+/// Nombre de pages empilées au-dessus de l'écran racine de chaque branche
+/// du shell (0=home, 1=favorites, 2=orders, 3=settings).
+///
+/// Ceci sert de filet de sécurité : certains widgets enfants appellent
+/// `Navigator.push()` directement au lieu de `context.push()` de GoRouter.
+/// Un tel appel empile la nouvelle page dans le Navigator imbriqué de la
+/// branche du shell au lieu du Navigator racine, ce qui garde la bottom
+/// bar de MainScreen visible par-dessus. En observant la profondeur de
+/// pile de chaque branche, MainScreen peut détecter ce cas et cacher la
+/// bottom bar même quand la navigation ne passe pas par GoRouter.
+///
+/// ⚠️ Correctif de symptôme : la vraie solution est de migrer les appels
+/// `Navigator.push()` restants vers `context.push()` (voir la liste des
+/// fichiers concernés partagée précédemment).
+final List<ValueNotifier<int>> branchStackDepth =
+List.generate(4, (_) => ValueNotifier(0));
+
+class _BranchDepthObserver extends NavigatorObserver {
+  final ValueNotifier<int> depth;
+  _BranchDepthObserver(this.depth);
+
+  @override
+  void didPush(Route route, Route? previousRoute) {
+    if (previousRoute != null) depth.value++;
+  }
+
+  @override
+  void didPop(Route route, Route? previousRoute) {
+    if (previousRoute != null && depth.value > 0) depth.value--;
+  }
+
+  @override
+  void didRemove(Route route, Route? previousRoute) {
+    if (previousRoute != null && depth.value > 0) depth.value--;
+  }
+}
+
 /// Routes that require an authenticated account, e.g. because they show or
 /// edit user-specific data (own reservations, own orders, profile/settings).
 /// Plain browsing (home, search, business detail) never requires login —
@@ -55,8 +92,8 @@ final GoRouter appRouter = GoRouter(
     final isLoggedIn = SessionService.instance.isLoggedIn;
     final isAuthRoute =
         state.matchedLocation.startsWith('/login') ||
-        state.matchedLocation.startsWith('/register') ||
-        state.matchedLocation.startsWith('/forgot-password');
+            state.matchedLocation.startsWith('/register') ||
+            state.matchedLocation.startsWith('/forgot-password');
     final requiresAuth = _authRequiredPaths.any((path) => state.matchedLocation.startsWith(path));
 
     // 🔒 Redirection uniquement pour les pages qui nécessitent réellement un compte
@@ -89,6 +126,7 @@ final GoRouter appRouter = GoRouter(
       builder: (context, state, navigationShell) {
         return MainScreen(
           navigationShell: navigationShell,
+          branchStackDepth: branchStackDepth,
           showBottomBar: state.matchedLocation == '/home' ||
               state.matchedLocation == '/favorites' ||
               state.matchedLocation == '/orders' ||
@@ -97,42 +135,46 @@ final GoRouter appRouter = GoRouter(
       },
       branches: [
         StatefulShellBranch(
+          observers: [_BranchDepthObserver(branchStackDepth[0])],
           routes: [
             GoRoute(
               path: '/home',
               name: 'home',
               pageBuilder: (context, state) =>
-                  const NoTransitionPage(child: HomePageScreen()),
+              const NoTransitionPage(child: HomePageScreen()),
             ),
           ],
         ),
         StatefulShellBranch(
+          observers: [_BranchDepthObserver(branchStackDepth[1])],
           routes: [
             GoRoute(
               path: '/favorites',
               name: 'favorites',
               pageBuilder: (context, state) =>
-                  const NoTransitionPage(child: FavoritesPageScreen()),
+              const NoTransitionPage(child: FavoritesPageScreen()),
             ),
           ],
         ),
         StatefulShellBranch(
+          observers: [_BranchDepthObserver(branchStackDepth[2])],
           routes: [
             GoRoute(
               path: '/orders',
               name: 'orders',
               pageBuilder: (context, state) =>
-                  const NoTransitionPage(child: OrderScreen()),
+              const NoTransitionPage(child: OrderScreen()),
             ),
           ],
         ),
         StatefulShellBranch(
+          observers: [_BranchDepthObserver(branchStackDepth[3])],
           routes: [
             GoRoute(
               path: '/settings',
               name: 'settings',
               pageBuilder: (context, state) =>
-                  const NoTransitionPage(child: SettingsScreen()),
+              const NoTransitionPage(child: SettingsScreen()),
             ),
           ],
         ),
@@ -174,7 +216,12 @@ final GoRouter appRouter = GoRouter(
       path: '/order-detail',
       name: 'orderDetail',
       pageBuilder: (context, state) {
-        final order = state.extra as Order;
+        final order = state.extra as Order?;
+        if (order == null) {
+          return const MaterialPage(
+            child: Scaffold(body: Center(child: Text('Commande introuvable'))),
+          );
+        }
         return MaterialPage(child: OrderDetailPage(order: order));
       },
     ),
@@ -182,7 +229,12 @@ final GoRouter appRouter = GoRouter(
       path: '/reservation-detail',
       name: 'reservationDetail',
       pageBuilder: (context, state) {
-        final reservation = state.extra as Reservation;
+        final reservation = state.extra as Reservation?;
+        if (reservation == null) {
+          return const MaterialPage(
+            child: Scaffold(body: Center(child: Text('Réservation introuvable'))),
+          );
+        }
         return MaterialPage(
           child: ReservationDetailPage(reservation: reservation),
         );
@@ -197,7 +249,7 @@ final GoRouter appRouter = GoRouter(
       path: '/edit-profile',
       name: 'edit-profile',
       pageBuilder: (context, state) =>
-          const MaterialPage(child: EditProfilePage()),
+      const MaterialPage(child: EditProfilePage()),
     ),
   ],
 );
