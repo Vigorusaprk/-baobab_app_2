@@ -44,7 +44,7 @@ class HelloUserWidget extends StatelessWidget {
                         ),
                       ),
                       Text(
-                        "Ou alons nous ajordhui ?",
+                        "Ou alons nous?",
                         style: const TextStyle(
                           fontFamily: 'Poppins',
                           fontSize: 20,

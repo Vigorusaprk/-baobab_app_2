@@ -58,22 +58,35 @@ class MainScreen extends StatelessWidget {
           body: navigationShell, // Affiche la branche courante
           bottomNavigationBar: shouldShowBar
               ? Container(
-            margin: const EdgeInsets.only(left: 16, right: 16, bottom: 16),
-            height: 70,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: List.generate(4, (index) {
-                return _buildNavItem(
-                  context,
-                  svgOutlinePath: _svgPaths[index][0],
-                  svgFilledPath: _svgPaths[index][1],
-                  label: _labels[index],
-                  index: index,
-                  isSelected: navigationShell.currentIndex == index,
-                );
-              }),
-            ),
-          )
+                decoration: BoxDecoration(
+                  color: AppColors.scaffoldBackground,
+                  borderRadius: BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20)),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.6),
+                      blurRadius: 16,
+                      offset: const Offset(0, 6),
+                    ),
+                  ],
+                ),
+                child: Container(
+                    margin: const EdgeInsets.only(left: 16, right: 16, bottom: 16),
+                    height: 70,
+                child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: List.generate(4, (index) {
+                  return _buildNavItem(
+                    context,
+                    svgOutlinePath: _svgPaths[index][0],
+                    svgFilledPath: _svgPaths[index][1],
+                    label: _labels[index],
+                    index: index,
+                    isSelected: navigationShell.currentIndex == index,
+                  );
+                }),
+                            ),
+                          ),
+              )
               : null,
         );
       },

@@ -29,7 +29,7 @@ class BusinessSpecificSection extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
-                    color: AppColors.primary50,
+                    color: AppColors.primary,
                   ),
                 ),
               ],
@@ -65,7 +65,7 @@ class BusinessSpecificSection extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(feature.icon, size: 18, color: AppColors.primary50),
+          Icon(feature.icon, size: 18, color: AppColors.primary),
           const SizedBox(width: 8),
           Text(
             feature.label,

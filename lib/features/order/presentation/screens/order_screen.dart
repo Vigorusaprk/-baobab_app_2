@@ -60,7 +60,7 @@ class _OrderScreenState extends State<OrderScreen> with WidgetsBindingObserver {
       _userId = user.id;
       await _loadOrders();
     } else {
-      context.go('/login');
+      setState(() => _isLoading = false);
     }
   }
 

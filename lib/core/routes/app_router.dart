@@ -43,18 +43,6 @@ class GoRouterRefreshStream extends ChangeNotifier {
 
 /// Nombre de pages empilées au-dessus de l'écran racine de chaque branche
 /// du shell (0=home, 1=favorites, 2=orders, 3=settings).
-///
-/// Ceci sert de filet de sécurité : certains widgets enfants appellent
-/// `Navigator.push()` directement au lieu de `context.push()` de GoRouter.
-/// Un tel appel empile la nouvelle page dans le Navigator imbriqué de la
-/// branche du shell au lieu du Navigator racine, ce qui garde la bottom
-/// bar de MainScreen visible par-dessus. En observant la profondeur de
-/// pile de chaque branche, MainScreen peut détecter ce cas et cacher la
-/// bottom bar même quand la navigation ne passe pas par GoRouter.
-///
-/// ⚠️ Correctif de symptôme : la vraie solution est de migrer les appels
-/// `Navigator.push()` restants vers `context.push()` (voir la liste des
-/// fichiers concernés partagée précédemment).
 final List<ValueNotifier<int>> branchStackDepth =
 List.generate(4, (_) => ValueNotifier(0));
 
@@ -78,26 +66,13 @@ class _BranchDepthObserver extends NavigatorObserver {
   }
 }
 
-/// Routes that require an authenticated account, e.g. because they show or
-/// edit user-specific data (own reservations, own orders, profile/settings).
-/// Plain browsing (home, search, business detail) never requires login —
-/// account creation is only prompted when the user attempts an action that
-/// needs one.
-const _authRequiredPaths = ['/favorites', '/orders', '/settings', '/profil-page', '/edit-profile'];
-
 final GoRouter appRouter = GoRouter(
-  initialLocation: '/',
-  refreshListenable: GoRouterRefreshStream(SessionService.instance.authStateChanges),
+  initialLocation: '/home',
   redirect: (context, state) {
     final isLoggedIn = SessionService.instance.isLoggedIn;
-    final isAuthRoute =
-        state.matchedLocation.startsWith('/login') ||
-            state.matchedLocation.startsWith('/register') ||
-            state.matchedLocation.startsWith('/forgot-password');
-    final requiresAuth = _authRequiredPaths.any((path) => state.matchedLocation.startsWith(path));
-
-    // 🔒 Redirection uniquement pour les pages qui nécessitent réellement un compte
-    if (!isLoggedIn && requiresAuth) return '/login';
+    final isAuthRoute = state.matchedLocation.startsWith('/login') ||
+        state.matchedLocation.startsWith('/register') ||
+        state.matchedLocation.startsWith('/forgot-password');
 
     // 🔓 Redirection si l'utilisateur est connecté et accède à une page d'authentification
     if (isLoggedIn && isAuthRoute) return '/home';
@@ -105,13 +80,10 @@ final GoRouter appRouter = GoRouter(
     return null;
   },
   routes: [
-    // Route racine : navigation libre, sans compte requis
+    // Route racine redirigeant proprement vers l'accueil public
     GoRoute(
       path: '/',
       redirect: (context, state) => '/home',
-      pageBuilder: (context, state) => const MaterialPage(
-        child: Scaffold(body: Center(child: CircularProgressIndicator())),
-      ),
     ),
 
     // --- ROUTES D'AUTHENTIFICATION ---

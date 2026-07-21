@@ -40,7 +40,7 @@ class BusinessDetailAppBar extends StatelessWidget {
           context,
           business.isFavorite ? Icons.favorite_rounded : Icons.favorite_outline_rounded,
               () {},
-          iconColor: business.isFavorite ? Colors.red : Colors.white,
+          iconColor: business.isFavorite ? Colors.red : AppColors.primary,
         ),
         const SizedBox(width: 7),
       ],
@@ -106,21 +106,17 @@ class BusinessDetailAppBar extends StatelessWidget {
     );
   }
 
-  Widget _buildCircleButton(BuildContext context, IconData icon, VoidCallback onTap, {Color iconColor = Colors.white}) {
+  Widget _buildCircleButton(BuildContext context, IconData icon, VoidCallback onTap, {Color iconColor = AppColors.primary}) {
     return ClipRRect(
       borderRadius: BorderRadius.circular(50),
       child: Container(
         decoration: BoxDecoration(
-
-          color: uiBusiness.categoryColor.withOpacity(0.3),
+          color: AppColors.scaffoldBackground,
           shape: BoxShape.circle,
         ),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 20.0, sigmaY: 20.0),
-          child: IconButton(
-            icon: Icon(icon, color: iconColor, size: 20),
-            onPressed: onTap,
-          ),
+        child: IconButton(
+          icon: Icon(icon, color: iconColor, size: 20),
+          onPressed: onTap,
         ),
       ),
     );

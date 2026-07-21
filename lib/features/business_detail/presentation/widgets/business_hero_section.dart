@@ -54,7 +54,6 @@ class BusinessHeroSection extends StatelessWidget {
                       borderRadius: BorderRadius.circular(22),
                       child: Stack(
                         children: [
-                          Positioned.fill(child: _buildBackgroundOrbes()),
                           BackdropFilter(
                             filter: ImageFilter.blur(sigmaX: 15.0, sigmaY: 15.0),
                             child: Container(

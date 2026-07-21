@@ -75,7 +75,7 @@ class _RestaurantReviewState extends State<RestaurantReview> {
           children: [
             Container(
               decoration: BoxDecoration(
-                  border: Border.all(width: 2, color: AppColors.primary50),
+                  border: Border.all(width: 2, color: AppColors.primary),
                   borderRadius: BorderRadius.circular(100)
               ),
               child: Padding(
@@ -104,7 +104,7 @@ class _RestaurantReviewState extends State<RestaurantReview> {
                       ],
                     ),
                     FilledButton.icon(
-                      style: FilledButton.styleFrom(backgroundColor: AppColors.primary50),
+                      style: FilledButton.styleFrom(backgroundColor: AppColors.primary),
                       onPressed: () => showWriteReviewDialog(
                         context,
                         widget.business,

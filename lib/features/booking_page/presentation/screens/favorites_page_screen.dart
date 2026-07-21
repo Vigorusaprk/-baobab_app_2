@@ -59,7 +59,7 @@ class _FavoritesPageScreenState extends State<FavoritesPageScreen> {
       _userId = user.id;
       await _loadReservations();
     } else {
-      context.go('/login');
+      setState(() => _isLoading = false);
     }
   }
 

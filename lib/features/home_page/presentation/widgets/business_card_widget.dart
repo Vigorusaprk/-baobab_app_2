@@ -50,29 +50,6 @@ class BusinessCardWidget extends StatelessWidget {
                 children: [
                   BusinessCardBackground(uiBusiness: uiBusiness),
 
-                  // Tag catégorie — pastille pleine couleur, plate
-                  Positioned(
-                    top: 12,
-                    left: 12,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                      decoration: BoxDecoration(
-                        color: categoryColor,
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Text(
-                        business.type.toString(),
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 11,
-                          fontWeight: FontWeight.w700,
-                          fontFamily: "Poppins",
-                          letterSpacing: 0.4,
-                        ),
-                      ),
-                    ),
-                  ),
-
                   // Pastille de note — fond blanc plat, ombre minimale
                   Positioned(
                     top: 12,
