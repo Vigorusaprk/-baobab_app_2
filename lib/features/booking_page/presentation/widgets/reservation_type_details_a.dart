@@ -1,174 +1,188 @@
 import 'package:flutter/material.dart';
+import 'package:baobabe_0_2/core/themes/app_diemens.dart';
 import 'package:baobabe_0_2/features/business_detail/domain/entities/reservation.dart';
-import 'package:baobabe_0_2/features/booking_page/presentation/utils/reservation_format_utils.dart';
-import 'reservation_detail_row.dart';
-
-/// Type-specific detail blocks for hotel, restaurant, car rental and travel
-/// reservations.
 
 class HotelReservationDetails extends StatelessWidget {
-  const HotelReservationDetails(this.reservation, {super.key});
-
   final Reservation reservation;
+  const HotelReservationDetails(this.reservation, {super.key});
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
-        ReservationDetailRow(
-            Icons.king_bed, reservation.roomType ?? 'Non spécifié'),
-        ReservationDetailRow(
-          Icons.person,
-          reservation.customerName.isNotEmpty
-              ? reservation.customerName
-              : 'Non renseigné',
-        ),
-        ReservationDetailRow(
-          Icons.phone,
-          reservation.phoneNumber.isNotEmpty
-              ? reservation.phoneNumber
-              : 'Non renseigné',
-        ),
-        ReservationDetailRow(
-          Icons.calendar_today,
-          'Du ${ReservationFormatUtils.safeFormatDate(reservation.checkInDate)} au ${ReservationFormatUtils.safeFormatDate(reservation.checkOutDate)}',
-        ),
-        ReservationDetailRow(
-          Icons.people,
-          '${reservation.numberOfGuests ?? 0} invité(s) • ${reservation.numberOfRooms ?? 0} chambre(s)',
-        ),
-        if (reservation.notes != null && reservation.notes!.isNotEmpty)
-          ReservationDetailRow(Icons.note, reservation.notes!),
+        _row('Chambre', reservation.roomType ?? 'Non spécifiée', Icons.king_bed),
+        _row('Arrivée', _fmt(reservation.checkInDate), Icons.calendar_today),
+        _row('Départ', _fmt(reservation.checkOutDate), Icons.calendar_today),
+        _row('Personnes', '${reservation.numberOfGuests ?? 1}', Icons.people),
       ],
     );
   }
+  Widget _row(String label, String value, IconData icon) => Padding(
+    padding: const EdgeInsets.symmetric(vertical: 4),
+    child: Row(children: [
+      Icon(icon, size: 16, color: Colors.grey),
+      const SizedBox(width: 8),
+      Expanded(flex: 2, child: Text(label, style: const TextStyle(color: Colors.grey))),
+      Expanded(flex: 3, child: Text(value, textAlign: TextAlign.end)),
+    ]),
+  );
+  String _fmt(DateTime? d) => d != null ? '${d.day}/${d.month}/${d.year}' : 'Non spécifiée';
 }
 
 class RestaurantReservationDetails extends StatelessWidget {
-  const RestaurantReservationDetails(this.reservation, {super.key});
-
   final Reservation reservation;
+  const RestaurantReservationDetails(this.reservation, {super.key});
 
   @override
   Widget build(BuildContext context) {
+    final time = reservation.time;
+    final timeStr = time != null
+        ? '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}'
+        : 'Non spécifiée';
     return Column(
       children: [
-        ReservationDetailRow(
-          Icons.person,
-          reservation.customerName.isNotEmpty
-              ? reservation.customerName
-              : 'Non renseigné',
-        ),
-        ReservationDetailRow(
-          Icons.phone,
-          reservation.phoneNumber.isNotEmpty
-              ? reservation.phoneNumber
-              : 'Non renseigné',
-        ),
-        ReservationDetailRow(
-          Icons.calendar_today,
-          '${ReservationFormatUtils.safeFormatDate(reservation.date)} à ${ReservationFormatUtils.safeFormatTime(reservation.time)}',
-        ),
-        ReservationDetailRow(
-          Icons.people,
-          '${reservation.numberOfPeople ?? 0} personne(s)',
-        ),
-        ReservationDetailRow(
-          Icons.table_restaurant,
-          'Table ${reservation.tableNumber ?? '?'}',
-        ),
-        if (reservation.notes != null && reservation.notes!.isNotEmpty)
-          ReservationDetailRow(Icons.note, reservation.notes!),
+        _row('Table', reservation.tableNumber ?? 'Non spécifiée', Icons.table_restaurant),
+        _row('Date', reservation.date != null ? '${reservation.date!.day}/${reservation.date!.month}/${reservation.date!.year}' : 'Non spécifiée', Icons.calendar_today),
+        _row('Heure', timeStr, Icons.access_time),
+        _row('Personnes', '${reservation.numberOfPeople ?? 0}', Icons.people),
       ],
     );
   }
+  Widget _row(String label, String value, IconData icon) => Padding(
+    padding: const EdgeInsets.symmetric(vertical: 4),
+    child: Row(children: [
+      Icon(icon, size: 16, color: Colors.grey),
+      const SizedBox(width: 8),
+      Expanded(flex: 2, child: Text(label, style: const TextStyle(color: Colors.grey))),
+      Expanded(flex: 3, child: Text(value, textAlign: TextAlign.end)),
+    ]),
+  );
 }
 
 class CarRentalReservationDetails extends StatelessWidget {
-  const CarRentalReservationDetails(this.reservation, {super.key});
-
   final Reservation reservation;
+  const CarRentalReservationDetails(this.reservation, {super.key});
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
-        ReservationDetailRow(
-          Icons.directions_car,
-          reservation.vehicleType ?? 'Non spécifié',
-        ),
-        ReservationDetailRow(
-          Icons.person,
-          reservation.customerName.isNotEmpty
-              ? reservation.customerName
-              : 'Non renseigné',
-        ),
-        ReservationDetailRow(
-          Icons.phone,
-          reservation.phoneNumber.isNotEmpty
-              ? reservation.phoneNumber
-              : 'Non renseigné',
-        ),
-        ReservationDetailRow(
-          Icons.calendar_today,
-          'Du ${ReservationFormatUtils.safeFormatDate(reservation.rentalStartDate)} au ${ReservationFormatUtils.safeFormatDate(reservation.rentalEndDate)}',
-        ),
-        ReservationDetailRow(
-            Icons.timer, '${reservation.rentalDays ?? 0} jour(s)'),
-        if (reservation.withDriver == true)
-          const ReservationDetailRow(Icons.person_pin, 'Avec chauffeur'),
-        if (reservation.includeInsurance == false)
-          const ReservationDetailRow(Icons.security, 'Assurance optionnelle'),
-        if (reservation.needDelivery == true)
-          const ReservationDetailRow(
-              Icons.delivery_dining, 'Livraison incluse'),
-        if (reservation.notes != null && reservation.notes!.isNotEmpty)
-          ReservationDetailRow(Icons.note, reservation.notes!),
+        _row('Véhicule', reservation.vehicleType ?? 'Non spécifié', Icons.directions_car),
+        _row('Début', _fmt(reservation.rentalStartDate), Icons.calendar_today),
+        _row('Fin', _fmt(reservation.rentalEndDate), Icons.calendar_today),
       ],
     );
   }
+  Widget _row(String label, String value, IconData icon) => Padding(
+    padding: const EdgeInsets.symmetric(vertical: 4),
+    child: Row(children: [
+      Icon(icon, size: 16, color: Colors.grey),
+      const SizedBox(width: 8),
+      Expanded(flex: 2, child: Text(label, style: const TextStyle(color: Colors.grey))),
+      Expanded(flex: 3, child: Text(value, textAlign: TextAlign.end)),
+    ]),
+  );
+  String _fmt(DateTime? d) => d != null ? '${d.day}/${d.month}/${d.year}' : 'Non spécifiée';
 }
 
 class TravelReservationDetails extends StatelessWidget {
-  const TravelReservationDetails(this.reservation, {super.key});
-
   final Reservation reservation;
+  const TravelReservationDetails(this.reservation, {super.key});
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
-        ReservationDetailRow(
-          Icons.location_on,
-          reservation.destination ?? 'Destination non spécifiée',
-        ),
-        ReservationDetailRow(
-          Icons.person,
-          reservation.customerName.isNotEmpty
-              ? reservation.customerName
-              : 'Non renseigné',
-        ),
-        ReservationDetailRow(
-          Icons.phone,
-          reservation.phoneNumber.isNotEmpty
-              ? reservation.phoneNumber
-              : 'Non renseigné',
-        ),
-        ReservationDetailRow(
-          Icons.calendar_today,
-          'Départ : ${ReservationFormatUtils.safeFormatDate(reservation.displayDate)}',
-        ),
-        ReservationDetailRow(
-          Icons.access_time,
-          reservation.departureTime ?? 'Heure non spécifiée',
-        ),
-        ReservationDetailRow(
-          Icons.people,
-          '${reservation.numberOfPassengers ?? 1} passager(s)',
-        ),
-        if (reservation.notes != null && reservation.notes!.isNotEmpty)
-          ReservationDetailRow(Icons.note, reservation.notes!),
+        _row('Destination', reservation.destination ?? 'Non spécifiée', Icons.location_on),
+        _row('Passagers', '${reservation.numberOfPassengers ?? 1}', Icons.people),
       ],
     );
   }
+  Widget _row(String label, String value, IconData icon) => Padding(
+    padding: const EdgeInsets.symmetric(vertical: 4),
+    child: Row(children: [
+      Icon(icon, size: 16, color: Colors.grey),
+      const SizedBox(width: 8),
+      Expanded(flex: 2, child: Text(label, style: const TextStyle(color: Colors.grey))),
+      Expanded(flex: 3, child: Text(value, textAlign: TextAlign.end)),
+    ]),
+  );
+}
+
+class SpaReservationDetails extends StatelessWidget {
+  final Reservation reservation;
+  const SpaReservationDetails(this.reservation, {super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final date = reservation.appointmentDate;
+    return Column(
+      children: [
+        _row('Soin', reservation.treatmentType ?? 'Non spécifié', Icons.spa),
+        _row('Date', date != null ? '${date.day}/${date.month}/${date.year}' : 'Non spécifiée', Icons.calendar_today),
+        _row('Thérapeute', reservation.therapistName ?? 'Non spécifié', Icons.person_pin),
+      ],
+    );
+  }
+  Widget _row(String label, String value, IconData icon) => Padding(
+    padding: const EdgeInsets.symmetric(vertical: 4),
+    child: Row(children: [
+      Icon(icon, size: 16, color: Colors.grey),
+      const SizedBox(width: 8),
+      Expanded(flex: 2, child: Text(label, style: const TextStyle(color: Colors.grey))),
+      Expanded(flex: 3, child: Text(value, textAlign: TextAlign.end)),
+    ]),
+  );
+}
+
+class CinemaReservationDetails extends StatelessWidget {
+  final Reservation reservation;
+  const CinemaReservationDetails(this.reservation, {super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final date = reservation.showtime;
+    return Column(
+      children: [
+        _row('Film', reservation.movieTitle ?? 'Non spécifié', Icons.movie),
+        _row('Séance', date != null ? '${date.day}/${date.month}/${date.year}' : 'Non spécifiée', Icons.calendar_today),
+        _row('Places', '${reservation.numberOfTickets ?? 0}', Icons.confirmation_number),
+      ],
+    );
+  }
+  Widget _row(String label, String value, IconData icon) => Padding(
+    padding: const EdgeInsets.symmetric(vertical: 4),
+    child: Row(children: [
+      Icon(icon, size: 16, color: Colors.grey),
+      const SizedBox(width: 8),
+      Expanded(flex: 2, child: Text(label, style: const TextStyle(color: Colors.grey))),
+      Expanded(flex: 3, child: Text(value, textAlign: TextAlign.end)),
+    ]),
+  );
+}
+
+class TourismReservationDetails extends StatelessWidget {
+  final Reservation reservation;
+  const TourismReservationDetails(this.reservation, {super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final date = reservation.day;
+    return Column(
+      children: [
+        _row('Activité', reservation.activitiName ?? 'Non spécifiée', Icons.tour),
+        _row('Date', date != null ? '${date.day}/${date.month}/${date.year}' : 'Non spécifiée', Icons.calendar_today),
+        _row('Participants', '${reservation.numberOfPassengers ?? 1}', Icons.people),
+      ],
+    );
+  }
+  Widget _row(String label, String value, IconData icon) => Padding(
+    padding: const EdgeInsets.symmetric(vertical: 4),
+    child: Row(children: [
+      Icon(icon, size: 16, color: Colors.grey),
+      const SizedBox(width: 8),
+      Expanded(flex: 2, child: Text(label, style: const TextStyle(color: Colors.grey))),
+      Expanded(flex: 3, child: Text(value, textAlign: TextAlign.end)),
+    ]),
+  );
 }

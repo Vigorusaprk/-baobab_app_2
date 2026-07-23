@@ -1,62 +1,42 @@
 import 'package:flutter/material.dart';
-import 'package:baobabe_0_2/features/business_detail/domain/entities/reservation.dart';
 import 'package:baobabe_0_2/core/themes/app_colors.dart';
+import 'package:baobabe_0_2/features/business_detail/domain/entities/reservation.dart';
 
-/// Shared formatting helpers used across the favorites/reservations UI.
 class ReservationFormatUtils {
-  const ReservationFormatUtils._();
+  static String getStatusText(DateTime? date) {
+    if (date == null) return 'À venir';
+    final now = DateTime.now();
+    final diff = date.difference(now);
+    if (diff.isNegative) return 'Passée';
+    if (diff.inDays == 0) return 'Aujourd\'hui';
+    if (diff.inDays == 1) return 'Demain';
+    return 'À venir';
+  }
 
-  static String formatDate(DateTime date) =>
-      '${date.day}/${date.month}/${date.year}';
-
-  static String formatTime(TimeOfDay time) =>
-      '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';
-
-  static String safeFormatDate(DateTime? date) =>
-      date != null ? formatDate(date) : 'Non spécifiée';
-
-  static String safeFormatTime(TimeOfDay? time) =>
-      time != null ? formatTime(time) : 'Non spécifiée';
+  static Color getStatusColor(DateTime? date) {
+    if (date == null) return AppColors.warning;
+    final now = DateTime.now();
+    final diff = date.difference(now);
+    if (diff.isNegative) return Colors.grey;
+    if (diff.inDays == 0) return AppColors.success;
+    if (diff.inDays <= 3) return AppColors.warning;
+    return AppColors.primary;
+  }
 
   static String getReservationSubtitle(Reservation reservation) {
-    if (reservation.type == 'hotel') {
-      final ci = reservation.checkInDate;
-      final co = reservation.checkOutDate;
-      if (ci != null && co != null) {
-        return '${formatDate(ci)} - ${formatDate(co)}';
-      }
-      return 'Dates non spécifiées';
-    } else if (reservation.type == 'car_rental') {
-      final sd = reservation.rentalStartDate;
-      final ed = reservation.rentalEndDate;
-      if (sd != null && ed != null) {
-        return '${formatDate(sd)} - ${formatDate(ed)}';
-      }
-      return 'Dates non spécifiées';
-    } else if (reservation.type == 'travel') {
-      return '${reservation.destination ?? "Destination inconnue"} • ${safeFormatDate(reservation.displayDate)}';
-    } else if (reservation.type == 'spa') {
-      return '${reservation.treatmentType ?? "Soin"} • ${safeFormatDate(reservation.appointmentDate)}';
-    } else if (reservation.type == 'cinema') {
-      return '${reservation.movieTitle ?? "Film"} • ${safeFormatDate(reservation.showtime)}';
-    } else if (reservation.type == 'toursime') {
-      return '${reservation.activitiName ?? "Activité"} • ${safeFormatDate(reservation.day)}';
-    } else {
-      return '${safeFormatDate(reservation.date)} • ${safeFormatTime(reservation.time)}';
+    if (reservation.date != null) {
+      final months = [
+        'Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin',
+        'Juil', 'Aoû', 'Sep', 'Oct', 'Nov', 'Déc'
+      ];
+      return '${reservation.date!.day} ${months[reservation.date!.month - 1]} ${reservation.date!.year}';
     }
-  }
-
-  static Color getStatusColor(DateTime reservationDate) {
-    final now = DateTime.now();
-    if (reservationDate.isBefore(now)) return Colors.grey;
-    if (reservationDate.difference(now).inDays <= 1) return AppColors.warning;
-    return AppColors.success;
-  }
-
-  static String getStatusText(DateTime reservationDate) {
-    final now = DateTime.now();
-    if (reservationDate.isBefore(now)) return 'Passée';
-    if (reservationDate.difference(now).inDays <= 1) return 'Bientôt';
-    return 'À venir';
+    if (reservation.checkInDate != null) {
+      return 'Arrivée: ${reservation.checkInDate!.day}/${reservation.checkInDate!.month}/${reservation.checkInDate!.year}';
+    }
+    if (reservation.rentalStartDate != null) {
+      return 'Début: ${reservation.rentalStartDate!.day}/${reservation.rentalStartDate!.month}/${reservation.rentalStartDate!.year}';
+    }
+    return 'Date non spécifiée';
   }
 }

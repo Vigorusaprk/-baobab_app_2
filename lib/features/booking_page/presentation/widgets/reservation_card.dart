@@ -6,7 +6,6 @@ import 'package:baobabe_0_2/core/themes/app_fonts.dart';
 import 'package:baobabe_0_2/features/business_detail/domain/entities/reservation.dart';
 import 'package:baobabe_0_2/features/booking_page/presentation/utils/reservation_format_utils.dart';
 import 'reservation_type_details_a.dart';
-import 'reservation_type_details_b.dart';
 
 /// Card summarizing a single reservation, with type-specific details and a
 /// delete action.

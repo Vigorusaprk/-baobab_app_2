@@ -11,9 +11,8 @@ import 'package:baobabe_0_2/features/auth/presentation/screens/auth_screen.dart'
 import 'package:baobabe_0_2/features/main/presentation/screens/main_screen.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/screens/home_page_screen.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/screens/search_page.dart';
-import 'package:baobabe_0_2/features/booking_page/presentation/screens/favorites_page_screen.dart';
 import 'package:baobabe_0_2/features/booking_page/presentation/screens/boking_detail_screen.dart';
-import 'package:baobabe_0_2/features/order/presentation/screens/order_screen.dart';
+import 'package:baobabe_0_2/features/activity/presentation/screens/activity_screen.dart';
 import 'package:baobabe_0_2/features/order/presentation/screens/order_detail_page.dart';
 import 'package:baobabe_0_2/features/settings/presentation/screens/settings_screen.dart';
 import 'package:baobabe_0_2/features/settings/presentation/widgets/profil_page.dart';
@@ -74,13 +73,11 @@ final GoRouter appRouter = GoRouter(
         state.matchedLocation.startsWith('/register') ||
         state.matchedLocation.startsWith('/forgot-password');
 
-    // 🔓 Redirection si l'utilisateur est connecté et accède à une page d'authentification
     if (isLoggedIn && isAuthRoute) return '/home';
 
     return null;
   },
   routes: [
-    // Route racine redirigeant proprement vers l'accueil public
     GoRoute(
       path: '/',
       redirect: (context, state) => '/home',
@@ -100,7 +97,7 @@ final GoRouter appRouter = GoRouter(
           navigationShell: navigationShell,
           branchStackDepth: branchStackDepth,
           showBottomBar: state.matchedLocation == '/home' ||
-              state.matchedLocation == '/favorites' ||
+              state.matchedLocation == '/expolre' ||
               state.matchedLocation == '/orders' ||
               state.matchedLocation == '/settings',
         );
@@ -121,10 +118,10 @@ final GoRouter appRouter = GoRouter(
           observers: [_BranchDepthObserver(branchStackDepth[1])],
           routes: [
             GoRoute(
-              path: '/favorites',
-              name: 'favorites',
+              path: '/expolre',
+              name: 'expolre',
               pageBuilder: (context, state) =>
-              const NoTransitionPage(child: FavoritesPageScreen()),
+              const NoTransitionPage(child: SearchPage()),
             ),
           ],
         ),
@@ -135,7 +132,7 @@ final GoRouter appRouter = GoRouter(
               path: '/orders',
               name: 'orders',
               pageBuilder: (context, state) =>
-              const NoTransitionPage(child: OrderScreen()),
+              const NoTransitionPage(child: ActivityScreen()),
             ),
           ],
         ),
