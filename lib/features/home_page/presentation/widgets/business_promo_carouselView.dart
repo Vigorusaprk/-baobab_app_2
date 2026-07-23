@@ -128,7 +128,7 @@ class _BusinessPromoCarouselViewState extends State<BusinessPromoCarouselView> {
                 ),
                 child: BusinessPromoCard(
                   uiBusiness: uiBusiness,
-                  isNew: true,
+                  isNew: uiBusiness.isNew,
                   badgeLabel: widget.badgeLabelBuilder?.call(uiBusiness) ?? 'Nouveau',
                   subtitle: widget.subtitleBuilder?.call(uiBusiness),
                   onTap: () => _handleTap(uiBusiness),

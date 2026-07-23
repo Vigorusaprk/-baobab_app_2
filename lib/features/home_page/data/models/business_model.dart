@@ -21,6 +21,8 @@ class BusinessModel {
   final double? latitude;
   final double? longitude;
   final List<BusinessModel>? stores;
+  final bool isSponsored;
+  final DateTime createdAt;
 
   BusinessModel({
     required this.id,
@@ -43,6 +45,8 @@ class BusinessModel {
     this.latitude,
     this.longitude,
     this.stores,
+    required this.isSponsored,
+    required this.createdAt,
   });
 
   factory BusinessModel.fromJson(Map<String, dynamic> json) {
@@ -67,13 +71,24 @@ class BusinessModel {
       website: json['website'],
       images: List<String>.from(json['images'] ?? []),
       specificData: Map<String, dynamic>.from(json['specific_data'] ?? {}),
-      reviews: (json['reviews'] as List?)?.map((r) => BusinessReview.fromJson(r)).toList() ?? [],
+      reviews: (json['reviews'] as List?)
+          ?.map((r) => BusinessReview.fromJson(r))
+          .toList() ??
+          [],
       isFavorite: json['is_favorite'] ?? json['isFavorite'] ?? false,
       latitude: (json['latitude'] as num?)?.toDouble(),
       longitude: (json['longitude'] as num?)?.toDouble(),
       stores: json['stores'] != null
-          ? (json['stores'] as List).map((s) => BusinessModel.fromJson(s)).toList()
+          ? (json['stores'] as List)
+          .map((s) => BusinessModel.fromJson(s))
+          .toList()
           : null,
+      isSponsored: json['is_sponsored'] ?? json['isSponsored'] ?? false,
+      createdAt: json['created_at'] != null
+          ? DateTime.parse(json['created_at'])
+          : (json['createdAt'] != null
+          ? DateTime.parse(json['createdAt'])
+          : DateTime.now()),
     );
   }
 
@@ -84,7 +99,7 @@ class BusinessModel {
       'address': address,
       'description': description,
       'bg_img': bgImg,
-      'profil_img' : profilImg,
+      'profil_img': profilImg,
       'rating': rating,
       'review_count': reviewCount,
       'opening_hours': openingHours,
@@ -99,6 +114,8 @@ class BusinessModel {
       'latitude': latitude,
       'longitude': longitude,
       'stores': stores?.map((store) => store.toJson()).toList(),
+      'is_sponsored': isSponsored,
+      'created_at': createdAt.toIso8601String(),
     };
   }
 
@@ -124,6 +141,8 @@ class BusinessModel {
       latitude: latitude,
       longitude: longitude,
       stores: stores?.map((store) => store.toEntity()).toList(),
+      isSponsored: isSponsored,
+      createdAt: createdAt,
     );
   }
 }

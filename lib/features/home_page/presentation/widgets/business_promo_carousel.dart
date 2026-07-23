@@ -9,10 +9,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 /// [BusinessBloc]/[CategoryBloc] que [BusinessCardsWidget], filtre la
 /// liste, puis délègue tout l'affichage à [BusinessPromoCarouselView].
 ///
-/// ⚠️ La table `business` n'a aujourd'hui ni `created_at` ni
-/// `is_sponsored` — sans `filter` fourni, tous les business chargés
-/// sont affichés. Branche un vrai critère dès que ces colonnes existent
-/// (ex: `filter: (b) => b.isSponsored`).
+/// Par défaut (sans `filter` personnalisé), affiche uniquement les
+/// business **nouveaux** (créés il y a moins de 30 jours).
+/// Le badge "Nouveau" est affiché dynamiquement selon la date de
+/// création via [UIBusiness.isNew].
 class BusinessPromoCarousel extends StatelessWidget {
   final bool Function(dynamic business)? filter;
   final String Function(UIBusiness uiBusiness)? badgeLabelBuilder;
@@ -49,16 +49,23 @@ class BusinessPromoCarousel extends StatelessWidget {
             // BusinessCardsWidget sur la même page.
             if (state is! BusinessLoaded) return const SizedBox.shrink();
 
+            // Filtre par défaut : uniquement les nouveaux (< 30 jours)
             final filtered = filter != null
                 ? state.businesses.where(filter!).toList()
-                : state.businesses;
+                : state.businesses.where((b) {
+                    final ui = UIBusiness(b);
+                    return ui.isNew;
+                  }).toList();
 
             final uiBusinesses = filtered.map((b) => UIBusiness(b)).toList();
 
+            // Si aucun nouveau business, on cache complètement la section
+            if (uiBusinesses.isEmpty) return const SizedBox.shrink();
+
             return BusinessPromoCarouselView(
-              title: 'Sponsorisé',
+              title: 'Nouveautés',
               uiBusinesses: uiBusinesses,
-              badgeLabelBuilder: badgeLabelBuilder,
+              badgeLabelBuilder: badgeLabelBuilder ?? ((ui) => 'Nouveau'),
               subtitleBuilder: subtitleBuilder,
               onCardTap: onCardTap,
               cardHeight: cardHeight,

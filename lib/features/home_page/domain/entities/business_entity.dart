@@ -11,11 +11,9 @@ enum BusinessType {
   cinema,
   travelAgency,
   spa,
-  tourism,      // ← nouveau
+  tourism,
   other
 }
-
-// lib/features/home_page/domain/entities/business_entity.dart
 
 class BusinessReview extends Equatable {
   final String id;
@@ -89,6 +87,8 @@ class Business extends Equatable {
   final double? latitude;
   final double? longitude;
   final List<Business>? stores;
+  final bool isSponsored;   // 👈 Ajouté pour filtrer les sponsorisés
+  final DateTime createdAt; // 👈 Ajouté pour filtrer les nouveautés
 
   const Business({
     required this.id,
@@ -111,6 +111,8 @@ class Business extends Equatable {
     this.latitude,
     this.longitude,
     this.stores,
+    required this.isSponsored,
+    required this.createdAt,
   });
 
   @override
@@ -135,5 +137,7 @@ class Business extends Equatable {
     latitude,
     longitude,
     stores,
+    isSponsored,
+    createdAt,
   ];
 }

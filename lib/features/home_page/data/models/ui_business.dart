@@ -62,4 +62,12 @@ class UIBusiness {
   }
 
   bool get isOpen => true;
+
+  /// Un business est considéré comme "Nouveau" s'il a été créé
+  /// il y a moins de 30 jours (1 mois).
+  bool get isNew {
+    final now = DateTime.now();
+    final diff = now.difference(business.createdAt);
+    return diff.inDays < 30;
+  }
 }
