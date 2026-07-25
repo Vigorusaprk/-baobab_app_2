@@ -28,10 +28,6 @@ class _LoginPageState extends State<LoginPage> {
           leading: IconButton(
             icon: const Icon(Icons.arrow_back_ios_new_rounded),
             onPressed: () {
-              // On arrive ici soit en poussant l'écran (bouton normal),
-              // soit via une redirection du router (rien à dépiler) :
-              // dans ce second cas on revient simplement à l'accueil,
-              // pour que la connexion reste optionnelle, pas un mur.
               if (context.canPop()) {
                 context.pop();
               } else {
@@ -53,18 +49,18 @@ class _LoginPageState extends State<LoginPage> {
                       SocialButton(
                         label: 'Google',
                         icon: IconLink.google,
-                        onPressed: () {
-                          // Handle Google login
-                        },
+                        onPressed: () => context
+                            .read<AuthBloc>()
+                            .add(AuthWithGoogleEvent()),
                       ),
                       if (isAppleDevice) ...[
                         AppDimens.spacerMedium,
                         SocialButton(
                           label: 'Apple',
                           icon: IconLink.apple,
-                          onPressed: () {
-                            // Handle Apple login
-                          },
+                          onPressed: () => context.read<AuthBloc>().add(
+                            AuthWithAppleEvent(),
+                          ),
                         ),
                       ],
                       AppDimens.spacerMedium,
