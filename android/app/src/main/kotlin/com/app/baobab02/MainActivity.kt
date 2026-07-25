@@ -1,4 +1,4 @@
-package com.example.baobabe_0_2
+package com.app.baobab02
 
 import io.flutter.embedding.android.FlutterActivity
 

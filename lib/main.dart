@@ -23,6 +23,9 @@ import 'core/services/sync_service.dart';
 import 'features/home_page/presentation/bloc/search_bloc.dart';
 import 'features/settings/presentation/bloc/settings_bloc.dart';
 
+import 'package:firebase_core/firebase_core.dart';
+import 'core/constants/firebase_options.dart';
+
 /// Kept alive for the app lifetime so its connectivity listener keeps running.
 late final SyncManager _syncManager;
 
@@ -32,8 +35,15 @@ void main() async {
 
   await SupabaseClientWrapper.initialize();
 
-  final reservationApiService = ReservationApiService(SupabaseClientWrapper.client);
-  _syncManager = SyncManager(SyncService(reservationApiService), reservationApiService);
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
+  final reservationApiService = ReservationApiService(
+    SupabaseClientWrapper.client,
+  );
+  _syncManager = SyncManager(
+    SyncService(reservationApiService),
+    reservationApiService,
+  );
 
   runApp(const MyApp());
 }
@@ -75,12 +85,15 @@ class _MyAppState extends State<MyApp> {
           ),
         ),
         BlocProvider<CategoryBloc>(
-          create: (_) => CategoryBloc(categoryRepository: CategoryRepositoryImpl()),
+          create: (_) =>
+              CategoryBloc(categoryRepository: CategoryRepositoryImpl()),
         ),
         BlocProvider<BusinessBloc>(
           create: (_) => BusinessBloc(
             getBusinesses: GetBusinesses(businessRepository),
-            getBusinessesByCategory: GetBusinessesByCategory(businessRepository),
+            getBusinessesByCategory: GetBusinessesByCategory(
+              businessRepository,
+            ),
           ),
         ),
         BlocProvider<MainScreenBloc>(create: (_) => MainScreenBloc()),

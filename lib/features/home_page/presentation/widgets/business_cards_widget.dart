@@ -1,5 +1,4 @@
 import 'package:baobabe_0_2/core/themes/app_diemens.dart';
-import 'package:baobabe_0_2/features/business_detail/presentation/screens/business_detail_screen.dart';
 import 'package:baobabe_0_2/features/home_page/data/models/ui_business.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/bloc/business_bloc.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/bloc/category_bloc.dart';

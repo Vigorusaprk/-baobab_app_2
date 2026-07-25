@@ -48,3 +48,5 @@ app.*.map.json
 **/node_modules/
 backend/.env
 backend/.env.local
+lib/core/constants/firebase_options.dart
+lib/core/constants/secrets.dart
