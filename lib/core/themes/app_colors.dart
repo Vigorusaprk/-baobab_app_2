@@ -1,38 +1,21 @@
 import 'package:flutter/material.dart';
 
-/// ===============================================================
-/// BAOBAB DESIGN SYSTEM
-/// ---------------------------------------------------------------
-/// Palette officielle de l'application Baobab
-///
-/// Concept visuel :
-///
-/// • Innovation
-/// • Voyage
-/// • Luxe moderne
-/// • Culture africaine
-/// • Interface lumineuse
-///
-/// Le thème abandonne volontairement les codes "vert nature"
-/// afin de créer une identité forte et mémorable.
-/// ===============================================================
-
 class AppColors {
   AppColors._();
 
-  // ===============================================================
-  // PRIMARY (Identité de Baobab)
-  // Indigo moderne
-  // ===============================================================
-
-  // ... (garder le début du fichier original jusqu'à PRIMARY)
-
-  // ===============================================================
-  // PRIMARY (Identité de Baobab)
-  // Vert profond (#0F2E20)
-  // ===============================================================
-
+  /// Couleur principale de l'application
   static const Color primary = Color(0xFF0F2E20);
+  static const Color secondary = Color(0xFF2E7D54);
+  static const Color textColor = Color(0xFF1A1F1C);
+  // Fond général de l'application
+  static const Color scaffoldBackground = Color(0xFFF2F4F3);
+  // Surface principale (Cards)
+  static const Color surface = Colors.white;
+  // Fond des TextField
+  static const Color inputBackground = Colors.white;
+  // Couleur d'inactivité
+  static const Color inactiveColor = Color(0xFFC6D1CB);
+
   static const Color primaryLight = Color(0xFF2E7D54);
   static const Color primaryDark = Color(0xFF0F2E20);
 
@@ -54,7 +37,6 @@ class AppColors {
   // Vert clair (#2E7D54)
   // ===============================================================
 
-  static const Color secondary = Color(0xFF2E7D54);
   static const Color secondaryLight = Color(0xFFA3C9A5);
   static const Color secondaryDark = Color(0xFF2E7D54);
 
@@ -69,30 +51,24 @@ class AppColors {
   static const Color secondary800 = Color(0xFF1D5538);
   static const Color secondary900 = Color(0xFF16422C);
 
-// ... (garder ACCENT inchangé)
+  // ... (garder ACCENT inchangé)
 
   // ===============================================================
   // COULEURS DE FOND
   // ===============================================================
 
-  /// Fond général de l'application
-  static const Color scaffoldBackground = Color(0xFFF2F4F3); // Gris neutre (#F2F4F3)
+  // Gris neutre (#F2F4F3)
 
   /// Fond des pages secondaires
   static const Color canvasBackground = Color(0xFFF2F4F3);
 
-  /// Surface principale (Cards)
-  static const Color surface = Colors.white;
-
   /// Surface légèrement contrastée
   static const Color surfaceVariant = Color(0xFFF2F4F3);
-
 
   // ===============================================================
   // TEXTE
   // ===============================================================
-  static const Color textColor = Color(0xFF1A1F1C);
-  
+
   static const Color textPrimary = Color(0xFF1C2235);
 
   static const Color textSecondary = Color(0xFF4A5168);
@@ -112,9 +88,6 @@ class AppColors {
   // ===============================================================
   // FORMULAIRES
   // ===============================================================
-
-  /// Fond des TextField
-  static const Color inputBackground = Color(0xFFF4F5FA);
 
   /// Bordure normale
   static const Color inputBorder = Color(0xFFDADDEA);
@@ -235,5 +208,5 @@ class AppColors {
 
   static const Color transparent = Colors.transparent;
 
-    static const Color grey = Color(0xFF9E9E9E);
+  static const Color grey = Color(0xFF9E9E9E);
 }

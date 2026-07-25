@@ -122,9 +122,11 @@ class AppDimens {
   // *** Button *** //
   static const double borderButton = 20.0;
   static const double borderRadiusAuthIconButton = 16.0;
+  static const buttonPadding = EdgeInsets.symmetric(horizontal: 24, vertical: 12);
 
   // *** Input field *** //
   static const double inputBorderRadius = 20.0;
+  static const inputPadding = EdgeInsets.symmetric(horizontal: 16, vertical: 12);
 
   // *** Spacer *** //
   static const Widget spacerSmall = SizedBox(height: 8.0);

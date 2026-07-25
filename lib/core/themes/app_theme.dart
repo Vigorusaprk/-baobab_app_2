@@ -52,11 +52,9 @@ class AppTheme {
         borderRadius: BorderRadius.circular(AppDimens.inputBorderRadius),
         borderSide: BorderSide.none,
       ),
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      hintStyle: const TextStyle(
-        color: AppColors.grey,
-        fontFamily: AppFonts.primaryFontFamily,
-      ),
+      contentPadding: AppDimens.inputPadding,
+      hintStyle: AppFonts.inputHintTextStyle,
+      labelStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.normal),
     ),
 
     elevatedButtonTheme: ElevatedButtonThemeData(
@@ -64,7 +62,7 @@ class AppTheme {
         backgroundColor: AppColors.primary,
         foregroundColor: AppColors.textOnPrimary,
         textStyle: AppFonts.button,
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+        padding: AppDimens.buttonPadding,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppDimens.borderButton),
         ),
@@ -76,7 +74,7 @@ class AppTheme {
       style: OutlinedButton.styleFrom(
         foregroundColor: AppColors.primary,
         textStyle: AppFonts.button,
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+        padding: AppDimens.buttonPadding,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppDimens.borderButton),
         ),

@@ -66,6 +66,20 @@ class AppFonts {
     color: Colors.grey,
   );
 
+  static const TextStyle inputHintTextStyle = TextStyle(
+    color: AppColors.grey,
+    fontFamily: AppFonts.primaryFontFamily,
+    fontWeight: FontWeight.normal,
+    fontSize: 14,
+  );
+
+  static const TextStyle inputTextStyle = TextStyle(
+    color: AppColors.textColor,
+    fontFamily: AppFonts.primaryFontFamily,
+    fontWeight: FontWeight.normal,
+    fontSize: 14,
+  );
+
   // Responsive font sizes
   static double responsiveFontSize(BuildContext context, double baseSize) {
     final double width = MediaQuery.of(context).size.width;
