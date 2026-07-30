@@ -1,7 +1,7 @@
+import 'package:baobabe_0_2/core/themes/app_diemens.dart';
 import 'package:baobabe_0_2/features/business_detail/domain/entities/review.dart';
 import 'package:baobabe_0_2/features/business_detail/presentation/widgets/review_stars.dart';
 import 'package:flutter/material.dart';
-import 'package:baobabe_0_2/core/themes/app_colors.dart';
 
 /// Carte affichant un avis individuel dans la liste des avis d'un business.
 /// Extrait de review.dart pour garder ce fichier concis ; comportement
@@ -22,8 +22,11 @@ class ReviewListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      color: AppColors.white,
+    return Container(
+      decoration: BoxDecoration(
+        color: Theme.of(context).cardColor,
+        borderRadius: BorderRadius.circular(AppDimens.radius20),
+      ),
       margin: const EdgeInsets.only(bottom: 12),
       child: Padding(
         padding: const EdgeInsets.all(16),

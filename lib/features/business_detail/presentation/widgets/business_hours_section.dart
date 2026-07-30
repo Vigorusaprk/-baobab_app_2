@@ -1,4 +1,5 @@
 import 'package:baobabe_0_2/core/themes/app_colors.dart';
+import 'package:baobabe_0_2/core/themes/app_diemens.dart';
 import 'package:baobabe_0_2/features/home_page/domain/entities/business_entity.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -40,16 +41,8 @@ class BusinessHoursSection extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: AppColors.white,
-        borderRadius: BorderRadius.circular(28),
-        border: Border.all(color: AppColors.textSecondary.withOpacity(0.1)),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.textPrimary.withOpacity(0.02),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
+        color: Theme.of(context).cardColor,
+        borderRadius: BorderRadius.circular(AppDimens.radius20),
       ),
       child: Column(
         children: entries.map((entry) {
@@ -60,7 +53,7 @@ class BusinessHoursSection extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
             decoration: BoxDecoration(
               color: isToday
-                  ? AppColors.primary.withOpacity(0.08)
+                  ? AppColors.primary.withValues(alpha: 0.08)
                   : AppColors.transparent,
               borderRadius: BorderRadius.circular(14),
             ),
@@ -72,15 +65,13 @@ class BusinessHoursSection extends StatelessWidget {
                     if (isToday)
                       Padding(
                         padding: EdgeInsets.only(right: 8),
-                        child: Container(
-                          child: SvgPicture.asset(
-                            "assets/icons/opening-hours.svg",
-                            width: 28,
-                            height: 28,
-                            colorFilter: ColorFilter.mode(
-                              AppColors.primary,
-                              BlendMode.srcIn,
-                            ),
+                        child: SvgPicture.asset(
+                          "assets/icons/opening-hours.svg",
+                          width: 28,
+                          height: 28,
+                          colorFilter: ColorFilter.mode(
+                            AppColors.primary,
+                            BlendMode.srcIn,
                           ),
                         ),
                       ),

@@ -1,5 +1,4 @@
 import 'package:baobabe_0_2/core/themes/app_colors.dart';
-import 'package:baobabe_0_2/core/themes/app_diemens.dart';
 import 'package:baobabe_0_2/features/home_page/domain/entities/business_entity.dart';
 import 'package:flutter/material.dart';
 import 'business_contact_section.dart';
@@ -12,44 +11,41 @@ class BusinessInfoSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: AppDimens.appPadding,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Description Card
-          if (business.description.isNotEmpty) ...[
-            _buildSectionTitle("À propos"),
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: const Color(0xFFF8F9FA),
-                borderRadius: BorderRadius.circular(24),
-              ),
-              child: Text(
-                business.description,
-                style: TextStyle(
-                  color: AppColors.textSecondary,
-                  fontSize: 15,
-                  height: 1.6,
-                ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Description Card
+        if (business.description.isNotEmpty) ...[
+          _buildSectionTitle("À propos"),
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: const Color(0xFFF8F9FA),
+              borderRadius: BorderRadius.circular(24),
+            ),
+            child: Text(
+              business.description,
+              style: TextStyle(
+                color: AppColors.textSecondary,
+                fontSize: 15,
+                height: 1.6,
               ),
             ),
-            const SizedBox(height: 24),
-          ],
-
-          _buildSectionTitle("Contact & Accès"),
-          BusinessContactSection(business: business),
-
+          ),
           const SizedBox(height: 24),
-
-          _buildSectionTitle("Horaires d'ouverture"),
-          BusinessHoursSection(business: business),
-
-          const SizedBox(height: 32),
         ],
-      ),
+    
+        _buildSectionTitle("Contact & Accès"),
+        BusinessContactSection(business: business),
+    
+        const SizedBox(height: 24),
+    
+        _buildSectionTitle("Horaires d'ouverture"),
+        BusinessHoursSection(business: business),
+    
+        const SizedBox(height: 32),
+      ],
     );
   }
 

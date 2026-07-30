@@ -45,35 +45,35 @@ class _BusinessDetailScreenState extends State<BusinessDetailScreen> {
           businessId: widget.businessId,
         )..add(LoadBusinessDetail(widget.businessId));
       },
-      child: Scaffold(
-        backgroundColor: AppColors.background,
-        body: BlocConsumer<BusinessDetailBloc, BusinessDetailState>(
-          listener: (context, state) {
-            // Gestion des retours visuels (Toasts / SnackBars) pour les réservations
-            if (state.reservationStatus == ReservationStatus.success) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Réservation effectuée avec succès ! 🎉'),
-                  backgroundColor: AppColors.success,
-                  behavior: SnackBarBehavior.floating,
+      child: BlocConsumer<BusinessDetailBloc, BusinessDetailState>(
+        listener: (context, state) {
+          // Gestion des retours visuels (Toasts / SnackBars) pour les réservations
+          if (state.reservationStatus == ReservationStatus.success) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Réservation effectuée avec succès ! 🎉'),
+                backgroundColor: AppColors.success,
+                behavior: SnackBarBehavior.floating,
+              ),
+            );
+          } else if (state.reservationStatus == ReservationStatus.error) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(
+                  state.reservationErrorMessage ?? 'Échec de la réservation.',
                 ),
-              );
-            } else if (state.reservationStatus == ReservationStatus.error) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(
-                    state.reservationErrorMessage ?? 'Échec de la réservation.',
-                  ),
-                  backgroundColor: AppColors.error,
-                  behavior: SnackBarBehavior.floating,
-                ),
-              );
-            }
-          },
-          builder: (context, state) {
-            return _buildContent(context, state);
-          },
-        ),
+                backgroundColor: AppColors.error,
+                behavior: SnackBarBehavior.floating,
+              ),
+            );
+          }
+        },
+        builder: (context, state) {
+          return Scaffold(
+            backgroundColor: AppColors.background,
+            body: _buildContent(context, state),
+          );
+        },
       ),
     );
   }

@@ -14,36 +14,30 @@ class BusinessSpecificSection extends StatelessWidget {
 
     if (features.isEmpty) return const SizedBox.shrink();
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Padding(
-            padding: EdgeInsets.only(left: 4, bottom: 16),
-            child: Row(
-              children: [
-                Text(
-                  "Commodités & Services",
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.primary,
-                  ),
-                ),
-              ],
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Text(
+              "Commodités & Services",
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: AppColors.primary,
+              ),
             ),
-          ),
-          // Grille Wrap pour un affichage fluide des badges
-          Wrap(
-            spacing: 10,
-            runSpacing: 10,
-            children: features
-                .map((feature) => _buildFeatureChip(feature))
-                .toList(),
-          ),
-        ],
-      ),
+          ],
+        ),
+        // Grille Wrap pour un affichage fluide des badges
+        Wrap(
+          spacing: 10,
+          runSpacing: 10,
+          children: features
+              .map((feature) => _buildFeatureChip(feature))
+              .toList(),
+        ),
+      ],
     );
   }
 
@@ -54,14 +48,9 @@ class BusinessSpecificSection extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.textSecondary.withOpacity(0.15)),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.textPrimary.withOpacity(0.03),
-            blurRadius: 8,
-            offset: const Offset(0, 4),
-          ),
-        ],
+        border: Border.all(
+          color: AppColors.textSecondary.withValues(alpha: 0.15),
+        ),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,

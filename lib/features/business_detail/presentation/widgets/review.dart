@@ -1,4 +1,5 @@
 import 'package:baobabe_0_2/core/themes/app_colors.dart';
+import 'package:baobabe_0_2/core/themes/app_diemens.dart';
 import 'package:baobabe_0_2/features/business_detail/data/review_api_service.dart';
 import 'package:baobabe_0_2/features/business_detail/domain/entities/review.dart';
 import 'package:baobabe_0_2/features/business_detail/presentation/widgets/review_list_item.dart';
@@ -80,8 +81,8 @@ class _RestaurantReviewState extends State<RestaurantReview> {
           children: [
             Container(
               decoration: BoxDecoration(
-                border: Border.all(width: 2, color: AppColors.primary),
-                borderRadius: BorderRadius.circular(100),
+                borderRadius: BorderRadius.circular(AppDimens.radius20),
+                color: Theme.of(context).cardColor,
               ),
               child: Padding(
                 padding: const EdgeInsets.symmetric(
@@ -121,18 +122,23 @@ class _RestaurantReviewState extends State<RestaurantReview> {
                         widget.business,
                         onSubmitted: _refreshReviews,
                       ),
-                      icon: Container(
-                        child: SvgPicture.asset(
-                          "assets/icons/commen.svg",
-                          width: 28,
-                          height: 28,
-                          colorFilter: ColorFilter.mode(
-                            AppColors.white,
-                            BlendMode.srcIn,
-                          ),
+                      icon: SvgPicture.asset(
+                        "assets/icons/commen.svg",
+                        width: Theme.of(
+                          context,
+                        ).textTheme.bodySmall!.fontSize,
+                        height: Theme.of(
+                          context,
+                        ).textTheme.bodySmall!.fontSize,
+                        colorFilter: ColorFilter.mode(
+                          AppColors.white,
+                          BlendMode.srcIn,
                         ),
                       ),
-                      label: const Text('Écrire un avis'),
+                      label: Text(
+                        'Écrire un avis',
+                        style: Theme.of(context).textTheme.bodySmall,
+                      ),
                     ),
                   ],
                 ),
@@ -141,7 +147,6 @@ class _RestaurantReviewState extends State<RestaurantReview> {
             ListView.builder(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
-              padding: const EdgeInsets.all(16),
               itemCount: reviews.length,
               itemBuilder: (context, index) {
                 return ReviewListItem(review: reviews[index]);
