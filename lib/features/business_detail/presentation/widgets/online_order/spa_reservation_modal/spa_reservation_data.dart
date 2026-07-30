@@ -26,7 +26,9 @@ class SpaReservationData {
     return total;
   }
 
-  List<Map<String, dynamic>> getSelectedTreatmentsWithPrices(List<dynamic> allTreatments) {
+  List<Map<String, dynamic>> getSelectedTreatmentsWithPrices(
+    List<dynamic> allTreatments,
+  ) {
     List<Map<String, dynamic>> result = [];
     for (final name in selectedTreatments) {
       Map<String, dynamic>? treatment;

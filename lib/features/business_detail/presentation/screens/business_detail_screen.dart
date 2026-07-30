@@ -11,7 +11,6 @@ import 'package:baobabe_0_2/features/business_detail/presentation/widgets/common
 import 'package:baobabe_0_2/features/business_detail/presentation/widgets/common/responsive_container.dart';
 import 'package:baobabe_0_2/features/business_detail/presentation/widgets/review.dart';
 import 'package:baobabe_0_2/features/home_page/data/models/ui_business.dart';
-import 'package:baobabe_0_2/features/home_page/domain/repositories/business_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -47,7 +46,7 @@ class _BusinessDetailScreenState extends State<BusinessDetailScreen> {
         )..add(LoadBusinessDetail(widget.businessId));
       },
       child: Scaffold(
-        backgroundColor: AppColors.canvasBackground,
+        backgroundColor: AppColors.background,
         body: BlocConsumer<BusinessDetailBloc, BusinessDetailState>(
           listener: (context, state) {
             // Gestion des retours visuels (Toasts / SnackBars) pour les réservations
@@ -55,15 +54,17 @@ class _BusinessDetailScreenState extends State<BusinessDetailScreen> {
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
                   content: Text('Réservation effectuée avec succès ! 🎉'),
-                  backgroundColor: Colors.green,
+                  backgroundColor: AppColors.success,
                   behavior: SnackBarBehavior.floating,
                 ),
               );
             } else if (state.reservationStatus == ReservationStatus.error) {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
-                  content: Text(state.reservationErrorMessage ?? 'Échec de la réservation.'),
-                  backgroundColor: Colors.red,
+                  content: Text(
+                    state.reservationErrorMessage ?? 'Échec de la réservation.',
+                  ),
+                  backgroundColor: AppColors.error,
                   behavior: SnackBarBehavior.floating,
                 ),
               );
@@ -95,17 +96,20 @@ class _BusinessDetailScreenState extends State<BusinessDetailScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                state.detailErrorMessage ?? "Impossible de charger les détails.",
+                state.detailErrorMessage ??
+                    "Impossible de charger les détails.",
                 textAlign: TextAlign.center,
-                style: const TextStyle(color: Colors.red, fontSize: 16),
+                style: const TextStyle(color: AppColors.error, fontSize: 16),
               ),
               const SizedBox(height: 16),
               ElevatedButton(
                 onPressed: () {
-                  context.read<BusinessDetailBloc>().add(LoadBusinessDetail(widget.businessId));
+                  context.read<BusinessDetailBloc>().add(
+                    LoadBusinessDetail(widget.businessId),
+                  );
                 },
                 child: const Text('Réessayer'),
-              )
+              ),
             ],
           ),
         ),
@@ -113,7 +117,8 @@ class _BusinessDetailScreenState extends State<BusinessDetailScreen> {
     }
 
     // 3. ÉTAT CHARGÉ (Détails du commerce disponibles)
-    if (state.detailStatus == BusinessDetailStatus.loaded && state.business != null) {
+    if (state.detailStatus == BusinessDetailStatus.loaded &&
+        state.business != null) {
       final business = state.business!;
       final uiBusiness = UIBusiness(business);
 
@@ -150,7 +155,7 @@ class _BusinessDetailScreenState extends State<BusinessDetailScreen> {
           // Indicateur de chargement en surimpression (Overlay) pendant qu'une réservation est envoyée
           if (state.reservationStatus == ReservationStatus.loading)
             Container(
-              color: Colors.black.withOpacity(0.3),
+              color: AppColors.textPrimary.withValues(alpha: 0.3),
               child: const Center(
                 child: CircularProgressIndicator(color: AppColors.primary),
               ),

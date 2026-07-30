@@ -63,7 +63,7 @@ class BusinessModel {
       reviewCount: json['review_count'] ?? json['reviewCount'] ?? 0,
       openingHours: Map<String, String>.from(json['opening_hours'] ?? {}),
       type: BusinessType.values.firstWhere(
-            (e) => e.name == json['type'],
+        (e) => e.name == json['type'],
         orElse: () => BusinessType.other,
       ),
       phone: json['phone'] ?? '',
@@ -71,24 +71,25 @@ class BusinessModel {
       website: json['website'],
       images: List<String>.from(json['images'] ?? []),
       specificData: Map<String, dynamic>.from(json['specific_data'] ?? {}),
-      reviews: (json['reviews'] as List?)
-          ?.map((r) => BusinessReview.fromJson(r))
-          .toList() ??
+      reviews:
+          (json['reviews'] as List?)
+              ?.map((r) => BusinessReview.fromJson(r))
+              .toList() ??
           [],
       isFavorite: json['is_favorite'] ?? json['isFavorite'] ?? false,
       latitude: (json['latitude'] as num?)?.toDouble(),
       longitude: (json['longitude'] as num?)?.toDouble(),
       stores: json['stores'] != null
           ? (json['stores'] as List)
-          .map((s) => BusinessModel.fromJson(s))
-          .toList()
+                .map((s) => BusinessModel.fromJson(s))
+                .toList()
           : null,
       isSponsored: json['is_sponsored'] ?? json['isSponsored'] ?? false,
       createdAt: json['created_at'] != null
           ? DateTime.parse(json['created_at'])
           : (json['createdAt'] != null
-          ? DateTime.parse(json['createdAt'])
-          : DateTime.now()),
+                ? DateTime.parse(json['createdAt'])
+                : DateTime.now()),
     );
   }
 

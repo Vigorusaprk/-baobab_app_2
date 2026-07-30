@@ -1,4 +1,4 @@
-import 'package:baobabe_0_2/core/themes/app_colors.dart';
+﻿import 'package:baobabe_0_2/core/themes/app_colors.dart';
 import 'package:baobabe_0_2/core/themes/app_diemens.dart';
 import 'package:baobabe_0_2/core/themes/app_fonts.dart';
 import 'package:baobabe_0_2/core/widgets/button/custom_button.dart';
@@ -37,7 +37,7 @@ class AuthRequiredCard extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         Container(
-          padding: const EdgeInsets.all(AppDimens.PADDING_16),
+          padding: const EdgeInsets.all(AppDimens.medium),
           decoration: BoxDecoration(
             shape: BoxShape.circle,
             color: AppColors.primary.withOpacity(0.1),

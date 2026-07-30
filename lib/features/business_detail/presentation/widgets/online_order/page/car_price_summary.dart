@@ -24,7 +24,7 @@ class CarPriceSummary extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.grey[100],
+        color: AppColors.background,
         borderRadius: BorderRadius.circular(8),
       ),
       child: Column(
@@ -32,10 +32,7 @@ class CarPriceSummary extends StatelessWidget {
         children: [
           const Text(
             'Résumé',
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.bold,
-            ),
+            style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 12),
           Row(
@@ -59,10 +56,7 @@ class CarPriceSummary extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
-                  'Chauffeur',
-                  style: TextStyle(fontSize: 12),
-                ),
+                const Text('Chauffeur', style: TextStyle(fontSize: 12)),
                 Text(
                   '${(50 * rentalDays).toStringAsFixed(2)}€',
                   style: const TextStyle(
@@ -78,10 +72,7 @@ class CarPriceSummary extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
-                  'Assurance',
-                  style: TextStyle(fontSize: 12),
-                ),
+                const Text('Assurance', style: TextStyle(fontSize: 12)),
                 Text(
                   '${(30 * rentalDays).toStringAsFixed(2)}€',
                   style: const TextStyle(
@@ -110,10 +101,7 @@ class CarPriceSummary extends StatelessWidget {
             children: [
               const Text(
                 'TOTAL',
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
               ),
               Text(
                 '${totalPrice.toStringAsFixed(2)}€',

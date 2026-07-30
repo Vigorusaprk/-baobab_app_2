@@ -10,7 +10,13 @@ class BusinessHoursSection extends StatelessWidget {
 
   // Ordre souhaité des jours (commence par Lundi)
   static const List<String> orderedDays = [
-    'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'
+    'Lundi',
+    'Mardi',
+    'Mercredi',
+    'Jeudi',
+    'Vendredi',
+    'Samedi',
+    'Dimanche',
   ];
 
   @override
@@ -19,25 +25,27 @@ class BusinessHoursSection extends StatelessWidget {
     final entries = business.openingHours.entries.toList();
     entries.sort((a, b) {
       final indexA = orderedDays.indexWhere(
-              (day) => day.toLowerCase() == a.key.trim().toLowerCase()
+        (day) => day.toLowerCase() == a.key.trim().toLowerCase(),
       );
       final indexB = orderedDays.indexWhere(
-              (day) => day.toLowerCase() == b.key.trim().toLowerCase()
+        (day) => day.toLowerCase() == b.key.trim().toLowerCase(),
       );
       // Si un jour n'est pas trouvé, le mettre à la fin (index 999)
-      return (indexA == -1 ? 999 : indexA).compareTo(indexB == -1 ? 999 : indexB);
+      return (indexA == -1 ? 999 : indexA).compareTo(
+        indexB == -1 ? 999 : indexB,
+      );
     });
 
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.white,
         borderRadius: BorderRadius.circular(28),
-        border: Border.all(color: Colors.grey.withOpacity(0.1)),
+        border: Border.all(color: AppColors.textSecondary.withOpacity(0.1)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.02),
+            color: AppColors.textPrimary.withOpacity(0.02),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -51,7 +59,9 @@ class BusinessHoursSection extends StatelessWidget {
             margin: const EdgeInsets.only(bottom: 4),
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
             decoration: BoxDecoration(
-              color: isToday ? AppColors.primary.withOpacity(0.08) : Colors.transparent,
+              color: isToday
+                  ? AppColors.primary.withOpacity(0.08)
+                  : AppColors.transparent,
               borderRadius: BorderRadius.circular(14),
             ),
             child: Row(
@@ -67,16 +77,21 @@ class BusinessHoursSection extends StatelessWidget {
                             "assets/icons/opening-hours.svg",
                             width: 28,
                             height: 28,
-                            colorFilter: ColorFilter.mode(AppColors.primary, BlendMode.srcIn),
+                            colorFilter: ColorFilter.mode(
+                              AppColors.primary,
+                              BlendMode.srcIn,
+                            ),
                           ),
-                        )
+                        ),
                       ),
                     Text(
                       entry.key,
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: isToday ? FontWeight.w800 : FontWeight.w500,
-                        color: isToday ? AppColors.primary : Colors.grey[700],
+                        color: isToday
+                            ? AppColors.primary
+                            : AppColors.textSecondary,
                       ),
                     ),
                   ],
@@ -86,7 +101,7 @@ class BusinessHoursSection extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: isToday ? FontWeight.bold : FontWeight.w600,
-                    color: isToday ? AppColors.primary : Colors.black87,
+                    color: isToday ? AppColors.primary : AppColors.textPrimary,
                   ),
                 ),
               ],
@@ -108,6 +123,7 @@ class BusinessHoursSection extends StatelessWidget {
       6: 'Samedi',
       7: 'Dimanche',
     };
-    return dayKey.trim().toLowerCase() == daysInFrench[now.weekday]?.toLowerCase();
+    return dayKey.trim().toLowerCase() ==
+        daysInFrench[now.weekday]?.toLowerCase();
   }
 }

@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 import '../themes/app_colors.dart';
@@ -8,7 +8,7 @@ class CustomLoadingButton extends StatelessWidget {
   final double size;
   const CustomLoadingButton({
     super.key,
-    this.color = AppColors.textColor,
+    this.color = AppColors.textPrimary,
     this.size = 30,
   });
 
@@ -23,7 +23,7 @@ class CustomLoadingPage extends StatelessWidget {
   final double size;
   const CustomLoadingPage({
     super.key,
-    this.color = AppColors.textColor,
+    this.color = AppColors.textPrimary,
     this.size = 30,
   });
 
@@ -38,7 +38,7 @@ class CustomConnexionLoading extends StatelessWidget {
   final double size;
   const CustomConnexionLoading({
     super.key,
-    this.color = AppColors.textColor,
+    this.color = AppColors.textPrimary,
     this.size = 20,
   });
 

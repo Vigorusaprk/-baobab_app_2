@@ -3,6 +3,7 @@ import 'package:baobabe_0_2/features/home_page/data/models/ui_business.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/bloc/business_bloc.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/bloc/category_bloc.dart';
 import 'package:flutter/material.dart';
+import 'package:baobabe_0_2/core/themes/app_colors.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import './business_card_widget.dart';
@@ -64,9 +65,7 @@ class _BusinessCardsWidgetState extends State<BusinessCardsWidget> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: const EdgeInsets.only(
-            left: AppDimens.PADDING_20,
-          ),
+          padding: const EdgeInsets.only(left: AppDimens.large),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -76,27 +75,25 @@ class _BusinessCardsWidgetState extends State<BusinessCardsWidget> {
                   fontSize: 18,
                   fontWeight: FontWeight.w800,
                   fontFamily: "Poppins",
-                  color: Colors.black,
+                  color: AppColors.textPrimary,
                 ),
               ),
 
-                Padding(
-                  padding: const EdgeInsets.only(
-                    right: AppDimens.PADDING_20,
-                  ),
-                  child: GestureDetector(
-                    onTap: widget.onSeeAllTap,
-                    child: const Text(
-                      'Voir tout',
-                      style: TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w600,
-                        fontFamily: "Poppins",
-                        color: Colors.green,
-                      ),
+              Padding(
+                padding: const EdgeInsets.only(right: AppDimens.large),
+                child: GestureDetector(
+                  onTap: widget.onSeeAllTap,
+                  child: const Text(
+                    'Voir tout',
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      fontFamily: "Poppins",
+                      color: AppColors.success,
                     ),
                   ),
                 ),
+              ),
             ],
           ),
         ),
@@ -137,18 +134,24 @@ class _BusinessCardsWidgetState extends State<BusinessCardsWidget> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.error_outline, size: 60, color: Colors.red[300]),
+                      Icon(
+                        Icons.error_outline,
+                        size: 60,
+                        color: AppColors.error,
+                      ),
                       const SizedBox(height: 16),
                       Text(
                         'Erreur : ${state.message}',
-                        style: const TextStyle(fontSize: 16, color: Colors.red),
+                        style: const TextStyle(
+                          fontSize: 16,
+                          color: AppColors.error,
+                        ),
                         textAlign: TextAlign.center,
                       ),
                       const SizedBox(height: 16),
                       ElevatedButton(
-                        onPressed: () => context.read<BusinessBloc>().add(
-                          LoadBusinesses(),
-                        ),
+                        onPressed: () =>
+                            context.read<BusinessBloc>().add(LoadBusinesses()),
                         child: const Text('Réessayer'),
                       ),
                     ],
@@ -174,15 +177,12 @@ class _BusinessCardsWidgetState extends State<BusinessCardsWidget> {
               Icon(
                 Icons.business_outlined,
                 size: 60,
-                color: Colors.grey[400],
+                color: AppColors.textSecondary,
               ),
               const SizedBox(height: 16),
               Text(
                 'Aucun établissement disponible',
-                style: TextStyle(
-                  fontSize: 16,
-                  color: Colors.grey[600],
-                ),
+                style: TextStyle(fontSize: 16, color: AppColors.textSecondary),
               ),
             ],
           ),
@@ -231,7 +231,7 @@ class _BusinessCardsWidgetState extends State<BusinessCardsWidget> {
     // BusinessCardWidget porte déjà sa propre ombre discrète (0.06
     // d'opacité). On garde juste le tap + le ripple.
     return Material(
-      color: Colors.transparent,
+      color: AppColors.transparent,
       borderRadius: BorderRadius.circular(24),
       child: InkWell(
         borderRadius: BorderRadius.circular(24),

@@ -9,12 +9,16 @@ class MovieDetailScreen extends StatelessWidget {
   final Business cinema;
   final Movie movie;
 
-  const MovieDetailScreen({super.key, required this.cinema, required this.movie});
+  const MovieDetailScreen({
+    super.key,
+    required this.cinema,
+    required this.movie,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.scaffoldBackground,
+      backgroundColor: AppColors.background,
       body: CustomScrollView(
         slivers: [
           SliverAppBar(
@@ -31,21 +35,29 @@ class MovieDetailScreen extends StatelessWidget {
                       errorBuilder: (context, error, stackTrace) {
                         return Container(
                           color: AppColors.primary,
-                          child: const Icon(Icons.movie, size: 100, color: Colors.white),
+                          child: const Icon(
+                            Icons.movie,
+                            size: 100,
+                            color: AppColors.white,
+                          ),
                         );
                       },
                     )
                   else
                     Container(
                       color: AppColors.primary,
-                      child: const Icon(Icons.movie, size: 100, color: Colors.white),
+                      child: const Icon(
+                        Icons.movie,
+                        size: 100,
+                        color: AppColors.white,
+                      ),
                     ),
                   const DecoratedBox(
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
                         begin: Alignment.topCenter,
                         end: Alignment.bottomCenter,
-                        colors: [Colors.transparent, Colors.black54],
+                        colors: [AppColors.transparent, Colors.black54],
                       ),
                     ),
                   ),
@@ -53,7 +65,10 @@ class MovieDetailScreen extends StatelessWidget {
               ),
             ),
             leading: IconButton(
-              icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white),
+              icon: const Icon(
+                Icons.arrow_back_ios_new_rounded,
+                color: AppColors.white,
+              ),
               onPressed: () => Navigator.pop(context),
             ),
           ),
@@ -63,21 +78,27 @@ class MovieDetailScreen extends StatelessWidget {
               delegate: SliverChildListDelegate([
                 Text(
                   movie.title,
-                  style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+                  style: const TextStyle(
+                    fontSize: 28,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
                 const SizedBox(height: 8),
                 Row(
                   children: [
                     if (movie.genre != null)
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 4,
+                        ),
                         decoration: BoxDecoration(
-                          color: Colors.green.withOpacity(0.1),
+                          color: AppColors.success.withOpacity(0.1),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Text(
                           movie.genre!,
-                          style: const TextStyle(color: Colors.green),
+                          style: const TextStyle(color: AppColors.success),
                         ),
                       ),
                     const SizedBox(width: 12),
@@ -96,20 +117,28 @@ class MovieDetailScreen extends StatelessWidget {
                 const SizedBox(height: 16),
                 Row(
                   children: [
-                    const Icon(Icons.access_time, size: 16, color: Colors.grey),
+                    const Icon(
+                      Icons.access_time,
+                      size: 16,
+                      color: AppColors.textSecondary,
+                    ),
                     const SizedBox(width: 4),
                     Text(
                       '${movie.duration} min',
-                      style: TextStyle(color: Colors.grey[600]),
+                      style: TextStyle(color: AppColors.textSecondary),
                     ),
                     const SizedBox(width: 16),
-                    const Icon(Icons.calendar_today, size: 16, color: Colors.grey),
+                    const Icon(
+                      Icons.calendar_today,
+                      size: 16,
+                      color: AppColors.textSecondary,
+                    ),
                     const SizedBox(width: 4),
                     Text(
                       movie.releaseDate != null
                           ? '${movie.releaseDate!.day}/${movie.releaseDate!.month}/${movie.releaseDate!.year}'
                           : 'Date inconnue',
-                      style: TextStyle(color: Colors.grey[600]),
+                      style: TextStyle(color: AppColors.textSecondary),
                     ),
                   ],
                 ),
@@ -121,7 +150,7 @@ class MovieDetailScreen extends StatelessWidget {
                 const SizedBox(height: 8),
                 Text(
                   movie.synopsis ?? 'Aucune description disponible.',
-                  style: TextStyle(color: Colors.grey[700], height: 1.5),
+                  style: TextStyle(color: AppColors.textSecondary, height: 1.5),
                 ),
                 const SizedBox(height: 24),
                 const Text(
@@ -130,14 +159,19 @@ class MovieDetailScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 12),
                 ...movie.showtimes.map((showtime) {
-                  final formattedTime = '${showtime.startTime.hour.toString().padLeft(2, '0')}:${showtime.startTime.minute.toString().padLeft(2, '0')}';
-                  final formattedDate = '${showtime.startTime.day}/${showtime.startTime.month}/${showtime.startTime.year}';
+                  final formattedTime =
+                      '${showtime.startTime.hour.toString().padLeft(2, '0')}:${showtime.startTime.minute.toString().padLeft(2, '0')}';
+                  final formattedDate =
+                      '${showtime.startTime.day}/${showtime.startTime.month}/${showtime.startTime.year}';
                   return Container(
                     margin: const EdgeInsets.symmetric(vertical: 10),
-                    padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 10,
+                      horizontal: 10,
+                    ),
                     decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(AppDimens.RADIUS_10),
+                      color: AppColors.white,
+                      borderRadius: BorderRadius.circular(AppDimens.radius10),
                     ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -145,10 +179,18 @@ class MovieDetailScreen extends StatelessWidget {
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(formattedDate, style: Theme.of(context).textTheme.bodyMedium),
-                            Text(formattedTime, style: Theme.of(context).textTheme.bodyMedium),
-                            Text('${showtime.room} • ${showtime.price.toStringAsFixed(2)} €',
-                                style: Theme.of(context).textTheme.bodySmall),
+                            Text(
+                              formattedDate,
+                              style: Theme.of(context).textTheme.bodyMedium,
+                            ),
+                            Text(
+                              formattedTime,
+                              style: Theme.of(context).textTheme.bodyMedium,
+                            ),
+                            Text(
+                              '${showtime.room} • ${showtime.price.toStringAsFixed(2)} €',
+                              style: Theme.of(context).textTheme.bodySmall,
+                            ),
                           ],
                         ),
                         ElevatedButton(
@@ -166,7 +208,10 @@ class MovieDetailScreen extends StatelessWidget {
                               borderRadius: BorderRadius.circular(20),
                             ),
                           ),
-                          child: const Text('Réserver', style: TextStyle(color: Colors.white)),
+                          child: const Text(
+                            'Réserver',
+                            style: TextStyle(color: AppColors.white),
+                          ),
                         ),
                       ],
                     ),

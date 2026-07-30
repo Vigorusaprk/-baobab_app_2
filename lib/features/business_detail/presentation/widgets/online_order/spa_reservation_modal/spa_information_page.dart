@@ -44,24 +44,69 @@ class SpaInformationPage extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Padding(padding: EdgeInsets.only(bottom: isSmallScreen ? 12 : 16), child: Text('Vos informations', style: TextStyle(fontSize: isSmallScreen ? 16 : 18, fontWeight: FontWeight.bold))),
-          _buildTextField("Nom complet", "Votre nom complet", fullNameController, isRequired: true),
-          _buildTextField("Numéro de téléphone", "Entrez votre numéro", phoneController, keyboardType: TextInputType.phone, isRequired: true),
+          Padding(
+            padding: EdgeInsets.only(bottom: isSmallScreen ? 12 : 16),
+            child: Text(
+              'Vos informations',
+              style: TextStyle(
+                fontSize: isSmallScreen ? 16 : 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+          _buildTextField(
+            "Nom complet",
+            "Votre nom complet",
+            fullNameController,
+            isRequired: true,
+          ),
+          _buildTextField(
+            "Numéro de téléphone",
+            "Entrez votre numéro",
+            phoneController,
+            keyboardType: TextInputType.phone,
+            isRequired: true,
+          ),
           if (isSmallScreen) ...[
-            _buildDatePickerTile("Date du rendez-vous", appointmentDate, onPickDate),
-            _buildTimePickerTile(context, "Heure du rendez-vous", appointmentTime, onPickTime),
+            _buildDatePickerTile(
+              "Date du rendez-vous",
+              appointmentDate,
+              onPickDate,
+            ),
+            _buildTimePickerTile(
+              context,
+              "Heure du rendez-vous",
+              appointmentTime,
+              onPickTime,
+            ),
           ] else ...[
             Row(
               children: [
-                Expanded(child: _buildDatePickerTile("Date", appointmentDate, onPickDate)),
+                Expanded(
+                  child: _buildDatePickerTile(
+                    "Date",
+                    appointmentDate,
+                    onPickDate,
+                  ),
+                ),
                 const SizedBox(width: 10),
-                Expanded(child: _buildTimePickerTile(context, "Heure", appointmentTime, onPickTime)),
+                Expanded(
+                  child: _buildTimePickerTile(
+                    context,
+                    "Heure",
+                    appointmentTime,
+                    onPickTime,
+                  ),
+                ),
               ],
             ),
           ],
           if (therapistNames.isNotEmpty) ...[
             const SizedBox(height: 16),
-            const Text('Thérapeute (optionnel)', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+            const Text(
+              'Thérapeute (optionnel)',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+            ),
             const SizedBox(height: 8),
             Wrap(
               spacing: 8,
@@ -71,22 +116,48 @@ class SpaInformationPage extends StatelessWidget {
                 return ChoiceChip(
                   label: Text(name),
                   selected: isSelected,
-                  onSelected: (selected) { onSelectTherapist(selected ? name : null); },
-                  backgroundColor: Colors.grey[100],
+                  onSelected: (selected) {
+                    onSelectTherapist(selected ? name : null);
+                  },
+                  backgroundColor: AppColors.background,
                   selectedColor: AppColors.primary.withOpacity(0.2),
-                  labelStyle: TextStyle(color: isSelected ? AppColors.primary : Colors.black),
+                  labelStyle: TextStyle(
+                    color: isSelected
+                        ? AppColors.primary
+                        : AppColors.textPrimary,
+                  ),
                 );
               }).toList(),
             ),
           ],
-          _buildTextField("Notes", "Ex: Allergies, préférences...", notesController, maxLines: 3),
+          _buildTextField(
+            "Notes",
+            "Ex: Allergies, préférences...",
+            notesController,
+            maxLines: 3,
+          ),
           SizedBox(height: isSmallScreen ? 16 : 20),
           SizedBox(
             width: double.infinity,
             child: ElevatedButton(
               onPressed: canContinue ? onContinue : null,
-              style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary, padding: EdgeInsets.symmetric(vertical: isSmallScreen ? 14 : 16), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
-              child: Text("Continuer", style: TextStyle(fontSize: isSmallScreen ? 16 : 18, color: Colors.white, fontWeight: FontWeight.bold)),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primary,
+                padding: EdgeInsets.symmetric(
+                  vertical: isSmallScreen ? 14 : 16,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              child: Text(
+                "Continuer",
+                style: TextStyle(
+                  fontSize: isSmallScreen ? 16 : 18,
+                  color: AppColors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ),
           ),
           SizedBox(height: isSmallScreen ? 8 : 12),
@@ -95,21 +166,52 @@ class SpaInformationPage extends StatelessWidget {
     );
   }
 
-  Widget _buildTextField(String label, String hint, TextEditingController controller, {TextInputType? keyboardType, int maxLines = 1, bool isRequired = false}) {
+  Widget _buildTextField(
+    String label,
+    String hint,
+    TextEditingController controller, {
+    TextInputType? keyboardType,
+    int maxLines = 1,
+    bool isRequired = false,
+  }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(children: [Text(label, style: TextStyle(fontWeight: FontWeight.bold, fontSize: isSmallScreen ? 14 : 16)), if (isRequired) Text(' *', style: TextStyle(color: Colors.red, fontSize: isSmallScreen ? 14 : 16))]),
+        Row(
+          children: [
+            Text(
+              label,
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: isSmallScreen ? 14 : 16,
+              ),
+            ),
+            if (isRequired)
+              Text(
+                ' *',
+                style: TextStyle(
+                  color: AppColors.error,
+                  fontSize: isSmallScreen ? 14 : 16,
+                ),
+              ),
+          ],
+        ),
         SizedBox(height: isSmallScreen ? 6 : 8),
         TextFormField(
           controller: controller,
           decoration: InputDecoration(
             hintText: hint,
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-            contentPadding: EdgeInsets.symmetric(horizontal: isSmallScreen ? 12 : 16, vertical: isSmallScreen ? 10 : 12),
+            contentPadding: EdgeInsets.symmetric(
+              horizontal: isSmallScreen ? 12 : 16,
+              vertical: isSmallScreen ? 10 : 12,
+            ),
             filled: true,
-            fillColor: Colors.grey[50],
-            focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: AppColors.primary, width: 2.5), borderRadius: BorderRadius.circular(10)),
+            fillColor: AppColors.background,
+            focusedBorder: OutlineInputBorder(
+              borderSide: BorderSide(color: AppColors.primary, width: 2.5),
+              borderRadius: BorderRadius.circular(10),
+            ),
           ),
           keyboardType: keyboardType,
           maxLines: maxLines,
@@ -120,11 +222,32 @@ class SpaInformationPage extends StatelessWidget {
     );
   }
 
-  Widget _buildDatePickerTile(String label, DateTime? date, VoidCallback onTap) {
+  Widget _buildDatePickerTile(
+    String label,
+    DateTime? date,
+    VoidCallback onTap,
+  ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(children: [Text(label, style: TextStyle(fontWeight: FontWeight.bold, fontSize: isSmallScreen ? 14 : 16)), Text(' *', style: TextStyle(color: Colors.red, fontSize: isSmallScreen ? 14 : 16))]),
+        Row(
+          children: [
+            Text(
+              label,
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: isSmallScreen ? 14 : 16,
+              ),
+            ),
+            Text(
+              ' *',
+              style: TextStyle(
+                color: AppColors.error,
+                fontSize: isSmallScreen ? 14 : 16,
+              ),
+            ),
+          ],
+        ),
         SizedBox(height: isSmallScreen ? 6 : 8),
         GestureDetector(
           onTap: onTap,
@@ -132,13 +255,25 @@ class SpaInformationPage extends StatelessWidget {
             child: TextFormField(
               decoration: InputDecoration(
                 hintText: "Sélectionnez la date",
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-                prefixIcon: Icon(Icons.calendar_today, size: isSmallScreen ? 18 : 20),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                prefixIcon: Icon(
+                  Icons.calendar_today,
+                  size: isSmallScreen ? 18 : 20,
+                ),
                 filled: true,
-                fillColor: Colors.grey[50],
-                contentPadding: EdgeInsets.symmetric(horizontal: isSmallScreen ? 12 : 16, vertical: isSmallScreen ? 10 : 12),
+                fillColor: AppColors.background,
+                contentPadding: EdgeInsets.symmetric(
+                  horizontal: isSmallScreen ? 12 : 16,
+                  vertical: isSmallScreen ? 10 : 12,
+                ),
               ),
-              controller: TextEditingController(text: date != null ? "${date.day}/${date.month}/${date.year}" : ""),
+              controller: TextEditingController(
+                text: date != null
+                    ? "${date.day}/${date.month}/${date.year}"
+                    : "",
+              ),
             ),
           ),
         ),
@@ -147,11 +282,33 @@ class SpaInformationPage extends StatelessWidget {
     );
   }
 
-  Widget _buildTimePickerTile(BuildContext context, String label, TimeOfDay? time, VoidCallback onTap) {
+  Widget _buildTimePickerTile(
+    BuildContext context,
+    String label,
+    TimeOfDay? time,
+    VoidCallback onTap,
+  ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(children: [Text(label, style: TextStyle(fontWeight: FontWeight.bold, fontSize: isSmallScreen ? 14 : 16)), Text(' *', style: TextStyle(color: Colors.red, fontSize: isSmallScreen ? 14 : 16))]),
+        Row(
+          children: [
+            Text(
+              label,
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: isSmallScreen ? 14 : 16,
+              ),
+            ),
+            Text(
+              ' *',
+              style: TextStyle(
+                color: AppColors.error,
+                fontSize: isSmallScreen ? 14 : 16,
+              ),
+            ),
+          ],
+        ),
         SizedBox(height: isSmallScreen ? 6 : 8),
         GestureDetector(
           onTap: onTap,
@@ -159,13 +316,23 @@ class SpaInformationPage extends StatelessWidget {
             child: TextFormField(
               decoration: InputDecoration(
                 hintText: "Sélectionnez l'heure",
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-                prefixIcon: Icon(Icons.access_time, size: isSmallScreen ? 18 : 20),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                prefixIcon: Icon(
+                  Icons.access_time,
+                  size: isSmallScreen ? 18 : 20,
+                ),
                 filled: true,
-                fillColor: Colors.grey[50],
-                contentPadding: EdgeInsets.symmetric(horizontal: isSmallScreen ? 12 : 16, vertical: isSmallScreen ? 10 : 12),
+                fillColor: AppColors.background,
+                contentPadding: EdgeInsets.symmetric(
+                  horizontal: isSmallScreen ? 12 : 16,
+                  vertical: isSmallScreen ? 10 : 12,
+                ),
               ),
-              controller: TextEditingController(text: time != null ? time.format(context) : ""),
+              controller: TextEditingController(
+                text: time != null ? time.format(context) : "",
+              ),
             ),
           ),
         ),

@@ -1,4 +1,4 @@
-import 'package:baobabe_0_2/core/animation/press_effect.dart';
+﻿import 'package:baobabe_0_2/core/animation/press_effect.dart';
 import 'package:baobabe_0_2/core/themes/app_colors.dart';
 import 'package:baobabe_0_2/core/themes/app_diemens.dart';
 import 'package:baobabe_0_2/core/widgets/custom_loading.dart';
@@ -28,10 +28,10 @@ class CustomButton extends StatelessWidget {
           curve: Curves.easeInOut,
           decoration: BoxDecoration(
             color: isLoading
-                ? AppColors.inactiveColor
+                ? AppColors.secondaryLight
                 : (isActive
                       ? Theme.of(context).primaryColor
-                      : AppColors.inactiveColor),
+                      : AppColors.secondaryLight),
             borderRadius: BorderRadius.circular(AppDimens.borderButton),
           ),
           child: ElevatedButton(

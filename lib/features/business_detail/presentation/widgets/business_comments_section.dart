@@ -20,22 +20,36 @@ class BusinessCommentsSection extends StatelessWidget {
         }
         final reviews = snapshot.data!;
         return Column(
-          children: reviews.map((review) => ListTile(
-            leading: CircleAvatar(
-              backgroundImage: review.userAvatar != null && review.userAvatar!.isNotEmpty
-                  ? NetworkImage(review.userAvatar!)
-                  : null,
-              child: review.userAvatar == null || review.userAvatar!.isEmpty
-                  ? const Icon(Icons.person)
-                  : null,
-            ),
-            title: Text(review.userName ?? 'Anonyme'),
-            subtitle: Text(review.comment ?? ''),
-            trailing: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: List.generate(5, (i) => Icon(i < review.rating ? Icons.star : Icons.star_border, size: 16, color: Colors.amber)),
-            ),
-          )).toList(),
+          children: reviews
+              .map(
+                (review) => ListTile(
+                  leading: CircleAvatar(
+                    backgroundImage:
+                        review.userAvatar != null &&
+                            review.userAvatar!.isNotEmpty
+                        ? NetworkImage(review.userAvatar!)
+                        : null,
+                    child:
+                        review.userAvatar == null || review.userAvatar!.isEmpty
+                        ? const Icon(Icons.person)
+                        : null,
+                  ),
+                  title: Text(review.userName ?? 'Anonyme'),
+                  subtitle: Text(review.comment ?? ''),
+                  trailing: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: List.generate(
+                      5,
+                      (i) => Icon(
+                        i < review.rating ? Icons.star : Icons.star_border,
+                        size: 16,
+                        color: Colors.amber,
+                      ),
+                    ),
+                  ),
+                ),
+              )
+              .toList(),
         );
       },
     );

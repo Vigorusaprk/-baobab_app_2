@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:baobabe_0_2/core/themes/app_colors.dart';
 
 class TravelModalHeader extends StatelessWidget {
   final bool isSmallScreen;
@@ -20,10 +21,14 @@ class TravelModalHeader extends StatelessWidget {
 
   static String pageTitle(int pageIndex) {
     switch (pageIndex) {
-      case 0: return 'Choisir le voyage';
-      case 1: return 'Informations';
-      case 2: return 'Récapitulatif';
-      default: return '';
+      case 0:
+        return 'Choisir le voyage';
+      case 1:
+        return 'Informations';
+      case 2:
+        return 'Récapitulatif';
+      default:
+        return '';
     }
   }
 
@@ -38,7 +43,11 @@ class TravelModalHeader extends StatelessWidget {
             children: [
               if (currentPage > 0)
                 IconButton(
-                  icon: Icon(Icons.arrow_back_ios_new, color: Theme.of(context).primaryColor, size: isSmallScreen ? 18 : 24),
+                  icon: Icon(
+                    Icons.arrow_back_ios_new,
+                    color: Theme.of(context).primaryColor,
+                    size: isSmallScreen ? 18 : 24,
+                  ),
                   onPressed: onBack,
                 )
               else
@@ -48,12 +57,18 @@ class TravelModalHeader extends StatelessWidget {
                   children: [
                     Text(
                       pageTitle(currentPage),
-                      style: TextStyle(fontSize: titleFontSize, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                        fontSize: titleFontSize,
+                        fontWeight: FontWeight.bold,
+                      ),
                       textAlign: TextAlign.center,
                     ),
                     Text(
                       businessName,
-                      style: TextStyle(fontSize: isSmallScreen ? 12 : 14, color: Colors.grey[600]),
+                      style: TextStyle(
+                        fontSize: isSmallScreen ? 12 : 14,
+                        color: AppColors.textSecondary,
+                      ),
                       textAlign: TextAlign.center,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -62,15 +77,22 @@ class TravelModalHeader extends StatelessWidget {
                 ),
               ),
               IconButton(
-                icon: Icon(Icons.close, color: Theme.of(context).primaryColor, size: isSmallScreen ? 18 : 24),
+                icon: Icon(
+                  Icons.close,
+                  color: Theme.of(context).primaryColor,
+                  size: isSmallScreen ? 18 : 24,
+                ),
                 onPressed: onClose,
               ),
             ],
           ),
         ),
-        const Divider(height: 1, color: Colors.grey),
+        const Divider(height: 1, color: AppColors.textSecondary),
         Padding(
-          padding: EdgeInsets.symmetric(horizontal: isSmallScreen ? 16 : 20, vertical: 8),
+          padding: EdgeInsets.symmetric(
+            horizontal: isSmallScreen ? 16 : 20,
+            vertical: 8,
+          ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [0, 1, 2].map((index) {
@@ -80,7 +102,9 @@ class TravelModalHeader extends StatelessWidget {
                 margin: EdgeInsets.symmetric(horizontal: isSmallScreen ? 3 : 4),
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: currentPage >= index ? Theme.of(context).colorScheme.primary : Colors.grey[300],
+                  color: currentPage >= index
+                      ? Theme.of(context).colorScheme.primary
+                      : AppColors.textSecondary,
                 ),
               );
             }).toList(),

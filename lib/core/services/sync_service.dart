@@ -20,7 +20,9 @@ class SyncService {
     required Future<void> Function() apiCall,
   }) async {
     final connectivityResult = await _connectivity.checkConnectivity();
-    final isOnline = connectivityResult.any((element) => element != ConnectivityResult.none);
+    final isOnline = connectivityResult.any(
+      (element) => element != ConnectivityResult.none,
+    );
 
     if (isOnline) {
       try {
@@ -32,13 +34,19 @@ class SyncService {
         await _saveToLocal(tableName, operationType, data);
       }
     } else {
-      _logger.w("Network: Offline. Saving $tableName operation to local storage.");
+      _logger.w(
+        "Network: Offline. Saving $tableName operation to local storage.",
+      );
       await _saveToLocal(tableName, operationType, data);
     }
   }
 
   /// Sauvegarde locale en cas d'échec ou d'absence de réseau
-  Future<void> _saveToLocal(String table, String type, Map<String, dynamic> data) async {
+  Future<void> _saveToLocal(
+    String table,
+    String type,
+    Map<String, dynamic> data,
+  ) async {
     await _db.insert('pending_operations', {
       'table_name': table,
       'operation_type': type,
@@ -71,15 +79,17 @@ class SyncService {
 }
 
 class SyncManager {
-  final SyncService _syncService;
+  final SyncService syncService;
   final ReservationApiService _reservationApi;
   final DatabaseHelper _db = DatabaseHelper.instance;
   final Connectivity _connectivity = Connectivity();
   final Logger _logger = Logger();
 
-  SyncManager(this._syncService, this._reservationApi) {
+  SyncManager(this.syncService, this._reservationApi) {
     _logger.i("SyncManager: Initialized.");
-    _connectivity.onConnectivityChanged.listen((List<ConnectivityResult> results) {
+    _connectivity.onConnectivityChanged.listen((
+      List<ConnectivityResult> results,
+    ) {
       if (results.any((result) => result != ConnectivityResult.none)) {
         _logger.i("SyncManager: Network recovered. Starting sync...");
         processPendingOperations();
@@ -105,8 +115,12 @@ class SyncManager {
     for (var op in pending) {
       final id = op['id'];
       try {
-        await _db.update('pending_operations', {'status': 'syncing'},
-            where: 'id = ?', whereArgs: [id]);
+        await _db.update(
+          'pending_operations',
+          {'status': 'syncing'},
+          where: 'id = ?',
+          whereArgs: [id],
+        );
 
         final data = jsonDecode(op['data'] as String);
 
@@ -124,14 +138,20 @@ class SyncManager {
           }
         }
 
-        await _db.delete('pending_operations', where: 'id = ?', whereArgs: [id]);
+        await _db.delete(
+          'pending_operations',
+          where: 'id = ?',
+          whereArgs: [id],
+        );
         _logger.i("SyncManager: Item $id synced and removed.");
       } catch (e) {
         _logger.e("SyncManager: Failed to sync $id: $e");
-        await _db.update('pending_operations', {
-          'status': 'failed',
-          'error_message': e.toString()
-        }, where: 'id = ?', whereArgs: [id]);
+        await _db.update(
+          'pending_operations',
+          {'status': 'failed', 'error_message': e.toString()},
+          where: 'id = ?',
+          whereArgs: [id],
+        );
       }
     }
   }

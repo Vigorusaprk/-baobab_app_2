@@ -46,8 +46,12 @@ class Room {
       capacity: toInt(json['capacity']),
       availableQuantity: toInt(json['available_quantity']),
       description: json['description']?.toString(),
-      amenities: json['amenities'] is Map ? Map<String, dynamic>.from(json['amenities']) : null,
-      images: json['images'] is List ? List<String>.from(json['images'].map((i) => i.toString())) : null,
+      amenities: json['amenities'] is Map
+          ? Map<String, dynamic>.from(json['amenities'])
+          : null,
+      images: json['images'] is List
+          ? List<String>.from(json['images'].map((i) => i.toString()))
+          : null,
     );
   }
 

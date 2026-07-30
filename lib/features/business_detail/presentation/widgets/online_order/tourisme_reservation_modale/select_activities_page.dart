@@ -41,10 +41,20 @@ class SelectActivitiesPage extends StatelessWidget {
               return Container(
                 margin: EdgeInsets.only(bottom: isSmallScreen ? 8 : 12),
                 decoration: BoxDecoration(
-                  color: isSelected ? AppColors.primary.withOpacity(0.3) : Colors.white,
+                  color: isSelected
+                      ? AppColors.primary.withOpacity(0.3)
+                      : AppColors.white,
                   borderRadius: BorderRadius.circular(12),
-                  border: isSelected ? Border.all(width: 2, color: AppColors.primary) : Border.all(width: 2.5, color: Colors.transparent),
-                  boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, 4))],
+                  border: isSelected
+                      ? Border.all(width: 2, color: AppColors.primary)
+                      : Border.all(width: 2.5, color: AppColors.transparent),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.textPrimary.withOpacity(0.05),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
                 ),
                 child: InkWell(
                   onTap: () => onToggleActivity(name),
@@ -62,14 +72,55 @@ class SelectActivitiesPage extends StatelessWidget {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(name, style: TextStyle(fontSize: isSmallScreen ? 14 : 16, fontWeight: FontWeight.w500)),
+                              Text(
+                                name,
+                                style: TextStyle(
+                                  fontSize: isSmallScreen ? 14 : 16,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
                               const SizedBox(height: 4),
-                              Row(children: [Icon(Icons.location_on, size: 14, color: Colors.grey), const SizedBox(width: 4), Text(location, style: TextStyle(fontSize: isSmallScreen ? 11 : 13))]),
-                              Text('Durée: $duration min', style: TextStyle(fontSize: isSmallScreen ? 11 : 13)),
-                              Text('\$$price / personne', style: TextStyle(fontSize: isSmallScreen ? 12 : 14, fontWeight: FontWeight.bold, color: AppColors.primary)),
+                              Row(
+                                children: [
+                                  Icon(
+                                    Icons.location_on,
+                                    size: 14,
+                                    color: AppColors.textSecondary,
+                                  ),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    location,
+                                    style: TextStyle(
+                                      fontSize: isSmallScreen ? 11 : 13,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              Text(
+                                'Durée: $duration min',
+                                style: TextStyle(
+                                  fontSize: isSmallScreen ? 11 : 13,
+                                ),
+                              ),
+                              Text(
+                                '\$$price / personne',
+                                style: TextStyle(
+                                  fontSize: isSmallScreen ? 12 : 14,
+                                  fontWeight: FontWeight.bold,
+                                  color: AppColors.primary,
+                                ),
+                              ),
                               if (description.isNotEmpty) ...[
                                 const SizedBox(height: 4),
-                                Text(description, style: TextStyle(fontSize: isSmallScreen ? 10 : 12, color: Colors.grey), maxLines: 2, overflow: TextOverflow.ellipsis),
+                                Text(
+                                  description,
+                                  style: TextStyle(
+                                    fontSize: isSmallScreen ? 10 : 12,
+                                    color: AppColors.textSecondary,
+                                  ),
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
                               ],
                             ],
                           ),
@@ -87,8 +138,21 @@ class SelectActivitiesPage extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('${selectedActivities.length} activité(s) sélectionnée(s)', style: TextStyle(fontWeight: FontWeight.bold, fontSize: isSmallScreen ? 14 : 16)),
-              Text('Total: \$${totalAmount.toStringAsFixed(2)}', style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.primary, fontSize: isSmallScreen ? 14 : 16)),
+              Text(
+                '${selectedActivities.length} activité(s) sélectionnée(s)',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: isSmallScreen ? 14 : 16,
+                ),
+              ),
+              Text(
+                'Total: \$${totalAmount.toStringAsFixed(2)}',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.primary,
+                  fontSize: isSmallScreen ? 14 : 16,
+                ),
+              ),
             ],
           ),
         ),
@@ -100,11 +164,26 @@ class SelectActivitiesPage extends StatelessWidget {
             child: ElevatedButton(
               onPressed: selectedActivities.isNotEmpty ? onNext : null,
               style: ElevatedButton.styleFrom(
-                backgroundColor: selectedActivities.isNotEmpty ? AppColors.primary : Colors.grey[300],
-                padding: EdgeInsets.symmetric(vertical: isSmallScreen ? 14 : 16),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                backgroundColor: selectedActivities.isNotEmpty
+                    ? AppColors.primary
+                    : AppColors.textSecondary,
+                padding: EdgeInsets.symmetric(
+                  vertical: isSmallScreen ? 14 : 16,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
               ),
-              child: Text("Continuer", style: TextStyle(fontSize: isSmallScreen ? 16 : 18, fontWeight: FontWeight.bold, color: selectedActivities.isNotEmpty ? Colors.white : Colors.grey[600])),
+              child: Text(
+                "Continuer",
+                style: TextStyle(
+                  fontSize: isSmallScreen ? 16 : 18,
+                  fontWeight: FontWeight.bold,
+                  color: selectedActivities.isNotEmpty
+                      ? AppColors.white
+                      : AppColors.textSecondary,
+                ),
+              ),
             ),
           ),
         ),

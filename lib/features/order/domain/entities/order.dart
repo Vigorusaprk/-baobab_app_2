@@ -1,5 +1,6 @@
-import 'package:baobabe_0_2/core/themes/app_colors.dart';
+import 'package:baobabe_0_2/core/themes/business_category_colors.dart';
 import 'package:flutter/material.dart';
+import 'package:baobabe_0_2/core/themes/app_colors.dart';
 import 'package:baobabe_0_2/features/home_page/domain/entities/business_entity.dart';
 import 'package:baobabe_0_2/features/order/domain/entities/order_item.dart';
 import 'package:baobabe_0_2/features/order/domain/entities/order_parsing_utils.dart';
@@ -74,15 +75,12 @@ class Order {
       List<OrderItem> itemsList = [];
       final dynamic itemsValue = map['items'] ?? map['order_items'];
       if (itemsValue is List) {
-        itemsList = itemsValue
-            .where((item) => item != null)
-            .map((item) {
-              if (item is Map<String, dynamic>) {
-                return OrderItem.fromMap(item);
-              }
-              return OrderItem.fromMap(Map<String, dynamic>.from(item as Map));
-            })
-            .toList();
+        itemsList = itemsValue.where((item) => item != null).map((item) {
+          if (item is Map<String, dynamic>) {
+            return OrderItem.fromMap(item);
+          }
+          return OrderItem.fromMap(Map<String, dynamic>.from(item as Map));
+        }).toList();
       } else if (itemsValue is Map<String, dynamic>) {
         itemsList = [OrderItem.fromMap(itemsValue)];
       } else if (itemsValue != null) {
@@ -105,18 +103,37 @@ class Order {
       return Order(
         id: map['id']?.toString() ?? '',
         establishmentId: map['business_id']?.toString() ?? '',
-        establishmentName: map['establishment_name']?.toString() ?? map['business_name']?.toString() ?? map['name']?.toString() ?? '',
-        customerId: map['customer'] is Map ? map['customer']['id']?.toString() : map['user_id']?.toString(),
-        customerName: map['customer'] is Map ? map['customer']['name']?.toString() : map['customer_name']?.toString(),
-        customerEmail: map['customer'] is Map ? map['customer']['email']?.toString() : null,
-        customerPhone: map['customer'] is Map ? map['customer']['phone']?.toString() : null,
+        establishmentName:
+            map['establishment_name']?.toString() ??
+            map['business_name']?.toString() ??
+            map['name']?.toString() ??
+            '',
+        customerId: map['customer'] is Map
+            ? map['customer']['id']?.toString()
+            : map['user_id']?.toString(),
+        customerName: map['customer'] is Map
+            ? map['customer']['name']?.toString()
+            : map['customer_name']?.toString(),
+        customerEmail: map['customer'] is Map
+            ? map['customer']['email']?.toString()
+            : null,
+        customerPhone: map['customer'] is Map
+            ? map['customer']['phone']?.toString()
+            : null,
         establishmentType: parseBusinessType(map['establishment_type']),
-        orderDate: DateTime.tryParse(map['order_date']?.toString() ?? map['created_at']?.toString() ?? '') ?? DateTime.now(),
+        orderDate:
+            DateTime.tryParse(
+              map['order_date']?.toString() ??
+                  map['created_at']?.toString() ??
+                  '',
+            ) ??
+            DateTime.now(),
         items: itemsList,
         subtotal: toDoubleOrNull(map['subtotal']) ?? computedSubtotal,
         tax: toDoubleOrNull(map['tax']) ?? 0.0,
         // Support databases that use either `total_amount` or `total_price`
-        totalAmount: toDoubleOrNull(map['total_amount'] ?? map['total_price']) ?? 0.0,
+        totalAmount:
+            toDoubleOrNull(map['total_amount'] ?? map['total_price']) ?? 0.0,
         status: parseOrderStatus(map['status']),
         notes: map['notes']?.toString(),
         deliveryAddress: map['delivery_address']?.toString(),
@@ -170,7 +187,6 @@ class Order {
     return null;
   }
 
-
   IconData get typeIcon {
     switch (establishmentType) {
       case BusinessType.hotel:
@@ -203,29 +219,29 @@ class Order {
   Color get typeColor {
     switch (establishmentType) {
       case BusinessType.hotel:
-        return AppColors.hotel;
+        return BusinessCategoryColors.hotel;
       case BusinessType.carRental:
-        return AppColors.carRental;
+        return BusinessCategoryColors.carRental;
       case BusinessType.travelAgency:
-        return AppColors.travelAgency;
+        return BusinessCategoryColors.travelAgency;
       case BusinessType.spa:
-        return AppColors.spa;
+        return BusinessCategoryColors.spa;
       case BusinessType.cinema:
-        return AppColors.cinema;
+        return BusinessCategoryColors.cinema;
       case BusinessType.tourism:
-        return AppColors.tourism;
+        return BusinessCategoryColors.tourism;
       case BusinessType.restaurant:
-        return AppColors.restaurant;
+        return BusinessCategoryColors.restaurant;
       case BusinessType.fastFood:
-        return AppColors.fastFood;
+        return BusinessCategoryColors.fastFood;
       case BusinessType.shopping:
-        return AppColors.shopping;
+        return BusinessCategoryColors.shopping;
       case BusinessType.mall:
-        return AppColors.mall;
+        return BusinessCategoryColors.mall;
       case BusinessType.other:
-        return Colors.grey;
+        return AppColors.textSecondary;
       default:
-        return Colors.grey;
+        return AppColors.textSecondary;
     }
   }
 }

@@ -23,12 +23,14 @@ class CustomAuthIconButton extends StatelessWidget {
           color: Theme.of(
             context,
           ).elevatedButtonTheme.style?.backgroundColor?.resolve({}),
-          borderRadius: BorderRadius.circular(AppDimens.borderRadiusAuthIconButton),
+          borderRadius: BorderRadius.circular(
+            AppDimens.borderRadiusAuthIconButton,
+          ),
         ),
         margin: EdgeInsets.only(
-          right: AppDimens.marginExtraSmall,
-          top: AppDimens.marginExtraSmall,
-          bottom: AppDimens.marginExtraSmall,
+          right: AppDimens.small,
+          top: AppDimens.small,
+          bottom: AppDimens.small,
         ),
         child: GestureDetector(
           onTap: onPressed,

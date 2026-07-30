@@ -1,6 +1,7 @@
-import 'package:baobabe_0_2/core/themes/app_colors.dart';
+import 'package:baobabe_0_2/core/themes/business_category_colors.dart';
 import 'package:baobabe_0_2/features/home_page/domain/entities/business_entity.dart';
 import 'package:flutter/material.dart';
+import 'package:baobabe_0_2/core/themes/app_colors.dart';
 
 class UIBusiness {
   final Business business;
@@ -10,27 +11,27 @@ class UIBusiness {
   Color get categoryColor {
     switch (business.type) {
       case BusinessType.restaurant:
-        return AppColors.restaurant;
+        return BusinessCategoryColors.restaurant;
       case BusinessType.fastFood:
-        return AppColors.fastFood;
+        return BusinessCategoryColors.fastFood;
       case BusinessType.shopping:
-        return AppColors.shopping;
+        return BusinessCategoryColors.shopping;
       case BusinessType.mall:
-        return AppColors.mall;
+        return BusinessCategoryColors.mall;
       case BusinessType.hotel:
-        return AppColors.hotel;
+        return BusinessCategoryColors.hotel;
       case BusinessType.carRental:
-        return AppColors.carRental;
+        return BusinessCategoryColors.carRental;
       case BusinessType.travelAgency:
-        return AppColors.travelAgency;
+        return BusinessCategoryColors.travelAgency;
       case BusinessType.spa:
-        return AppColors.spa;
+        return BusinessCategoryColors.spa;
       case BusinessType.cinema:
-        return AppColors.cinema;
+        return BusinessCategoryColors.cinema;
       case BusinessType.tourism:
-        return AppColors.tourism;
+        return BusinessCategoryColors.tourism;
       default:
-        return Colors.grey;
+        return AppColors.textSecondary;
     }
   }
 

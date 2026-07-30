@@ -57,9 +57,8 @@ class _LoginPageState extends State<LoginPage> {
                       SocialButton(
                         label: 'Google',
                         icon: IconLink.google,
-                        onPressed: () => context
-                            .read<AuthBloc>()
-                            .add(AuthWithGoogleEvent()),
+                        onPressed: () =>
+                            context.read<AuthBloc>().add(AuthWithGoogleEvent()),
                       ),
                       if (isAppleDevice) ...[
                         AppDimens.spacerMedium,

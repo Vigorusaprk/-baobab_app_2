@@ -10,7 +10,11 @@ class BusinessHeroSection extends StatelessWidget {
   final UIBusiness uiBusiness;
   final Business business;
 
-  const BusinessHeroSection({super.key, required this.uiBusiness, required this.business});
+  const BusinessHeroSection({
+    super.key,
+    required this.uiBusiness,
+    required this.business,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -23,7 +27,9 @@ class BusinessHeroSection extends StatelessWidget {
         if (snapshot.hasData && snapshot.data!.isNotEmpty) {
           final reviews = snapshot.data!;
           reviewCount = reviews.length;
-          rating = reviews.map((r) => r.rating).reduce((a, b) => a + b) / reviewCount;
+          rating =
+              reviews.map((r) => r.rating).reduce((a, b) => a + b) /
+              reviewCount;
         } else {
           rating = uiBusiness.business.rating;
           reviewCount = uiBusiness.business.reviewCount;
@@ -44,7 +50,7 @@ class BusinessHeroSection extends StatelessWidget {
                       borderRadius: BorderRadius.circular(28),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.1),
+                          color: AppColors.textPrimary.withValues(alpha: 0.1),
                           blurRadius: 16,
                           offset: const Offset(0, 8),
                         ),
@@ -55,13 +61,16 @@ class BusinessHeroSection extends StatelessWidget {
                       child: Stack(
                         children: [
                           BackdropFilter(
-                            filter: ImageFilter.blur(sigmaX: 15.0, sigmaY: 15.0),
+                            filter: ImageFilter.blur(
+                              sigmaX: 15.0,
+                              sigmaY: 15.0,
+                            ),
                             child: Container(
                               decoration: BoxDecoration(
-                                color: Colors.white.withOpacity(0.15),
+                                color: AppColors.white.withValues(alpha: 0.15),
                                 borderRadius: BorderRadius.circular(22),
                                 border: Border.all(
-                                  color: Colors.white.withOpacity(0.3),
+                                  color: AppColors.white.withValues(alpha: 0.3),
                                   width: 1,
                                 ),
                               ),
@@ -75,7 +84,7 @@ class BusinessHeroSection extends StatelessWidget {
                                       fontSize: 28,
                                       fontWeight: FontWeight.bold,
                                       letterSpacing: -0.5,
-                                      color: Colors.white,
+                                      color: AppColors.white,
                                     ),
                                   ),
                                   const SizedBox(height: 16),
@@ -89,13 +98,16 @@ class BusinessHeroSection extends StatelessWidget {
                                       const SizedBox(width: 1),
                                       _buildBadge(
                                         icon: Icons.comment,
-                                        label: "$reviewCount ${reviewCount > 1 ? 'avis' : 'avis'}",
+                                        label:
+                                            "$reviewCount ${reviewCount > 1 ? 'avis' : 'avis'}",
                                         isStatus: true,
                                       ),
                                       const SizedBox(width: 12),
                                       _buildBadge(
                                         icon: Icons.circle,
-                                        label: uiBusiness.isOpen ? 'OUVERT' : 'FERMÉ',
+                                        label: uiBusiness.isOpen
+                                            ? 'OUVERT'
+                                            : 'FERMÉ',
                                         isStatus: true,
                                       ),
                                     ],
@@ -118,28 +130,38 @@ class BusinessHeroSection extends StatelessWidget {
                   width: 100,
                   height: 100,
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: AppColors.white,
                     shape: BoxShape.circle,
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.5),
+                        color: AppColors.textPrimary.withValues(alpha: 0.5),
                         blurRadius: 15,
                         offset: const Offset(0, 1),
                       ),
                     ],
-                    border: Border.all(color: uiBusiness.categoryColor.withOpacity(0.7), width: 5.5),
+                    border: Border.all(
+                      color: uiBusiness.categoryColor.withValues(alpha: 0.7),
+                      width: 5.5,
+                    ),
                   ),
                   child: Container(
-                    child: business.profilImg != null && business.profilImg!.isNotEmpty
+                    child: business.profilImg.isNotEmpty
                         ? Container(
-                      width: 100,
-                      height: 100,
-                      decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          image: DecorationImage(image: NetworkImage(business.profilImg!), fit: BoxFit.cover)
-                      ),
-                    )
-                        : Icon(uiBusiness.categoryIcon, size: 45, color: uiBusiness.categoryColor),
+                            width: 100,
+                            height: 100,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              image: DecorationImage(
+                                image: NetworkImage(business.profilImg),
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                          )
+                        : Icon(
+                            uiBusiness.categoryIcon,
+                            size: 45,
+                            color: uiBusiness.categoryColor,
+                          ),
                   ),
                 ),
               ),
@@ -147,49 +169,6 @@ class BusinessHeroSection extends StatelessWidget {
           ),
         );
       },
-    );
-  }
-
-  Widget _buildBackgroundOrbes() {
-    return Stack(
-      children: [
-        Positioned(
-          top: -20,
-          right: 40,
-          child: Container(
-            width: 120,
-            height: 120,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: AppColors.secondaryLight.withOpacity(0.25),
-            ),
-          ),
-        ),
-        Positioned(
-          bottom: 10,
-          right: 10,
-          child: Container(
-            width: 90,
-            height: 90,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: AppColors.primaryLight.withOpacity(0.4),
-            ),
-          ),
-        ),
-        Positioned(
-          bottom: 30,
-          left: -10,
-          child: Container(
-            width: 100,
-            height: 100,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: AppColors.secondaryDark.withOpacity(0.5),
-            ),
-          ),
-        ),
-      ],
     );
   }
 
@@ -203,11 +182,15 @@ class BusinessHeroSection extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: isStatus ? 15 : 18, color: Colors.white),
+          Icon(icon, size: isStatus ? 15 : 18, color: AppColors.white),
           const SizedBox(width: 6),
           Text(
             label,
-            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 13),
+            style: const TextStyle(
+              color: AppColors.white,
+              fontWeight: FontWeight.w700,
+              fontSize: 13,
+            ),
           ),
         ],
       ),

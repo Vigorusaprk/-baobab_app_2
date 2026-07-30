@@ -44,20 +44,21 @@ class PopularBusinessesSection extends StatelessWidget {
           builder: (context, state) {
             if (state is! BusinessLoaded) return const SizedBox.shrink();
 
-            final sorted = [...state.businesses]..sort((a, b) {
-              final ratingCompare = b.rating.compareTo(a.rating);
-              if (ratingCompare != 0) return ratingCompare;
-              return b.reviewCount.compareTo(a.reviewCount);
-            });
+            final sorted = [...state.businesses]
+              ..sort((a, b) {
+                final ratingCompare = b.rating.compareTo(a.rating);
+                if (ratingCompare != 0) return ratingCompare;
+                return b.reviewCount.compareTo(a.reviewCount);
+              });
 
             final top = sorted.take(maxItems).toList();
             final uiBusinesses = top.map((b) => UIBusiness(b)).toList();
 
             return Padding(
               padding: const EdgeInsets.only(
-                left: AppDimens.PADDING_20,
-                right: AppDimens.PADDING_20,
-                top: AppDimens.PADDING_16,
+                left: AppDimens.large,
+                right: AppDimens.large,
+                top: AppDimens.medium,
               ),
               child: PopularBusinessListView(
                 uiBusinesses: uiBusinesses,

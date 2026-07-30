@@ -1,4 +1,5 @@
 import 'package:baobabe_0_2/core/themes/app_colors.dart';
+import 'package:baobabe_0_2/core/themes/app_diemens.dart';
 import 'package:flutter/material.dart';
 
 class InformationDetailPage extends StatelessWidget {
@@ -32,7 +33,7 @@ class InformationDetailPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
+      padding: AppDimens.appPadding,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -44,11 +45,22 @@ class InformationDetailPage extends StatelessWidget {
             ),
           ),
 
-          _buildTextField("Nom complet", "Votre nom complet", fullNameController,
-              icon: Icons.person, isRequired: true),
+          _buildTextField(
+            "Nom complet",
+            "Votre nom complet",
+            fullNameController,
+            icon: Icons.person,
+            isRequired: true,
+          ),
 
-          _buildTextField("Numéro de téléphone", "Entrez votre numéro", phoneController,
-              icon: Icons.phone, keyboardType: TextInputType.phone, isRequired: true),
+          _buildTextField(
+            "Numéro de téléphone",
+            "Entrez votre numéro",
+            phoneController,
+            icon: Icons.phone,
+            keyboardType: TextInputType.phone,
+            isRequired: true,
+          ),
 
           Row(
             children: [
@@ -58,7 +70,9 @@ class InformationDetailPage extends StatelessWidget {
                   "Date d'arrivée",
                   "Sélectionnez la date",
                   Icons.calendar_today,
-                  date != null ? "${date!.day}/${date!.month}/${date!.year}" : "",
+                  date != null
+                      ? "${date!.day}/${date!.month}/${date!.year}"
+                      : "",
                   onPickDate,
                 ),
               ),
@@ -76,11 +90,22 @@ class InformationDetailPage extends StatelessWidget {
             ],
           ),
 
-          _buildTextField("Nombre de personnes", "Combien de personnes", peopleController,
-              icon: Icons.people, keyboardType: TextInputType.number, isRequired: true),
+          _buildTextField(
+            "Nombre de personnes",
+            "Combien de personnes",
+            peopleController,
+            icon: Icons.people,
+            keyboardType: TextInputType.number,
+            isRequired: true,
+          ),
 
-          _buildTextField("Notes", "Ex: Besoin de 2 chaises bébé...", notesController,
-              icon: Icons.note, maxLines: 3),
+          _buildTextField(
+            "Notes",
+            "Ex: Besoin de 2 chaises bébé...",
+            notesController,
+            icon: Icons.note,
+            maxLines: 3,
+          ),
 
           const SizedBox(height: 20),
           SizedBox(
@@ -90,12 +115,18 @@ class InformationDetailPage extends StatelessWidget {
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.secondary,
                 padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15),
+                ),
                 elevation: 2,
               ),
               child: const Text(
                 "Continuer",
-                style: TextStyle(fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold),
+                style: TextStyle(
+                  fontSize: 18,
+                  color: AppColors.white,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
           ),
@@ -105,15 +136,29 @@ class InformationDetailPage extends StatelessWidget {
     );
   }
 
-  Widget _buildTextField(String label, String hint, TextEditingController controller,
-      {IconData? icon, TextInputType? keyboardType, int maxLines = 1, bool isRequired = false}) {
+  Widget _buildTextField(
+    String label,
+    String hint,
+    TextEditingController controller, {
+    IconData? icon,
+    TextInputType? keyboardType,
+    int maxLines = 1,
+    bool isRequired = false,
+  }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
           children: [
-            Text(label, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-            if (isRequired) const Text(' *', style: TextStyle(color: Colors.red, fontSize: 16)),
+            Text(
+              label,
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+            ),
+            if (isRequired)
+              const Text(
+                ' *',
+                style: TextStyle(color: AppColors.error, fontSize: 16),
+              ),
           ],
         ),
         const SizedBox(height: 8),
@@ -122,13 +167,16 @@ class InformationDetailPage extends StatelessWidget {
           decoration: InputDecoration(
             hintText: hint,
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 16,
+              vertical: 12,
+            ),
             prefixIcon: icon != null ? Icon(icon, size: 20) : null,
             filled: true,
-            fillColor: Colors.grey[50],
+            fillColor: AppColors.background,
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(color: AppColors.primaryDark, width: 2),
+              borderSide: BorderSide(color: AppColors.primary, width: 2),
             ),
           ),
           keyboardType: keyboardType,
@@ -140,15 +188,27 @@ class InformationDetailPage extends StatelessWidget {
     );
   }
 
-  Widget _buildDateOrTimePicker(BuildContext context, String label, String hint, IconData icon,
-      String value, VoidCallback onTap) {
+  Widget _buildDateOrTimePicker(
+    BuildContext context,
+    String label,
+    String hint,
+    IconData icon,
+    String value,
+    VoidCallback onTap,
+  ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
           children: [
-            Text(label, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-            const Text(' *', style: TextStyle(color: Colors.red, fontSize: 16)),
+            Text(
+              label,
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+            ),
+            const Text(
+              ' *',
+              style: TextStyle(color: AppColors.error, fontSize: 16),
+            ),
           ],
         ),
         const SizedBox(height: 8),
@@ -158,10 +218,12 @@ class InformationDetailPage extends StatelessWidget {
             child: TextFormField(
               decoration: InputDecoration(
                 hintText: hint,
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
                 prefixIcon: Icon(icon, size: 20),
                 filled: true,
-                fillColor: Colors.grey[50],
+                fillColor: AppColors.background,
               ),
               controller: TextEditingController(text: value),
             ),

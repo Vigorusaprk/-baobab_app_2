@@ -19,7 +19,9 @@ class Activity {
     return Activity(
       name: json['name'] ?? '',
       price: (json['price'] as num?)?.toDouble() ?? 0.0,
-      duration: json['duration'] is int ? json['duration'] : (json['duration'] as num?)?.toInt() ?? 0,
+      duration: json['duration'] is int
+          ? json['duration']
+          : (json['duration'] as num?)?.toInt() ?? 0,
       description: json['description'] ?? '',
       imageUrl: json['image_url'] ?? json['imageUrl'] ?? '',
       location: json['location'] ?? '',

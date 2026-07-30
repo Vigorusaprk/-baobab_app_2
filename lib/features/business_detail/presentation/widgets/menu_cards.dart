@@ -6,7 +6,6 @@ import 'package:baobabe_0_2/features/business_detail/presentation/widgets/online
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
-
 class RestaurantInfoBigCard extends StatelessWidget {
   final MenuItem item;
   final String? restaurantId;
@@ -45,7 +44,7 @@ class RestaurantInfoBigCard extends StatelessWidget {
           boxShadow: [
             BoxShadow(
               // 2. Ombre plus prononcée
-              color: Colors.black.withOpacity(0.25),
+              color: AppColors.textPrimary.withOpacity(0.25),
               blurRadius: 15,
               offset: const Offset(0, 6),
             ),
@@ -89,7 +88,7 @@ class RestaurantInfoBigCard extends StatelessWidget {
                           style: const TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
-                            color: AppColors.primary50,
+                            color: AppColors.white,
                             height: 1.2,
                           ),
                         ),
@@ -97,7 +96,7 @@ class RestaurantInfoBigCard extends StatelessWidget {
                         Text(
                           '${item.price.toStringAsFixed(2)} €',
                           style: TextStyle(
-                            color: AppColors.primary50,
+                            color: AppColors.white,
                             fontWeight: FontWeight.bold,
                             fontSize: 14,
                           ),
@@ -112,17 +111,15 @@ class RestaurantInfoBigCard extends StatelessWidget {
                           height: 20,
                           width: 20,
                           colorFilter: ColorFilter.mode(
-                            AppColors.primary50,
+                            AppColors.white,
                             BlendMode.srcIn,
                           ),
                         ),
                         const SizedBox(width: 4),
                         Text(
                           "20-30 min",
-                          style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                            fontSize: 12,
-                            color:  AppColors.primary50,
-                          ),
+                          style: Theme.of(context).textTheme.labelSmall
+                              ?.copyWith(fontSize: 12, color: AppColors.white),
                         ),
                         const SizedBox(width: 12),
                         SvgPicture.asset(
@@ -130,17 +127,17 @@ class RestaurantInfoBigCard extends StatelessWidget {
                           height: 20,
                           width: 20,
                           colorFilter: ColorFilter.mode(
-                            AppColors.primary50,
+                            AppColors.white,
                             BlendMode.srcIn,
                           ),
                         ),
                         const SizedBox(width: 4),
                         Text(
-                          isFreeDelivery ? "Livraison gratuite" : "Frais de livraison",
-                          style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                            fontSize: 12,
-                            color:  AppColors.primary50,
-                          ),
+                          isFreeDelivery
+                              ? "Livraison gratuite"
+                              : "Frais de livraison",
+                          style: Theme.of(context).textTheme.labelSmall
+                              ?.copyWith(fontSize: 12, color: AppColors.white),
                         ),
                       ],
                     ),
@@ -161,19 +158,19 @@ class RestaurantInfoBigCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(16),
           child: item.imageUrl.startsWith('http')
               ? Image.network(
-            item.imageUrl,
-            height: 180,
-            width: double.infinity,
-            fit: BoxFit.cover,
-            errorBuilder: (_, __, ___) => _buildPlaceholder(),
-          )
+                  item.imageUrl,
+                  height: 180,
+                  width: double.infinity,
+                  fit: BoxFit.cover,
+                  errorBuilder: (_, __, ___) => _buildPlaceholder(),
+                )
               : Image.asset(
-            item.imageUrl,
-            height: 180,
-            width: double.infinity,
-            fit: BoxFit.cover,
-            errorBuilder: (_, __, ___) => _buildPlaceholder(),
-          ),
+                  item.imageUrl,
+                  height: 180,
+                  width: double.infinity,
+                  fit: BoxFit.cover,
+                  errorBuilder: (_, __, ___) => _buildPlaceholder(),
+                ),
         ),
       ],
     );
@@ -193,9 +190,9 @@ class RestaurantInfoBigCard extends StatelessWidget {
     child: Stack(
       children: [
         Positioned(
-            right: 10,
-            bottom: 5,
-            child: const Icon(Icons.fastfood, color: Colors.white, size:150)
+          right: 10,
+          bottom: 5,
+          child: const Icon(Icons.fastfood, color: AppColors.white, size: 150),
         ),
       ],
     ),

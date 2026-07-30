@@ -1,5 +1,6 @@
 import 'package:baobabe_0_2/core/themes/app_diemens.dart';
-import 'package:baobabe_0_2/features/home_page/domain/entities/business_entity.dart' show Business;
+import 'package:baobabe_0_2/features/home_page/domain/entities/business_entity.dart'
+    show Business;
 import 'package:baobabe_0_2/features/home_page/domain/entities/search_filter_entity.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/bloc/search_state.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/bloc/search_event.dart';
@@ -38,16 +39,20 @@ class SearchResultsList extends StatelessWidget {
             children: [
               Text(
                 '${state.results.length} résultat(s)',
-                style: TextStyle(fontSize: 14, color: AppColors.secondary, fontWeight: FontWeight.bold),
+                style: TextStyle(
+                  fontSize: 14,
+                  color: AppColors.secondary,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               const Spacer(),
               Container(
                 padding: EdgeInsets.symmetric(horizontal: 10),
                 decoration: BoxDecoration(
                   color: AppColors.secondaryLight,
-                  borderRadius: BorderRadius.circular(AppDimens.BORDER_RADIUS_10)
+                  borderRadius: BorderRadius.circular(AppDimens.radius10),
                 ),
-                  child: _buildSortDropdown(),
+                child: _buildSortDropdown(),
               ),
             ],
           ),
@@ -80,26 +85,29 @@ class SearchResultsList extends StatelessWidget {
   Widget _buildLoadingMore() {
     return const Padding(
       padding: EdgeInsets.symmetric(vertical: 16),
-      child: Center(child: CircularProgressIndicator(color: AppColors.secondary,)),
+      child: Center(
+        child: CircularProgressIndicator(color: AppColors.secondary),
+      ),
     );
   }
 
   Widget _buildSortDropdown() {
     return DropdownButton<SortBy>(
-      borderRadius: BorderRadius.circular(AppDimens.BORDER_RADIUS_20),
+      borderRadius: BorderRadius.circular(AppDimens.radius20),
       dropdownColor: AppColors.secondaryLight,
-      style: TextStyle(color: AppColors.scaffoldBackground),
+      style: TextStyle(color: AppColors.background),
       value: state.activeFilters.sortBy,
       underline: const SizedBox(),
       items: SortBy.values.map((sortBy) {
-        return DropdownMenuItem(
-          value: sortBy,
-          child: Text(sortBy.displayName),
-        );
+        return DropdownMenuItem(value: sortBy, child: Text(sortBy.displayName));
       }).toList(),
       onChanged: (newValue) {
         if (newValue != null) {
-          searchBloc.add(SearchFiltersChanged(state.activeFilters.copyWith(sortBy: newValue)));
+          searchBloc.add(
+            SearchFiltersChanged(
+              state.activeFilters.copyWith(sortBy: newValue),
+            ),
+          );
         }
       },
     );
@@ -119,11 +127,11 @@ class SearchResultsList extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: AppColors.canvasBackground,
+          color: AppColors.background,
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
+              color: AppColors.textPrimary.withOpacity(0.05),
               blurRadius: 10,
               offset: const Offset(0, 4),
             ),
@@ -143,7 +151,11 @@ class SearchResultsList extends StatelessWidget {
                     width: 80,
                     height: 80,
                     color: uiBusiness.categoryColor.withOpacity(0.2),
-                    child: Icon(uiBusiness.categoryIcon, color: uiBusiness.categoryColor, size: 40),
+                    child: Icon(
+                      uiBusiness.categoryIcon,
+                      color: uiBusiness.categoryColor,
+                      size: 40,
+                    ),
                   );
                 },
               ),
@@ -155,7 +167,10 @@ class SearchResultsList extends StatelessWidget {
                 children: [
                   Text(
                     business.name,
-                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -164,17 +179,29 @@ class SearchResultsList extends StatelessWidget {
                     children: [
                       const Icon(Icons.star, color: Colors.amber, size: 16),
                       const SizedBox(width: 4),
-                      Text(business.rating.toString(), style: const TextStyle(fontWeight: FontWeight.w600)),
+                      Text(
+                        business.rating.toString(),
+                        style: const TextStyle(fontWeight: FontWeight.w600),
+                      ),
                       const SizedBox(width: 8),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 2,
+                        ),
                         decoration: BoxDecoration(
                           color: uiBusiness.categoryColor.withOpacity(0.1),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Text(
-                          SearchActiveFiltersBar.categoryDisplayName(business.type),
-                          style: TextStyle(color: uiBusiness.categoryColor, fontSize: 12, fontWeight: FontWeight.w600),
+                          SearchActiveFiltersBar.categoryDisplayName(
+                            business.type,
+                          ),
+                          style: TextStyle(
+                            color: uiBusiness.categoryColor,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                       ),
                     ],
@@ -182,7 +209,10 @@ class SearchResultsList extends StatelessWidget {
                   const SizedBox(height: 4),
                   Text(
                     business.address,
-                    style: TextStyle(color: Colors.grey[600], fontSize: 13),
+                    style: TextStyle(
+                      color: AppColors.textSecondary,
+                      fontSize: 13,
+                    ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),

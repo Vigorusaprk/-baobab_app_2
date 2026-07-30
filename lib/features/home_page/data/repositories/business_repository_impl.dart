@@ -3,7 +3,6 @@ import 'package:baobabe_0_2/features/booking_page/data/models/reservation_model.
 import 'package:baobabe_0_2/features/home_page/data/data_sources/remote_datasource/business_remote_datasource.dart';
 import 'package:baobabe_0_2/features/home_page/domain/entities/business_entity.dart';
 import 'package:baobabe_0_2/features/home_page/domain/repositories/business_repository.dart';
-import '../models/business_model.dart';
 
 class BusinessRepositoryImpl implements BusinessRepository {
   final BusinessRemoteDataSource remoteDataSource;
@@ -59,11 +58,14 @@ class BusinessRepositoryImpl implements BusinessRepository {
   @override
   Future<List<Business>> searchBusinesses(String query) async {
     final all = await getBusinesses();
-    return all.where((b) =>
-    b.name.toLowerCase().contains(query.toLowerCase()) ||
-        b.address.toLowerCase().contains(query.toLowerCase()) ||
-        b.description.toLowerCase().contains(query.toLowerCase())
-    ).toList();
+    return all
+        .where(
+          (b) =>
+              b.name.toLowerCase().contains(query.toLowerCase()) ||
+              b.address.toLowerCase().contains(query.toLowerCase()) ||
+              b.description.toLowerCase().contains(query.toLowerCase()),
+        )
+        .toList();
   }
 
   // NOUVELLE MÉTHODE IMPLÉMENTÉE
@@ -76,5 +78,4 @@ class BusinessRepositoryImpl implements BusinessRepository {
       throw Exception('Erreur lors de la récupération du menu: $e');
     }
   }
-
 }

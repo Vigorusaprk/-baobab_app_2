@@ -17,7 +17,7 @@ class CartItemRow extends StatelessWidget {
         color: AppColors.surface,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.2),
+            color: AppColors.textPrimary.withOpacity(0.2),
             blurRadius: 10,
             offset: const Offset(0, -3),
           ),
@@ -39,15 +39,12 @@ class CartItemRow extends StatelessWidget {
             height: 150,
             width: 130,
             child: Center(
-              child: Icon(Icons.fastfood, color: Colors.white, size: 50),
+              child: Icon(Icons.fastfood, color: AppColors.white, size: 50),
             ),
           ),
           Expanded(
             child: Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 10,
-                vertical: 10,
-              ),
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -69,7 +66,7 @@ class CartItemRow extends StatelessWidget {
                         Text(
                           '${item.price} €',
                           style: const TextStyle(
-                            color: AppColors.black,
+                            color: AppColors.textPrimary,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -87,7 +84,10 @@ class CartItemRow extends StatelessWidget {
                             "assets/icons/dollar-square(1).svg",
                             width: 23,
                             height: 23,
-                            colorFilter: const ColorFilter.mode(AppColors.secondary, BlendMode.srcIn),
+                            colorFilter: const ColorFilter.mode(
+                              AppColors.secondary,
+                              BlendMode.srcIn,
+                            ),
                           ),
                           SizedBox(width: 5),
                           Text(
@@ -106,7 +106,10 @@ class CartItemRow extends StatelessWidget {
                             "assets/icons/shopping-cart.svg",
                             width: 20,
                             height: 20,
-                            colorFilter: const ColorFilter.mode(AppColors.secondary, BlendMode.srcIn),
+                            colorFilter: const ColorFilter.mode(
+                              AppColors.secondary,
+                              BlendMode.srcIn,
+                            ),
                           ),
                           SizedBox(width: 5),
                           Text(

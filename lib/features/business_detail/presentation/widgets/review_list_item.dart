@@ -1,6 +1,7 @@
 import 'package:baobabe_0_2/features/business_detail/domain/entities/review.dart';
 import 'package:baobabe_0_2/features/business_detail/presentation/widgets/review_stars.dart';
 import 'package:flutter/material.dart';
+import 'package:baobabe_0_2/core/themes/app_colors.dart';
 
 /// Carte affichant un avis individuel dans la liste des avis d'un business.
 /// Extrait de review.dart pour garder ce fichier concis ; comportement
@@ -22,7 +23,7 @@ class ReviewListItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      color: Colors.white,
+      color: AppColors.white,
       margin: const EdgeInsets.only(bottom: 12),
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -32,17 +33,23 @@ class ReviewListItem extends StatelessWidget {
             Row(
               children: [
                 CircleAvatar(
-                  backgroundImage: review.userAvatar != null && review.userAvatar!.isNotEmpty
+                  backgroundImage:
+                      review.userAvatar != null && review.userAvatar!.isNotEmpty
                       ? NetworkImage(review.userAvatar!)
                       : null,
-                  child: review.userAvatar == null || review.userAvatar!.isEmpty ? const Icon(Icons.person) : null,
+                  child: review.userAvatar == null || review.userAvatar!.isEmpty
+                      ? const Icon(Icons.person)
+                      : null,
                 ),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(review.userName ?? 'Anonyme', style: const TextStyle(fontWeight: FontWeight.bold)),
+                      Text(
+                        review.userName ?? 'Anonyme',
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      ),
                       Row(
                         children: [
                           ...buildReviewStars(review.rating.toDouble(), 12),

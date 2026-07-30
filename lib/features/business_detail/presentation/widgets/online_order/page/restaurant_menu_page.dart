@@ -30,7 +30,7 @@ class RestaurantMenuPage extends StatelessWidget {
     // Si le menu est vide, on affiche un état d'erreur simple hors du contrôleur
     if (menuItems.isEmpty) {
       return Scaffold(
-        backgroundColor: AppColors.scaffoldBackground,
+        backgroundColor: AppColors.background,
         appBar: _buildSimpleAppBar(context),
         body: _buildEmptyState(),
       );
@@ -40,16 +40,16 @@ class RestaurantMenuPage extends StatelessWidget {
     return DefaultTabController(
       length: categories.length,
       child: Scaffold(
-        backgroundColor: AppColors.canvasBackground,
+        backgroundColor: AppColors.background,
         body: Container(
           decoration: BoxDecoration(
             borderRadius: const BorderRadius.only(
-              topLeft: Radius.circular(AppDimens.BORDER_RADIUS_30),
-              topRight: Radius.circular(AppDimens.BORDER_RADIUS_30),
+              topLeft: Radius.circular(AppDimens.radius30),
+              topRight: Radius.circular(AppDimens.radius30),
             ),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.1),
+                color: AppColors.textPrimary.withOpacity(0.1),
                 blurRadius: 20,
                 offset: const Offset(0, -5),
               ),
@@ -58,19 +58,22 @@ class RestaurantMenuPage extends StatelessWidget {
           // 4. Utilisation de TabBarView : change de contenu selon la catégorie sélectionnée en haut
           child: ClipRRect(
             borderRadius: const BorderRadius.only(
-              topLeft: Radius.circular(AppDimens.BORDER_RADIUS_30),
-              topRight: Radius.circular(AppDimens.BORDER_RADIUS_30),
+              topLeft: Radius.circular(AppDimens.radius30),
+              topRight: Radius.circular(AppDimens.radius30),
             ),
             child: Column(
               children: [
                 Padding(
-                  padding: const EdgeInsets.only(top:45, right: 10, left: 10),
+                  padding: const EdgeInsets.only(top: 45, right: 10, left: 10),
                   child: Row(
                     children: [
                       Container(
                         decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            border: Border.all(width: 3, color: AppColors.secondary)
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            width: 3,
+                            color: AppColors.secondary,
+                          ),
                         ),
                         child: IconButton(
                           icon: const Icon(
@@ -80,7 +83,7 @@ class RestaurantMenuPage extends StatelessWidget {
                           onPressed: () => Navigator.pop(context),
                         ),
                       ),
-                      SizedBox(width: 10,),
+                      SizedBox(width: 10),
                       Row(
                         children: [
                           SvgPicture.asset(
@@ -91,7 +94,7 @@ class RestaurantMenuPage extends StatelessWidget {
                               BlendMode.srcIn,
                             ),
                           ),
-                          const SizedBox(width: AppDimens.PADDING_12),
+                          const SizedBox(width: AppDimens.medium),
                           const Text(
                             'Notre Menu',
                             style: TextStyle(
@@ -107,21 +110,26 @@ class RestaurantMenuPage extends StatelessWidget {
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 8,
+                  ),
                   child: Container(
                     width: double.infinity,
                     decoration: BoxDecoration(
-                      color: AppColors.secondaryDark, // Couleur de fond sur toute la TabBar
+                      color: AppColors
+                          .secondary, // Couleur de fond sur toute la TabBar
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: TabBar(
                       indicatorSize: TabBarIndicatorSize.tab,
-                      dividerColor: Colors.transparent,
+                      dividerColor: AppColors.transparent,
                       isScrollable: true,
                       tabAlignment: TabAlignment.start,
-                      indicatorColor: Colors.transparent, // Retrait de l'indicateur par défaut
-                      labelColor: AppColors.primary50, // Couleur du texte actif
-                      unselectedLabelColor: AppColors.primary50,
+                      indicatorColor: AppColors
+                          .transparent, // Retrait de l'indicateur par défaut
+                      labelColor: AppColors.white, // Couleur du texte actif
+                      unselectedLabelColor: AppColors.white,
                       labelStyle: const TextStyle(
                         fontFamily: AppFonts.primaryFontFamily,
                         fontSize: 16,
@@ -132,7 +140,9 @@ class RestaurantMenuPage extends StatelessWidget {
                         fontSize: 15,
                         fontWeight: FontWeight.normal,
                       ),
-                      tabs: categories.map((category) => Tab(text: category)).toList(),
+                      tabs: categories
+                          .map((category) => Tab(text: category))
+                          .toList(),
                     ),
                   ),
                 ),
@@ -163,7 +173,10 @@ class RestaurantMenuPage extends StatelessWidget {
       backgroundColor: AppColors.secondaryLight,
       elevation: 0,
       leading: IconButton(
-        icon: const Icon(Icons.arrow_back_ios_new_rounded, color: AppColors.scaffoldBackground),
+        icon: const Icon(
+          Icons.arrow_back_ios_new_rounded,
+          color: AppColors.background,
+        ),
         onPressed: () => Navigator.pop(context),
       ),
     );
@@ -174,8 +187,8 @@ class RestaurantMenuPage extends StatelessWidget {
       decoration: const BoxDecoration(
         color: AppColors.white,
         borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(AppDimens.BORDER_RADIUS_30),
-          topRight: Radius.circular(AppDimens.BORDER_RADIUS_30),
+          topLeft: Radius.circular(AppDimens.radius30),
+          topRight: Radius.circular(AppDimens.radius30),
         ),
       ),
       child: const Center(
@@ -187,4 +200,3 @@ class RestaurantMenuPage extends StatelessWidget {
     );
   }
 }
-

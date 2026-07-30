@@ -52,7 +52,11 @@ class _RestaurantReviewState extends State<RestaurantReview> {
             child: Center(
               child: Column(
                 children: [
-                  const Icon(Icons.error_outline, color: Colors.red, size: 48),
+                  const Icon(
+                    Icons.error_outline,
+                    color: AppColors.error,
+                    size: 48,
+                  ),
                   const SizedBox(height: 16),
                   Text('Erreur: ${snapshot.error}'),
                   const SizedBox(height: 16),
@@ -68,18 +72,22 @@ class _RestaurantReviewState extends State<RestaurantReview> {
         final reviews = snapshot.data ?? [];
         final totalReviews = reviews.length;
         final avgRating = totalReviews > 0
-            ? reviews.map((r) => r.rating).reduce((a, b) => a + b) / totalReviews
+            ? reviews.map((r) => r.rating).reduce((a, b) => a + b) /
+                  totalReviews
             : 0.0;
 
         return Column(
           children: [
             Container(
               decoration: BoxDecoration(
-                  border: Border.all(width: 2, color: AppColors.primary),
-                  borderRadius: BorderRadius.circular(100)
+                border: Border.all(width: 2, color: AppColors.primary),
+                borderRadius: BorderRadius.circular(100),
               ),
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 8,
+                  vertical: 10,
+                ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
@@ -89,9 +97,7 @@ class _RestaurantReviewState extends State<RestaurantReview> {
                           avgRating.toStringAsFixed(1),
                           style: Theme.of(context).textTheme.headlineMedium,
                         ),
-                        Row(
-                          children: buildReviewStars(avgRating, 16),
-                        ),
+                        Row(children: buildReviewStars(avgRating, 16)),
                       ],
                     ),
                     Column(
@@ -100,11 +106,16 @@ class _RestaurantReviewState extends State<RestaurantReview> {
                           totalReviews.toString(),
                           style: Theme.of(context).textTheme.titleMedium,
                         ),
-                        Text('Avis', style: Theme.of(context).textTheme.bodySmall),
+                        Text(
+                          'Avis',
+                          style: Theme.of(context).textTheme.bodySmall,
+                        ),
                       ],
                     ),
                     FilledButton.icon(
-                      style: FilledButton.styleFrom(backgroundColor: AppColors.primary),
+                      style: FilledButton.styleFrom(
+                        backgroundColor: AppColors.primary,
+                      ),
                       onPressed: () => showWriteReviewDialog(
                         context,
                         widget.business,
@@ -115,7 +126,10 @@ class _RestaurantReviewState extends State<RestaurantReview> {
                           "assets/icons/commen.svg",
                           width: 28,
                           height: 28,
-                          colorFilter: ColorFilter.mode(Colors.white, BlendMode.srcIn),
+                          colorFilter: ColorFilter.mode(
+                            AppColors.white,
+                            BlendMode.srcIn,
+                          ),
                         ),
                       ),
                       label: const Text('Écrire un avis'),

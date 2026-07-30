@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:baobabe_0_2/core/themes/app_colors.dart';
 import 'package:baobabe_0_2/features/home_page/data/models/ui_business.dart';
 
 /// Image de fond (ou remplacement par les initiales/icône) d'une carte
@@ -11,7 +12,7 @@ class BusinessCardBackground extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final hasImage = uiBusiness.business.bgImg != null && uiBusiness.business.bgImg!.isNotEmpty;
+    final hasImage = uiBusiness.business.bgImg.isNotEmpty;
     final Color color = uiBusiness.categoryColor;
 
     return Container(
@@ -23,15 +24,18 @@ class BusinessCardBackground extends StatelessWidget {
       ),
       child: hasImage
           ? ClipRRect(
-        borderRadius: BorderRadius.circular(28),
-        child: Image.network(
-          uiBusiness.business.bgImg!,
-          fit: BoxFit.cover,
-          errorBuilder: (context, error, stackTrace) {
-            return _InitialsContainer(color: color, uiBusiness: uiBusiness);
-          },
-        ),
-      )
+              borderRadius: BorderRadius.circular(28),
+              child: Image.network(
+                uiBusiness.business.bgImg,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) {
+                  return _InitialsContainer(
+                    color: color,
+                    uiBusiness: uiBusiness,
+                  );
+                },
+              ),
+            )
           : _InitialsContainer(color: color, uiBusiness: uiBusiness),
     );
   }
@@ -53,11 +57,7 @@ class _InitialsContainer extends StatelessWidget {
       width: double.infinity,
       height: 100,
       child: Center(
-        child: Icon(
-          uiBusiness.categoryIcon,
-          size: 80,
-          color: Colors.white,
-        ),
+        child: Icon(uiBusiness.categoryIcon, size: 80, color: AppColors.white),
       ),
     );
   }

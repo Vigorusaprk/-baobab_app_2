@@ -8,7 +8,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final AuthRepository authRepository;
 
   AuthBloc({required this.authRepository}) : super(AuthInitial()) {
-       on<RequestEmailOtpEvent>(_requestEmailOtp);
+    on<RequestEmailOtpEvent>(_requestEmailOtp);
     on<VerifyEmailOtpEvent>(_verifyEmailOtp);
     on<AuthWithGoogleEvent>(_authWithGoogle);
     on<AuthWithAppleEvent>(_authWithApple);
@@ -20,9 +20,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     Emitter<AuthState> emit,
   ) async {
     emit(RequestEmailOtpLoading());
-    final result = await authRepository.requestEmailOtp(
-      event.email,
-    );
+    final result = await authRepository.requestEmailOtp(event.email);
     result.fold(
       (failure) => emit(RequestEmailOtpFailure(error: failure.message)),
       (_) => emit(RequestEmailOtpSuccess(email: event.email)),
@@ -34,10 +32,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     Emitter<AuthState> emit,
   ) async {
     emit(VerifyEmailOtpLoading());
-    final result = await authRepository.verifyEmailOtp(
-      event.email,
-      event.code,
-    );
+    final result = await authRepository.verifyEmailOtp(event.email, event.code);
     result.fold(
       (failure) => emit(VerifyEmailOtpFailure(error: failure.message)),
       (_) => emit(VerifyEmailOtpSuccess()),
@@ -68,10 +63,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     );
   }
 
-  Future<void> _signOut(
-    SignOutEvent event,
-    Emitter<AuthState> emit,
-  ) async {
+  Future<void> _signOut(SignOutEvent event, Emitter<AuthState> emit) async {
     emit(SignOutLoading());
     final result = await authRepository.signOut();
     result.fold(

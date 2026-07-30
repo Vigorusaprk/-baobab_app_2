@@ -26,9 +26,10 @@ class Movie extends Equatable {
   });
 
   factory Movie.fromJson(Map<String, dynamic> json) {
-    final showtimesList = (json['showtimes'] as List?)
-        ?.map((s) => Showtime.fromJson(s as Map<String, dynamic>))
-        .toList() ??
+    final showtimesList =
+        (json['showtimes'] as List?)
+            ?.map((s) => Showtime.fromJson(s as Map<String, dynamic>))
+            .toList() ??
         [];
 
     return Movie(
@@ -37,7 +38,9 @@ class Movie extends Equatable {
       title: json['title']?.toString() ?? '',
       duration: movieToInt(json['duration']) ?? 0,
       genre: json['genre']?.toString(),
-      releaseDate: json['release_date'] != null ? DateTime.tryParse(json['release_date'].toString()) : null,
+      releaseDate: json['release_date'] != null
+          ? DateTime.tryParse(json['release_date'].toString())
+          : null,
       synopsis: json['synopsis']?.toString(),
       posterUrl: json['poster_url']?.toString(),
       rating: movieToDouble(json['rating']) ?? 0.0,

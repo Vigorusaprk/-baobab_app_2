@@ -44,18 +44,18 @@ class BusinessPromoCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final business = uiBusiness.business;
     final bannerColor = uiBusiness.categoryColor;
-    final effectiveSubtitle = subtitle ?? business.description ?? '';
+    final effectiveSubtitle = subtitle ?? business.description;
 
     return GestureDetector(
       onTap: onTap,
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.white,
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: Colors.grey.shade200, width: 1),
+          border: Border.all(color: AppColors.textSecondary, width: 1),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.06),
+              color: AppColors.textPrimary.withValues(alpha: 0.06),
               blurRadius: 14,
               offset: const Offset(0, 5),
             ),
@@ -69,7 +69,7 @@ class BusinessPromoCard extends StatelessWidget {
             // --- Bloc coloré : badge + nom en filigrane ---
             Container(
               width: double.infinity,
-              height:125,
+              height: 125,
               padding: const EdgeInsets.fromLTRB(16, 14, 16, 22),
               color: bannerColor,
               child: Stack(
@@ -87,7 +87,7 @@ class BusinessPromoCard extends StatelessWidget {
                           maxLines: 1,
                           overflow: TextOverflow.visible,
                           style: TextStyle(
-                            color: Colors.white.withOpacity(0.28),
+                            color: AppColors.white.withValues(alpha: 0.28),
                             fontSize: 26,
                             fontWeight: FontWeight.w800,
                             fontFamily: "Poppins",
@@ -103,15 +103,18 @@ class BusinessPromoCard extends StatelessWidget {
                     Align(
                       alignment: Alignment.topLeft,
                       child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 5,
+                        ),
                         decoration: BoxDecoration(
-                          color: Colors.black.withOpacity(0.55),
+                          color: AppColors.textPrimary.withValues(alpha: 0.55),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Text(
                           badgeLabel,
                           style: const TextStyle(
-                            color: Colors.white,
+                            color: AppColors.white,
                             fontSize: 11,
                             fontWeight: FontWeight.w600,
                             fontFamily: "Poppins",
@@ -138,7 +141,7 @@ class BusinessPromoCard extends StatelessWidget {
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: const TextStyle(
-                            color: Colors.black,
+                            color: AppColors.textPrimary,
                             fontSize: 17,
                             fontWeight: FontWeight.w500,
                             fontFamily: "Poppins",
@@ -151,7 +154,7 @@ class BusinessPromoCard extends StatelessWidget {
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: TextStyle(
-                              color: Colors.grey.shade600,
+                              color: AppColors.textSecondary,
                               fontSize: 13,
                               fontFamily: "Poppins",
                             ),
@@ -164,15 +167,18 @@ class BusinessPromoCard extends StatelessWidget {
 
                   // Bouton "Voir"
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 18,
+                      vertical: 10,
+                    ),
                     decoration: BoxDecoration(
-                      color: AppColors.primaryLight,
+                      color: AppColors.secondary,
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(
                       actionLabel,
                       style: const TextStyle(
-                        color: Colors.white,
+                        color: AppColors.white,
                         fontSize: 13,
                         fontWeight: FontWeight.w700,
                         fontFamily: "Poppins",

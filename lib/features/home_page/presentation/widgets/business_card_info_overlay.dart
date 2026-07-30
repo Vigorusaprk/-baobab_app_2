@@ -12,7 +12,11 @@ class BusinessCardInfoOverlay extends StatelessWidget {
   final UIBusiness uiBusiness;
   final double rating;
 
-  const BusinessCardInfoOverlay({super.key, required this.uiBusiness, required this.rating});
+  const BusinessCardInfoOverlay({
+    super.key,
+    required this.uiBusiness,
+    required this.rating,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -21,7 +25,7 @@ class BusinessCardInfoOverlay extends StatelessWidget {
         borderRadius: BorderRadius.circular(22),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: AppColors.textPrimary.withOpacity(0.1),
             blurRadius: 16,
             offset: const Offset(0, 8),
           ),
@@ -37,10 +41,10 @@ class BusinessCardInfoOverlay extends StatelessWidget {
               child: Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.15),
+                  color: AppColors.white.withOpacity(0.15),
                   borderRadius: BorderRadius.circular(22),
                   border: Border.all(
-                    color: Colors.white.withOpacity(0.3),
+                    color: AppColors.white.withOpacity(0.3),
                     width: 1,
                   ),
                 ),
@@ -55,7 +59,7 @@ class BusinessCardInfoOverlay extends StatelessWidget {
                           child: Text(
                             uiBusiness.business.name,
                             style: const TextStyle(
-                              color: Colors.white,
+                              color: AppColors.white,
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
                               letterSpacing: -0.5,
@@ -72,7 +76,7 @@ class BusinessCardInfoOverlay extends StatelessWidget {
                           "assets/icons/location-svgrepo-com (1).svg",
                           height: 14,
                           colorFilter: const ColorFilter.mode(
-                            Colors.white,
+                            AppColors.white,
                             BlendMode.srcIn,
                           ),
                         ),
@@ -81,7 +85,7 @@ class BusinessCardInfoOverlay extends StatelessWidget {
                           child: Text(
                             uiBusiness.business.address,
                             style: TextStyle(
-                              color: Colors.white.withOpacity(0.85),
+                              color: AppColors.white.withOpacity(0.85),
                               fontSize: 13,
                             ),
                             overflow: TextOverflow.ellipsis,
@@ -105,9 +109,7 @@ class _BackgroundOrbes extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: EdgeInsets.all(0.5),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(22),
-      ),
+      decoration: BoxDecoration(borderRadius: BorderRadius.circular(22)),
       child: Stack(
         children: [
           Positioned(
@@ -130,7 +132,7 @@ class _BackgroundOrbes extends StatelessWidget {
               height: 90,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: AppColors.primaryLight.withOpacity(0.4),
+                color: AppColors.secondary.withOpacity(0.4),
               ),
             ),
           ),
@@ -142,7 +144,7 @@ class _BackgroundOrbes extends StatelessWidget {
               height: 100,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: AppColors.secondaryDark.withOpacity(0.5),
+                color: AppColors.secondary.withOpacity(0.5),
               ),
             ),
           ),
@@ -167,11 +169,15 @@ class _RatingBadge extends StatelessWidget {
       ),
       child: Row(
         children: [
-          const Icon(Icons.star_rounded, size: 16, color: Colors.white),
+          const Icon(Icons.star_rounded, size: 16, color: AppColors.white),
           const SizedBox(width: 4),
           Text(
             rating.toStringAsFixed(1),
-            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12),
+            style: const TextStyle(
+              color: AppColors.white,
+              fontWeight: FontWeight.bold,
+              fontSize: 12,
+            ),
           ),
         ],
       ),

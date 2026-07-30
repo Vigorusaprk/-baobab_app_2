@@ -5,23 +5,38 @@ import 'package:baobabe_0_2/features/home_page/presentation/bloc/search_event.da
 import 'package:baobabe_0_2/features/home_page/presentation/bloc/search_state.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/widgets/search_active_filters_bar.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/widgets/search_bar.dart';
-import 'package:baobabe_0_2/features/home_page/presentation/widgets/search_filter_sheet.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/widgets/search_results_list.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:baobabe_0_2/core/themes/app_colors.dart';
 import 'package:flutter_svg/svg.dart';
 
-import '../../../main/presentation/widgets/app_background.dart';
-
-class SearchPage extends StatefulWidget {
+/// Standalone route wrapper for `/search` (pushed on top of another page,
+/// e.g. from Home's "voir tout"). Owns its own Scaffold since it lives
+/// outside MainShell's single Scaffold. The Explore tab uses
+/// [SearchPageBody] directly instead.
+class SearchPage extends StatelessWidget {
   const SearchPage({super.key});
 
   @override
-  State<SearchPage> createState() => _SearchPageState();
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: AppColors.background,
+      body: const SearchPageBody(),
+    );
+  }
 }
 
-class _SearchPageState extends State<SearchPage> {
+/// Body-only content shared by the Explore tab (inside MainShell) and the
+/// standalone `/search` route ([SearchPage]).
+class SearchPageBody extends StatefulWidget {
+  const SearchPageBody({super.key});
+
+  @override
+  State<SearchPageBody> createState() => _SearchPageBodyState();
+}
+
+class _SearchPageBodyState extends State<SearchPageBody> {
   final TextEditingController _searchController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
   late SearchBloc _searchBloc;
@@ -60,110 +75,128 @@ class _SearchPageState extends State<SearchPage> {
 
   @override
   Widget build(BuildContext context) {
-    return authBackground(
-      child: Scaffold(
-        backgroundColor: AppColors.transparent,
-        body: SafeArea(
-          child: Column(
-            children: [
-              // Barre de recherche fixe
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Row(
-                  children: [
-                    Container(
-                      decoration: BoxDecoration(
-                          color: AppColors.primary,
-                          borderRadius: BorderRadius.circular(AppDimens.BORDER_RADIUS_50)
-                      ),
-                      child: IconButton(
-                        icon: Icon(Icons.arrow_back_ios_new_rounded, color: AppColors.canvasBackground,),
-                        onPressed: () => Navigator.pop(context),
-                      ),
+    return SafeArea(
+      child: Column(
+        children: [
+          // Barre de recherche fixe
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Row(
+              children: [
+                Container(
+                  decoration: BoxDecoration(
+                    color: AppColors.primary,
+                    borderRadius: BorderRadius.circular(AppDimens.radius50),
+                  ),
+                  child: IconButton(
+                    icon: Icon(
+                      Icons.arrow_back_ios_new_rounded,
+                      color: AppColors.background,
                     ),
-
-                    SizedBox(width: 5,),
-                    Expanded(
-                      child: SearchAppBar(
-                        controller: _searchController,
-                        onSubmitted: (value) {
-                          _searchBloc.add(SearchQueryChanged(value));
-                        },
-                      ),
-                    ),
-
-                    SizedBox(width: 5,),
-                    Container(
-                      padding: EdgeInsets.symmetric(horizontal: AppDimens.PADDING_10, vertical: AppDimens.PADDING_10),
-                      decoration: BoxDecoration(
-                        color: AppColors.secondaryLight,
-                        borderRadius: BorderRadius.circular(AppDimens.BORDER_RADIUS_50)
-                      ),
-                      child: SvgPicture.asset(
-                        'assets/icons/filter.svg',
-                        height: 25,
-                        width: 25,
-                        colorFilter: const ColorFilter.mode(
-                          AppColors.canvasBackground,
-                          BlendMode.srcIn,
-                        ),
-                      ),
-                    ),
-                  ],
+                    onPressed: () => Navigator.pop(context),
+                  ),
                 ),
-              ),
 
-              // Filtres actifs
-              BlocBuilder<SearchBloc, SearchState>(
-                builder: (context, state) {
-                  if (state is SearchResultsLoaded && state.activeFilters.hasActiveFilters) {
-                    return SearchActiveFiltersBar(filters: state.activeFilters, searchBloc: _searchBloc);
-                  } else if (state is SearchLoading && state.activeFilters != null && state.activeFilters!.hasActiveFilters) {
-                    return SearchActiveFiltersBar(filters: state.activeFilters!, searchBloc: _searchBloc);
-                  }
-                  return const SizedBox.shrink();
-                },
-              ),
-
-              // Résultats
-              Expanded(
-                child: BlocBuilder<SearchBloc, SearchState>(
-                  builder: (context, state) {
-                    if (state is SearchInitial) {
-                      return _buildEmptyState('Recherchez un établissement', Icons.search);
-                    } else if (state is SearchLoading) {
-                      if (state.previousResults != null && state.previousResults!.isNotEmpty) {
-                        return SearchResultsList(
-                          state: SearchResultsLoaded(
-                            results: state.previousResults!,
-                            activeFilters: state.activeFilters ?? const SearchFilterEntity(),
-                            hasReachedMax: false,
-                          ),
-                          scrollController: _scrollController,
-                          searchBloc: _searchBloc,
-                          isLoadingMore: true,
-                        );
-                      }
-                      return _buildLoadingState();
-                    } else if (state is SearchError) {
-                      return _buildErrorState(state.message);
-                    } else if (state is SearchResultsLoaded) {
-                      if (state.results.isEmpty) {
-                        return _buildEmptyState('Aucun résultat trouvé', Icons.search_off);
-                      }
-                      return SearchResultsList(
-                        state: state,
-                        scrollController: _scrollController,
-                        searchBloc: _searchBloc,
-                      );
-                    }
-                    return const SizedBox();
-                  },
+                SizedBox(width: 5),
+                Expanded(
+                  child: SearchAppBar(
+                    controller: _searchController,
+                    onSubmitted: (value) {
+                      _searchBloc.add(SearchQueryChanged(value));
+                    },
+                  ),
                 ),
-              ),
-            ],
+
+                SizedBox(width: 5),
+                Container(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: AppDimens.small,
+                    vertical: AppDimens.small,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppColors.secondaryLight,
+                    borderRadius: BorderRadius.circular(AppDimens.radius50),
+                  ),
+                  child: SvgPicture.asset(
+                    'assets/icons/filter.svg',
+                    height: 25,
+                    width: 25,
+                    colorFilter: const ColorFilter.mode(
+                      AppColors.background,
+                      BlendMode.srcIn,
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
-        ),
+
+          // Filtres actifs
+          BlocBuilder<SearchBloc, SearchState>(
+            builder: (context, state) {
+              if (state is SearchResultsLoaded &&
+                  state.activeFilters.hasActiveFilters) {
+                return SearchActiveFiltersBar(
+                  filters: state.activeFilters,
+                  searchBloc: _searchBloc,
+                );
+              } else if (state is SearchLoading &&
+                  state.activeFilters != null &&
+                  state.activeFilters!.hasActiveFilters) {
+                return SearchActiveFiltersBar(
+                  filters: state.activeFilters!,
+                  searchBloc: _searchBloc,
+                );
+              }
+              return const SizedBox.shrink();
+            },
+          ),
+
+          // Résultats
+          Expanded(
+            child: BlocBuilder<SearchBloc, SearchState>(
+              builder: (context, state) {
+                if (state is SearchInitial) {
+                  return _buildEmptyState(
+                    'Recherchez un établissement',
+                    Icons.search,
+                  );
+                } else if (state is SearchLoading) {
+                  if (state.previousResults != null &&
+                      state.previousResults!.isNotEmpty) {
+                    return SearchResultsList(
+                      state: SearchResultsLoaded(
+                        results: state.previousResults!,
+                        activeFilters:
+                            state.activeFilters ?? const SearchFilterEntity(),
+                        hasReachedMax: false,
+                      ),
+                      scrollController: _scrollController,
+                      searchBloc: _searchBloc,
+                      isLoadingMore: true,
+                    );
+                  }
+                  return _buildLoadingState();
+                } else if (state is SearchError) {
+                  return _buildErrorState(state.message);
+                } else if (state is SearchResultsLoaded) {
+                  if (state.results.isEmpty) {
+                    return _buildEmptyState(
+                      'Aucun résultat trouvé',
+                      Icons.search_off,
+                    );
+                  }
+                  return SearchResultsList(
+                    state: state,
+                    scrollController: _scrollController,
+                    searchBloc: _searchBloc,
+                  );
+                }
+                return const SizedBox();
+              },
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -177,7 +210,7 @@ class _SearchPageState extends State<SearchPage> {
           height: 120,
           margin: const EdgeInsets.only(bottom: 12),
           decoration: BoxDecoration(
-            color: Colors.grey[200],
+            color: AppColors.background,
             borderRadius: BorderRadius.circular(16),
           ),
         );
@@ -192,7 +225,7 @@ class _SearchPageState extends State<SearchPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.error_outline, size: 64, color: Colors.red[400]),
+            Icon(Icons.error_outline, size: 64, color: AppColors.error),
             const SizedBox(height: 16),
             Text(
               'Erreur de recherche',
@@ -202,7 +235,7 @@ class _SearchPageState extends State<SearchPage> {
             Text(
               message,
               textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.grey[600]),
+              style: TextStyle(color: AppColors.textSecondary),
             ),
             const SizedBox(height: 16),
             ElevatedButton(
@@ -224,47 +257,16 @@ class _SearchPageState extends State<SearchPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, size: 80, color: AppColors.canvasBackground),
+            Icon(icon, size: 80, color: AppColors.background),
             const SizedBox(height: 16),
             Text(
               message,
               textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 16, color: Colors.grey[600]),
+              style: TextStyle(fontSize: 16, color: AppColors.textSecondary),
             ),
           ],
         ),
       ),
-    );
-  }
-
-  void _showFilterSheet(BuildContext context) {
-    final state = _searchBloc.state;
-    SearchFilterEntity currentFilters;
-
-    if (state is SearchResultsLoaded) {
-      currentFilters = state.activeFilters;
-    } else if (state is SearchLoading && state.activeFilters != null) {
-      currentFilters = state.activeFilters!;
-    } else {
-      currentFilters = const SearchFilterEntity();
-    }
-
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.white,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (context) {
-        return SearchFilterSheet(
-          currentFilters: currentFilters,
-          onFiltersChanged: (filters) {
-            _searchBloc.add(SearchFiltersChanged(filters));
-            Navigator.pop(context);
-          },
-        );
-      },
     );
   }
 }

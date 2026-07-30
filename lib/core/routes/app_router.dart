@@ -8,7 +8,7 @@ import 'package:baobabe_0_2/core/services/session_service.dart';
 import 'package:baobabe_0_2/features/auth/presentation/screens/auth_screen.dart';
 
 // Autres Écrans de l'application
-import 'package:baobabe_0_2/features/main/presentation/screens/main_screen.dart';
+import 'package:baobabe_0_2/app/main_shell.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/screens/home_page_screen.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/screens/search_page.dart';
 import 'package:baobabe_0_2/features/booking_page/presentation/screens/boking_detail_screen.dart';
@@ -42,8 +42,10 @@ class GoRouterRefreshStream extends ChangeNotifier {
 
 /// Nombre de pages empilées au-dessus de l'écran racine de chaque branche
 /// du shell (0=home, 1=favorites, 2=orders, 3=settings).
-final List<ValueNotifier<int>> branchStackDepth =
-List.generate(4, (_) => ValueNotifier(0));
+final List<ValueNotifier<int>> branchStackDepth = List.generate(
+  4,
+  (_) => ValueNotifier(0),
+);
 
 class _BranchDepthObserver extends NavigatorObserver {
   final ValueNotifier<int> depth;
@@ -67,12 +69,16 @@ class _BranchDepthObserver extends NavigatorObserver {
 
 final GoRouter appRouter = GoRouter(
   initialLocation: '/home',
-  refreshListenable: GoRouterRefreshStream(
-    SessionService.instance.authStateChanges,
-  ),
+  // NOTE: no refreshListenable here on purpose. Closing the auth screen is
+  // handled explicitly (see AuthForm / LoginPage BlocListeners) so the user
+  // returns to the exact page they were on. Wiring Supabase's auth stream
+  // into refreshListenable would fire this `redirect` reactively and force
+  // a full-stack replace to '/home' the instant the session updates, racing
+  // with those explicit pops (and clobbering the previous page in history).
   redirect: (context, state) {
     final isLoggedIn = SessionService.instance.isLoggedIn;
-    final isAuthRoute = state.matchedLocation.startsWith('/login') ||
+    final isAuthRoute =
+        state.matchedLocation.startsWith('/login') ||
         state.matchedLocation.startsWith('/register') ||
         state.matchedLocation.startsWith('/forgot-password');
 
@@ -81,10 +87,7 @@ final GoRouter appRouter = GoRouter(
     return null;
   },
   routes: [
-    GoRoute(
-      path: '/',
-      redirect: (context, state) => '/home',
-    ),
+    GoRoute(path: '/', redirect: (context, state) => '/home'),
 
     // --- ROUTES D'AUTHENTIFICATION ---
     GoRoute(
@@ -96,13 +99,9 @@ final GoRouter appRouter = GoRouter(
     // --- SHELL DE NAVIGATION PRINCIPAL (avec bottom bar) ---
     StatefulShellRoute.indexedStack(
       builder: (context, state, navigationShell) {
-        return MainScreen(
+        return MainShell(
           navigationShell: navigationShell,
           branchStackDepth: branchStackDepth,
-          showBottomBar: state.matchedLocation == '/home' ||
-              state.matchedLocation == '/expolre' ||
-              state.matchedLocation == '/orders' ||
-              state.matchedLocation == '/settings',
         );
       },
       branches: [
@@ -113,7 +112,7 @@ final GoRouter appRouter = GoRouter(
               path: '/home',
               name: 'home',
               pageBuilder: (context, state) =>
-              const NoTransitionPage(child: HomePageScreen()),
+                  const NoTransitionPage(child: HomePageScreen()),
             ),
           ],
         ),
@@ -124,7 +123,7 @@ final GoRouter appRouter = GoRouter(
               path: '/expolre',
               name: 'expolre',
               pageBuilder: (context, state) =>
-              const NoTransitionPage(child: SearchPage()),
+                  const NoTransitionPage(child: SearchPageBody()),
             ),
           ],
         ),
@@ -135,7 +134,7 @@ final GoRouter appRouter = GoRouter(
               path: '/orders',
               name: 'orders',
               pageBuilder: (context, state) =>
-              const NoTransitionPage(child: ActivityScreen()),
+                  const NoTransitionPage(child: ActivityScreen()),
             ),
           ],
         ),
@@ -146,7 +145,7 @@ final GoRouter appRouter = GoRouter(
               path: '/settings',
               name: 'settings',
               pageBuilder: (context, state) =>
-              const NoTransitionPage(child: SettingsScreen()),
+                  const NoTransitionPage(child: SettingsScreen()),
             ),
           ],
         ),
@@ -204,7 +203,9 @@ final GoRouter appRouter = GoRouter(
         final reservation = state.extra as Reservation?;
         if (reservation == null) {
           return const MaterialPage(
-            child: Scaffold(body: Center(child: Text('Réservation introuvable'))),
+            child: Scaffold(
+              body: Center(child: Text('Réservation introuvable')),
+            ),
           );
         }
         return MaterialPage(
@@ -221,7 +222,7 @@ final GoRouter appRouter = GoRouter(
       path: '/edit-profile',
       name: 'edit-profile',
       pageBuilder: (context, state) =>
-      const MaterialPage(child: EditProfilePage()),
+          const MaterialPage(child: EditProfilePage()),
     ),
   ],
 );

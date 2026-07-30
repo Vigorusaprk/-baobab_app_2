@@ -20,7 +20,7 @@ void showTravelReservationModal(BuildContext context, Business business) {
   showModalBottomSheet(
     context: context,
     isScrollControlled: true,
-    backgroundColor: Colors.transparent,
+    backgroundColor: AppColors.transparent,
     builder: (modalContext) => BlocProvider.value(
       value: bloc,
       child: TravelReservationModal(business: business),
@@ -30,7 +30,8 @@ void showTravelReservationModal(BuildContext context, Business business) {
 
 class TravelReservationModal extends StatefulWidget {
   final Business business;
-  const TravelReservationModal({Key? key, required this.business}) : super(key: key);
+  const TravelReservationModal({Key? key, required this.business})
+    : super(key: key);
 
   @override
   State<TravelReservationModal> createState() => _TravelReservationModalState();
@@ -97,7 +98,11 @@ class _TravelReservationModalState extends State<TravelReservationModal> {
 
   void _showSnackBar(String message, {bool isSuccess = false}) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message), backgroundColor: isSuccess ? Colors.green : Colors.red, behavior: SnackBarBehavior.floating),
+      SnackBar(
+        content: Text(message),
+        backgroundColor: isSuccess ? AppColors.success : AppColors.error,
+        behavior: SnackBarBehavior.floating,
+      ),
     );
   }
 
@@ -114,7 +119,10 @@ class _TravelReservationModalState extends State<TravelReservationModal> {
   Future<void> _saveReservation() async {
     final sessionUser = SessionService.instance.currentUser;
     if (sessionUser == null) {
-      showAuthRequiredCard(context, message: 'Connectez-vous pour réserver ce voyage.');
+      showAuthRequiredCard(
+        context,
+        message: 'Connectez-vous pour réserver ce voyage.',
+      );
       return;
     }
 
@@ -136,7 +144,9 @@ class _TravelReservationModalState extends State<TravelReservationModal> {
           'destination': _data.destination,
           'departure_date': _data.departureDate!.toIso8601String(),
           'number_of_passengers': _data.numberOfPassengers,
-          'notes': _notesController.text.trim().isEmpty ? null : _notesController.text.trim(),
+          'notes': _notesController.text.trim().isEmpty
+              ? null
+              : _notesController.text.trim(),
           'establishment_name': widget.business.name,
         },
       );
@@ -162,9 +172,10 @@ class _TravelReservationModalState extends State<TravelReservationModal> {
         final double titleFontSize = isSmallScreen ? 18.0 : 20.0;
 
         return Container(
-          height: MediaQuery.of(context).size.height * (isSmallScreen ? 0.85 : 0.9),
+          height:
+              MediaQuery.of(context).size.height * (isSmallScreen ? 0.85 : 0.9),
           decoration: BoxDecoration(
-            color: AppColors.scaffoldBackground,
+            color: AppColors.background,
             borderRadius: const BorderRadius.vertical(top: Radius.circular(30)),
           ),
           child: Column(
@@ -187,7 +198,8 @@ class _TravelReservationModalState extends State<TravelReservationModal> {
                       isSmallScreen: isSmallScreen,
                       horizontalPadding: horizontalPadding,
                       destination: _data.destination,
-                      onDestinationChanged: (v) => setState(() => _data.destination = v),
+                      onDestinationChanged: (v) =>
+                          setState(() => _data.destination = v),
                       onNext: _data.destination != null ? _nextPage : null,
                     ),
                     InformationPage(
@@ -202,7 +214,8 @@ class _TravelReservationModalState extends State<TravelReservationModal> {
                         setState(() => _data.departureDate = selected);
                       },
                       numberOfPassengers: _data.numberOfPassengers,
-                      onPassengersChanged: (value) => setState(() => _data.numberOfPassengers = value),
+                      onPassengersChanged: (value) =>
+                          setState(() => _data.numberOfPassengers = value),
                       canContinue: _validateStep2(),
                       onNext: _nextPage,
                       onFieldChanged: () => setState(() {}),

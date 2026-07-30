@@ -17,7 +17,7 @@ class OrderCard extends StatelessWidget {
       final dateFormat = DateFormat('dd/MM/yyyy HH:mm');
 
       return Card(
-        color: Colors.white,
+        color: AppColors.white,
         margin: const EdgeInsets.only(bottom: 12),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         child: InkWell(
@@ -38,7 +38,11 @@ class OrderCard extends StatelessWidget {
                         color: order.typeColor.withOpacity(0.1),
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      child: Icon(order.typeIcon, color: order.typeColor, size: 24),
+                      child: Icon(
+                        order.typeIcon,
+                        color: order.typeColor,
+                        size: 24,
+                      ),
                     ),
                     const SizedBox(width: 12),
                     Expanded(
@@ -107,46 +111,50 @@ class OrderCard extends StatelessWidget {
                 Text(
                   dateFormat.format(order.orderDate),
                   style: TextStyle(
-                    color: Colors.grey[600],
+                    color: AppColors.textSecondary,
                     fontSize: 14,
                     fontFamily: "Poppins",
                   ),
                 ),
                 const SizedBox(height: 12),
-                ...order.items.take(2).map((item) => Padding(
-                  padding: const EdgeInsets.only(bottom: 4),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        '${item.quantity}x ${item.name}',
-                        style: const TextStyle(fontFamily: "Poppins"),
+                ...order.items
+                    .take(2)
+                    .map(
+                      (item) => Padding(
+                        padding: const EdgeInsets.only(bottom: 4),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              '${item.quantity}x ${item.name}',
+                              style: const TextStyle(fontFamily: "Poppins"),
+                            ),
+                            Text(
+                              '${(item.price * item.quantity).toStringAsFixed(2)} \$',
+                              style: const TextStyle(fontFamily: "Poppins"),
+                            ),
+                          ],
+                        ),
                       ),
-                      Text(
-                        '${(item.price * item.quantity).toStringAsFixed(2)} \$',
-                        style: const TextStyle(fontFamily: "Poppins"),
-                      ),
-                    ],
-                  ),
-                )),
+                    ),
                 if (order.items.length > 2)
                   Text(
                     '+${order.items.length - 2} autres articles',
                     style: TextStyle(
-                      color: Colors.grey[600],
+                      color: AppColors.textSecondary,
                       fontSize: 13,
                       fontFamily: "Poppins",
                     ),
                   ),
-                const SizedBox(height: AppDimens.PADDING_20),
+                const SizedBox(height: AppDimens.large),
                 Container(
                   padding: EdgeInsets.symmetric(
-                    horizontal: AppDimens.PADDING_10,
-                    vertical: AppDimens.PADDING_10,
+                    horizontal: AppDimens.small,
+                    vertical: AppDimens.small,
                   ),
                   decoration: BoxDecoration(
                     color: AppColors.success.withOpacity(0.3),
-                    borderRadius: BorderRadius.circular(AppDimens.BORDER_RADIUS_15),
+                    borderRadius: BorderRadius.circular(AppDimens.radius16),
                   ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,

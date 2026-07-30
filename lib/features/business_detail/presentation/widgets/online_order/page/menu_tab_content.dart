@@ -47,12 +47,13 @@ class MenuTabContent extends StatelessWidget {
             ),
             child: TabBar(
               indicatorSize: TabBarIndicatorSize.tab,
-              dividerColor: Colors.transparent,
+              dividerColor: AppColors.transparent,
               isScrollable: true,
               tabAlignment: TabAlignment.start,
-              indicatorColor: Colors.transparent, // Retrait de l'indicateur par défaut
-              labelColor: AppColors.primary50, // Couleur du texte actif
-              unselectedLabelColor: AppColors.primary50,
+              indicatorColor:
+                  AppColors.transparent, // Retrait de l'indicateur par défaut
+              labelColor: AppColors.white, // Couleur du texte actif
+              unselectedLabelColor: AppColors.white,
               labelStyle: const TextStyle(
                 fontFamily: AppFonts.primaryFontFamily,
                 fontSize: 16,

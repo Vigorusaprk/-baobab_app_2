@@ -32,17 +32,15 @@ class HomeSearchBar extends StatelessWidget {
               },
               child: Container(
                 padding: const EdgeInsets.symmetric(
-                  horizontal: AppDimens.PADDING_12,
-                  vertical: AppDimens.PADDING_8,
+                  horizontal: AppDimens.medium,
+                  vertical: AppDimens.small,
                 ),
                 decoration: BoxDecoration(
                   color: AppColors.surface,
-                  borderRadius: BorderRadius.circular(
-                    AppDimens.BORDER_RADIUS_12,
-                  ),
+                  borderRadius: BorderRadius.circular(AppDimens.radius12),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.05),
+                      color: AppColors.textPrimary.withOpacity(0.05),
                       blurRadius: 10,
                       offset: const Offset(0, 4),
                     ),
@@ -59,14 +57,14 @@ class HomeSearchBar extends StatelessWidget {
                         BlendMode.srcIn,
                       ),
                     ),
-                    const SizedBox(width: AppDimens.PADDING_12),
+                    const SizedBox(width: AppDimens.medium),
                     const Expanded(
                       child: Text(
                         "Où voulez-vous aller ?",
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
                           fontFamily: 'Poppins',
-                          color: Colors.grey,
+                          color: AppColors.textSecondary,
                           fontSize: 14,
                         ),
                       ),
@@ -77,20 +75,20 @@ class HomeSearchBar extends StatelessWidget {
             ),
           ),
 
-          const SizedBox(width: AppDimens.PADDING_12),
+          const SizedBox(width: AppDimens.medium),
 
           GestureDetector(
             onTap: () {
               // TODO : ouvrir les filtres
             },
             child: Container(
-              padding: const EdgeInsets.all(AppDimens.PADDING_12),
+              padding: const EdgeInsets.all(AppDimens.medium),
               decoration: BoxDecoration(
                 color: AppColors.primary,
-                borderRadius: BorderRadius.circular(AppDimens.BORDER_RADIUS_12),
+                borderRadius: BorderRadius.circular(AppDimens.radius12),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
+                    color: AppColors.textPrimary.withOpacity(0.05),
                     blurRadius: 10,
                     offset: const Offset(0, 4),
                   ),
@@ -101,7 +99,7 @@ class HomeSearchBar extends StatelessWidget {
                 height: 20,
                 width: 20,
                 colorFilter: const ColorFilter.mode(
-                  AppColors.primary50,
+                  AppColors.white,
                   BlendMode.srcIn,
                 ),
               ),

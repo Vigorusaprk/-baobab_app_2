@@ -26,9 +26,7 @@ class CarCustomerForm extends StatelessWidget {
           controller: nameController,
           decoration: InputDecoration(
             labelText: 'Nom complet *',
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-            ),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
             prefixIcon: const Icon(Icons.person),
           ),
         ),
@@ -37,9 +35,7 @@ class CarCustomerForm extends StatelessWidget {
           controller: phoneController,
           decoration: InputDecoration(
             labelText: 'Téléphone *',
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-            ),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
             prefixIcon: const Icon(Icons.phone),
           ),
           keyboardType: TextInputType.phone,
@@ -50,9 +46,7 @@ class CarCustomerForm extends StatelessWidget {
           maxLines: 3,
           decoration: InputDecoration(
             labelText: 'Notes (optionnel)',
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-            ),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
             alignLabelWithHint: true,
           ),
         ),

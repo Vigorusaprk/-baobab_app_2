@@ -2,7 +2,6 @@ import 'package:baobabe_0_2/core/themes/app_diemens.dart';
 import 'package:flutter/material.dart';
 import 'package:baobabe_0_2/core/themes/app_colors.dart';
 import 'package:baobabe_0_2/features/business_detail/domain/entities/menu_restau.dart';
-import 'package:baobabe_0_2/features/order/domain/entities/order.dart';
 import 'package:baobabe_0_2/features/order/presentation/widgets/order_service.dart';
 import 'package:baobabe_0_2/features/home_page/domain/entities/business_entity.dart';
 
@@ -36,11 +35,11 @@ class _PlatDetailState extends State<PlatDetail> {
     final totalPrice = menu.price * _quantity;
 
     return Scaffold(
-      backgroundColor: AppColors.scaffoldBackground,
+      backgroundColor: AppColors.background,
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
+        backgroundColor: AppColors.transparent,
         title: Text(
-            menu.itemName,
+          menu.itemName,
           style: TextStyle(
             fontFamily: 'Poppins',
             fontSize: 24,
@@ -49,12 +48,12 @@ class _PlatDetailState extends State<PlatDetail> {
             decoration: TextDecoration.none,
           ),
         ),
-        foregroundColor: Colors.white,
+        foregroundColor: AppColors.white,
         leading: Container(
           margin: EdgeInsets.only(left: 10),
           decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              border: Border.all(width: 3, color: AppColors.secondary)
+            shape: BoxShape.circle,
+            border: Border.all(width: 3, color: AppColors.secondary),
           ),
           child: IconButton(
             icon: const Icon(
@@ -78,11 +77,11 @@ class _PlatDetailState extends State<PlatDetail> {
                 height: 200,
                 width: double.infinity,
                 fit: BoxFit.cover,
-                errorBuilder: (_, __, ___) => Container(
+                errorBuilder: (_, _, _) => Container(
                   height: 200,
                   width: double.infinity,
-                  color: Colors.grey[300],
-                  child: const Icon(Icons.fastfood, size: 100,),
+                  color: AppColors.textSecondary,
+                  child: const Icon(Icons.fastfood, size: 100),
                 ),
               ),
             ),
@@ -96,7 +95,7 @@ class _PlatDetailState extends State<PlatDetail> {
             // Catégorie
             Text(
               menu.itemCategory,
-              style: TextStyle(color: Colors.grey[600]),
+              style: TextStyle(color: AppColors.textSecondary),
             ),
             const SizedBox(height: 16),
             // Description
@@ -116,7 +115,9 @@ class _PlatDetailState extends State<PlatDetail> {
               const SizedBox(height: 8),
               Wrap(
                 spacing: 8,
-                children: menu.ingredients.map((ing) => Chip(label: Text(ing))).toList(),
+                children: menu.ingredients
+                    .map((ing) => Chip(label: Text(ing)))
+                    .toList(),
               ),
             ],
             const SizedBox(height: 24),
@@ -132,12 +133,24 @@ class _PlatDetailState extends State<PlatDetail> {
                   Row(
                     children: [
                       IconButton(
-                        icon: const Icon(Icons.remove, color: AppColors.secondary,),
-                        onPressed: _quantity > 1 ? () => setState(() => _quantity--) : null,
+                        icon: const Icon(
+                          Icons.remove,
+                          color: AppColors.secondary,
+                        ),
+                        onPressed: _quantity > 1
+                            ? () => setState(() => _quantity--)
+                            : null,
                       ),
-                      Text('$_quantity', style: const TextStyle(fontSize: 18, color: AppColors.secondary, fontWeight: FontWeight.bold)),
+                      Text(
+                        '$_quantity',
+                        style: const TextStyle(
+                          fontSize: 18,
+                          color: AppColors.secondary,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                       IconButton(
-                        icon: const Icon(Icons.add, color: AppColors.secondary,),
+                        icon: const Icon(Icons.add, color: AppColors.secondary),
                         onPressed: () => setState(() => _quantity++),
                       ),
                     ],
@@ -145,7 +158,11 @@ class _PlatDetailState extends State<PlatDetail> {
                   const Spacer(),
                   Text(
                     'Total : ${totalPrice.toStringAsFixed(2)} €',
-                    style:  TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.secondary),
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.secondary,
+                    ),
                   ),
                 ],
               ),
@@ -156,76 +173,64 @@ class _PlatDetailState extends State<PlatDetail> {
       ),
       bottomNavigationBar: widget.isOrderMode
           ? Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: const BorderRadius.only(
-            topLeft: Radius.circular(AppDimens.BORDER_RADIUS_30),
-            topRight: Radius.circular(AppDimens.BORDER_RADIUS_30),
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              blurRadius: 10,
-              offset: const Offset(0, -4),
-            ),
-          ],
-        ),
-        child: SafeArea(
-          child: ElevatedButton(
-            onPressed: _isLoading ? null : _placeOrder,
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.secondaryLight,
-              padding: const EdgeInsets.symmetric(vertical: 16),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-            ),
-            child: _isLoading
-                ? const CircularProgressIndicator(color: Colors.white)
-                : Text('Passer commande', style: TextStyle(color: AppColors.scaffoldBackground),),
-          ),
-        ),
-      )
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: AppColors.white,
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(AppDimens.radius30),
+                  topRight: Radius.circular(AppDimens.radius30),
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.textPrimary.withValues(alpha: 0.05),
+                    blurRadius: 10,
+                    offset: const Offset(0, -4),
+                  ),
+                ],
+              ),
+              child: SafeArea(
+                child: ElevatedButton(
+                  onPressed: _isLoading ? null : _placeOrder,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.secondaryLight,
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  child: _isLoading
+                      ? const CircularProgressIndicator(color: AppColors.white)
+                      : Text(
+                          'Passer commande',
+                          style: TextStyle(color: AppColors.background),
+                        ),
+                ),
+              ),
+            )
           : null,
     );
   }
 
   Future<void> _placeOrder() async {
     setState(() => _isLoading = true);
-    final orderItem = OrderItem(
-      menuItemId: widget.menuItem.itemName,
-      name: widget.menuItem.itemName,
-      price: widget.menuItem.price,
-      quantity: _quantity,
-    );
-    final subtotal = widget.menuItem.price * _quantity;
-    const tax = 0.0;
-    final total = subtotal + tax;
-
-    final order = Order(
-      id: DateTime.now().millisecondsSinceEpoch.toString(),
-      establishmentId: widget.restaurantId ?? 'unknown',
-      establishmentName: widget.restaurantName ?? 'Restaurant', // ← nom correct
-      establishmentType: widget.restaurantType,                 // ← type correct
-      orderDate: DateTime.now(),
-      items: [orderItem],
-      subtotal: subtotal,
-      tax: tax,
-      totalAmount: total,
-      status: OrderStatus.pending,
-      notes: null,
-    );
 
     try {
-      await OrderApiService();
+      OrderApiService();
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Commande passée !'), backgroundColor: Colors.green),
+        const SnackBar(
+          content: Text('Commande passée !'),
+          backgroundColor: AppColors.success,
+        ),
       );
       Navigator.pop(context); // Retour à la page précédente
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Erreur : $e'), backgroundColor: Colors.red),
+        SnackBar(
+          content: Text('Erreur : $e'),
+          backgroundColor: AppColors.error,
+        ),
       );
     } finally {
       setState(() => _isLoading = false);

@@ -19,10 +19,7 @@ class AuthHeader extends StatelessWidget {
           child: SvgPicture.asset(
             IconLink.appIcon,
             height: 48,
-            colorFilter: ColorFilter.mode(
-              theme.primaryColor,
-              BlendMode.srcIn,
-            ),
+            colorFilter: ColorFilter.mode(theme.primaryColor, BlendMode.srcIn),
           ),
         ),
         const SizedBox(height: 16),

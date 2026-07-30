@@ -28,7 +28,7 @@ class SelectTablePage extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 16.0),
           child: Text(
             'Choisissez votre table préférée',
-            style: TextStyle(fontSize: 16, color: Colors.grey[600]),
+            style: TextStyle(fontSize: 16, color: AppColors.textSecondary),
           ),
         ),
         const SizedBox(height: 10),
@@ -48,10 +48,12 @@ class SelectTablePage extends StatelessWidget {
                     onSelected: (selected) {
                       onFloorSelected(floor);
                     },
-                    backgroundColor: Colors.grey[200],
+                    backgroundColor: AppColors.background,
                     selectedColor: AppColors.secondary,
                     labelStyle: TextStyle(
-                      color: isSelected ? Theme.of(context).canvasColor : Colors.black,
+                      color: isSelected
+                          ? Theme.of(context).canvasColor
+                          : AppColors.textPrimary,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -81,20 +83,25 @@ class SelectTablePage extends StatelessWidget {
                 onTap: isReserved
                     ? null
                     : () {
-                  onTableSelected(tableNumber.toString());
-                },
+                        onTableSelected(tableNumber.toString());
+                      },
                 child: Container(
                   decoration: BoxDecoration(
                     color: isReserved
-                        ? Colors.grey
-                        : (isSelected ? AppColors.secondary : Colors.grey[200]),
+                        ? AppColors.textSecondary
+                        : (isSelected
+                              ? AppColors.secondary
+                              : AppColors.background),
                     borderRadius: BorderRadius.circular(12),
-                    border: isSelected ? Border.all(color: AppColors.primary, width: 2) : null,
+                    border: isSelected
+                        ? Border.all(color: AppColors.primary, width: 2)
+                        : null,
                     boxShadow: [
                       BoxShadow(
-                          color: Colors.black.withOpacity(0.1),
-                          blurRadius: 4,
-                          offset: const Offset(0, 2)),
+                        color: AppColors.textPrimary.withOpacity(0.1),
+                        blurRadius: 4,
+                        offset: const Offset(0, 2),
+                      ),
                     ],
                   ),
                   child: Stack(
@@ -107,8 +114,10 @@ class SelectTablePage extends StatelessWidget {
                               Icons.table_restaurant,
                               size: 30,
                               color: isReserved
-                                  ? Colors.white
-                                  : (isSelected ? Colors.white : Colors.black),
+                                  ? AppColors.white
+                                  : (isSelected
+                                        ? AppColors.white
+                                        : AppColors.textPrimary),
                             ),
                             const SizedBox(height: 4),
                             Text(
@@ -117,8 +126,10 @@ class SelectTablePage extends StatelessWidget {
                                 fontSize: 14,
                                 fontWeight: FontWeight.bold,
                                 color: isReserved
-                                    ? Colors.white
-                                    : (isSelected ? Colors.white : Colors.black),
+                                    ? AppColors.white
+                                    : (isSelected
+                                          ? AppColors.white
+                                          : AppColors.textPrimary),
                               ),
                             ),
                           ],
@@ -129,15 +140,18 @@ class SelectTablePage extends StatelessWidget {
                           top: 4,
                           right: 4,
                           child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 6,
+                              vertical: 2,
+                            ),
                             decoration: BoxDecoration(
-                              color: Colors.red,
+                              color: AppColors.error,
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: const Text(
                               'Réservée',
                               style: TextStyle(
-                                color: Colors.white,
+                                color: AppColors.white,
                                 fontSize: 10,
                                 fontWeight: FontWeight.bold,
                               ),
@@ -159,9 +173,13 @@ class SelectTablePage extends StatelessWidget {
             child: ElevatedButton(
               onPressed: onNext,
               style: ElevatedButton.styleFrom(
-                backgroundColor: selectedTable != null ? AppColors.secondary : Colors.grey[300],
+                backgroundColor: selectedTable != null
+                    ? AppColors.secondary
+                    : AppColors.textSecondary,
                 padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15),
+                ),
                 elevation: 2,
               ),
               child: Text(
@@ -169,7 +187,9 @@ class SelectTablePage extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
-                  color: selectedTable != null ? Colors.white : Colors.grey[600],
+                  color: selectedTable != null
+                      ? AppColors.white
+                      : AppColors.textSecondary,
                 ),
               ),
             ),

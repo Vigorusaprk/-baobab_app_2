@@ -8,6 +8,7 @@ import 'package:baobabe_0_2/features/business_detail/presentation/widgets/online
 import 'package:baobabe_0_2/features/business_detail/presentation/widgets/online_order/tourisme_reservation_modale.dart';
 import 'package:baobabe_0_2/features/order/presentation/bloc/cart_bloc.dart';
 import 'package:flutter/material.dart';
+import 'package:baobabe_0_2/core/themes/app_colors.dart';
 import 'package:baobabe_0_2/features/home_page/domain/entities/business_entity.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:baobabe_0_2/features/business_detail/presentation/bloc/business_detail_bloc.dart';
@@ -27,12 +28,16 @@ BusinessRepository _createBusinessRepository() =>
 class BusinessActionNavigator {
   const BusinessActionNavigator._();
 
-  static void showReservationModal(BuildContext context, Business business, String type) {
+  static void showReservationModal(
+    BuildContext context,
+    Business business,
+    String type,
+  ) {
     final bloc = context.read<BusinessDetailBloc>();
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: Colors.transparent,
+      backgroundColor: AppColors.transparent,
       builder: (modalContext) => BlocProvider.value(
         value: bloc,
         child: _buildModalContent(type, business),
@@ -58,10 +63,8 @@ class BusinessActionNavigator {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => CinemaListScreen(
-          cinema: business,
-          businessDetailBloc: bloc,
-        ),
+        builder: (context) =>
+            CinemaListScreen(cinema: business, businessDetailBloc: bloc),
       ),
     );
   }
@@ -71,7 +74,8 @@ class BusinessActionNavigator {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => HotelRoomsListPage(hotel: business, businessDetailBloc: bloc),
+        builder: (context) =>
+            HotelRoomsListPage(hotel: business, businessDetailBloc: bloc),
       ),
     );
   }
@@ -80,10 +84,8 @@ class BusinessActionNavigator {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => CarListPage(
-          businessId: business.id,
-          businessName: business.name,
-        ),
+        builder: (context) =>
+            CarListPage(businessId: business.id, businessName: business.name),
       ),
     );
   }
@@ -93,10 +95,8 @@ class BusinessActionNavigator {
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => MallStoresPage(
-            stores: business.stores!,
-            mallName: business.name,
-          ),
+          builder: (context) =>
+              MallStoresPage(stores: business.stores!, mallName: business.name),
         ),
       );
     } else {

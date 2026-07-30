@@ -2,7 +2,6 @@ import 'package:baobabe_0_2/core/themes/app_colors.dart';
 import 'package:baobabe_0_2/features/home_page/domain/entities/business_entity.dart';
 import 'package:flutter/material.dart';
 
-
 class BusinessSpecificSection extends StatelessWidget {
   final Business business;
 
@@ -39,7 +38,9 @@ class BusinessSpecificSection extends StatelessWidget {
           Wrap(
             spacing: 10,
             runSpacing: 10,
-            children: features.map((feature) => _buildFeatureChip(feature)).toList(),
+            children: features
+                .map((feature) => _buildFeatureChip(feature))
+                .toList(),
           ),
         ],
       ),
@@ -51,12 +52,12 @@ class BusinessSpecificSection extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.grey.withOpacity(0.15)),
+        border: Border.all(color: AppColors.textSecondary.withOpacity(0.15)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.03),
+            color: AppColors.textPrimary.withOpacity(0.03),
             blurRadius: 8,
             offset: const Offset(0, 4),
           ),

@@ -1,4 +1,4 @@
-import 'package:baobabe_0_2/features/business_detail/presentation/bloc/business_detail_bloc.dart';
+﻿import 'package:baobabe_0_2/features/business_detail/presentation/bloc/business_detail_bloc.dart';
 import 'package:baobabe_0_2/features/business_detail/presentation/widgets/online_order/page/cart_empty_state.dart';
 import 'package:baobabe_0_2/features/business_detail/presentation/widgets/online_order/page/cart_footer.dart';
 import 'package:baobabe_0_2/features/business_detail/presentation/widgets/online_order/page/cart_header.dart';
@@ -27,7 +27,7 @@ class CartPage extends StatelessWidget {
     final state = bloc.state;
 
     return Scaffold(
-      backgroundColor: AppColors.canvasBackground,
+      backgroundColor: AppColors.background,
       body: state.cartItems.isEmpty
           ? const CartEmptyState()
           : Column(

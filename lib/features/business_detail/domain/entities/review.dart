@@ -38,7 +38,9 @@ class Review {
       createdAt: json['created_at'] != null
           ? DateTime.parse(json['created_at'].toString())
           : DateTime.now(),
-      updatedAt: json['updated_at'] != null ? DateTime.parse(json['updated_at'].toString()) : null,
+      updatedAt: json['updated_at'] != null
+          ? DateTime.parse(json['updated_at'].toString())
+          : null,
       userName: json['user_name']?.toString(),
       userAvatar: json['user_avatar']?.toString(),
     );

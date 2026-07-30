@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:baobabe_0_2/core/themes/app_colors.dart';
 import 'package:baobabe_0_2/features/business_detail/presentation/widgets/business_hero_section.dart';
 import 'package:baobabe_0_2/features/home_page/data/models/ui_business.dart';
@@ -21,7 +19,7 @@ class BusinessDetailAppBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SliverAppBar(
-      backgroundColor: AppColors.scaffoldBackground,
+      backgroundColor: AppColors.background,
       expandedHeight: 350,
       pinned: true,
       elevation: 0,
@@ -31,16 +29,18 @@ class BusinessDetailAppBar extends StatelessWidget {
           _buildCircleButton(
             context,
             Icons.arrow_back_ios_new_rounded,
-                () => Navigator.pop(context),
+            () => Navigator.pop(context),
           ),
         ],
       ),
       actions: [
         _buildCircleButton(
           context,
-          business.isFavorite ? Icons.favorite_rounded : Icons.favorite_outline_rounded,
-              () {},
-          iconColor: business.isFavorite ? Colors.red : AppColors.primary,
+          business.isFavorite
+              ? Icons.favorite_rounded
+              : Icons.favorite_outline_rounded,
+          () {},
+          iconColor: business.isFavorite ? AppColors.error : AppColors.primary,
         ),
         const SizedBox(width: 7),
       ],
@@ -50,10 +50,15 @@ class BusinessDetailAppBar extends StatelessWidget {
           final double collapsedHeight = kToolbarHeight + topPadding;
 
           // Détermine si la barre est pliée
-          final bool isCollapsed = constraints.biggest.height <= collapsedHeight + 20;
+          final bool isCollapsed =
+              constraints.biggest.height <= collapsedHeight + 20;
 
           return FlexibleSpaceBar(
-            titlePadding: const EdgeInsets.only(bottom: 20, left: 20, right: 20),
+            titlePadding: const EdgeInsets.only(
+              bottom: 20,
+              left: 20,
+              right: 20,
+            ),
             centerTitle: true,
             background: Stack(
               fit: StackFit.expand,
@@ -78,8 +83,8 @@ class BusinessDetailAppBar extends StatelessWidget {
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                         colors: [
-                          AppColors.primary,       // Couleur unie sans transparence
-                          AppColors.primaryLight,  // Couleur unie sans transparence
+                          AppColors.primary, // Couleur unie sans transparence
+                          AppColors.secondary, // Couleur unie sans transparence
                         ],
                       ),
                     ),
@@ -95,7 +100,10 @@ class BusinessDetailAppBar extends StatelessWidget {
                   child: AnimatedOpacity(
                     duration: const Duration(milliseconds: 150),
                     opacity: isCollapsed ? 0.0 : 1.0,
-                    child: BusinessHeroSection(uiBusiness: uiBusiness, business: business,),
+                    child: BusinessHeroSection(
+                      uiBusiness: uiBusiness,
+                      business: business,
+                    ),
                   ),
                 ),
               ],
@@ -106,12 +114,17 @@ class BusinessDetailAppBar extends StatelessWidget {
     );
   }
 
-  Widget _buildCircleButton(BuildContext context, IconData icon, VoidCallback onTap, {Color iconColor = AppColors.primary}) {
+  Widget _buildCircleButton(
+    BuildContext context,
+    IconData icon,
+    VoidCallback onTap, {
+    Color iconColor = AppColors.primary,
+  }) {
     return ClipRRect(
       borderRadius: BorderRadius.circular(50),
       child: Container(
         decoration: BoxDecoration(
-          color: AppColors.scaffoldBackground,
+          color: AppColors.background,
           shape: BoxShape.circle,
         ),
         child: IconButton(
@@ -123,7 +136,7 @@ class BusinessDetailAppBar extends StatelessWidget {
   }
 
   Widget _buildBackgroundImage() {
-    final hasImage = business.bgImg != null && business.bgImg!.isNotEmpty;
+    final hasImage = business.bgImg.isNotEmpty;
     final Color color = uiBusiness.categoryColor;
 
     return Container(
@@ -135,20 +148,24 @@ class BusinessDetailAppBar extends StatelessWidget {
       ),
       child: hasImage
           ? ClipRRect(
-        borderRadius: BorderRadius.circular(28),
-        child: Image.network(
-          business.bgImg!,
-          fit: BoxFit.cover,
-          errorBuilder: (context, error, stackTrace) => _buildInitialsContainer(color),
-        ),
-      )
+              borderRadius: BorderRadius.circular(28),
+              child: Image.network(
+                business.bgImg,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) =>
+                    _buildInitialsContainer(color),
+              ),
+            )
           : _buildInitialsContainer(color),
     );
   }
 
   Widget _buildInitialsContainer(Color color) {
     return Container(
-      decoration: BoxDecoration(color: color, borderRadius: BorderRadius.circular(28)),
+      decoration: BoxDecoration(
+        color: color,
+        borderRadius: BorderRadius.circular(28),
+      ),
       width: double.infinity,
       height: 200,
     );

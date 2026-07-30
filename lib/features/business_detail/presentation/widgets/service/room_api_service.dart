@@ -1,11 +1,11 @@
-﻿import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:baobabe_0_2/features/business_detail/data/models/room.dart';
 
 class RoomApiService {
   final SupabaseClient _supabase;
 
   RoomApiService([SupabaseClient? supabase])
-      : _supabase = supabase ?? Supabase.instance.client;
+    : _supabase = supabase ?? Supabase.instance.client;
 
   Future<List<Room>> getRoomsByHotel(String businessId) async {
     try {

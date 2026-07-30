@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:baobabe_0_2/core/themes/app_colors.dart';
 
 class ReservationModalHeader extends StatelessWidget {
   final String title;
@@ -25,7 +26,10 @@ class ReservationModalHeader extends StatelessWidget {
         children: [
           if (showBack)
             IconButton(
-              icon: const Icon(Icons.arrow_back_ios_new, color: Colors.black),
+              icon: const Icon(
+                Icons.arrow_back_ios_new,
+                color: AppColors.textPrimary,
+              ),
               onPressed: onBack,
             ),
           if (!showBack) const SizedBox(width: 48),
@@ -41,16 +45,13 @@ class ReservationModalHeader extends StatelessWidget {
               ),
               Text(
                 businessName,
-                style: TextStyle(
-                  fontSize: 14,
-                  color: Colors.grey[600],
-                ),
+                style: TextStyle(fontSize: 14, color: AppColors.textSecondary),
               ),
             ],
           ),
 
           IconButton(
-            icon: const Icon(Icons.close, color: Colors.black),
+            icon: const Icon(Icons.close, color: AppColors.textPrimary),
             onPressed: onClose,
           ),
         ],

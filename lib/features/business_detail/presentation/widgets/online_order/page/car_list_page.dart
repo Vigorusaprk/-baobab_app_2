@@ -53,7 +53,7 @@ class _CarListPageState extends State<CarListPage> {
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.7),
+                    color: AppColors.textPrimary.withOpacity(0.7),
                     blurRadius: 20,
                     offset: const Offset(0, 10),
                   ),
@@ -73,12 +73,16 @@ class _CarListPageState extends State<CarListPage> {
       backgroundColor: AppColors.primary,
       elevation: 0,
       leading: IconButton(
-        icon: const Icon(Icons.arrow_back_ios, color: AppColors.scaffoldBackground),
+        icon: const Icon(Icons.arrow_back_ios, color: AppColors.background),
         onPressed: () => Navigator.pop(context),
       ),
       title: Row(
         children: [
-          Icon(Icons.directions_car, color: AppColors.primary, size: 35), // Remplace SVG
+          Icon(
+            Icons.directions_car,
+            color: AppColors.primary,
+            size: 35,
+          ), // Remplace SVG
           const SizedBox(width: 12),
           Text(
             'Louez un véhicule ',
@@ -86,7 +90,7 @@ class _CarListPageState extends State<CarListPage> {
               fontFamily: 'Poppins',
               fontSize: 24,
               fontWeight: FontWeight.bold,
-              color: AppColors.scaffoldBackground,
+              color: AppColors.background,
               decoration: TextDecoration.none,
             ),
           ),
@@ -125,7 +129,11 @@ class _CarListPageState extends State<CarListPage> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.directions_car_outlined, size: 64, color: Colors.grey),
+          Icon(
+            Icons.directions_car_outlined,
+            size: 64,
+            color: AppColors.textSecondary,
+          ),
           SizedBox(height: 16),
           Text('Aucun véhicule disponible'),
         ],
@@ -139,7 +147,7 @@ class _CarListPageState extends State<CarListPage> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Icon(Icons.error_outline, size: 64, color: Colors.red),
+          const Icon(Icons.error_outline, size: 64, color: AppColors.error),
           const SizedBox(height: 16),
           Text('Erreur: $errorMessage'),
           const SizedBox(height: 16),

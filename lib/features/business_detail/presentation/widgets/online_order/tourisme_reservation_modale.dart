@@ -20,7 +20,7 @@ void showTourismReservationModal(BuildContext context, Business business) {
   showModalBottomSheet(
     context: context,
     isScrollControlled: true,
-    backgroundColor: Colors.transparent,
+    backgroundColor: AppColors.transparent,
     builder: (modalContext) => BlocProvider.value(
       value: bloc,
       child: TourismReservationModal(business: business),
@@ -30,10 +30,12 @@ void showTourismReservationModal(BuildContext context, Business business) {
 
 class TourismReservationModal extends StatefulWidget {
   final Business business;
-  const TourismReservationModal({Key? key, required this.business}) : super(key: key);
+  const TourismReservationModal({Key? key, required this.business})
+    : super(key: key);
 
   @override
-  State<TourismReservationModal> createState() => _TourismReservationModalState();
+  State<TourismReservationModal> createState() =>
+      _TourismReservationModalState();
 }
 
 class _TourismReservationModalState extends State<TourismReservationModal> {
@@ -99,7 +101,7 @@ class _TourismReservationModalState extends State<TourismReservationModal> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
-        backgroundColor: isSuccess ? Colors.green : Colors.red,
+        backgroundColor: isSuccess ? AppColors.success : AppColors.error,
         behavior: SnackBarBehavior.floating,
       ),
     );
@@ -119,19 +121,26 @@ class _TourismReservationModalState extends State<TourismReservationModal> {
   Future<void> _saveReservation() async {
     final sessionUser = SessionService.instance.currentUser;
     if (sessionUser == null) {
-      showAuthRequiredCard(context, message: 'Connectez-vous pour réserver cette activité.');
+      showAuthRequiredCard(
+        context,
+        message: 'Connectez-vous pour réserver cette activité.',
+      );
       return;
     }
-    if (_fullNameController.text.trim().isEmpty || _phoneController.text.trim().isEmpty || _data.activityDate == null) {
+    if (_fullNameController.text.trim().isEmpty ||
+        _phoneController.text.trim().isEmpty ||
+        _data.activityDate == null) {
       _showSnackBar('Veuillez remplir tous les champs obligatoires');
       return;
     }
 
     setState(() => _isLoading = true);
     try {
-      final activities = widget.business.specificData['activities'] as List? ?? [];
+      final activities =
+          widget.business.specificData['activities'] as List? ?? [];
       final totalAmount = _data.calculateTotal(activities);
-      final selectedActivitiesWithPrices = _data.getSelectedActivitiesWithPrices(activities);
+      final selectedActivitiesWithPrices = _data
+          .getSelectedActivitiesWithPrices(activities);
 
       final reservation = Reservation(
         id: '',
@@ -144,7 +153,9 @@ class _TourismReservationModalState extends State<TourismReservationModal> {
         details: {
           'customer_name': _fullNameController.text.trim(),
           'phone': _phoneController.text.trim(),
-          'notes': _notesController.text.trim().isEmpty ? null : _notesController.text.trim(),
+          'notes': _notesController.text.trim().isEmpty
+              ? null
+              : _notesController.text.trim(),
           'day': _data.activityDate!.toIso8601String(),
           'number_of_passengers': _data.numberOfParticipants,
           'selected_activities': selectedActivitiesWithPrices,
@@ -171,12 +182,14 @@ class _TourismReservationModalState extends State<TourismReservationModal> {
         final bool isSmallScreen = constraints.maxWidth < 360;
         final double horizontalPadding = isSmallScreen ? 12.0 : 16.0;
         final double titleFontSize = isSmallScreen ? 18.0 : 20.0;
-        final activities = widget.business.specificData['activities'] as List? ?? [];
+        final activities =
+            widget.business.specificData['activities'] as List? ?? [];
 
         return Container(
-          height: MediaQuery.of(context).size.height * (isSmallScreen ? 0.85 : 0.9),
+          height:
+              MediaQuery.of(context).size.height * (isSmallScreen ? 0.85 : 0.9),
           decoration: BoxDecoration(
-            color: AppColors.scaffoldBackground,
+            color: AppColors.background,
             borderRadius: const BorderRadius.vertical(top: Radius.circular(30)),
           ),
           child: Column(
@@ -210,7 +223,9 @@ class _TourismReservationModalState extends State<TourismReservationModal> {
                           }
                         });
                       },
-                      onNext: _data.selectedActivities.isNotEmpty ? _nextPage : null,
+                      onNext: _data.selectedActivities.isNotEmpty
+                          ? _nextPage
+                          : null,
                     ),
                     InformationPage(
                       isSmallScreen: isSmallScreen,
@@ -224,7 +239,8 @@ class _TourismReservationModalState extends State<TourismReservationModal> {
                         setState(() => _data.activityDate = selected);
                       },
                       numberOfParticipants: _data.numberOfParticipants,
-                      onParticipantsChanged: (value) => setState(() => _data.numberOfParticipants = value),
+                      onParticipantsChanged: (value) =>
+                          setState(() => _data.numberOfParticipants = value),
                       canContinue: _validateStep2(),
                       onNext: _nextPage,
                       onFieldChanged: () => setState(() {}),
@@ -238,7 +254,8 @@ class _TourismReservationModalState extends State<TourismReservationModal> {
                       activityDate: _data.activityDate,
                       numberOfParticipants: _data.numberOfParticipants,
                       notes: _notesController.text,
-                      selectedActivitiesWithPrices: _data.getSelectedActivitiesWithPrices(activities),
+                      selectedActivitiesWithPrices: _data
+                          .getSelectedActivitiesWithPrices(activities),
                       totalAmount: _data.calculateTotal(activities),
                       isLoading: _isLoading,
                       onBack: _previousPage,
@@ -253,5 +270,4 @@ class _TourismReservationModalState extends State<TourismReservationModal> {
       },
     );
   }
-
 }

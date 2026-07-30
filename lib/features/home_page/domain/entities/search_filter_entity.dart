@@ -1,14 +1,7 @@
 import 'package:equatable/equatable.dart';
 import 'package:baobabe_0_2/features/home_page/domain/entities/business_entity.dart';
 
-enum SortBy {
-  relevance,
-  ratingDesc,
-  ratingAsc,
-  priceDesc,
-  priceAsc,
-  newest,
-}
+enum SortBy { relevance, ratingDesc, ratingAsc, priceDesc, priceAsc, newest }
 
 extension SortByExtension on SortBy {
   String get displayName {
@@ -69,11 +62,5 @@ class SearchFilterEntity extends Equatable {
   }
 
   @override
-  List<Object?> get props => [
-    query,
-    category,
-    minRating,
-    location,
-    sortBy,
-  ];
+  List<Object?> get props => [query, category, minRating, location, sortBy];
 }

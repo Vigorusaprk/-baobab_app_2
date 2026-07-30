@@ -7,8 +7,8 @@ class AppTheme {
   static ThemeData get silvaTheme => ThemeData(
     brightness: Brightness.light,
     primaryColor: AppColors.primary,
-    scaffoldBackgroundColor: AppColors.scaffoldBackground,
-    canvasColor: AppColors.canvasBackground,
+    scaffoldBackgroundColor: AppColors.background,
+    canvasColor: AppColors.background,
 
     colorScheme: ColorScheme.fromSeed(
       seedColor: AppColors.primary,
@@ -16,7 +16,7 @@ class AppTheme {
       secondary: AppColors.secondary,
       surface: AppColors.surface,
       onPrimary: AppColors.textOnPrimary,
-      onSecondary: AppColors.textOnSecondary,
+      onSecondary: AppColors.white,
       onSurface: AppColors.textPrimary,
       brightness: Brightness.light,
     ),
@@ -33,9 +33,9 @@ class AppTheme {
     cardColor: AppColors.surface,
 
     appBarTheme: const AppBarTheme(
-      backgroundColor: AppColors.scaffoldBackground,
+      backgroundColor: AppColors.background,
       foregroundColor: AppColors.textOnPrimary,
-      elevation: AppDimens.ELEVATION_2,
+      elevation: AppDimens.elevationDefault,
       centerTitle: true,
       titleTextStyle: TextStyle(
         fontSize: 20,
@@ -47,7 +47,7 @@ class AppTheme {
 
     inputDecorationTheme: InputDecorationTheme(
       filled: true,
-      fillColor: AppColors.inputBackground,
+      fillColor: AppColors.white,
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(AppDimens.inputBorderRadius),
         borderSide: BorderSide.none,
@@ -66,7 +66,7 @@ class AppTheme {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppDimens.borderButton),
         ),
-        elevation: AppDimens.ELEVATION_2,
+        elevation: AppDimens.elevationDefault,
       ),
     ),
 
@@ -83,8 +83,8 @@ class AppTheme {
     ),
 
     dividerTheme: const DividerThemeData(
-      thickness: AppDimens.THICKNESS_1,
-      color: Colors.grey,
+      thickness: AppDimens.borderWidthThin,
+      color: AppColors.textSecondary,
     ),
   );
 }

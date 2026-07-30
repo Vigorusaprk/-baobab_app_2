@@ -1,4 +1,4 @@
-import 'package:baobabe_0_2/core/themes/app_colors.dart';
+﻿import 'package:baobabe_0_2/core/themes/app_colors.dart';
 import 'package:baobabe_0_2/core/themes/app_fonts.dart';
 import 'package:baobabe_0_2/features/settings/presentation/bloc/settings_bloc.dart';
 import 'package:flutter/material.dart';
@@ -12,7 +12,7 @@ void showThemePickerDialog(BuildContext context) {
   showDialog(
     context: context,
     builder: (context) => AlertDialog(
-      backgroundColor: AppColors.scaffoldBackground,
+      backgroundColor: AppColors.background,
       title: Text("Choisir le thème", style: AppFonts.titleMedium),
       content: Column(
         mainAxisSize: MainAxisSize.min,

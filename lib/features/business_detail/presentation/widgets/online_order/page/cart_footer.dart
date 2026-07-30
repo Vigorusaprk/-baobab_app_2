@@ -29,7 +29,7 @@ class CartFooter extends StatelessWidget {
         borderRadius: BorderRadius.circular(15),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.2),
+            color: AppColors.textPrimary.withOpacity(0.2),
             blurRadius: 10,
             offset: const Offset(0, -3),
           ),
@@ -81,7 +81,10 @@ class CartFooter extends StatelessWidget {
   ) async {
     final sessionUser = SessionService.instance.currentUser;
     if (sessionUser == null) {
-      showAuthRequiredCard(context, message: 'Connectez-vous pour valider votre commande.');
+      showAuthRequiredCard(
+        context,
+        message: 'Connectez-vous pour valider votre commande.',
+      );
       return;
     }
 
@@ -98,14 +101,17 @@ class CartFooter extends StatelessWidget {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Commande validée !'),
-          backgroundColor: Colors.green,
+          backgroundColor: AppColors.success,
         ),
       );
       Navigator.pop(context);
     } catch (e) {
       if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Erreur : $e'), backgroundColor: Colors.red),
+        SnackBar(
+          content: Text('Erreur : $e'),
+          backgroundColor: AppColors.error,
+        ),
       );
     }
   }

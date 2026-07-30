@@ -39,7 +39,10 @@ class _HotelRoomsListPageState extends State<HotelRoomsListPage> {
       setState(() => _rooms = rooms);
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Erreur de chargement: $e'), backgroundColor: Colors.red),
+        SnackBar(
+          content: Text('Erreur de chargement: $e'),
+          backgroundColor: AppColors.error,
+        ),
       );
     } finally {
       setState(() => _isLoading = false);
@@ -52,41 +55,43 @@ class _HotelRoomsListPageState extends State<HotelRoomsListPage> {
       appBar: AppBar(
         title: Text('Chambres - ${widget.hotel.name}'),
         backgroundColor: AppColors.primary,
-        foregroundColor: Colors.white,
+        foregroundColor: AppColors.white,
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : _rooms.isEmpty
           ? const Center(child: Text('Aucune chambre disponible'))
           : ListView.builder(
-        padding: const EdgeInsets.all(16),
-        itemCount: _rooms.length,
-        itemBuilder: (context, index) {
-          final room = _rooms[index];
-          return Card(
-            margin: const EdgeInsets.only(bottom: 16),
-            child: ListTile(
-              title: Text(room.roomType),
-              subtitle: Text('${room.pricePerNight} €/nuit • ${room.capacity} pers.'),
-              trailing: const Icon(Icons.chevron_right),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => BlocProvider.value(
-                      value: widget.businessDetailBloc,
-                      child: RoomDetailPage(
-                        hotel: widget.hotel,
-                        room: room,
-                      ),
+              padding: const EdgeInsets.all(16),
+              itemCount: _rooms.length,
+              itemBuilder: (context, index) {
+                final room = _rooms[index];
+                return Card(
+                  margin: const EdgeInsets.only(bottom: 16),
+                  child: ListTile(
+                    title: Text(room.roomType),
+                    subtitle: Text(
+                      '${room.pricePerNight} €/nuit • ${room.capacity} pers.',
                     ),
+                    trailing: const Icon(Icons.chevron_right),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => BlocProvider.value(
+                            value: widget.businessDetailBloc,
+                            child: RoomDetailPage(
+                              hotel: widget.hotel,
+                              room: room,
+                            ),
+                          ),
+                        ),
+                      );
+                    },
                   ),
                 );
               },
             ),
-          );
-        },
-      ),
     );
   }
 }

@@ -26,7 +26,7 @@ class MenuItemCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: Colors.transparent,
+      color: AppColors.transparent,
       child: InkWell(
         onTap: () {
           Navigator.push(
@@ -52,7 +52,7 @@ class MenuItemCard extends StatelessWidget {
             boxShadow: [
               BoxShadow(
                 // 2. Ombre plus prononcée
-                color: Colors.black.withOpacity(0.25),
+                color: AppColors.textPrimary.withOpacity(0.25),
                 blurRadius: 15,
                 offset: const Offset(0, 6),
               ),
@@ -70,10 +70,14 @@ class MenuItemCard extends StatelessWidget {
                   filter: ImageFilter.blur(sigmaX: 1.5, sigmaY: 1.5),
                   child: Container(
                     decoration: BoxDecoration(
-                      color: Colors.black.withOpacity(0.3), // noir transparent
+                      color: AppColors.textPrimary.withOpacity(
+                        0.3,
+                      ), // noir transparent
                       borderRadius: BorderRadius.circular(16),
                       border: Border.all(
-                        color: Colors.white.withOpacity(0.15), // bordure claire très fine
+                        color: AppColors.white.withOpacity(
+                          0.15,
+                        ), // bordure claire très fine
                         width: 1.5,
                       ),
                     ),
@@ -84,12 +88,13 @@ class MenuItemCard extends StatelessWidget {
                 Container(
                   decoration: const BoxDecoration(
                     borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(16),
-                        bottomLeft: Radius.circular(16)),
+                      topLeft: Radius.circular(16),
+                      bottomLeft: Radius.circular(16),
+                    ),
                     gradient: LinearGradient(
                       colors: [
                         Colors.white10, // touche de brillance
-                        Colors.transparent,
+                        AppColors.transparent,
                       ],
                       begin: Alignment.centerLeft,
                       end: Alignment.centerRight,
@@ -114,14 +119,14 @@ class MenuItemCard extends StatelessWidget {
                             style: const TextStyle(
                               fontSize: 24,
                               fontWeight: FontWeight.bold,
-                              color: AppColors.primary50, // Blanc
+                              color: AppColors.white, // Blanc
                               height: 1.2,
                             ),
                           ),
                           Text(
                             '${item.price.toStringAsFixed(2)} €',
                             style: const TextStyle(
-                              color: AppColors.primary50, // Blanc
+                              color: AppColors.white, // Blanc
                               fontWeight: FontWeight.bold,
                               fontSize: 14,
                             ),
@@ -133,7 +138,7 @@ class MenuItemCard extends StatelessWidget {
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
-                          color: AppColors.primary50, // Gris clair
+                          color: AppColors.white, // Gris clair
                           fontSize: 13,
                           decoration: TextDecoration.none,
                         ),
@@ -148,62 +153,65 @@ class MenuItemCard extends StatelessWidget {
                                 height: 20,
                                 width: 20,
                                 colorFilter: const ColorFilter.mode(
-                                  AppColors.primary50, // Icône blanche
+                                  AppColors.white, // Icône blanche
                                   BlendMode.srcIn,
                                 ),
                               ),
                               const SizedBox(width: 4),
                               Text(
                                 "20-30 min",
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .labelSmall
+                                style: Theme.of(context).textTheme.labelSmall
                                     ?.copyWith(
-                                  fontSize: 12,
-                                  color: AppColors.primary50,
-                                ),
+                                      fontSize: 12,
+                                      color: AppColors.white,
+                                    ),
                               ),
                             ],
                           ),
                           const SizedBox(width: 12),
-                        GestureDetector(
-                              onTap: () {
-                                // 1. On récupère le bloc existant
-                                final bloc = context.read<BusinessDetailBloc>();
+                          GestureDetector(
+                            onTap: () {
+                              // 1. On récupère le bloc existant
+                              final bloc = context.read<BusinessDetailBloc>();
 
-                                // 2. On crée l'objet OrderItem (ajustez selon vos champs si nécessaire)
-                                final newItem = OrderItem(
-                                  menuItemId: item.id.toString(),
-                                  name: item.itemName,
-                                  price: item.price,
-                                  quantity: 1,
-                                );
+                              // 2. On crée l'objet OrderItem (ajustez selon vos champs si nécessaire)
+                              final newItem = OrderItem(
+                                menuItemId: item.id.toString(),
+                                name: item.itemName,
+                                price: item.price,
+                                quantity: 1,
+                              );
 
-                                // 3. On déclenche l'événement AddToCart
-                                bloc.add(AddToCart(newItem));
+                              // 3. On déclenche l'événement AddToCart
+                              bloc.add(AddToCart(newItem));
 
-                                // 4. Feedback utilisateur
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text(
-                                        '${item.itemName} ajouté au panier',
-                                        style: const TextStyle(color: Colors.black)),
-                                    duration: const Duration(seconds: 1),
-                                    behavior: SnackBarBehavior.floating,
-                                    backgroundColor: AppColors.secondary,
+                              // 4. Feedback utilisateur
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                    '${item.itemName} ajouté au panier',
+                                    style: const TextStyle(
+                                      color: AppColors.textPrimary,
+                                    ),
                                   ),
-                                );
-                              },
+                                  duration: const Duration(seconds: 1),
+                                  behavior: SnackBarBehavior.floating,
+                                  backgroundColor: AppColors.secondary,
+                                ),
+                              );
+                            },
                             child: Container(
                               padding: const EdgeInsets.symmetric(
-                                  horizontal: 10, vertical: 5),
+                                horizontal: 10,
+                                vertical: 5,
+                              ),
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(20),
                                 // 5. Bouton en dégradé doré pour contraster sur fond sombre
-                                gradient:  LinearGradient(
+                                gradient: LinearGradient(
                                   colors: [
-                                    AppColors.secondary300,
-                                    AppColors.secondary600,
+                                    AppColors.secondaryLight,
+                                    AppColors.secondary,
                                   ],
                                   begin: Alignment.topLeft,
                                   end: Alignment.bottomRight,
@@ -214,8 +222,9 @@ class MenuItemCard extends StatelessWidget {
                                   Text(
                                     "Ajouté au panier",
                                     style: TextStyle(
-                                        color: Colors.black,
-                                        fontWeight: FontWeight.w600),
+                                      color: AppColors.textPrimary,
+                                      fontWeight: FontWeight.w600,
+                                    ),
                                   ),
                                   SizedBox(width: 5),
                                 ],
@@ -242,19 +251,19 @@ class MenuItemCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(16),
           child: item.imageUrl.startsWith('http')
               ? Image.network(
-            item.imageUrl,
-            height: 180,
-            width: double.infinity,
-            fit: BoxFit.cover,
-            errorBuilder: (_, __, ___) => _buildPlaceholder(),
-          )
+                  item.imageUrl,
+                  height: 180,
+                  width: double.infinity,
+                  fit: BoxFit.cover,
+                  errorBuilder: (_, __, ___) => _buildPlaceholder(),
+                )
               : Image.asset(
-            item.imageUrl,
-            height: 180,
-            width: double.infinity,
-            fit: BoxFit.cover,
-            errorBuilder: (_, __, ___) => _buildPlaceholder(),
-          ),
+                  item.imageUrl,
+                  height: 180,
+                  width: double.infinity,
+                  fit: BoxFit.cover,
+                  errorBuilder: (_, __, ___) => _buildPlaceholder(),
+                ),
         ),
       ],
     );
@@ -274,9 +283,9 @@ class MenuItemCard extends StatelessWidget {
     child: Stack(
       children: [
         Positioned(
-            right: 10,
-            bottom: 5,
-            child: const Icon(Icons.fastfood, color: Colors.white, size:150)
+          right: 10,
+          bottom: 5,
+          child: const Icon(Icons.fastfood, color: AppColors.white, size: 150),
         ),
       ],
     ),

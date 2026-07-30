@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:baobabe_0_2/core/themes/app_colors.dart';
+import 'package:baobabe_0_2/core/themes/app_diemens.dart';
 import 'package:baobabe_0_2/core/themes/app_fonts.dart';
 
 /// État vide affiché quand l'utilisateur n'a aucune commande.
@@ -23,18 +24,18 @@ class OrderEmptyState extends StatelessWidget {
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                   colors: [
-                    AppColors.primary.withOpacity(0.15),
-                    AppColors.primary.withOpacity(0.05),
+                    AppColors.primary.withValues(alpha: 0.15),
+                    AppColors.primary.withValues(alpha: 0.05),
                   ],
                 ),
                 borderRadius: BorderRadius.circular(24),
                 border: Border.all(
-                  color: AppColors.primary.withOpacity(0.3),
+                  color: AppColors.primary.withValues(alpha: 0.3),
                   width: 2,
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: AppColors.primary.withOpacity(0.1),
+                    color: AppColors.primary.withValues(alpha: 0.1),
                     blurRadius: 20,
                     offset: const Offset(0, 8),
                   ),
@@ -47,7 +48,7 @@ class OrderEmptyState extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: AppColors.primary.withOpacity(0.1),
+                      color: AppColors.primary.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(16),
                     ),
                     child: Icon(
@@ -63,7 +64,7 @@ class OrderEmptyState extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
-                      color: AppColors.scaffoldBackground,
+                      color: AppColors.background,
                       fontFamily: AppFonts.primaryFontFamily,
                     ),
                   ),
@@ -74,7 +75,7 @@ class OrderEmptyState extends StatelessWidget {
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 14,
-                      color: Colors.grey[600],
+                      color: AppColors.textSecondary,
                       fontFamily: AppFonts.primaryFontFamily,
                       height: 1.5,
                     ),
@@ -85,7 +86,7 @@ class OrderEmptyState extends StatelessWidget {
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 13,
-                      color: Colors.grey[500],
+                      color: AppColors.textSecondary,
                       fontFamily: AppFonts.primaryFontFamily,
                     ),
                   ),
@@ -106,7 +107,7 @@ class OrderEmptyState extends StatelessWidget {
                       ),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.primary,
-                        foregroundColor: AppColors.scaffoldBackground,
+                        foregroundColor: AppColors.background,
                         elevation: 0,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
@@ -135,19 +136,16 @@ class OrderFilteredEmptyState extends StatelessWidget {
   Widget build(BuildContext context) {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 24),
+        padding: AppDimens.appPadding,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
-                color: Colors.grey[100],
+                color: AppColors.background,
                 borderRadius: BorderRadius.circular(20),
-                border: Border.all(
-                  color: Colors.grey[300]!,
-                  width: 2,
-                ),
+                border: Border.all(color: AppColors.textSecondary, width: 2),
               ),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -155,7 +153,7 @@ class OrderFilteredEmptyState extends StatelessWidget {
                   Icon(
                     Icons.filter_alt_off,
                     size: 64,
-                    color: Colors.grey[400],
+                    color: AppColors.textSecondary,
                   ),
                   const SizedBox(height: 16),
                   Text(
@@ -173,7 +171,7 @@ class OrderFilteredEmptyState extends StatelessWidget {
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 14,
-                      color: Colors.grey[600],
+                      color: AppColors.textSecondary,
                       fontFamily: AppFonts.primaryFontFamily,
                     ),
                   ),
@@ -184,7 +182,10 @@ class OrderFilteredEmptyState extends StatelessWidget {
                       onPressed: onShowAll,
                       style: OutlinedButton.styleFrom(
                         foregroundColor: AppColors.secondaryLight,
-                        side: const BorderSide(color: AppColors.secondaryLight, width: 2),
+                        side: const BorderSide(
+                          color: AppColors.secondaryLight,
+                          width: 2,
+                        ),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10),
                         ),

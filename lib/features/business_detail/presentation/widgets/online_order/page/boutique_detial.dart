@@ -1,4 +1,5 @@
 import 'package:baobabe_0_2/core/themes/app_colors.dart';
+import 'package:baobabe_0_2/core/themes/business_category_colors.dart';
 import 'package:baobabe_0_2/features/home_page/domain/entities/business_entity.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -11,7 +12,7 @@ class BoutiqueDetail extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.scaffoldBackground,
+      backgroundColor: AppColors.background,
       body: CustomScrollView(
         slivers: [
           // AppBar avec image de couverture
@@ -30,7 +31,11 @@ class BoutiqueDetail extends StatelessWidget {
                     fit: BoxFit.cover,
                     errorBuilder: (_, __, ___) => Container(
                       color: AppColors.primary.withOpacity(0.3),
-                      child: const Icon(Icons.store, size: 80, color: Colors.white),
+                      child: const Icon(
+                        Icons.store,
+                        size: 80,
+                        color: AppColors.white,
+                      ),
                     ),
                   ),
                   // Gradient pour lisibilité du titre
@@ -39,7 +44,7 @@ class BoutiqueDetail extends StatelessWidget {
                       gradient: LinearGradient(
                         begin: Alignment.topCenter,
                         end: Alignment.bottomCenter,
-                        colors: [Colors.transparent, Colors.black54],
+                        colors: [AppColors.transparent, Colors.black54],
                       ),
                     ),
                   ),
@@ -47,7 +52,7 @@ class BoutiqueDetail extends StatelessWidget {
               ),
             ),
             leading: IconButton(
-              icon: const Icon(Icons.arrow_back, color: Colors.white),
+              icon: const Icon(Icons.arrow_back, color: AppColors.white),
               onPressed: () => Navigator.pop(context),
             ),
           ),
@@ -64,13 +69,21 @@ class BoutiqueDetail extends StatelessWidget {
                     Expanded(
                       child: Text(
                         businessModel.name,
-                        style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+                        style: const TextStyle(
+                          fontSize: 28,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 6,
+                      ),
                       decoration: BoxDecoration(
-                        color: _getCategoryColor(businessModel.type).withOpacity(0.1),
+                        color: _getCategoryColor(
+                          businessModel.type,
+                        ).withOpacity(0.1),
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: Text(
@@ -88,12 +101,19 @@ class BoutiqueDetail extends StatelessWidget {
                 // Adresse
                 Row(
                   children: [
-                    const Icon(Icons.location_on, color: Colors.grey, size: 20),
+                    const Icon(
+                      Icons.location_on,
+                      color: AppColors.textSecondary,
+                      size: 20,
+                    ),
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
                         businessModel.address,
-                        style: const TextStyle(fontSize: 16, color: Colors.grey),
+                        style: const TextStyle(
+                          fontSize: 16,
+                          color: AppColors.textSecondary,
+                        ),
                       ),
                     ),
                   ],
@@ -149,7 +169,10 @@ class BoutiqueDetail extends StatelessWidget {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(entry.key, style: const TextStyle(fontWeight: FontWeight.w500)),
+                        Text(
+                          entry.key,
+                          style: const TextStyle(fontWeight: FontWeight.w500),
+                        ),
                         Text(entry.value),
                       ],
                     ),
@@ -182,7 +205,7 @@ class BoutiqueDetail extends StatelessWidget {
                               errorBuilder: (_, __, ___) => Container(
                                 width: 100,
                                 height: 100,
-                                color: Colors.grey[300],
+                                color: AppColors.textSecondary,
                                 child: const Icon(Icons.broken_image),
                               ),
                             ),
@@ -200,18 +223,24 @@ class BoutiqueDetail extends StatelessWidget {
     );
   }
 
-  Widget _buildActionButton({required IconData icon, required String label, required VoidCallback onTap}) {
+  Widget _buildActionButton({
+    required IconData icon,
+    required String label,
+    required VoidCallback onTap,
+  }) {
     return Expanded(
       child: ElevatedButton.icon(
         onPressed: onTap,
         icon: Icon(icon, size: 18),
         label: Text(label),
         style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.white,
+          backgroundColor: AppColors.white,
           foregroundColor: AppColors.primary,
           elevation: 0,
           side: BorderSide(color: AppColors.primary.withOpacity(0.3)),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
         ),
       ),
     );
@@ -220,12 +249,13 @@ class BoutiqueDetail extends StatelessWidget {
   Color _getCategoryColor(BusinessType type) {
     switch (type) {
       case BusinessType.restaurant:
+        return BusinessCategoryColors.restaurant;
       case BusinessType.fastFood:
-        return Colors.orange;
+        return BusinessCategoryColors.fastFood;
       case BusinessType.shopping:
-        return Colors.blue;
+        return BusinessCategoryColors.shopping;
       default:
-        return Colors.grey;
+        return AppColors.textSecondary;
     }
   }
 
@@ -253,7 +283,9 @@ class BoutiqueDetail extends StatelessWidget {
 
   void _launchMaps(String address) async {
     final query = Uri.encodeComponent(address);
-    final Uri launchUri = Uri.parse('https://www.google.com/maps/search/?api=1&query=$query');
+    final Uri launchUri = Uri.parse(
+      'https://www.google.com/maps/search/?api=1&query=$query',
+    );
     if (await canLaunchUrl(launchUri)) {
       await launchUrl(launchUri);
     }
@@ -266,4 +298,3 @@ class BoutiqueDetail extends StatelessWidget {
     }
   }
 }
-

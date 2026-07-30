@@ -9,7 +9,13 @@ class SettingsState {
 }
 
 class SettingsCubit extends Cubit<SettingsState> {
-  SettingsCubit() : super(SettingsState(themeMode: ThemeMode.system, locale: const Locale('fr', 'FR'))) {
+  SettingsCubit()
+    : super(
+        SettingsState(
+          themeMode: ThemeMode.system,
+          locale: const Locale('fr', 'FR'),
+        ),
+      ) {
     _loadSettings();
   }
 
@@ -17,10 +23,12 @@ class SettingsCubit extends Cubit<SettingsState> {
     final prefs = await SharedPreferences.getInstance();
     final themeIndex = prefs.getInt('theme_mode') ?? 0;
     final languageCode = prefs.getString('language_code') ?? 'fr';
-    emit(SettingsState(
-      themeMode: ThemeMode.values[themeIndex],
-      locale: Locale(languageCode),
-    ));
+    emit(
+      SettingsState(
+        themeMode: ThemeMode.values[themeIndex],
+        locale: Locale(languageCode),
+      ),
+    );
   }
 
   Future<void> setThemeMode(ThemeMode mode) async {

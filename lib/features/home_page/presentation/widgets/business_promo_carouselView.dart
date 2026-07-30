@@ -1,6 +1,7 @@
 import 'package:baobabe_0_2/core/themes/app_diemens.dart';
 import 'package:baobabe_0_2/features/home_page/data/models/ui_business.dart';
 import 'package:flutter/material.dart';
+import 'package:baobabe_0_2/core/themes/app_colors.dart';
 import 'package:go_router/go_router.dart';
 import './business_promo_card.dart';
 
@@ -81,14 +82,14 @@ class _BusinessPromoCarouselViewState extends State<BusinessPromoCarouselView> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Padding(
-                padding: const EdgeInsets.only(left: AppDimens.PADDING_20),
+                padding: const EdgeInsets.only(left: AppDimens.large),
                 child: Text(
                   widget.title!,
                   style: const TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w400,
                     fontFamily: "Poppins",
-                    color: Colors.grey,
+                    color: AppColors.textSecondary,
                   ),
                 ),
               ),
@@ -101,7 +102,7 @@ class _BusinessPromoCarouselViewState extends State<BusinessPromoCarouselView> {
                       fontSize: 13,
                       fontWeight: FontWeight.w600,
                       fontFamily: "Poppins",
-                      color: Colors.grey.shade600,
+                      color: AppColors.textSecondary,
                     ),
                   ),
                 ),
@@ -119,8 +120,8 @@ class _BusinessPromoCarouselViewState extends State<BusinessPromoCarouselView> {
               final uiBusiness = widget.uiBusinesses[index];
               return Padding(
                 padding: const EdgeInsets.only(
-                  left: AppDimens.PADDING_10,
-                  right: AppDimens.PADDING_10,
+                  left: AppDimens.small,
+                  right: AppDimens.small,
                 ),
                 child: BusinessPromoCard(
                   uiBusiness: uiBusiness,

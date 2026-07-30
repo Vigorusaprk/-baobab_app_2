@@ -4,7 +4,8 @@ import 'package:flutter/material.dart';
 class ReservationProgressIndicator extends StatelessWidget {
   final int currentPage;
 
-  const ReservationProgressIndicator({Key? key, required this.currentPage}) : super(key: key);
+  const ReservationProgressIndicator({Key? key, required this.currentPage})
+    : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +20,9 @@ class ReservationProgressIndicator extends StatelessWidget {
             margin: const EdgeInsets.symmetric(horizontal: 4),
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: currentPage >= index ? AppColors.secondary : Colors.grey[300],
+              color: currentPage >= index
+                  ? AppColors.secondary
+                  : AppColors.textSecondary,
             ),
           );
         }).toList(),

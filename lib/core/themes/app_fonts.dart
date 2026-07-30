@@ -47,7 +47,7 @@ class AppFonts {
 
   static const TextStyle bodySmall = TextStyle(
     fontFamily: primaryFontFamily,
-    fontSize: 15,
+    fontSize: 12,
     fontWeight: bold,
     color: AppColors.secondaryLight,
   );
@@ -63,18 +63,18 @@ class AppFonts {
     fontFamily: primaryFontFamily,
     fontSize: 12,
     fontWeight: regular,
-    color: Colors.grey,
+    color: AppColors.textSecondary,
   );
 
   static const TextStyle inputHintTextStyle = TextStyle(
-    color: AppColors.grey,
+    color: AppColors.textSecondary,
     fontFamily: AppFonts.primaryFontFamily,
     fontWeight: FontWeight.normal,
     fontSize: 14,
   );
 
   static const TextStyle inputTextStyle = TextStyle(
-    color: AppColors.textColor,
+    color: AppColors.textPrimary,
     fontFamily: AppFonts.primaryFontFamily,
     fontWeight: FontWeight.normal,
     fontSize: 14,

@@ -11,7 +11,7 @@ class CategoryRepositoryImpl implements CategoryRepository {
   @override
   Future<Category> getCategoryByType(BusinessType type) async {
     return Category.allCategories.firstWhere(
-          (cat) => cat.type == type,
+      (cat) => cat.type == type,
       orElse: () => Category.allCategories.first, // Retourne "Tout" par défaut
     );
   }

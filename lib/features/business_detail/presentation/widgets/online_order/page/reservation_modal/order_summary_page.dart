@@ -50,27 +50,45 @@ class OrderSummaryPage extends StatelessWidget {
           ),
           Text(
             'Chez $businessName',
-            style: TextStyle(fontSize: 16, color: Colors.grey[600]),
+            style: TextStyle(fontSize: 16, color: AppColors.textSecondary),
           ),
           const SizedBox(height: 20),
 
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: Colors.grey[50],
+              color: AppColors.background,
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: Colors.grey),
+              border: Border.all(color: AppColors.textSecondary),
             ),
             child: Column(
               children: [
-                _buildSummaryRow("Nom", fullName.isNotEmpty ? fullName : "Non renseigné"),
-                _buildSummaryRow("Téléphone", phone.isNotEmpty ? phone : "Non renseigné"),
                 _buildSummaryRow(
-                    "Date", date != null ? "${date!.day}/${date!.month}/${date!.year}" : "Non renseignée"),
-                _buildSummaryRow("Heure", time != null ? time!.format(context) : "Non renseignée"),
+                  "Nom",
+                  fullName.isNotEmpty ? fullName : "Non renseigné",
+                ),
                 _buildSummaryRow(
-                    "Nombre de personnes", peopleText.isNotEmpty ? peopleText : "Non renseigné"),
-                _buildSummaryRow("Table", selectedTable?.toString() ?? "Non sélectionnée"),
+                  "Téléphone",
+                  phone.isNotEmpty ? phone : "Non renseigné",
+                ),
+                _buildSummaryRow(
+                  "Date",
+                  date != null
+                      ? "${date!.day}/${date!.month}/${date!.year}"
+                      : "Non renseignée",
+                ),
+                _buildSummaryRow(
+                  "Heure",
+                  time != null ? time!.format(context) : "Non renseignée",
+                ),
+                _buildSummaryRow(
+                  "Nombre de personnes",
+                  peopleText.isNotEmpty ? peopleText : "Non renseigné",
+                ),
+                _buildSummaryRow(
+                  "Table",
+                  selectedTable?.toString() ?? "Non sélectionnée",
+                ),
                 _buildSummaryRow("Étage", selectedFloor),
                 if (notes.isNotEmpty) _buildSummaryRow("Notes", notes),
               ],
@@ -82,17 +100,24 @@ class OrderSummaryPage extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: Colors.grey[50],
+              color: AppColors.background,
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: Colors.grey),
+              border: Border.all(color: AppColors.textSecondary),
             ),
             child: Column(
               children: [
-                _buildPriceRow("Sous-total", "\$${subtotal.toStringAsFixed(2)}"),
+                _buildPriceRow(
+                  "Sous-total",
+                  "\$${subtotal.toStringAsFixed(2)}",
+                ),
                 _buildPriceRow("Taxe", "\$${tax.toStringAsFixed(2)}"),
                 const SizedBox(height: 10),
                 const Divider(),
-                _buildPriceRow("Total", "\$${grandTotal.toStringAsFixed(2)}", isTotal: true),
+                _buildPriceRow(
+                  "Total",
+                  "\$${grandTotal.toStringAsFixed(2)}",
+                  isTotal: true,
+                ),
               ],
             ),
           ),
@@ -103,31 +128,41 @@ class OrderSummaryPage extends StatelessWidget {
             child: ElevatedButton(
               onPressed: isLoading ? null : onConfirm,
               style: ElevatedButton.styleFrom(
-                backgroundColor: isLoading ? Colors.grey : AppColors.secondary,
+                backgroundColor: isLoading
+                    ? AppColors.textSecondary
+                    : AppColors.secondary,
                 padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15),
+                ),
                 elevation: 2,
               ),
               child: isLoading
                   ? const SizedBox(
-                height: 20,
-                width: 20,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                ),
-              )
+                      height: 20,
+                      width: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        valueColor: AlwaysStoppedAnimation<Color>(
+                          AppColors.white,
+                        ),
+                      ),
+                    )
                   : const Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.check_circle, color: Colors.white),
-                  SizedBox(width: 8),
-                  Text(
-                    "Payer et Réserver",
-                    style: TextStyle(fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold),
-                  ),
-                ],
-              ),
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.check_circle, color: AppColors.white),
+                        SizedBox(width: 8),
+                        Text(
+                          "Payer et Réserver",
+                          style: TextStyle(
+                            fontSize: 18,
+                            color: AppColors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
             ),
           ),
           const SizedBox(height: 10),
@@ -137,7 +172,7 @@ class OrderSummaryPage extends StatelessWidget {
               onPressed: isLoading ? null : onEditInfo,
               child: const Text(
                 "Modifier les informations",
-                style: TextStyle(fontSize: 16, color: Colors.grey),
+                style: TextStyle(fontSize: 16, color: AppColors.textSecondary),
               ),
             ),
           ),
@@ -152,7 +187,13 @@ class OrderSummaryPage extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(label, style: const TextStyle(color: Colors.grey, fontSize: 16)),
+          Text(
+            label,
+            style: const TextStyle(
+              color: AppColors.textSecondary,
+              fontSize: 16,
+            ),
+          ),
           Text(
             value,
             style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
@@ -181,7 +222,7 @@ class OrderSummaryPage extends StatelessWidget {
             style: TextStyle(
               fontSize: isTotal ? 18 : 16,
               fontWeight: isTotal ? FontWeight.bold : FontWeight.normal,
-              color: isTotal ? AppColors.secondary : Colors.black,
+              color: isTotal ? AppColors.secondary : AppColors.textPrimary,
             ),
           ),
         ],

@@ -24,30 +24,21 @@ class CarVehicleHeader extends StatelessWidget {
           children: [
             Text(
               name,
-              style: const TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
-              ),
+              style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
             ),
-            Text(
-              type,
-              style: TextStyle(color: Colors.grey[600]),
-            ),
+            Text(type, style: TextStyle(color: AppColors.textSecondary)),
           ],
         ),
         Container(
-          padding: const EdgeInsets.symmetric(
-            horizontal: 16,
-            vertical: 12,
-          ),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           decoration: BoxDecoration(
-            color: AppColors.primaryLight,
+            color: AppColors.secondary,
             borderRadius: BorderRadius.circular(8),
           ),
           child: Text(
             '${dailyPrice.toStringAsFixed(0)}€/jour',
             style: const TextStyle(
-              color: Colors.white,
+              color: AppColors.white,
               fontSize: 18,
               fontWeight: FontWeight.bold,
             ),

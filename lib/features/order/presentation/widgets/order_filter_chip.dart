@@ -40,12 +40,15 @@ class OrderFilterChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final effectiveSelectedColor = selectedColor ?? AppColors.secondaryLight;
-    final effectiveUnselectedColor = unselectedColor ?? Colors.grey.withOpacity(0.3);
+    final effectiveUnselectedColor =
+        unselectedColor ?? AppColors.textSecondary.withOpacity(0.3);
     final effectiveLabelColor = AppColors.secondary;
-    final effectiveSelectedLabelColor = selectedLabelColor ?? AppColors.scaffoldBackground;
+    final effectiveSelectedLabelColor =
+        selectedLabelColor ?? AppColors.background;
     final effectiveFontSize = fontSize ?? 14;
     final effectiveFontWeight = fontWeight ?? FontWeight.w500;
-    final effectivePadding = padding ?? const EdgeInsets.symmetric(horizontal: 12, vertical: 8);
+    final effectivePadding =
+        padding ?? const EdgeInsets.symmetric(horizontal: 12, vertical: 8);
     final effectiveBorderRadius = borderRadius ?? 20.0;
 
     return Padding(
@@ -55,16 +58,18 @@ class OrderFilterChip extends StatelessWidget {
         child: Container(
           padding: effectivePadding,
           decoration: BoxDecoration(
-            color: isSelected ? effectiveSelectedColor : effectiveUnselectedColor,
+            color: isSelected
+                ? effectiveSelectedColor
+                : effectiveUnselectedColor,
             borderRadius: BorderRadius.circular(effectiveBorderRadius),
             boxShadow: isSelected
                 ? [
-              BoxShadow(
-                color: effectiveSelectedColor.withOpacity(0.3),
-                blurRadius: 4,
-                offset: const Offset(0, 2),
-              ),
-            ]
+                    BoxShadow(
+                      color: effectiveSelectedColor.withOpacity(0.3),
+                      blurRadius: 4,
+                      offset: const Offset(0, 2),
+                    ),
+                  ]
                 : null,
           ),
           child: Row(
@@ -73,7 +78,9 @@ class OrderFilterChip extends StatelessWidget {
               Text(
                 label,
                 style: TextStyle(
-                  color: isSelected ? effectiveSelectedLabelColor : effectiveLabelColor,
+                  color: isSelected
+                      ? effectiveSelectedLabelColor
+                      : effectiveLabelColor,
                   fontSize: effectiveFontSize,
                   fontWeight: effectiveFontWeight,
                 ),

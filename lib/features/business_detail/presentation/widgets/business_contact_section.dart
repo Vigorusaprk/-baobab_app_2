@@ -1,4 +1,4 @@
-import 'package:baobabe_0_2/core/themes/app_colors.dart';
+﻿import 'package:baobabe_0_2/core/themes/app_colors.dart';
 import 'package:baobabe_0_2/features/home_page/domain/entities/business_entity.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -14,9 +14,9 @@ class BusinessContactSection extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.white,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: Colors.grey.withOpacity(0.1)),
+        border: Border.all(color: AppColors.textSecondary.withOpacity(0.1)),
       ),
       child: Column(
         children: [
@@ -57,7 +57,7 @@ class BusinessContactSection extends StatelessWidget {
       leading: Container(
         padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
-          color: const Color(0xFF254D32).withOpacity(0.1),
+          color: AppColors.primary.withOpacity(0.1),
           shape: BoxShape.circle,
         ),
         child: SvgPicture.asset(
@@ -69,20 +69,20 @@ class BusinessContactSection extends StatelessWidget {
       ),
       title: Text(
         title,
-        style: const TextStyle(fontSize: 13, color: Colors.grey),
+        style: const TextStyle(fontSize: 13, color: AppColors.textSecondary),
       ),
       subtitle: Text(
         value,
         style: const TextStyle(
           fontSize: 15,
           fontWeight: FontWeight.w600,
-          color: Colors.black87,
+          color: AppColors.textPrimary,
         ),
       ),
       trailing: const Icon(
         Icons.arrow_forward_ios_rounded,
         size: 14,
-        color: Colors.grey,
+        color: AppColors.textSecondary,
       ),
     );
   }

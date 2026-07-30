@@ -13,7 +13,7 @@ class BusinessRemoteDataSourceImpl implements BusinessRemoteDataSource {
   final Connectivity _connectivity = Connectivity();
 
   BusinessRemoteDataSourceImpl({SupabaseClient? supabase})
-      : _supabase = supabase ?? Supabase.instance.client;
+    : _supabase = supabase ?? Supabase.instance.client;
 
   // REMARQUE : Vérifiez bien dans votre tableau de bord Supabase si la table
   // s'appelle 'business' ou 'businesses'. J'ai utilisé 'business' ci-dessous.
@@ -22,13 +22,17 @@ class BusinessRemoteDataSourceImpl implements BusinessRemoteDataSource {
   @override
   Future<List<BusinessModel>> getBusinesses() async {
     final connectivityResult = await _connectivity.checkConnectivity();
-    final isOnline = connectivityResult.any((element) => element != ConnectivityResult.none);
+    final isOnline = connectivityResult.any(
+      (element) => element != ConnectivityResult.none,
+    );
 
     if (!isOnline) {
       final cached = await _db.getCache('all_businesses');
       if (cached != null) {
         final List<dynamic> decoded = jsonDecode(cached);
-        return decoded.map((json) => BusinessModel.fromJson(json as Map<String, dynamic>)).toList();
+        return decoded
+            .map((json) => BusinessModel.fromJson(json as Map<String, dynamic>))
+            .toList();
       }
       return [];
     }
@@ -40,14 +44,19 @@ class BusinessRemoteDataSourceImpl implements BusinessRemoteDataSource {
           .toList();
 
       // Sauvegarde Cache
-      await _db.saveCache('all_businesses', jsonEncode(businesses.map((e) => e.toJson()).toList()));
+      await _db.saveCache(
+        'all_businesses',
+        jsonEncode(businesses.map((e) => e.toJson()).toList()),
+      );
 
       return businesses;
     } catch (e) {
       final cached = await _db.getCache('all_businesses');
       if (cached != null) {
         final List<dynamic> decoded = jsonDecode(cached);
-        return decoded.map((json) => BusinessModel.fromJson(json as Map<String, dynamic>)).toList();
+        return decoded
+            .map((json) => BusinessModel.fromJson(json as Map<String, dynamic>))
+            .toList();
       }
       throw Exception('Erreur Supabase lors du chargement des businesses : $e');
     }
@@ -56,14 +65,18 @@ class BusinessRemoteDataSourceImpl implements BusinessRemoteDataSource {
   @override
   Future<BusinessModel> getBusinessDetail(String businessId) async {
     final connectivityResult = await _connectivity.checkConnectivity();
-    final isOnline = connectivityResult.any((element) => element != ConnectivityResult.none);
+    final isOnline = connectivityResult.any(
+      (element) => element != ConnectivityResult.none,
+    );
 
     if (!isOnline) {
       final cached = await _db.getCache('business_detail_$businessId');
       if (cached != null) {
         return BusinessModel.fromJson(jsonDecode(cached));
       }
-      throw Exception('Mode hors-ligne : détail non disponible pour cet établissement.');
+      throw Exception(
+        'Mode hors-ligne : détail non disponible pour cet établissement.',
+      );
     }
 
     try {
@@ -77,10 +90,13 @@ class BusinessRemoteDataSourceImpl implements BusinessRemoteDataSource {
         throw Exception('Business non trouvé avec l\'ID : $businessId');
       }
 
-      final business = BusinessModel.fromJson(response as Map<String, dynamic>);
-      
+      final business = BusinessModel.fromJson(response);
+
       // Sauvegarde Cache
-      await _db.saveCache('business_detail_$businessId', jsonEncode(business.toJson()));
+      await _db.saveCache(
+        'business_detail_$businessId',
+        jsonEncode(business.toJson()),
+      );
 
       return business;
     } catch (e) {
@@ -88,20 +104,26 @@ class BusinessRemoteDataSourceImpl implements BusinessRemoteDataSource {
       if (cached != null) {
         return BusinessModel.fromJson(jsonDecode(cached));
       }
-      throw Exception('Erreur Supabase lors du chargement du détail business : $e');
+      throw Exception(
+        'Erreur Supabase lors du chargement du détail business : $e',
+      );
     }
   }
 
   @override
   Future<List<BusinessModel>> getBusinessesByCategory(String category) async {
     final connectivityResult = await _connectivity.checkConnectivity();
-    final isOnline = connectivityResult.any((element) => element != ConnectivityResult.none);
+    final isOnline = connectivityResult.any(
+      (element) => element != ConnectivityResult.none,
+    );
 
     if (!isOnline) {
       final cached = await _db.getCache('businesses_cat_$category');
       if (cached != null) {
         final List<dynamic> decoded = jsonDecode(cached);
-        return decoded.map((json) => BusinessModel.fromJson(json as Map<String, dynamic>)).toList();
+        return decoded
+            .map((json) => BusinessModel.fromJson(json as Map<String, dynamic>))
+            .toList();
       }
       return [];
     }
@@ -117,29 +139,40 @@ class BusinessRemoteDataSourceImpl implements BusinessRemoteDataSource {
           .toList();
 
       // Sauvegarde Cache
-      await _db.saveCache('businesses_cat_$category', jsonEncode(businesses.map((e) => e.toJson()).toList()));
+      await _db.saveCache(
+        'businesses_cat_$category',
+        jsonEncode(businesses.map((e) => e.toJson()).toList()),
+      );
 
       return businesses;
     } catch (e) {
       final cached = await _db.getCache('businesses_cat_$category');
       if (cached != null) {
         final List<dynamic> decoded = jsonDecode(cached);
-        return decoded.map((json) => BusinessModel.fromJson(json as Map<String, dynamic>)).toList();
+        return decoded
+            .map((json) => BusinessModel.fromJson(json as Map<String, dynamic>))
+            .toList();
       }
-      throw Exception('Erreur Supabase lors de la recherche par catégorie : $e');
+      throw Exception(
+        'Erreur Supabase lors de la recherche par catégorie : $e',
+      );
     }
   }
 
   @override
   Future<List<MenuItem>> getMenuByBusiness(String businessId) async {
     final connectivityResult = await _connectivity.checkConnectivity();
-    final isOnline = connectivityResult.any((element) => element != ConnectivityResult.none);
+    final isOnline = connectivityResult.any(
+      (element) => element != ConnectivityResult.none,
+    );
 
     if (!isOnline) {
       final cached = await _db.getCache('menu_$businessId');
       if (cached != null) {
         final List<dynamic> decoded = jsonDecode(cached);
-        return decoded.map((json) => MenuItem.fromJson(json as Map<String, dynamic>)).toList();
+        return decoded
+            .map((json) => MenuItem.fromJson(json as Map<String, dynamic>))
+            .toList();
       }
       return [];
     }
@@ -155,14 +188,19 @@ class BusinessRemoteDataSourceImpl implements BusinessRemoteDataSource {
           .toList();
 
       // Sauvegarde Cache
-      await _db.saveCache('menu_$businessId', jsonEncode(menu.map((e) => e.toJson()).toList()));
+      await _db.saveCache(
+        'menu_$businessId',
+        jsonEncode(menu.map((e) => e.toJson()).toList()),
+      );
 
       return menu;
     } catch (e) {
       final cached = await _db.getCache('menu_$businessId');
       if (cached != null) {
         final List<dynamic> decoded = jsonDecode(cached);
-        return decoded.map((json) => MenuItem.fromJson(json as Map<String, dynamic>)).toList();
+        return decoded
+            .map((json) => MenuItem.fromJson(json as Map<String, dynamic>))
+            .toList();
       }
       throw Exception('Erreur Supabase lors de la récupération du menu : $e');
     }
@@ -177,7 +215,9 @@ class BusinessRemoteDataSourceImpl implements BusinessRemoteDataSource {
           .from('reservations')
           .insert(reservation.toJson(isNew: true));
     } catch (e) {
-      throw Exception('Erreur Supabase lors de la création de la réservation : $e');
+      throw Exception(
+        'Erreur Supabase lors de la création de la réservation : $e',
+      );
     }
   }
 }

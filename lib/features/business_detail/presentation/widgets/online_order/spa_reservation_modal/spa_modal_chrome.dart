@@ -30,7 +30,11 @@ class SpaModalHeader extends StatelessWidget {
         children: [
           if (showBack)
             IconButton(
-              icon: Icon(Icons.arrow_back_ios_new, color: AppColors.primary, size: isSmallScreen ? 18 : 24),
+              icon: Icon(
+                Icons.arrow_back_ios_new,
+                color: AppColors.primary,
+                size: isSmallScreen ? 18 : 24,
+              ),
               onPressed: onBack,
             )
           else
@@ -40,12 +44,18 @@ class SpaModalHeader extends StatelessWidget {
               children: [
                 Text(
                   title,
-                  style: TextStyle(fontSize: titleFontSize, fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                    fontSize: titleFontSize,
+                    fontWeight: FontWeight.bold,
+                  ),
                   textAlign: TextAlign.center,
                 ),
                 Text(
                   businessName,
-                  style: TextStyle(fontSize: isSmallScreen ? 12 : 14, color: Colors.grey[600]),
+                  style: TextStyle(
+                    fontSize: isSmallScreen ? 12 : 14,
+                    color: AppColors.textSecondary,
+                  ),
                   textAlign: TextAlign.center,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -54,7 +64,11 @@ class SpaModalHeader extends StatelessWidget {
             ),
           ),
           IconButton(
-            icon: Icon(Icons.close, color: AppColors.primary, size: isSmallScreen ? 18 : 24),
+            icon: Icon(
+              Icons.close,
+              color: AppColors.primary,
+              size: isSmallScreen ? 18 : 24,
+            ),
             onPressed: onClose,
           ),
         ],
@@ -67,12 +81,19 @@ class SpaModalProgressIndicator extends StatelessWidget {
   final bool isSmallScreen;
   final int currentPage;
 
-  const SpaModalProgressIndicator({Key? key, required this.isSmallScreen, required this.currentPage}) : super(key: key);
+  const SpaModalProgressIndicator({
+    Key? key,
+    required this.isSmallScreen,
+    required this.currentPage,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: isSmallScreen ? 16 : 20, vertical: 8),
+      padding: EdgeInsets.symmetric(
+        horizontal: isSmallScreen ? 16 : 20,
+        vertical: 8,
+      ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [0, 1, 2].map((index) {
@@ -82,7 +103,9 @@ class SpaModalProgressIndicator extends StatelessWidget {
             margin: EdgeInsets.symmetric(horizontal: isSmallScreen ? 3 : 4),
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: currentPage >= index ? Theme.of(context).colorScheme.primary : Colors.grey[300],
+              color: currentPage >= index
+                  ? Theme.of(context).colorScheme.primary
+                  : AppColors.textSecondary,
             ),
           );
         }).toList(),

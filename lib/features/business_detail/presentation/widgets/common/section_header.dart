@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:baobabe_0_2/core/themes/app_colors.dart';
 
 class SectionHeader extends StatelessWidget {
   final String title;
@@ -18,7 +19,7 @@ class SectionHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final themeColor = color ?? const Color(0xFF254D32);
+    final themeColor = color ?? AppColors.primary;
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 16),
       child: Row(
@@ -35,7 +36,11 @@ class SectionHeader extends StatelessWidget {
           Expanded(
             child: Text(
               title,
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800, letterSpacing: -0.5),
+              style: const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w800,
+                letterSpacing: -0.5,
+              ),
             ),
           ),
           if (onSeeAll != null)
@@ -44,7 +49,10 @@ class SectionHeader extends StatelessWidget {
               style: TextButton.styleFrom(foregroundColor: themeColor),
               child: Text(
                 seeAllText ?? 'Voir tout',
-                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 13,
+                ),
               ),
             ),
         ],

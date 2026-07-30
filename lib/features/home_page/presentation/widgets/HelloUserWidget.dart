@@ -6,7 +6,6 @@ import 'package:baobabe_0_2/features/home_page/presentation/screens/search_page.
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:go_router/go_router.dart';
 
 class HelloUserWidget extends StatelessWidget {
   const HelloUserWidget({super.key});
@@ -17,9 +16,6 @@ class HelloUserWidget extends StatelessWidget {
       initialData: SessionService.instance.currentUser,
       stream: SessionService.instance.userChanges,
       builder: (context, snapshot) {
-        final user = snapshot.data;
-        final userName = user?.name ?? 'Utilisateur';
-
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -57,7 +53,7 @@ class HelloUserWidget extends StatelessWidget {
                         decoration: BoxDecoration(
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.05),
+                              color: AppColors.textPrimary.withOpacity(0.05),
                               blurRadius: 10,
                               offset: const Offset(0, 4),
                             ),
@@ -75,14 +71,14 @@ class HelloUserWidget extends StatelessWidget {
                           ),
                         ),
                       ),
-                      const SizedBox(width: AppDimens.PADDING_10),
+                      const SizedBox(width: AppDimens.small),
                       _buildAvatar(user, userName, context),
                     ],
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: AppDimens.PADDING_16),*/
+            const SizedBox(height: AppDimens.medium),*/
             _buildSearchField(context),
           ],
         );
@@ -110,15 +106,15 @@ class HelloUserWidget extends StatelessWidget {
             },
             child: Container(
               padding: const EdgeInsets.symmetric(
-                horizontal: AppDimens.PADDING_12,
-                vertical: AppDimens.PADDING_8,
+                horizontal: AppDimens.medium,
+                vertical: AppDimens.small,
               ),
               decoration: BoxDecoration(
                 color: AppColors.surface,
-                borderRadius: BorderRadius.circular(AppDimens.BORDER_RADIUS_12),
+                borderRadius: BorderRadius.circular(AppDimens.radius12),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
+                    color: AppColors.textPrimary.withValues(alpha: 0.05),
                     blurRadius: 10,
                     offset: const Offset(0, 4),
                   ),
@@ -135,14 +131,14 @@ class HelloUserWidget extends StatelessWidget {
                       BlendMode.srcIn,
                     ),
                   ),
-                  const SizedBox(width: AppDimens.PADDING_12),
+                  const SizedBox(width: AppDimens.medium),
                   const Expanded(
                     child: Text(
                       "Où voulez-vous aller ?",
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
                         fontFamily: 'Poppins',
-                        color: Colors.grey,
+                        color: AppColors.textSecondary,
                         fontSize: 14,
                       ),
                     ),
@@ -153,20 +149,18 @@ class HelloUserWidget extends StatelessWidget {
           ),
         ),
 
-        const SizedBox(width: AppDimens.PADDING_12),
+        const SizedBox(width: AppDimens.medium),
 
         GestureDetector(
-          onTap: () {
-            // TODO : ouvrir les filtres
-          },
+          onTap: () {},
           child: Container(
-            padding: const EdgeInsets.all(AppDimens.PADDING_12),
+            padding: const EdgeInsets.all(AppDimens.medium),
             decoration: BoxDecoration(
               color: AppColors.primary,
-              borderRadius: BorderRadius.circular(AppDimens.BORDER_RADIUS_12),
+              borderRadius: BorderRadius.circular(AppDimens.radius12),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
+                  color: AppColors.textPrimary.withValues(alpha: 0.05),
                   blurRadius: 10,
                   offset: const Offset(0, 4),
                 ),
@@ -177,7 +171,7 @@ class HelloUserWidget extends StatelessWidget {
               height: 20,
               width: 20,
               colorFilter: const ColorFilter.mode(
-                AppColors.primary50,
+                AppColors.white,
                 BlendMode.srcIn,
               ),
             ),
@@ -185,77 +179,5 @@ class HelloUserWidget extends StatelessWidget {
         ),
       ],
     );
-  }
-
-  Widget _buildAvatar(
-    AppSessionUser? user,
-    String userName,
-    BuildContext context,
-  ) {
-    return GestureDetector(
-      onTap: () => context.go('/profile'),
-      child: Container(
-        width: 45,
-        height: 45,
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.08),
-              blurRadius: 8,
-              offset: const Offset(0, 3),
-            ),
-          ],
-        ),
-        child: ClipOval(child: _buildInitialsAvatar(userName)),
-      ),
-    );
-  }
-
-  Widget _buildInitialsAvatar(String name) {
-    final initials = _getInitials(name);
-    return Container(
-      color: _getAvatarColor(name),
-      child: Center(
-        child: Text(
-          initials,
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-      ),
-    );
-  }
-
-  String _getInitials(String name) {
-    if (name.isEmpty || name.trim().isEmpty) return "?";
-    final parts = name.trim().split(' ');
-    if (parts.isEmpty) return "?";
-    if (parts.length == 1) {
-      return parts[0][0].toUpperCase();
-    } else {
-      return (parts[0][0] + parts.last[0]).toUpperCase();
-    }
-  }
-
-  Color _getAvatarColor(String name) {
-    if (name.isEmpty) return Colors.blue;
-    final List<Color> colors = [
-      Colors.red,
-      Colors.pink,
-      Colors.purple,
-      Colors.deepPurple,
-      Colors.indigo,
-      Colors.blue,
-      Colors.lightBlue,
-      Colors.cyan,
-      Colors.teal,
-      Colors.green,
-    ];
-    final int hash = name.hashCode;
-    final int index = hash.abs() % colors.length;
-    return colors[index];
   }
 }

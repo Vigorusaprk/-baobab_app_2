@@ -1,8 +1,7 @@
-import 'package:baobabe_0_2/features/home_page/domain/entities/search_filter_entity.dart';
+﻿import 'package:baobabe_0_2/features/home_page/domain/entities/search_filter_entity.dart';
 import 'package:flutter/material.dart';
 import 'package:baobabe_0_2/core/themes/app_colors.dart';
 import 'package:baobabe_0_2/features/home_page/domain/entities/business_entity.dart';
-
 
 // ... imports inchangés ...
 
@@ -11,10 +10,10 @@ class SearchFilterSheet extends StatefulWidget {
   final ValueChanged<SearchFilterEntity> onFiltersChanged;
 
   const SearchFilterSheet({
-    Key? key,
+    super.key,
     required this.currentFilters,
     required this.onFiltersChanged,
-  }) : super(key: key);
+  });
 
   @override
   State<SearchFilterSheet> createState() => _SearchFilterSheetState();
@@ -87,8 +86,10 @@ class _SearchFilterSheetState extends State<SearchFilterSheet> {
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.of(context).size.height;
     return Container(
-      color: AppColors.scaffoldBackground,
-      padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+      color: AppColors.background,
+      padding: EdgeInsets.only(
+        bottom: MediaQuery.of(context).viewInsets.bottom,
+      ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -96,11 +97,14 @@ class _SearchFilterSheetState extends State<SearchFilterSheet> {
           Container(
             padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
             decoration: BoxDecoration(
-              border: Border(bottom: BorderSide(color: Colors.grey[200]!)),
+              border: Border(bottom: BorderSide(color: AppColors.background)),
             ),
             child: Row(
               children: [
-                const Text('Filtres de recherche', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                const Text(
+                  'Filtres de recherche',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
                 const Spacer(),
                 TextButton(
                   onPressed: () {
@@ -111,7 +115,10 @@ class _SearchFilterSheetState extends State<SearchFilterSheet> {
                       }
                     });
                   },
-                  child: Text('Réinitialiser', style: TextStyle(color: AppColors.primary)),
+                  child: Text(
+                    'Réinitialiser',
+                    style: TextStyle(color: AppColors.primary),
+                  ),
                 ),
               ],
             ),
@@ -134,18 +141,25 @@ class _SearchFilterSheetState extends State<SearchFilterSheet> {
                     children: BusinessType.values.map((category) {
                       final isSelected = _categorySelection[category] ?? false;
                       return FilterChip(
-                        backgroundColor: Colors.grey[100],
+                        backgroundColor: AppColors.background,
                         label: Text(_getCategoryDisplayName(category)),
-                        avatar: Icon(_getCategoryIcon(category), size: 16, color: AppColors.primary),
+                        avatar: Icon(
+                          _getCategoryIcon(category),
+                          size: 16,
+                          color: AppColors.primary,
+                        ),
                         selected: isSelected,
-                        selectedColor: AppColors.primary.withOpacity(0.2),
+                        selectedColor: AppColors.primary.withValues(alpha: 0.2),
                         checkmarkColor: AppColors.primary,
                         onSelected: (selected) {
                           setState(() {
                             for (var cat in BusinessType.values) {
-                              _categorySelection[cat] = cat == category && selected;
+                              _categorySelection[cat] =
+                                  cat == category && selected;
                             }
-                            _filters = _filters.copyWith(category: selected ? category : null);
+                            _filters = _filters.copyWith(
+                              category: selected ? category : null,
+                            );
                           });
                         },
                       );
@@ -160,9 +174,11 @@ class _SearchFilterSheetState extends State<SearchFilterSheet> {
                   SliderTheme(
                     data: SliderTheme.of(context).copyWith(
                       activeTrackColor: AppColors.primary,
-                      inactiveTrackColor: AppColors.primary.withOpacity(0.3),
+                      inactiveTrackColor: AppColors.primary.withValues(
+                        alpha: 0.3,
+                      ),
                       thumbColor: AppColors.primary,
-                      overlayColor: AppColors.primary.withOpacity(0.2),
+                      overlayColor: AppColors.primary.withValues(alpha: 0.2),
                       valueIndicatorColor: AppColors.primary,
                     ),
                     child: Column(
@@ -175,19 +191,30 @@ class _SearchFilterSheetState extends State<SearchFilterSheet> {
                           label: (_filters.minRating ?? 0.0).toStringAsFixed(1),
                           onChanged: (value) {
                             setState(() {
-                              _filters = _filters.copyWith(minRating: value > 0 ? value : null);
+                              _filters = _filters.copyWith(
+                                minRating: value > 0 ? value : null,
+                              );
                             });
                           },
                         ),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text('0.0', style: TextStyle(color: Colors.grey[600])),
+                            Text(
+                              '0.0',
+                              style: TextStyle(color: AppColors.textSecondary),
+                            ),
                             Text(
                               'Note: ${(_filters.minRating ?? 0.0).toStringAsFixed(1)}',
-                              style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.primary),
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.primary,
+                              ),
                             ),
-                            Text('5.0', style: TextStyle(color: Colors.grey[600])),
+                            Text(
+                              '5.0',
+                              style: TextStyle(color: AppColors.textSecondary),
+                            ),
                           ],
                         ),
                       ],
@@ -202,16 +229,28 @@ class _SearchFilterSheetState extends State<SearchFilterSheet> {
                   TextField(
                     decoration: InputDecoration(
                       hintText: 'Ex: Kinshasa, Lubumbashi...',
-                      prefixIcon: Icon(Icons.location_on, color: AppColors.primary),
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                      prefixIcon: Icon(
+                        Icons.location_on,
+                        color: AppColors.primary,
+                      ),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 14,
+                      ),
                     ),
                     onChanged: (value) {
                       setState(() {
-                        _filters = _filters.copyWith(location: value.isEmpty ? null : value);
+                        _filters = _filters.copyWith(
+                          location: value.isEmpty ? null : value,
+                        );
                       });
                     },
-                    controller: TextEditingController(text: _filters.location ?? ''),
+                    controller: TextEditingController(
+                      text: _filters.location ?? '',
+                    ),
                   ),
 
                   const SizedBox(height: 24),
@@ -224,13 +263,17 @@ class _SearchFilterSheetState extends State<SearchFilterSheet> {
                     children: SortBy.values.map((sortBy) {
                       final isSelected = _filters.sortBy == sortBy;
                       return ChoiceChip(
-                        backgroundColor: Colors.grey[100],
+                        backgroundColor: AppColors.background,
                         label: Text(sortBy.displayName),
                         selected: isSelected,
-                        selectedColor: AppColors.primary.withOpacity(0.2),
+                        selectedColor: AppColors.primary.withValues(alpha: 0.2),
                         labelStyle: TextStyle(
-                          color: isSelected ? AppColors.primary : Colors.grey[700],
-                          fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                          color: isSelected
+                              ? AppColors.primary
+                              : AppColors.textSecondary,
+                          fontWeight: isSelected
+                              ? FontWeight.bold
+                              : FontWeight.normal,
                         ),
                         onSelected: (selected) {
                           if (selected) {
@@ -253,9 +296,15 @@ class _SearchFilterSheetState extends State<SearchFilterSheet> {
           Container(
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              color: AppColors.scaffoldBackground,
-              border: Border(top: BorderSide(color: Colors.grey[200]!)),
-              boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 10, offset: const Offset(0, -5))],
+              color: AppColors.background,
+              border: Border(top: BorderSide(color: AppColors.background)),
+              boxShadow: [
+                BoxShadow(
+                  color: AppColors.textPrimary.withValues(alpha: 0.1),
+                  blurRadius: 10,
+                  offset: const Offset(0, -5),
+                ),
+              ],
             ),
             child: Row(
               children: [
@@ -264,10 +313,15 @@ class _SearchFilterSheetState extends State<SearchFilterSheet> {
                     onPressed: () => Navigator.pop(context),
                     style: OutlinedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 16),
-                      side: BorderSide(color: AppColors.primary,width: 3),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      side: BorderSide(color: AppColors.primary, width: 3),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
                     ),
-                    child: const Text('Annuler', style: TextStyle(color: AppColors.primary),),
+                    child: const Text(
+                      'Annuler',
+                      style: TextStyle(color: AppColors.primary),
+                    ),
                   ),
                 ),
                 const SizedBox(width: 16),
@@ -279,9 +333,14 @@ class _SearchFilterSheetState extends State<SearchFilterSheet> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.primary,
                       padding: const EdgeInsets.symmetric(vertical: 16),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
                     ),
-                    child: const Text('Appliquer', style: TextStyle(color: Colors.white)),
+                    child: const Text(
+                      'Appliquer',
+                      style: TextStyle(color: AppColors.white),
+                    ),
                   ),
                 ),
               ],
@@ -293,6 +352,9 @@ class _SearchFilterSheetState extends State<SearchFilterSheet> {
   }
 
   Widget _buildSectionTitle(String title) {
-    return Text(title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold));
+    return Text(
+      title,
+      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+    );
   }
 }

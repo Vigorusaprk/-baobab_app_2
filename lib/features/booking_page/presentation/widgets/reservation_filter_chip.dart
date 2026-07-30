@@ -22,20 +22,22 @@ class ReservationFilterChip extends StatelessWidget {
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.symmetric(
-          horizontal: AppDimens.PADDING_16,
-          vertical: AppDimens.PADDING_8,
+          horizontal: AppDimens.medium,
+          vertical: AppDimens.small,
         ),
         decoration: BoxDecoration(
-          color: isSelected ? AppColors.primary50 : AppColors.primary50.withOpacity(0.3),
-          borderRadius: BorderRadius.circular(AppDimens.BORDER_RADIUS_20),
+          color: isSelected
+              ? AppColors.white
+              : AppColors.white.withOpacity(0.3),
+          borderRadius: BorderRadius.circular(AppDimens.radius20),
           boxShadow: isSelected
               ? [
-            BoxShadow(
-              color: AppColors.primary.withOpacity(0.3),
-              blurRadius: 8,
-              offset: const Offset(0, 2),
-            ),
-          ]
+                  BoxShadow(
+                    color: AppColors.primary.withOpacity(0.3),
+                    blurRadius: 8,
+                    offset: const Offset(0, 2),
+                  ),
+                ]
               : [],
         ),
         child: Text(
@@ -44,7 +46,7 @@ class ReservationFilterChip extends StatelessWidget {
             fontSize: 14,
             fontWeight: AppFonts.medium,
             fontFamily: AppFonts.primaryFontFamily,
-            color: isSelected ? AppColors.primary50 : AppColors.primary50,
+            color: isSelected ? AppColors.white : AppColors.white,
           ),
         ),
       ),

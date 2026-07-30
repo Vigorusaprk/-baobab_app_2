@@ -37,9 +37,10 @@ class MenuSection extends StatelessWidget {
     return BlocProvider(
       create: (context) => CartCubit(),
       child: DefaultTabController(
-        length: categories.length, // OBLIGATOIRE pour synchroniser la TabBar et le TabBarView
+        length: categories
+            .length, // OBLIGATOIRE pour synchroniser la TabBar et le TabBarView
         child: Scaffold(
-          backgroundColor: AppColors.canvasBackground,
+          backgroundColor: AppColors.background,
           body: Column(
             children: [
               MenuTopBar(

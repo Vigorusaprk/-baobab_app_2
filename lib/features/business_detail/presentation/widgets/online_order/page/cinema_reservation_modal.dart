@@ -9,16 +9,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 void showCinemaReservationModal(
-    BuildContext context, {
-      required Business cinema,
-      required Movie movie,
-      required Showtime showtime,
-    }) {
+  BuildContext context, {
+  required Business cinema,
+  required Movie movie,
+  required Showtime showtime,
+}) {
   final bloc = context.read<BusinessDetailBloc>();
   showModalBottomSheet(
     context: context,
     isScrollControlled: true,
-    backgroundColor: Colors.transparent,
+    backgroundColor: AppColors.transparent,
     builder: (modalContext) => BlocProvider.value(
       value: bloc,
       child: CinemaReservationModal(
@@ -66,12 +66,19 @@ class _CinemaReservationModalState extends State<CinemaReservationModal> {
   void _book() async {
     final sessionUser = SessionService.instance.currentUser;
     if (sessionUser == null) {
-      showAuthRequiredCard(context, message: 'Connectez-vous pour réserver vos places.');
+      showAuthRequiredCard(
+        context,
+        message: 'Connectez-vous pour réserver vos places.',
+      );
       return;
     }
-    if (_fullNameController.text.trim().isEmpty || _phoneController.text.trim().isEmpty) {
+    if (_fullNameController.text.trim().isEmpty ||
+        _phoneController.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Veuillez remplir votre nom et téléphone'), backgroundColor: Colors.orange),
+        const SnackBar(
+          content: Text('Veuillez remplir votre nom et téléphone'),
+          backgroundColor: Colors.orange,
+        ),
       );
       return;
     }
@@ -95,7 +102,9 @@ class _CinemaReservationModalState extends State<CinemaReservationModal> {
         'tickets_count': _numberOfTickets,
         'customer_name': _fullNameController.text.trim(),
         'phone': _phoneController.text.trim(),
-        'notes': _notesController.text.trim().isEmpty ? null : _notesController.text.trim(),
+        'notes': _notesController.text.trim().isEmpty
+            ? null
+            : _notesController.text.trim(),
         'establishment_name': widget.cinema.name,
       },
     );
@@ -104,11 +113,17 @@ class _CinemaReservationModalState extends State<CinemaReservationModal> {
       context.read<BusinessDetailBloc>().add(MakeReservation(reservation));
       Navigator.pop(context);
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Réservation confirmée !'), backgroundColor: Colors.green),
+        const SnackBar(
+          content: Text('Réservation confirmée !'),
+          backgroundColor: AppColors.success,
+        ),
       );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Erreur : $e'), backgroundColor: Colors.red),
+        SnackBar(
+          content: Text('Erreur : $e'),
+          backgroundColor: AppColors.error,
+        ),
       );
     } finally {
       setState(() => _isLoading = false);
@@ -122,7 +137,7 @@ class _CinemaReservationModalState extends State<CinemaReservationModal> {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: const BoxDecoration(
-        color: AppColors.scaffoldBackground,
+        color: AppColors.background,
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       height: screenHeight * 0.7,
@@ -134,7 +149,7 @@ class _CinemaReservationModalState extends State<CinemaReservationModal> {
               width: 40,
               height: 4,
               decoration: BoxDecoration(
-                color: Colors.grey[300],
+                color: AppColors.textSecondary,
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
@@ -147,18 +162,23 @@ class _CinemaReservationModalState extends State<CinemaReservationModal> {
           const SizedBox(height: 8),
           Text(
             '${widget.showtime.startTime.day}/${widget.showtime.startTime.month}/${widget.showtime.startTime.year} à ${widget.showtime.startTime.hour}:${widget.showtime.startTime.minute.toString().padLeft(2, '0')} - ${widget.showtime.room}',
-            style: const TextStyle(color: Colors.grey),
+            style: const TextStyle(color: AppColors.textSecondary),
           ),
           const SizedBox(height: 16),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text('Nombre de tickets', style: TextStyle(fontWeight: FontWeight.bold)),
+              const Text(
+                'Nombre de tickets',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
               Row(
                 children: [
                   IconButton(
                     icon: const Icon(Icons.remove),
-                    onPressed: _numberOfTickets > 1 ? () => setState(() => _numberOfTickets--) : null,
+                    onPressed: _numberOfTickets > 1
+                        ? () => setState(() => _numberOfTickets--)
+                        : null,
                   ),
                   Text('$_numberOfTickets'),
                   IconButton(
@@ -201,16 +221,19 @@ class _CinemaReservationModalState extends State<CinemaReservationModal> {
             children: [
               Text(
                 'Total: ${totalPrice.toStringAsFixed(2)} €',
-                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               ElevatedButton(
                 onPressed: _isLoading ? null : _book,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.green,
-                  foregroundColor: Colors.white,
+                  backgroundColor: AppColors.success,
+                  foregroundColor: AppColors.white,
                 ),
                 child: _isLoading
-                    ? const CircularProgressIndicator(color: Colors.white)
+                    ? const CircularProgressIndicator(color: AppColors.white)
                     : const Text('Confirmer'),
               ),
             ],

@@ -50,12 +50,10 @@ class InfoTile extends StatelessWidget {
           children: [
             IconBadge(icon: icon, color: AppColors.secondary),
             const SizedBox(width: 16),
-            Expanded(
-              child: Text(subtitle, style: AppFonts.bodyMedium),
-            ),
+            Expanded(child: Text(subtitle, style: AppFonts.bodyMedium)),
             if (trailing != null) trailing!,
             if (onTap != null && trailing == null)
-              Icon(Icons.chevron_right, color: Colors.grey[400]),
+              Icon(Icons.chevron_right, color: AppColors.textSecondary),
           ],
         ),
       ),
@@ -67,7 +65,11 @@ class DetailSection extends StatelessWidget {
   final String sectionTitle;
   final List<Widget> children;
 
-  const DetailSection({super.key, required this.sectionTitle, required this.children});
+  const DetailSection({
+    super.key,
+    required this.sectionTitle,
+    required this.children,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -81,14 +83,14 @@ class DetailSection extends StatelessWidget {
         Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: AppColors.white,
             borderRadius: BorderRadius.circular(24),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.03),
+                color: AppColors.textPrimary.withOpacity(0.03),
                 blurRadius: 20,
                 offset: const Offset(0, 8),
-              )
+              ),
             ],
           ),
           child: Column(children: children),

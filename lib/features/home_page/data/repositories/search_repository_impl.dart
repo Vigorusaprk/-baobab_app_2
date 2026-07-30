@@ -3,7 +3,8 @@ import 'package:baobabe_0_2/features/home_page/domain/entities/business_entity.d
 import 'package:baobabe_0_2/features/home_page/domain/entities/search_filter_entity.dart';
 import 'package:baobabe_0_2/features/home_page/domain/repositories/search_repository.dart';
 
-import '../data_sources/remote_datasource/business_remote_datasource.dart' show BusinessRemoteDataSource;
+import '../data_sources/remote_datasource/business_remote_datasource.dart'
+    show BusinessRemoteDataSource;
 
 class SearchRepositoryImpl implements SearchRepository {
   final BusinessRemoteDataSource localDataSource;
@@ -14,7 +15,9 @@ class SearchRepositoryImpl implements SearchRepository {
   Future<List<Business>> searchBusinesses(SearchFilterEntity filters) async {
     try {
       final allBusinesses = await localDataSource.getBusinesses();
-      final businesses = allBusinesses.map((model) => model.toEntity()).toList();
+      final businesses = allBusinesses
+          .map((model) => model.toEntity())
+          .toList();
 
       var results = businesses.where((business) {
         // Filtre par texte
@@ -38,7 +41,9 @@ class SearchRepositoryImpl implements SearchRepository {
 
         // Filtre par localisation (adresse)
         if (filters.location != null && filters.location!.isNotEmpty) {
-          if (!business.address.toLowerCase().contains(filters.location!.toLowerCase())) {
+          if (!business.address.toLowerCase().contains(
+            filters.location!.toLowerCase(),
+          )) {
             return false;
           }
         }
@@ -93,10 +98,10 @@ class SearchRepositoryImpl implements SearchRepository {
         results.sort((a, b) => _extractPrice(a).compareTo(_extractPrice(b)));
         break;
       case SortBy.newest:
-      // Pas de date de création, on garde l'ordre par défaut
+        // Pas de date de création, on garde l'ordre par défaut
         break;
       case SortBy.relevance:
-      // Ordre par défaut
+        // Ordre par défaut
         break;
     }
     return results;
@@ -104,7 +109,8 @@ class SearchRepositoryImpl implements SearchRepository {
 
   double _extractPrice(Business business) {
     // Extraction d'un prix moyen selon le type (similaire à avant)
-    if (business.type == BusinessType.hotel && business.specificData['roomTypes'] != null) {
+    if (business.type == BusinessType.hotel &&
+        business.specificData['roomTypes'] != null) {
       final roomTypes = business.specificData['roomTypes'] as List;
       if (roomTypes.isNotEmpty) {
         double total = 0;
@@ -113,7 +119,8 @@ class SearchRepositoryImpl implements SearchRepository {
         }
         return total / roomTypes.length;
       }
-    } else if (business.type == BusinessType.carRental && business.specificData['vehicleTypes'] != null) {
+    } else if (business.type == BusinessType.carRental &&
+        business.specificData['vehicleTypes'] != null) {
       final vehicles = business.specificData['vehicleTypes'] as List;
       if (vehicles.isNotEmpty) {
         double total = 0;
@@ -122,7 +129,8 @@ class SearchRepositoryImpl implements SearchRepository {
         }
         return total / vehicles.length;
       }
-    } else if (business.type == BusinessType.travelAgency && business.specificData['destinations'] != null) {
+    } else if (business.type == BusinessType.travelAgency &&
+        business.specificData['destinations'] != null) {
       final destinations = business.specificData['destinations'] as List;
       if (destinations.isNotEmpty) {
         double total = 0;

@@ -1,6 +1,7 @@
 import 'package:baobabe_0_2/features/home_page/data/models/ui_business.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/widgets/business_card_background.dart';
 import 'package:flutter/material.dart';
+import 'package:baobabe_0_2/core/themes/app_colors.dart';
 
 /// Carte de présentation d'un établissement — style flat/minimaliste
 /// (inspiré Uber Eats / Deliveroo) : photo en haut, contenu sur fond
@@ -17,18 +18,17 @@ class BusinessCardWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final categoryColor = uiBusiness.categoryColor;
     final business = uiBusiness.business;
-    final hasDescription = business.description != null && business.description!.trim().isNotEmpty;
+    final hasDescription = business.description.trim().isNotEmpty;
 
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.white,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: Colors.grey.shade200, width: 1),
+        border: Border.all(color: AppColors.textSecondary, width: 1),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.06),
+            color: AppColors.textPrimary.withValues(alpha: 0.06),
             blurRadius: 16,
             offset: const Offset(0, 6),
           ),
@@ -55,13 +55,18 @@ class BusinessCardWidget extends StatelessWidget {
                     top: 12,
                     right: 12,
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 5,
+                      ),
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: AppColors.white,
                         borderRadius: BorderRadius.circular(8),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.08),
+                            color: AppColors.textPrimary.withValues(
+                              alpha: 0.08,
+                            ),
                             blurRadius: 6,
                             offset: const Offset(0, 2),
                           ),
@@ -70,12 +75,16 @@ class BusinessCardWidget extends StatelessWidget {
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          const Icon(Icons.star_rounded, size: 14, color: Colors.amber),
+                          const Icon(
+                            Icons.star_rounded,
+                            size: 14,
+                            color: Colors.amber,
+                          ),
                           const SizedBox(width: 3),
                           Text(
                             business.rating.toStringAsFixed(1),
                             style: const TextStyle(
-                              color: Colors.black87,
+                              color: AppColors.textPrimary,
                               fontSize: 12,
                               fontWeight: FontWeight.w700,
                               fontFamily: "Poppins",
@@ -100,7 +109,7 @@ class BusinessCardWidget extends StatelessWidget {
                 Text(
                   business.name,
                   style: const TextStyle(
-                    color: Colors.black,
+                    color: AppColors.textPrimary,
                     fontSize: 19,
                     fontWeight: FontWeight.w800,
                     fontFamily: "Poppins",
@@ -112,9 +121,9 @@ class BusinessCardWidget extends StatelessWidget {
                 if (hasDescription) ...[
                   const SizedBox(height: 6),
                   Text(
-                    business.description!,
+                    business.description,
                     style: TextStyle(
-                      color: Colors.grey.shade600,
+                      color: AppColors.textSecondary,
                       fontSize: 13,
                       fontFamily: "Poppins",
                       height: 1.3,

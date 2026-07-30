@@ -74,25 +74,28 @@ class _CarDetailPageState extends State<CarDetailPage> {
 
   Future<void> _submitReservation() async {
     if (SessionService.instance.currentUser == null) {
-      showAuthRequiredCard(context, message: 'Connectez-vous pour réserver ce véhicule.');
+      showAuthRequiredCard(
+        context,
+        message: 'Connectez-vous pour réserver ce véhicule.',
+      );
       return;
     }
     if (_startDate == null || _endDate == null) {
-      _showSnackBar('Veuillez sélectionner les dates', Colors.red);
+      _showSnackBar('Veuillez sélectionner les dates', AppColors.error);
       return;
     }
     if (_customerNameController.text.isEmpty) {
-      _showSnackBar('Veuillez entrer votre nom', Colors.red);
+      _showSnackBar('Veuillez entrer votre nom', AppColors.error);
       return;
     }
     if (_phoneNumberController.text.isEmpty) {
-      _showSnackBar('Veuillez entrer votre téléphone', Colors.red);
+      _showSnackBar('Veuillez entrer votre téléphone', AppColors.error);
       return;
     }
     if (_endDate!.isBefore(_startDate!)) {
       _showSnackBar(
         'La date de fin doit être après la date de début',
-        Colors.red,
+        AppColors.error,
       );
       return;
     }
@@ -127,14 +130,17 @@ class _CarDetailPageState extends State<CarDetailPage> {
       );
 
       if (mounted) {
-        _showSnackBar('✅ Réservation enregistrée avec succès!', Colors.green);
+        _showSnackBar(
+          '✅ Réservation enregistrée avec succès!',
+          AppColors.success,
+        );
         Future.delayed(const Duration(seconds: 1), () {
           if (mounted) Navigator.pop(context, true);
         });
       }
     } catch (e) {
       if (mounted) {
-        _showSnackBar('❌ Erreur: ${e.toString()}', Colors.red);
+        _showSnackBar('❌ Erreur: ${e.toString()}', AppColors.error);
       }
     } finally {
       if (mounted) setState(() => _isLoading = false);
@@ -175,18 +181,18 @@ class _CarDetailPageState extends State<CarDetailPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.scaffoldBackground,
+      backgroundColor: AppColors.background,
       appBar: AppBar(
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: AppColors.scaffoldBackground),
+          icon: const Icon(Icons.arrow_back_ios, color: AppColors.background),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
           widget.vehicle.name,
-          style: TextStyle(color: AppColors.scaffoldBackground),
+          style: TextStyle(color: AppColors.background),
         ),
         elevation: 0,
-        backgroundColor: AppColors.primaryLight,
+        backgroundColor: AppColors.secondary,
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -218,7 +224,8 @@ class _CarDetailPageState extends State<CarDetailPage> {
                     withDriver: _withDriver,
                     includeInsurance: _includeInsurance,
                     needDelivery: _needDelivery,
-                    onWithDriverChanged: (v) => setState(() => _withDriver = v ?? false),
+                    onWithDriverChanged: (v) =>
+                        setState(() => _withDriver = v ?? false),
                     onIncludeInsuranceChanged: (v) =>
                         setState(() => _includeInsurance = v ?? false),
                     onNeedDeliveryChanged: (v) =>

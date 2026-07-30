@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:baobabe_0_2/core/themes/app_colors.dart';
 
 class RatingWidget extends StatelessWidget {
   final double rating;
@@ -27,7 +28,11 @@ class RatingWidget extends StatelessWidget {
           ),
           child: Row(
             children: [
-              Icon(Icons.star_rounded, color: Colors.amber[800], size: iconSize),
+              Icon(
+                Icons.star_rounded,
+                color: Colors.amber[800],
+                size: iconSize,
+              ),
               const SizedBox(width: 4),
               Text(
                 rating.toStringAsFixed(1),
@@ -44,7 +49,11 @@ class RatingWidget extends StatelessWidget {
           const SizedBox(width: 8),
           Text(
             "$reviewCount avis",
-            style: TextStyle(color: Colors.grey[600], fontSize: 13, fontWeight: FontWeight.w500),
+            style: TextStyle(
+              color: AppColors.textSecondary,
+              fontSize: 13,
+              fontWeight: FontWeight.w500,
+            ),
           ),
         ],
       ],

@@ -13,4 +13,3 @@ abstract class AuthRemoteDataSource {
 
   Future<Either<Failure, AuthResponse>> authWithGoogle();
 }
-

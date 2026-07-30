@@ -22,29 +22,26 @@ class CarVehicleCard extends StatelessWidget {
     return GestureDetector(
       onTap: isAvailable
           ? () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => CarDetailPage(
-              businessId: businessId,
-              businessName: businessName,
-              vehicle: vehicle,
-            ),
-          ),
-        );
-      }
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => CarDetailPage(
+                    businessId: businessId,
+                    businessName: businessName,
+                    vehicle: vehicle,
+                  ),
+                ),
+              );
+            }
           : null,
       child: Card(
-        color: AppColors.scaffoldBackground,
+        color: AppColors.background,
         margin: const EdgeInsets.only(bottom: 16),
         elevation: 2,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildVehicleImage(),
-            _buildVehicleDetails(isAvailable),
-          ],
+          children: [_buildVehicleImage(), _buildVehicleDetails(isAvailable)],
         ),
       ),
     );
@@ -55,23 +52,33 @@ class CarVehicleCard extends StatelessWidget {
       height: 200,
       width: double.infinity,
       decoration: BoxDecoration(
-        color: Colors.grey[300],
+        color: AppColors.textSecondary,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
       ),
       child: vehicle.imageUrl.isNotEmpty
           ? ClipRRect(
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
-        child: Image.network(
-          vehicle.imageUrl,
-          fit: BoxFit.cover,
-          errorBuilder: (_, __, ___) => Center(
-            child: Icon(Icons.directions_car, size: 80, color: Colors.grey[600]),
-          ),
-        ),
-      )
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(12),
+              ),
+              child: Image.network(
+                vehicle.imageUrl,
+                fit: BoxFit.cover,
+                errorBuilder: (_, __, ___) => Center(
+                  child: Icon(
+                    Icons.directions_car,
+                    size: 80,
+                    color: AppColors.textSecondary,
+                  ),
+                ),
+              ),
+            )
           : Center(
-        child: Icon(Icons.directions_car, size: 80, color: Colors.grey[600]),
-      ),
+              child: Icon(
+                Icons.directions_car,
+                size: 80,
+                color: AppColors.textSecondary,
+              ),
+            ),
     );
   }
 
@@ -93,29 +100,34 @@ class CarVehicleCard extends StatelessWidget {
                       style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
-                        color: Colors.black87,
+                        color: AppColors.textPrimary,
                       ),
                     ),
                     Text(
                       vehicle.type,
                       style: TextStyle(
                         fontSize: 14,
-                        color: Colors.grey[600],
+                        color: AppColors.textSecondary,
                       ),
                     ),
                   ],
                 ),
               ),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 8,
+                ),
                 decoration: BoxDecoration(
-                  color: isAvailable ? AppColors.primaryLight : Colors.grey[400],
+                  color: isAvailable
+                      ? AppColors.secondary
+                      : AppColors.textSecondary,
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
                   '${vehicle.dailyPrice.toStringAsFixed(0)}€/jour',
                   style: const TextStyle(
-                    color: Colors.white,
+                    color: AppColors.white,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -141,7 +153,7 @@ class CarVehicleCard extends StatelessWidget {
             feature,
             style: const TextStyle(fontSize: 12, color: Colors.black87),
           ),
-          backgroundColor: Colors.grey[200],
+          backgroundColor: AppColors.background,
           padding: EdgeInsets.zero,
         );
       }).toList(),
@@ -150,12 +162,10 @@ class CarVehicleCard extends StatelessWidget {
 
   Widget _buildAvailability(bool isAvailable, int quantity) {
     return Text(
-      isAvailable
-          ? '✅ $quantity disponible(s)'
-          : '❌ Indisponible',
+      isAvailable ? '✅ $quantity disponible(s)' : '❌ Indisponible',
       style: TextStyle(
         fontSize: 12,
-        color: isAvailable ? Colors.green : Colors.red,
+        color: isAvailable ? AppColors.success : AppColors.error,
         fontWeight: FontWeight.w600,
       ),
     );

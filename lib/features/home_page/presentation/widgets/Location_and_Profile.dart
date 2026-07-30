@@ -9,7 +9,11 @@ class LocationAndProfile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(left: AppDimens.PADDING_20, right: AppDimens.PADDING_20, top: AppDimens.PADDING_20),
+      padding: const EdgeInsets.only(
+        left: AppDimens.large,
+        right: AppDimens.large,
+        top: AppDimens.large,
+      ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -22,7 +26,7 @@ class LocationAndProfile extends StatelessWidget {
               ],
             ),
           ),
-          _buildHeaderNotification()
+          _buildHeaderNotification(),
         ],
       ),
     );
@@ -32,17 +36,14 @@ class LocationAndProfile extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(15),
       decoration: BoxDecoration(
-        color:  AppColors.primary,
+        color: AppColors.primary,
         shape: BoxShape.circle,
       ),
       child: SvgPicture.asset(
         'assets/icons/location-svgrepo-com (1).svg',
         height: 20,
         width: 20,
-        colorFilter: const ColorFilter.mode(
-          AppColors.primary50,
-          BlendMode.srcIn,
-        ),
+        colorFilter: const ColorFilter.mode(AppColors.white, BlendMode.srcIn),
       ),
     );
   }
@@ -85,10 +86,7 @@ class LocationAndProfile extends StatelessWidget {
         'assets/icons/notifications.svg',
         height: 25,
         width: 25,
-        colorFilter: const ColorFilter.mode(
-          AppColors.primary50,
-          BlendMode.srcIn,
-        ),
+        colorFilter: const ColorFilter.mode(AppColors.white, BlendMode.srcIn),
       ),
     );
   }

@@ -23,26 +23,26 @@ class ReservationCard extends StatelessWidget {
   Widget build(BuildContext context) {
     try {
       return Container(
-        margin: const EdgeInsets.only(bottom: AppDimens.PADDING_16),
+        margin: const EdgeInsets.only(bottom: AppDimens.medium),
         decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(AppDimens.BORDER_RADIUS_20),
+          color: AppColors.white,
+          borderRadius: BorderRadius.circular(AppDimens.radius20),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.08),
+              color: AppColors.textPrimary.withOpacity(0.08),
               blurRadius: 12,
               offset: const Offset(0, 4),
             ),
           ],
         ),
         child: Material(
-          color: Colors.transparent,
+          color: AppColors.transparent,
           child: InkWell(
             onTap: () =>
                 context.pushNamed('reservationDetail', extra: reservation),
-            borderRadius: BorderRadius.circular(AppDimens.BORDER_RADIUS_20),
+            borderRadius: BorderRadius.circular(AppDimens.radius20),
             child: Padding(
-              padding: const EdgeInsets.all(AppDimens.PADDING_16),
+              padding: const EdgeInsets.all(AppDimens.medium),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -56,9 +56,12 @@ class ReservationCard extends StatelessWidget {
                         decoration: BoxDecoration(
                           color: reservation.typeColor.withOpacity(0.2),
                           borderRadius: BorderRadius.circular(
-                            AppDimens.BORDER_RADIUS_12,
+                            AppDimens.radius12,
                           ),
-                          border: Border.all(width: 2, color: reservation.typeColor),
+                          border: Border.all(
+                            width: 2,
+                            color: reservation.typeColor,
+                          ),
                         ),
                         child: Icon(
                           reservation.typeIcon,
@@ -66,7 +69,7 @@ class ReservationCard extends StatelessWidget {
                           size: 24,
                         ),
                       ),
-                      const SizedBox(width: AppDimens.PADDING_16),
+                      const SizedBox(width: AppDimens.medium),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -82,20 +85,20 @@ class ReservationCard extends StatelessWidget {
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
                             ),
-                            const SizedBox(height: AppDimens.PADDING_4),
+                            const SizedBox(height: AppDimens.small),
                             Row(
                               children: [
                                 Container(
                                   padding: const EdgeInsets.symmetric(
-                                    horizontal: AppDimens.PADDING_8,
-                                    vertical: AppDimens.PADDING_4,
+                                    horizontal: AppDimens.small,
+                                    vertical: AppDimens.small,
                                   ),
                                   decoration: BoxDecoration(
                                     color: reservation.typeColor.withOpacity(
                                       0.1,
                                     ),
                                     borderRadius: BorderRadius.circular(
-                                      AppDimens.BORDER_RADIUS_8,
+                                      AppDimens.radius8,
                                     ),
                                   ),
                                   child: Text(
@@ -108,14 +111,15 @@ class ReservationCard extends StatelessWidget {
                                     ),
                                   ),
                                 ),
-                                const SizedBox(width: AppDimens.PADDING_8),
+                                const SizedBox(width: AppDimens.small),
                                 Expanded(
                                   child: Text(
-                                    ReservationFormatUtils
-                                        .getReservationSubtitle(reservation),
+                                    ReservationFormatUtils.getReservationSubtitle(
+                                      reservation,
+                                    ),
                                     style: TextStyle(
                                       fontSize: 14,
-                                      color: Colors.grey,
+                                      color: AppColors.textSecondary,
                                       fontFamily: AppFonts.primaryFontFamily,
                                     ),
                                     maxLines: 1,
@@ -132,19 +136,21 @@ class ReservationCard extends StatelessWidget {
                         children: [
                           Container(
                             padding: const EdgeInsets.symmetric(
-                              horizontal: AppDimens.PADDING_10,
-                              vertical: AppDimens.PADDING_5,
+                              horizontal: AppDimens.small,
+                              vertical: AppDimens.small,
                             ),
                             decoration: BoxDecoration(
                               color: ReservationFormatUtils.getStatusColor(
-                                  reservation.displayDate),
+                                reservation.displayDate,
+                              ),
                               borderRadius: BorderRadius.circular(
-                                AppDimens.BORDER_RADIUS_10,
+                                AppDimens.radius10,
                               ),
                             ),
                             child: Text(
                               ReservationFormatUtils.getStatusText(
-                                  reservation.displayDate),
+                                reservation.displayDate,
+                              ),
                               style: TextStyle(
                                 color: AppColors.white,
                                 fontSize: 12,
@@ -153,11 +159,11 @@ class ReservationCard extends StatelessWidget {
                               ),
                             ),
                           ),
-                          const SizedBox(height: AppDimens.PADDING_8),
+                          const SizedBox(height: AppDimens.small),
                           IconButton(
                             icon: Icon(
                               Icons.delete_outline,
-                              color: Colors.grey,
+                              color: AppColors.textSecondary,
                               size: 20,
                             ),
                             onPressed: onDelete,
@@ -168,7 +174,7 @@ class ReservationCard extends StatelessWidget {
                       ),
                     ],
                   ),
-                  const SizedBox(height: AppDimens.PADDING_16),
+                  const SizedBox(height: AppDimens.medium),
                   // Détails spécifiques
                   if (reservation.type == 'hotel')
                     HotelReservationDetails(reservation)
@@ -184,15 +190,13 @@ class ReservationCard extends StatelessWidget {
                     CinemaReservationDetails(reservation)
                   else if (reservation.type == 'toursime')
                     TourismReservationDetails(reservation),
-                  const SizedBox(height: AppDimens.PADDING_12),
+                  const SizedBox(height: AppDimens.medium),
                   Container(
-                    padding: const EdgeInsets.all(AppDimens.PADDING_12),
+                    padding: const EdgeInsets.all(AppDimens.medium),
                     decoration: BoxDecoration(
                       color: reservation.typeColor.withOpacity(0.2),
                       border: Border.all(width: 2, color: AppColors.secondary),
-                      borderRadius: BorderRadius.circular(
-                        AppDimens.BORDER_RADIUS_12,
-                      ),
+                      borderRadius: BorderRadius.circular(AppDimens.radius12),
                     ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,

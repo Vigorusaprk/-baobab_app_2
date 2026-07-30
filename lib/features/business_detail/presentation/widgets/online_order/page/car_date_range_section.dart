@@ -1,4 +1,5 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
+import 'package:baobabe_0_2/core/themes/app_colors.dart';
 
 class CarDateRangeSection extends StatelessWidget {
   final DateTime? startDate;
@@ -34,7 +35,7 @@ class CarDateRangeSection extends StatelessWidget {
                 child: Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    border: Border.all(color: Colors.grey[400]!),
+                    border: Border.all(color: AppColors.textSecondary),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Column(
@@ -44,7 +45,7 @@ class CarDateRangeSection extends StatelessWidget {
                         'Début',
                         style: TextStyle(
                           fontSize: 12,
-                          color: Colors.grey,
+                          color: AppColors.textSecondary,
                         ),
                       ),
                       const SizedBox(height: 4),
@@ -69,7 +70,7 @@ class CarDateRangeSection extends StatelessWidget {
                 child: Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    border: Border.all(color: Colors.grey[400]!),
+                    border: Border.all(color: AppColors.textSecondary),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Column(
@@ -79,7 +80,7 @@ class CarDateRangeSection extends StatelessWidget {
                         'Fin',
                         style: TextStyle(
                           fontSize: 12,
-                          color: Colors.grey,
+                          color: AppColors.textSecondary,
                         ),
                       ),
                       const SizedBox(height: 4),

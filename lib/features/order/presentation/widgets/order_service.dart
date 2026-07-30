@@ -11,7 +11,7 @@ class OrderApiService {
   final Connectivity _connectivity = Connectivity();
 
   OrderApiService([SupabaseClient? supabase])
-      : _supabase = supabase ?? Supabase.instance.client;
+    : _supabase = supabase ?? Supabase.instance.client;
 
   Future<void> createOrder({
     required String userId,
@@ -22,7 +22,9 @@ class OrderApiService {
     String? paymentMethod,
     String? notes,
   }) async {
-    final totalAmount = items.fold<double>(0, (sum, item) => sum + item.total) + (deliveryFee ?? 0);
+    final totalAmount =
+        items.fold<double>(0, (sum, item) => sum + item.total) +
+        (deliveryFee ?? 0);
     final payload = {
       'user_id': userId,
       'business_id': businessId,
@@ -112,13 +114,17 @@ class OrderApiService {
 
   Future<List<Order>> getOrders(String userId) async {
     final connectivityResult = await _connectivity.checkConnectivity();
-    final isOnline = connectivityResult.any((element) => element != ConnectivityResult.none);
+    final isOnline = connectivityResult.any(
+      (element) => element != ConnectivityResult.none,
+    );
 
     if (!isOnline) {
       final cached = await _db.getCache('orders_$userId');
       if (cached != null) {
         final List<dynamic> decoded = jsonDecode(cached);
-        return decoded.map((json) => Order.fromMap(json as Map<String, dynamic>)).toList();
+        return decoded
+            .map((json) => Order.fromMap(json as Map<String, dynamic>))
+            .toList();
       }
       return [];
     }
@@ -147,7 +153,9 @@ class OrderApiService {
       final cached = await _db.getCache('orders_$userId');
       if (cached != null) {
         final List<dynamic> decoded = jsonDecode(cached);
-        return decoded.map((json) => Order.fromMap(json as Map<String, dynamic>)).toList();
+        return decoded
+            .map((json) => Order.fromMap(json as Map<String, dynamic>))
+            .toList();
       }
       throw Exception('Erreur lors du chargement des commandes : $e');
     }

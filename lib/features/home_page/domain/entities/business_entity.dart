@@ -12,7 +12,7 @@ enum BusinessType {
   travelAgency,
   spa,
   tourism,
-  other
+  other,
 }
 
 class BusinessReview extends Equatable {
@@ -63,7 +63,16 @@ class BusinessReview extends Equatable {
   }
 
   @override
-  List<Object?> get props => [id, userName, userAvatar, rating, comment, date, likes, commentCount];
+  List<Object?> get props => [
+    id,
+    userName,
+    userAvatar,
+    rating,
+    comment,
+    date,
+    likes,
+    commentCount,
+  ];
 }
 
 class Business extends Equatable {
@@ -87,7 +96,7 @@ class Business extends Equatable {
   final double? latitude;
   final double? longitude;
   final List<Business>? stores;
-  final bool isSponsored;   // 👈 Ajouté pour filtrer les sponsorisés
+  final bool isSponsored; // 👈 Ajouté pour filtrer les sponsorisés
   final DateTime createdAt; // 👈 Ajouté pour filtrer les nouveautés
 
   const Business({

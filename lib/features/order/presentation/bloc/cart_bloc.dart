@@ -3,14 +3,15 @@ import 'package:baobabe_0_2/features/order/domain/entities/cart_item.dart';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 
-
 part 'cart_state.dart';
 
 class CartCubit extends Cubit<CartState> {
   CartCubit() : super(const CartState(items: []));
 
   void addItem(CartItem item) {
-    final existingIndex = state.items.indexWhere((i) => i.menuItem == item.menuItem);
+    final existingIndex = state.items.indexWhere(
+      (i) => i.menuItem == item.menuItem,
+    );
     if (existingIndex >= 0) {
       final updatedItems = List<CartItem>.from(state.items);
       updatedItems[existingIndex] = updatedItems[existingIndex].copyWith(
@@ -23,7 +24,9 @@ class CartCubit extends Cubit<CartState> {
   }
 
   void removeItem(MenuItem menuItem) {
-    final updatedItems = state.items.where((i) => i.menuItem != menuItem).toList();
+    final updatedItems = state.items
+        .where((i) => i.menuItem != menuItem)
+        .toList();
     emit(CartState(items: updatedItems));
   }
 
@@ -45,5 +48,6 @@ class CartCubit extends Cubit<CartState> {
   }
 
   int get totalItems => state.items.fold(0, (sum, item) => sum + item.quantity);
-  double get totalPrice => state.items.fold(0.0, (sum, item) => sum + item.totalPrice);
+  double get totalPrice =>
+      state.items.fold(0.0, (sum, item) => sum + item.totalPrice);
 }

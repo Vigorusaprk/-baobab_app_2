@@ -8,7 +8,11 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 /// business UserEntity, so the rest of the app reads session identity
 /// straight from Supabase instead of depending on auth-internal types.
 class AppSessionUser {
-  const AppSessionUser({required this.id, required this.name, required this.email});
+  const AppSessionUser({
+    required this.id,
+    required this.name,
+    required this.email,
+  });
 
   final String id;
   final String name;
@@ -44,9 +48,9 @@ class SessionService {
 
   /// Emits the current session user every time Supabase's auth state changes
   /// (sign in, sign out, token refresh).
-  Stream<AppSessionUser?> get userChanges => _client.auth.onAuthStateChange.map(
-    (data) => data.session?.user,
-  ).map((user) => user == null ? null : AppSessionUser.fromSupabase(user));
+  Stream<AppSessionUser?> get userChanges => _client.auth.onAuthStateChange
+      .map((data) => data.session?.user)
+      .map((user) => user == null ? null : AppSessionUser.fromSupabase(user));
 
   /// Raw auth state change stream, handy for GoRouter's refreshListenable.
   Stream<AuthState> get authStateChanges => _client.auth.onAuthStateChange;

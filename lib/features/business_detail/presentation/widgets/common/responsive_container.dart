@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:baobabe_0_2/core/themes/app_diemens.dart';
 
 class ResponsiveContainer extends StatelessWidget {
   final Widget child;
@@ -15,7 +16,7 @@ class ResponsiveContainer extends StatelessWidget {
     return Center(
       child: Container(
         constraints: BoxConstraints(maxWidth: maxWidth),
-        padding: padding ?? const EdgeInsets.symmetric(horizontal: 20),
+        padding: padding ?? AppDimens.appPadding,
         child: child,
       ),
     );

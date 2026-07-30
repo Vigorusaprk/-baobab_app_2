@@ -26,7 +26,7 @@ class ReservationDetailPage extends StatelessWidget {
     final total = reservation.totalAmount.toStringAsFixed(2);
 
     return Scaffold(
-      backgroundColor: AppColors.scaffoldBackground,
+      backgroundColor: AppColors.background,
       appBar: AppBar(
         title: Text(
           'Détails de la réservation',
@@ -42,24 +42,24 @@ class ReservationDetailPage extends StatelessWidget {
         leading: IconButton(
           icon: Container(
             decoration: BoxDecoration(
-              border: Border.all(color: AppColors.secondary50, width: 2.5),
-              shape: BoxShape.circle
+              border: Border.all(color: AppColors.secondaryLight, width: 2.5),
+              shape: BoxShape.circle,
             ),
             child: const Center(
               child: Icon(
                 Icons.arrow_back_ios_new_rounded,
-                color: AppColors.secondary100,
+                color: AppColors.white,
               ),
             ),
           ),
           onPressed: () => Navigator.pop(context),
         ),
         backgroundColor: AppColors.transparent,
-        foregroundColor: Colors.black87,
+        foregroundColor: AppColors.textPrimary,
       ),
       body: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
+          padding: AppDimens.appPadding,
           child: Column(
             children: [
               Container(
@@ -68,58 +68,167 @@ class ReservationDetailPage extends StatelessWidget {
                     _buildHeaderCard(primaryColor, establishmentName),
                     const SizedBox(height: 16),
                     _buildInfoCard('Informations générales', [
-                      _buildRow('Établissement', establishmentName, icon: Icons.store),
-                      _buildRow('Type', reservation.typeDisplayName, icon: Icons.category),
-                      _buildRow('Nom', reservation.customerName.isNotEmpty ? reservation.customerName : 'Non renseigné',
-                          icon: Icons.person),
-                      _buildRow('Téléphone',
-                          reservation.phoneNumber.isNotEmpty ? reservation.phoneNumber : 'Non renseigné',
-                          icon: Icons.phone),
+                      _buildRow(
+                        'Établissement',
+                        establishmentName,
+                        icon: Icons.store,
+                      ),
+                      _buildRow(
+                        'Type',
+                        reservation.typeDisplayName,
+                        icon: Icons.category,
+                      ),
+                      _buildRow(
+                        'Nom',
+                        reservation.customerName.isNotEmpty
+                            ? reservation.customerName
+                            : 'Non renseigné',
+                        icon: Icons.person,
+                      ),
+                      _buildRow(
+                        'Téléphone',
+                        reservation.phoneNumber.isNotEmpty
+                            ? reservation.phoneNumber
+                            : 'Non renseigné',
+                        icon: Icons.phone,
+                      ),
                     ]),
                     const SizedBox(height: 16),
                     if (reservation.type == 'restaurant')
                       _buildInfoCard('Détails du restaurant', [
-                        _buildRow('Table', reservation.tableNumber ?? 'Non spécifiée', icon: Icons.table_restaurant),
-                        _buildRow('Date', _safeFormatDate(reservation.date), icon: Icons.calendar_today),
-                        _buildRow('Heure', _safeFormatTime(reservation.time), icon: Icons.access_time),
-                        _buildRow('Personnes', '${reservation.numberOfPeople ?? 0}', icon: Icons.people),
+                        _buildRow(
+                          'Table',
+                          reservation.tableNumber ?? 'Non spécifiée',
+                          icon: Icons.table_restaurant,
+                        ),
+                        _buildRow(
+                          'Date',
+                          _safeFormatDate(reservation.date),
+                          icon: Icons.calendar_today,
+                        ),
+                        _buildRow(
+                          'Heure',
+                          _safeFormatTime(reservation.time),
+                          icon: Icons.access_time,
+                        ),
+                        _buildRow(
+                          'Personnes',
+                          '${reservation.numberOfPeople ?? 0}',
+                          icon: Icons.people,
+                        ),
                       ]),
                     if (reservation.type == 'hotel')
                       _buildInfoCard('Détails de l\'hôtel', [
-                        _buildRow('Chambre', reservation.roomType ?? 'Non spécifiée', icon: Icons.king_bed),
-                        _buildRow('Arrivée', _safeFormatDate(reservation.checkInDate), icon: Icons.calendar_today),
-                        _buildRow('Départ', _safeFormatDate(reservation.checkOutDate), icon: Icons.calendar_today),
-                        _buildRow('Chambres', '${reservation.numberOfRooms ?? 1}', icon: Icons.hotel),
-                        _buildRow('Personnes', '${reservation.numberOfGuests ?? 1}', icon: Icons.people),
+                        _buildRow(
+                          'Chambre',
+                          reservation.roomType ?? 'Non spécifiée',
+                          icon: Icons.king_bed,
+                        ),
+                        _buildRow(
+                          'Arrivée',
+                          _safeFormatDate(reservation.checkInDate),
+                          icon: Icons.calendar_today,
+                        ),
+                        _buildRow(
+                          'Départ',
+                          _safeFormatDate(reservation.checkOutDate),
+                          icon: Icons.calendar_today,
+                        ),
+                        _buildRow(
+                          'Chambres',
+                          '${reservation.numberOfRooms ?? 1}',
+                          icon: Icons.hotel,
+                        ),
+                        _buildRow(
+                          'Personnes',
+                          '${reservation.numberOfGuests ?? 1}',
+                          icon: Icons.people,
+                        ),
                       ]),
                     if (reservation.type == 'car_rental')
                       _buildInfoCard('Détails de la location', [
-                        _buildRow('Véhicule', reservation.vehicleType ?? 'Non spécifié', icon: Icons.directions_car),
-                        _buildRow('Début', _safeFormatDate(reservation.rentalStartDate), icon: Icons.calendar_today),
-                        _buildRow('Fin', _safeFormatDate(reservation.rentalEndDate), icon: Icons.calendar_today),
+                        _buildRow(
+                          'Véhicule',
+                          reservation.vehicleType ?? 'Non spécifié',
+                          icon: Icons.directions_car,
+                        ),
+                        _buildRow(
+                          'Début',
+                          _safeFormatDate(reservation.rentalStartDate),
+                          icon: Icons.calendar_today,
+                        ),
+                        _buildRow(
+                          'Fin',
+                          _safeFormatDate(reservation.rentalEndDate),
+                          icon: Icons.calendar_today,
+                        ),
                       ]),
                     if (reservation.type == 'travel')
                       _buildInfoCard('Détails du voyage', [
-                        _buildRow('Destination', reservation.destination ?? 'Non spécifiée', icon: Icons.location_on),
-                        _buildRow('Passagers', '${reservation.numberOfPassengers ?? 1}', icon: Icons.people),
+                        _buildRow(
+                          'Destination',
+                          reservation.destination ?? 'Non spécifiée',
+                          icon: Icons.location_on,
+                        ),
+                        _buildRow(
+                          'Passagers',
+                          '${reservation.numberOfPassengers ?? 1}',
+                          icon: Icons.people,
+                        ),
                       ]),
                     if (reservation.type == 'spa')
                       _buildInfoCard('Détails du spa', [
-                        _buildRow('Soin', reservation.treatmentType ?? 'Non spécifié', icon: Icons.spa),
-                        _buildRow('Date', _safeFormatDate(reservation.appointmentDate), icon: Icons.calendar_today),
-                        _buildRow('Thérapeute', reservation.therapistName ?? 'Non spécifié', icon: Icons.person_pin),
+                        _buildRow(
+                          'Soin',
+                          reservation.treatmentType ?? 'Non spécifié',
+                          icon: Icons.spa,
+                        ),
+                        _buildRow(
+                          'Date',
+                          _safeFormatDate(reservation.appointmentDate),
+                          icon: Icons.calendar_today,
+                        ),
+                        _buildRow(
+                          'Thérapeute',
+                          reservation.therapistName ?? 'Non spécifié',
+                          icon: Icons.person_pin,
+                        ),
                       ]),
                     if (reservation.type == 'cinema')
                       _buildInfoCard('Détails du cinéma', [
-                        _buildRow('Film', reservation.movieTitle ?? 'Non spécifié', icon: Icons.movie),
-                        _buildRow('Séance', _safeFormatDate(reservation.showtime), icon: Icons.calendar_today),
-                        _buildRow('Places', '${reservation.numberOfTickets ?? 0}', icon: Icons.confirmation_number),
+                        _buildRow(
+                          'Film',
+                          reservation.movieTitle ?? 'Non spécifié',
+                          icon: Icons.movie,
+                        ),
+                        _buildRow(
+                          'Séance',
+                          _safeFormatDate(reservation.showtime),
+                          icon: Icons.calendar_today,
+                        ),
+                        _buildRow(
+                          'Places',
+                          '${reservation.numberOfTickets ?? 0}',
+                          icon: Icons.confirmation_number,
+                        ),
                       ]),
                     if (reservation.type == 'toursime')
                       _buildInfoCard('Détails du tourisme', [
-                        _buildRow('Activité', reservation.activitiName ?? 'Non spécifiée', icon: Icons.tour),
-                        _buildRow('Date', _safeFormatDate(reservation.day), icon: Icons.calendar_today),
-                        _buildRow('Participants', '${reservation.numberOfPassengers ?? 1}', icon: Icons.people),
+                        _buildRow(
+                          'Activité',
+                          reservation.activitiName ?? 'Non spécifiée',
+                          icon: Icons.tour,
+                        ),
+                        _buildRow(
+                          'Date',
+                          _safeFormatDate(reservation.day),
+                          icon: Icons.calendar_today,
+                        ),
+                        _buildRow(
+                          'Participants',
+                          '${reservation.numberOfPassengers ?? 1}',
+                          icon: Icons.people,
+                        ),
                       ]),
                     const SizedBox(height: 16),
                   ],
@@ -140,12 +249,13 @@ class ReservationDetailPage extends StatelessWidget {
         color: AppColors.surface,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.3), blurRadius: 7, offset: const Offset(0, 1)),
+          BoxShadow(
+            color: AppColors.textPrimary.withOpacity(0.3),
+            blurRadius: 7,
+            offset: const Offset(0, 1),
+          ),
         ],
-        border: Border.all(
-          width: 2.5,
-          color: reservation.typeColor,
-        ),
+        border: Border.all(width: 2.5, color: reservation.typeColor),
       ),
       width: double.infinity,
       child: Padding(
@@ -156,7 +266,11 @@ class ReservationDetailPage extends StatelessWidget {
             const SizedBox(height: 10),
             Text(
               establishmentName,
-              style: TextStyle(color: reservation.typeColor, fontSize: 18, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                color: reservation.typeColor,
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
             ),
             const SizedBox(height: 5),
             Text(
@@ -179,7 +293,10 @@ class ReservationDetailPage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            Text(
+              title,
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
             const Divider(thickness: 1, height: 24),
             ...children,
           ],
@@ -194,12 +311,18 @@ class ReservationDetailPage extends StatelessWidget {
       child: Row(
         children: [
           if (icon != null) ...[
-            Icon(icon, size: 20, color: Colors.grey.shade600),
+            Icon(icon, size: 20, color: AppColors.textSecondary),
             const SizedBox(width: 12),
           ],
           Expanded(
             flex: 2,
-            child: Text(label, style: const TextStyle(fontWeight: FontWeight.w500, color: Colors.black54)),
+            child: Text(
+              label,
+              style: const TextStyle(
+                fontWeight: FontWeight.w500,
+                color: AppColors.textSecondary,
+              ),
+            ),
           ),
           Expanded(
             flex: 3,
@@ -225,7 +348,10 @@ class ReservationDetailPage extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          const Text('Total', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+          const Text(
+            'Total',
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
           Text(
             '\$$total',
             style: TextStyle(

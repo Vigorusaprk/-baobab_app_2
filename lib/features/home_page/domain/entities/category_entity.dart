@@ -14,12 +14,24 @@ class Category extends Equatable {
 
   static const allCategories = [
     Category(id: '0', type: BusinessType.other, displayName: 'Tout'),
-    Category(id: '1', type: BusinessType.restaurant, displayName: 'Restaurants'),
+    Category(
+      id: '1',
+      type: BusinessType.restaurant,
+      displayName: 'Restaurants',
+    ),
     Category(id: '2', type: BusinessType.fastFood, displayName: 'Fast Food'),
     Category(id: '3', type: BusinessType.shopping, displayName: 'Shopping'),
-    Category(id: '4', type: BusinessType.mall, displayName: 'Centres Commerciaux'),
+    Category(
+      id: '4',
+      type: BusinessType.mall,
+      displayName: 'Centres Commerciaux',
+    ),
     Category(id: '5', type: BusinessType.hotel, displayName: 'Hôtels'),
-    Category(id: '6', type: BusinessType.carRental, displayName: 'Location Voiture'),
+    Category(
+      id: '6',
+      type: BusinessType.carRental,
+      displayName: 'Location Voiture',
+    ),
     Category(id: '7', type: BusinessType.travelAgency, displayName: 'Voyage'),
     Category(id: '8', type: BusinessType.spa, displayName: 'Spa'),
     Category(id: '9', type: BusinessType.cinema, displayName: 'Cinema'),

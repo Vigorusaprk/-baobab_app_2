@@ -28,7 +28,10 @@ class RoomCounterRow extends StatelessWidget {
               onPressed: value > min ? () => onChanged(value - 1) : null,
               icon: const Icon(Icons.remove_circle_outline),
             ),
-            Text('$value', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            Text(
+              '$value',
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
             IconButton(
               onPressed: value < max ? () => onChanged(value + 1) : null,
               icon: const Icon(Icons.add_circle_outline),

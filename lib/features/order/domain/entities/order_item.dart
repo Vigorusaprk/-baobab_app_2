@@ -44,15 +44,23 @@ class OrderItem {
   }
 
   factory OrderItem.fromMap(Map<String, dynamic> map) {
-    final menuItem = map['menu_items'] is Map ? map['menu_items'] as Map<String, dynamic> : null;
+    final menuItem = map['menu_items'] is Map
+        ? map['menu_items'] as Map<String, dynamic>
+        : null;
     return OrderItem(
-      menuItemId: map['menu_item_id']?.toString() ?? menuItem?['id']?.toString() ?? '',
-      name: map['name']?.toString() ??
+      menuItemId:
+          map['menu_item_id']?.toString() ?? menuItem?['id']?.toString() ?? '',
+      name:
+          map['name']?.toString() ??
           map['item_name']?.toString() ??
           menuItem?['item_name']?.toString() ??
           menuItem?['name']?.toString() ??
           '',
-      price: toDoubleOrNull(map['unit_price'] ?? map['price'] ?? menuItem?['price']) ?? 0.0,
+      price:
+          toDoubleOrNull(
+            map['unit_price'] ?? map['price'] ?? menuItem?['price'],
+          ) ??
+          0.0,
       quantity: toIntOrNull(map['quantity']) ?? 0,
       specialInstructions: map['special_instructions']?.toString(),
     );

@@ -1,4 +1,5 @@
 import 'package:baobabe_0_2/core/themes/app_colors.dart';
+import 'package:baobabe_0_2/core/themes/app_diemens.dart';
 import 'package:baobabe_0_2/features/home_page/domain/entities/business_entity.dart';
 import 'package:flutter/material.dart';
 import 'business_contact_section.dart';
@@ -12,7 +13,7 @@ class BusinessInfoSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
+      padding: AppDimens.appPadding,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -29,7 +30,7 @@ class BusinessInfoSection extends StatelessWidget {
               child: Text(
                 business.description,
                 style: TextStyle(
-                  color: Colors.grey[800],
+                  color: AppColors.textSecondary,
                   fontSize: 15,
                   height: 1.6,
                 ),

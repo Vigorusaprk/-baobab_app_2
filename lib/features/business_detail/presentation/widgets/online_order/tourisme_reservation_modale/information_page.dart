@@ -38,19 +38,75 @@ class InformationPage extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Padding(padding: EdgeInsets.only(bottom: isSmallScreen ? 12 : 16), child: Text('Vos informations', style: TextStyle(fontSize: isSmallScreen ? 16 : 18, fontWeight: FontWeight.bold))),
-          _buildTextField("Nom complet", "Votre nom complet", fullNameController, isSmallScreen: isSmallScreen, isRequired: true),
-          _buildTextField("Numéro de téléphone", "Entrez votre numéro", phoneController, isSmallScreen: isSmallScreen, keyboardType: TextInputType.phone, isRequired: true),
-          _buildDatePickerTile("Date de l'activité", Icons.calendar_today, activityDate, onPickDate, isSmallScreen),
-          _buildCounterField("Nombre de participants", numberOfParticipants, onParticipantsChanged, min: 1, max: 20, isSmallScreen: isSmallScreen),
-          _buildTextField("Notes", "Ex: Allergies, préférences...", notesController, isSmallScreen: isSmallScreen, maxLines: 3),
+          Padding(
+            padding: EdgeInsets.only(bottom: isSmallScreen ? 12 : 16),
+            child: Text(
+              'Vos informations',
+              style: TextStyle(
+                fontSize: isSmallScreen ? 16 : 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+          _buildTextField(
+            "Nom complet",
+            "Votre nom complet",
+            fullNameController,
+            isSmallScreen: isSmallScreen,
+            isRequired: true,
+          ),
+          _buildTextField(
+            "Numéro de téléphone",
+            "Entrez votre numéro",
+            phoneController,
+            isSmallScreen: isSmallScreen,
+            keyboardType: TextInputType.phone,
+            isRequired: true,
+          ),
+          _buildDatePickerTile(
+            "Date de l'activité",
+            Icons.calendar_today,
+            activityDate,
+            onPickDate,
+            isSmallScreen,
+          ),
+          _buildCounterField(
+            "Nombre de participants",
+            numberOfParticipants,
+            onParticipantsChanged,
+            min: 1,
+            max: 20,
+            isSmallScreen: isSmallScreen,
+          ),
+          _buildTextField(
+            "Notes",
+            "Ex: Allergies, préférences...",
+            notesController,
+            isSmallScreen: isSmallScreen,
+            maxLines: 3,
+          ),
           SizedBox(height: isSmallScreen ? 16 : 20),
           SizedBox(
             width: double.infinity,
             child: ElevatedButton(
               onPressed: canContinue ? onNext : null,
-              style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary, padding: EdgeInsets.symmetric(vertical: isSmallScreen ? 14 : 16), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
-              child: Text("Continuer", style: TextStyle(fontSize: isSmallScreen ? 16 : 18, color: Colors.white, fontWeight: FontWeight.bold)),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primary,
+                padding: EdgeInsets.symmetric(
+                  vertical: isSmallScreen ? 14 : 16,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              child: Text(
+                "Continuer",
+                style: TextStyle(
+                  fontSize: isSmallScreen ? 16 : 18,
+                  color: AppColors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ),
           ),
           SizedBox(height: isSmallScreen ? 8 : 12),
@@ -59,21 +115,53 @@ class InformationPage extends StatelessWidget {
     );
   }
 
-  Widget _buildTextField(String label, String hint, TextEditingController controller, {bool isSmallScreen = false, TextInputType? keyboardType, int maxLines = 1, bool isRequired = false}) {
+  Widget _buildTextField(
+    String label,
+    String hint,
+    TextEditingController controller, {
+    bool isSmallScreen = false,
+    TextInputType? keyboardType,
+    int maxLines = 1,
+    bool isRequired = false,
+  }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(children: [Text(label, style: TextStyle(fontWeight: FontWeight.bold, fontSize: isSmallScreen ? 14 : 16)), if (isRequired) Text(' *', style: TextStyle(color: Colors.red, fontSize: isSmallScreen ? 14 : 16))]),
+        Row(
+          children: [
+            Text(
+              label,
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: isSmallScreen ? 14 : 16,
+              ),
+            ),
+            if (isRequired)
+              Text(
+                ' *',
+                style: TextStyle(
+                  color: AppColors.error,
+                  fontSize: isSmallScreen ? 14 : 16,
+                ),
+              ),
+          ],
+        ),
         SizedBox(height: isSmallScreen ? 6 : 8),
         TextFormField(
           controller: controller,
           decoration: InputDecoration(
             hintText: hint,
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-            contentPadding: EdgeInsets.symmetric(horizontal: isSmallScreen ? 12 : 16, vertical: isSmallScreen ? 10 : 12),
+            contentPadding: EdgeInsets.symmetric(
+              horizontal: isSmallScreen ? 12 : 16,
+              vertical: isSmallScreen ? 10 : 12,
+            ),
             filled: true,
-            fillColor: Colors.grey[50],
-            focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: AppColors.primary, width: 2.5), borderRadius: BorderRadius.circular(10)),
+            fillColor: AppColors.background,
+            focusedBorder: OutlineInputBorder(
+              borderSide: BorderSide(color: AppColors.primary, width: 2.5),
+              borderRadius: BorderRadius.circular(10),
+            ),
           ),
           keyboardType: keyboardType,
           maxLines: maxLines,
@@ -84,11 +172,34 @@ class InformationPage extends StatelessWidget {
     );
   }
 
-  Widget _buildDatePickerTile(String label, IconData icon, DateTime? date, VoidCallback onTap, bool isSmallScreen) {
+  Widget _buildDatePickerTile(
+    String label,
+    IconData icon,
+    DateTime? date,
+    VoidCallback onTap,
+    bool isSmallScreen,
+  ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(children: [Text(label, style: TextStyle(fontWeight: FontWeight.bold, fontSize: isSmallScreen ? 14 : 16)), Text(' *', style: TextStyle(color: Colors.red, fontSize: isSmallScreen ? 14 : 16))]),
+        Row(
+          children: [
+            Text(
+              label,
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: isSmallScreen ? 14 : 16,
+              ),
+            ),
+            Text(
+              ' *',
+              style: TextStyle(
+                color: AppColors.error,
+                fontSize: isSmallScreen ? 14 : 16,
+              ),
+            ),
+          ],
+        ),
         SizedBox(height: isSmallScreen ? 6 : 8),
         GestureDetector(
           onTap: onTap,
@@ -96,13 +207,22 @@ class InformationPage extends StatelessWidget {
             child: TextFormField(
               decoration: InputDecoration(
                 hintText: "Sélectionnez la date",
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
                 prefixIcon: Icon(icon, size: isSmallScreen ? 18 : 20),
                 filled: true,
-                fillColor: Colors.grey[50],
-                contentPadding: EdgeInsets.symmetric(horizontal: isSmallScreen ? 12 : 16, vertical: isSmallScreen ? 10 : 12),
+                fillColor: AppColors.background,
+                contentPadding: EdgeInsets.symmetric(
+                  horizontal: isSmallScreen ? 12 : 16,
+                  vertical: isSmallScreen ? 10 : 12,
+                ),
               ),
-              controller: TextEditingController(text: date != null ? "${date.day}/${date.month}/${date.year}" : ""),
+              controller: TextEditingController(
+                text: date != null
+                    ? "${date.day}/${date.month}/${date.year}"
+                    : "",
+              ),
             ),
           ),
         ),
@@ -111,19 +231,55 @@ class InformationPage extends StatelessWidget {
     );
   }
 
-  Widget _buildCounterField(String label, int value, void Function(int) onChanged, {required int min, required int max, bool isSmallScreen = false}) {
+  Widget _buildCounterField(
+    String label,
+    int value,
+    void Function(int) onChanged, {
+    required int min,
+    required int max,
+    bool isSmallScreen = false,
+  }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: TextStyle(fontWeight: FontWeight.bold, fontSize: isSmallScreen ? 14 : 16)),
+        Text(
+          label,
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: isSmallScreen ? 14 : 16,
+          ),
+        ),
         SizedBox(height: isSmallScreen ? 6 : 8),
         Container(
-          decoration: BoxDecoration(border: Border.all(color: Colors.grey.shade300), borderRadius: BorderRadius.circular(10)),
+          decoration: BoxDecoration(
+            border: Border.all(color: AppColors.textSecondary),
+            borderRadius: BorderRadius.circular(10),
+          ),
           child: Row(
             children: [
-              IconButton(icon: const Icon(Icons.remove), onPressed: value > min ? () => onChanged(value - 1) : null, color: value > min ? AppColors.primary : Colors.grey, iconSize: isSmallScreen ? 16 : 20),
-              Expanded(child: Text('$value', textAlign: TextAlign.center, style: TextStyle(fontSize: isSmallScreen ? 14 : 16))),
-              IconButton(icon: const Icon(Icons.add), onPressed: value < max ? () => onChanged(value + 1) : null, color: value < max ? AppColors.primary : Colors.grey, iconSize: isSmallScreen ? 16 : 20),
+              IconButton(
+                icon: const Icon(Icons.remove),
+                onPressed: value > min ? () => onChanged(value - 1) : null,
+                color: value > min
+                    ? AppColors.primary
+                    : AppColors.textSecondary,
+                iconSize: isSmallScreen ? 16 : 20,
+              ),
+              Expanded(
+                child: Text(
+                  '$value',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: isSmallScreen ? 14 : 16),
+                ),
+              ),
+              IconButton(
+                icon: const Icon(Icons.add),
+                onPressed: value < max ? () => onChanged(value + 1) : null,
+                color: value < max
+                    ? AppColors.primary
+                    : AppColors.textSecondary,
+                iconSize: isSmallScreen ? 16 : 20,
+              ),
             ],
           ),
         ),

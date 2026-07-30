@@ -1,5 +1,6 @@
-﻿import 'dart:convert';
+import 'dart:convert';
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:baobabe_0_2/features/business_detail/domain/entities/reservation.dart';
 import 'package:baobabe_0_2/core/database/database_helper.dart';
@@ -10,7 +11,7 @@ class ReservationApiService {
   final Connectivity _connectivity = Connectivity();
 
   ReservationApiService([SupabaseClient? supabase])
-      : _supabase = supabase ?? Supabase.instance.client;
+    : _supabase = supabase ?? Supabase.instance.client;
 
   String _resolveUserId(String? userId) {
     final trimmedUserId = userId?.trim();
@@ -21,7 +22,8 @@ class ReservationApiService {
     if (finalUserId == null || finalUserId.isEmpty) {
       final currentSessionUserId = _supabase.auth.currentUser?.id;
       throw Exception(
-          'Utilisateur non authentifié. userId param=${userId ?? 'null'} currentSupabaseUser=$currentSessionUserId');
+        'Utilisateur non authentifié. userId param=${userId ?? 'null'} currentSupabaseUser=$currentSessionUserId',
+      );
     }
 
     return finalUserId;
@@ -37,7 +39,9 @@ class ReservationApiService {
     String? userId,
   }) async {
     final finalUserId = _resolveUserId(userId);
-    print('ReservationApiService.createReservation: user_id=$finalUserId');
+    if (kDebugMode) {
+      print('ReservationApiService.createReservation: user_id=$finalUserId');
+    }
 
     final payload = {
       'business_id': businessId,
@@ -45,10 +49,7 @@ class ReservationApiService {
       'type': type,
       'reservation_date': reservationDate.toIso8601String(),
       'total_amount': totalAmount,
-      'details': {
-        ...details,
-        if (establishmentName != null) 'establishment_name': establishmentName,
-      },
+      'details': {...details, 'establishment_name': ?establishmentName},
     };
 
     try {
@@ -58,7 +59,7 @@ class ReservationApiService {
           .select()
           .single();
 
-      return response as Map<String, dynamic>;
+      return response;
     } catch (e) {
       throw Exception('Erreur lors de la création de la réservation: $e');
     }
@@ -66,15 +67,19 @@ class ReservationApiService {
 
   Future<List<Reservation>> getReservations({String? userId}) async {
     final finalUserId = _resolveUserId(userId);
-    
+
     final connectivityResult = await _connectivity.checkConnectivity();
-    final isOnline = connectivityResult.any((element) => element != ConnectivityResult.none);
+    final isOnline = connectivityResult.any(
+      (element) => element != ConnectivityResult.none,
+    );
 
     if (!isOnline) {
       final cached = await _db.getCache('reservations_$finalUserId');
       if (cached != null) {
         final List<dynamic> decoded = jsonDecode(cached);
-        return decoded.map((json) => Reservation.fromJson(json as Map<String, dynamic>)).toList();
+        return decoded
+            .map((json) => Reservation.fromJson(json as Map<String, dynamic>))
+            .toList();
       }
       return [];
     }
@@ -87,13 +92,20 @@ class ReservationApiService {
           .order('reservation_date', ascending: false);
 
       final data = response as List<dynamic>;
-      print('ReservationApiService.getReservations: fetched ${data.length} rows from Supabase.');
-      
+      if (kDebugMode) {
+        print(
+          'ReservationApiService.getReservations: fetched ${data.length} rows from Supabase.',
+        );
+      }
+
       // Si le join a été retiré, on tente un chargement manuel des noms pour les anciennes lignes
-      final needManualBusinessLoad = data.any((item) => 
-        (item['establishment_name'] == null || item['establishment_name'].toString().isEmpty) && 
-        (item['details'] == null || (item['details'] as Map)['establishment_name'] == null) &&
-        item['business_id'] != null
+      final needManualBusinessLoad = data.any(
+        (item) =>
+            (item['establishment_name'] == null ||
+                item['establishment_name'].toString().isEmpty) &&
+            (item['details'] == null ||
+                (item['details'] as Map)['establishment_name'] == null) &&
+            item['business_id'] != null,
       );
 
       if (needManualBusinessLoad) {
@@ -102,20 +114,23 @@ class ReservationApiService {
             .whereType<String>()
             .toSet()
             .toList();
-        
+
         if (businessIds.isNotEmpty) {
           final businessResponse = await _supabase
               .from('business')
               .select('id, name')
               .inFilter('id', businessIds);
-          
+
           final businessNames = {
-            for (var b in (businessResponse as List)) b['id'].toString(): b['name'].toString()
+            for (var b in (businessResponse as List))
+              b['id'].toString(): b['name'].toString(),
           };
 
           for (var item in data) {
             final bId = item['business_id']?.toString();
-            if (item['business'] == null && bId != null && businessNames.containsKey(bId)) {
+            if (item['business'] == null &&
+                bId != null &&
+                businessNames.containsKey(bId)) {
               item['business'] = {'name': businessNames[bId]};
             }
           }
@@ -127,7 +142,9 @@ class ReservationApiService {
           .toList();
 
       // Sauvegarder dans le cache
-      final reservationsJson = jsonEncode(reservations.map((e) => e.toJson()).toList());
+      final reservationsJson = jsonEncode(
+        reservations.map((e) => e.toJson()).toList(),
+      );
       await _db.saveCache('reservations_$finalUserId', reservationsJson);
 
       return reservations;
@@ -136,7 +153,9 @@ class ReservationApiService {
       final cached = await _db.getCache('reservations_$finalUserId');
       if (cached != null) {
         final List<dynamic> decoded = jsonDecode(cached);
-        return decoded.map((json) => Reservation.fromJson(json as Map<String, dynamic>)).toList();
+        return decoded
+            .map((json) => Reservation.fromJson(json as Map<String, dynamic>))
+            .toList();
       }
       throw Exception('Erreur lors du chargement des réservations: $e');
     }

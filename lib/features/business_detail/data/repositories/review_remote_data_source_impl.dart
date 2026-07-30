@@ -6,7 +6,7 @@ class ReviewRemoteDataSourceImpl implements ReviewRemoteDataSource {
   final SupabaseClient _supabase;
 
   ReviewRemoteDataSourceImpl({SupabaseClient? supabase})
-      : _supabase = supabase ?? Supabase.instance.client;
+    : _supabase = supabase ?? Supabase.instance.client;
 
   @override
   Future<void> submitReview({
@@ -38,9 +38,7 @@ class ReviewRemoteDataSourceImpl implements ReviewRemoteDataSource {
           .eq('business_id', businessId)
           .order('created_at', ascending: false);
 
-      return (response as List)
-          .map((json) => Review.fromJson(json))
-          .toList();
+      return (response as List).map((json) => Review.fromJson(json)).toList();
     } catch (e) {
       throw Exception('Erreur Supabase lors de la récupération des avis : $e');
     }

@@ -1,5 +1,6 @@
 import 'package:baobabe_0_2/core/themes/app_colors.dart';
-import 'package:baobabe_0_2/features/home_page/domain/entities/business_entity.dart' show BusinessType;
+import 'package:baobabe_0_2/features/home_page/domain/entities/business_entity.dart'
+    show BusinessType;
 import 'package:baobabe_0_2/features/home_page/domain/entities/search_filter_entity.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/bloc/search_bloc.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/bloc/search_event.dart';
@@ -56,35 +57,48 @@ class SearchActiveFiltersBar extends StatelessWidget {
               FilterChipWidget(
                 label: categoryDisplayName(filters.category!),
                 onRemoved: () {
-                  searchBloc.add(SearchFiltersChanged(filters.copyWith(category: null)));
+                  searchBloc.add(
+                    SearchFiltersChanged(filters.copyWith(category: null)),
+                  );
                 },
               ),
             if (filters.minRating != null)
               FilterChipWidget(
                 label: 'Note ≥ ${filters.minRating}',
                 onRemoved: () {
-                  searchBloc.add(SearchFiltersChanged(filters.copyWith(minRating: null)));
+                  searchBloc.add(
+                    SearchFiltersChanged(filters.copyWith(minRating: null)),
+                  );
                 },
               ),
             if (filters.location != null && filters.location!.isNotEmpty)
               FilterChipWidget(
                 label: filters.location!,
                 onRemoved: () {
-                  searchBloc.add(SearchFiltersChanged(filters.copyWith(location: null)));
+                  searchBloc.add(
+                    SearchFiltersChanged(filters.copyWith(location: null)),
+                  );
                 },
               ),
             if (filters.sortBy != SortBy.relevance)
               FilterChipWidget(
                 label: 'Tri: ${filters.sortBy.displayName}',
                 onRemoved: () {
-                  searchBloc.add(SearchFiltersChanged(filters.copyWith(sortBy: SortBy.relevance)));
+                  searchBloc.add(
+                    SearchFiltersChanged(
+                      filters.copyWith(sortBy: SortBy.relevance),
+                    ),
+                  );
                 },
               ),
             TextButton(
               onPressed: () {
                 searchBloc.add(SearchClearFilters());
               },
-              child: Text('Tout effacer', style: TextStyle(color: AppColors.secondary),),
+              child: Text(
+                'Tout effacer',
+                style: TextStyle(color: AppColors.secondary),
+              ),
             ),
           ],
         ),

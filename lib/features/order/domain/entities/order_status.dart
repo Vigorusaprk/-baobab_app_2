@@ -1,13 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:baobabe_0_2/core/themes/app_colors.dart';
 
-enum OrderStatus {
-  pending,
-  confirmed,
-  preparing,
-  ready,
-  delivered,
-  cancelled,
-}
+enum OrderStatus { pending, confirmed, preparing, ready, delivered, cancelled }
 
 extension OrderStatusExtension on OrderStatus {
   String get displayName {
@@ -38,9 +32,9 @@ extension OrderStatusExtension on OrderStatus {
       case OrderStatus.ready:
         return Colors.teal;
       case OrderStatus.delivered:
-        return Colors.green;
+        return AppColors.success;
       case OrderStatus.cancelled:
-        return Colors.red;
+        return AppColors.error;
     }
   }
 }

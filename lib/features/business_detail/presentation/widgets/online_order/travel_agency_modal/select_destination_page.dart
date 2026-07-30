@@ -24,14 +24,22 @@ class SelectDestinationPage extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text("Destination", style: TextStyle(fontWeight: FontWeight.bold, fontSize: isSmallScreen ? 14 : 16)),
+          Text(
+            "Destination",
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: isSmallScreen ? 14 : 16,
+            ),
+          ),
           const SizedBox(height: 8),
           DropdownButtonFormField<String>(
             value: destination,
             decoration: InputDecoration(
-              border: OutlineInputBorder(borderRadius: BorderRadius.circular(15)),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(15),
+              ),
               filled: true,
-              fillColor: Colors.white,
+              fillColor: AppColors.white,
             ),
             hint: const Text("Choisir une destination"),
             items: const [
@@ -46,11 +54,26 @@ class SelectDestinationPage extends StatelessWidget {
             child: ElevatedButton(
               onPressed: destination != null ? onNext : null,
               style: ElevatedButton.styleFrom(
-                backgroundColor: destination != null ? AppColors.primary : Colors.grey[300],
-                padding: EdgeInsets.symmetric(vertical: isSmallScreen ? 14 : 16),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                backgroundColor: destination != null
+                    ? AppColors.primary
+                    : AppColors.textSecondary,
+                padding: EdgeInsets.symmetric(
+                  vertical: isSmallScreen ? 14 : 16,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
               ),
-              child: Text("Continuer", style: TextStyle(fontSize: isSmallScreen ? 16 : 18, fontWeight: FontWeight.bold, color: destination != null ? Colors.white : Colors.grey[600])),
+              child: Text(
+                "Continuer",
+                style: TextStyle(
+                  fontSize: isSmallScreen ? 16 : 18,
+                  fontWeight: FontWeight.bold,
+                  color: destination != null
+                      ? AppColors.white
+                      : AppColors.textSecondary,
+                ),
+              ),
             ),
           ),
           SizedBox(height: isSmallScreen ? 8 : 12),

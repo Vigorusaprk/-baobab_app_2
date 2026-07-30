@@ -1,6 +1,7 @@
 part of 'business_detail_bloc.dart';
 
 enum BusinessDetailStatus { initial, loading, loaded, error }
+
 enum ReservationStatus { initial, loading, success, error }
 
 class BusinessDetailState extends Equatable {
@@ -34,7 +35,8 @@ class BusinessDetailState extends Equatable {
       detailStatus: detailStatus ?? this.detailStatus,
       detailErrorMessage: detailErrorMessage ?? this.detailErrorMessage,
       reservationStatus: reservationStatus ?? this.reservationStatus,
-      reservationErrorMessage: reservationErrorMessage ?? this.reservationErrorMessage,
+      reservationErrorMessage:
+          reservationErrorMessage ?? this.reservationErrorMessage,
       cartItems: cartItems ?? this.cartItems,
     );
   }

@@ -64,22 +64,28 @@ class MenuTopBar extends StatelessWidget {
           BlocBuilder<BusinessDetailBloc, BusinessDetailState>(
             builder: (context, state) {
               // Calcul du total des articles via la liste du bloc
-              final totalItems = state.cartItems.fold(0, (sum, item) => sum + item.quantity);
+              final totalItems = state.cartItems.fold(
+                0,
+                (sum, item) => sum + item.quantity,
+              );
 
               return Stack(
                 clipBehavior: Clip.none,
                 children: [
                   Container(
                     decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        border: Border.all(width: 3, color: AppColors.secondary)
+                      shape: BoxShape.circle,
+                      border: Border.all(width: 3, color: AppColors.secondary),
                     ),
                     child: IconButton(
                       icon: SvgPicture.asset(
                         "assets/icons/shopping-cart.svg",
                         width: 28,
                         height: 28,
-                        colorFilter: const ColorFilter.mode(AppColors.secondary, BlendMode.srcIn),
+                        colorFilter: const ColorFilter.mode(
+                          AppColors.secondary,
+                          BlendMode.srcIn,
+                        ),
                       ),
                       onPressed: () {
                         // On récupère le bloc existant
@@ -88,7 +94,8 @@ class MenuTopBar extends StatelessWidget {
                           context,
                           MaterialPageRoute(
                             builder: (context) => BlocProvider.value(
-                              value: bloc, // On passe l'instance existante à la nouvelle route
+                              value:
+                                  bloc, // On passe l'instance existante à la nouvelle route
                               child: CartPage(
                                 restaurantId: restaurantId,
                                 restaurantName: restaurantName,
@@ -108,12 +115,18 @@ class MenuTopBar extends StatelessWidget {
                         padding: const EdgeInsets.all(7),
                         decoration: const BoxDecoration(
                           shape: BoxShape.circle,
-                          color: Colors.red,
+                          color: AppColors.error,
                         ),
-                        constraints: const BoxConstraints(minWidth: 16, minHeight: 16),
+                        constraints: const BoxConstraints(
+                          minWidth: 16,
+                          minHeight: 16,
+                        ),
                         child: Text(
                           '$totalItems',
-                          style: const TextStyle(color: Colors.white, fontSize: 10),
+                          style: const TextStyle(
+                            color: AppColors.white,
+                            fontSize: 10,
+                          ),
                           textAlign: TextAlign.center,
                         ),
                       ),

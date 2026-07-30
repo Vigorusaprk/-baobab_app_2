@@ -19,7 +19,9 @@ class TourismReservationData {
     return total * numberOfParticipants;
   }
 
-  List<Map<String, dynamic>> getSelectedActivitiesWithPrices(List<dynamic> allActivities) {
+  List<Map<String, dynamic>> getSelectedActivitiesWithPrices(
+    List<dynamic> allActivities,
+  ) {
     List<Map<String, dynamic>> result = [];
     for (final name in selectedActivities) {
       for (final a in allActivities) {

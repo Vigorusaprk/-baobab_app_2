@@ -1,7 +1,7 @@
 import 'package:baobabe_0_2/core/bloc/settings_bloc.dart';
 import 'package:flutter/material.dart';
+import 'package:baobabe_0_2/core/themes/app_colors.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:baobabe_0_2/features/settings/presentation/bloc/settings_bloc.dart' hide SettingsCubit, SettingsState;
 import 'package:go_router/go_router.dart';
 
 class ProfilPage extends StatefulWidget {
@@ -23,10 +23,13 @@ class _ProfilPageState extends State<ProfilPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Mon Profil', style: TextStyle(fontWeight: FontWeight.bold)),
+        title: const Text(
+          'Mon Profil',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
         centerTitle: true,
         elevation: 0,
-        backgroundColor: Colors.transparent,
+        backgroundColor: AppColors.transparent,
       ),
       body: BlocBuilder<SettingsCubit, SettingsState>(
         builder: (context, state) {
@@ -41,12 +44,21 @@ class _ProfilPageState extends State<ProfilPage> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Icon(Icons.error_outline, color: Colors.red, size: 48),
+                    const Icon(
+                      Icons.error_outline,
+                      color: AppColors.error,
+                      size: 48,
+                    ),
                     const SizedBox(height: 16),
-                    Text(state.message, textAlign: TextAlign.center, style: const TextStyle(color: Colors.red)),
+                    Text(
+                      state.message,
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(color: AppColors.error),
+                    ),
                     const SizedBox(height: 16),
                     ElevatedButton(
-                      onPressed: () => context.read<SettingsCubit>().loadUserProfile(),
+                      onPressed: () =>
+                          context.read<SettingsCubit>().loadUserProfile(),
                       child: const Text('Réessayer'),
                     ),
                   ],
@@ -65,8 +77,8 @@ class _ProfilPageState extends State<ProfilPage> {
                 children: [
                   const CircleAvatar(
                     radius: 50,
-                    backgroundColor: Colors.grey,
-                    child: Icon(Icons.person, size: 50, color: Colors.white),
+                    backgroundColor: AppColors.textSecondary,
+                    child: Icon(Icons.person, size: 50, color: AppColors.white),
                   ),
                   const SizedBox(height: 24),
 
@@ -81,7 +93,8 @@ class _ProfilPageState extends State<ProfilPage> {
                   // --- CHAMPS PROFILS (USER_PROFILE) ---
                   _buildProfileField(
                     label: 'Nom Complet',
-                    value: profile['name'] ?? profile['username'] ?? 'Nom inconnu',
+                    value:
+                        profile['name'] ?? profile['username'] ?? 'Nom inconnu',
                     icon: Icons.badge_outlined,
                   ),
                   const SizedBox(height: 16),
@@ -99,9 +112,17 @@ class _ProfilPageState extends State<ProfilPage> {
                     child: ElevatedButton.icon(
                       onPressed: () => context.push('/edit-profile'),
                       icon: const Icon(Icons.edit),
-                      label: const Text('Modifier le profil', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                      label: const Text(
+                        'Modifier le profil',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                       style: ElevatedButton.styleFrom(
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
                       ),
                     ),
                   ),
@@ -116,24 +137,40 @@ class _ProfilPageState extends State<ProfilPage> {
     );
   }
 
-  Widget _buildProfileField({required String label, required String value, required IconData icon}) {
+  Widget _buildProfileField({
+    required String label,
+    required String value,
+    required IconData icon,
+  }) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.grey[100],
+        color: AppColors.background,
         borderRadius: BorderRadius.circular(16),
       ),
       child: Row(
         children: [
-          Icon(icon, color: Colors.grey[600]),
+          Icon(icon, color: AppColors.textSecondary),
           const SizedBox(width: 16),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(label, style: TextStyle(fontSize: 12, color: Colors.grey[500])),
+                Text(
+                  label,
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: AppColors.textSecondary,
+                  ),
+                ),
                 const SizedBox(height: 4),
-                Text(value, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+                Text(
+                  value,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
               ],
             ),
           ),

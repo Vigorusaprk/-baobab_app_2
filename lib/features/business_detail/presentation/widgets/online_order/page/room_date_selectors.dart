@@ -39,13 +39,17 @@ class RoomDateSelectors extends StatelessWidget {
     );
   }
 
-  Widget _dateTile({required String label, required DateTime? date, required VoidCallback onTap}) {
+  Widget _dateTile({
+    required String label,
+    required DateTime? date,
+    required VoidCallback onTap,
+  }) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 12),
         decoration: BoxDecoration(
-          border: Border.all(color: Colors.grey.shade300),
+          border: Border.all(color: AppColors.textSecondary),
           borderRadius: BorderRadius.circular(8),
         ),
         child: Row(
@@ -55,7 +59,11 @@ class RoomDateSelectors extends StatelessWidget {
             Expanded(
               child: Text(
                 date != null ? DateFormat('dd/MM/yyyy').format(date) : label,
-                style: TextStyle(color: date != null ? Colors.black : Colors.grey),
+                style: TextStyle(
+                  color: date != null
+                      ? AppColors.textPrimary
+                      : AppColors.textSecondary,
+                ),
               ),
             ),
           ],

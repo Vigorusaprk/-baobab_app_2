@@ -26,13 +26,16 @@ class ReservationData {
 }
 
 void showRestaurantReservationModal(BuildContext context, Business business) {
-  final isRestaurant = business.type.name == 'restaurant' || business.type.name == 'restaurent';
+  final isRestaurant =
+      business.type.name == 'restaurant' || business.type.name == 'restaurent';
   final canReserve = business.specificData['canReserve'] == true;
 
   if (!isRestaurant || !canReserve) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('La réservation n\'est pas disponible pour ${business.name}'),
+        content: Text(
+          'La réservation n\'est pas disponible pour ${business.name}',
+        ),
         backgroundColor: Colors.orange,
       ),
     );
@@ -42,7 +45,7 @@ void showRestaurantReservationModal(BuildContext context, Business business) {
   showModalBottomSheet(
     context: context,
     isScrollControlled: true,
-    backgroundColor: Colors.transparent,
+    backgroundColor: AppColors.transparent,
     builder: (context) {
       return Localizations(
         locale: const Locale('fr', 'FR'),
@@ -69,7 +72,12 @@ class ReservationModal extends StatefulWidget {
 class _ReservationModalState extends State<ReservationModal> {
   final PageController _pageController = PageController();
   final ReservationData _data = ReservationData();
-  final List<String> _floors = ['Rez-de-chaussée', '1er Étage', '2ème Étage', 'Terrasse'];
+  final List<String> _floors = [
+    'Rez-de-chaussée',
+    '1er Étage',
+    '2ème Étage',
+    'Terrasse',
+  ];
   String _selectedFloor = 'Rez-de-chaussée';
   String? _selectedTable;
 
@@ -118,7 +126,7 @@ class _ReservationModalState extends State<ReservationModal> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
-        backgroundColor: Colors.red,
+        backgroundColor: AppColors.error,
         behavior: SnackBarBehavior.floating,
       ),
     );
@@ -151,7 +159,10 @@ class _ReservationModalState extends State<ReservationModal> {
     final sessionUser = SessionService.instance.currentUser;
     if (sessionUser == null) {
       setState(() => _isLoading = false);
-      showAuthRequiredCard(context, message: 'Connectez-vous pour réserver cette table.');
+      showAuthRequiredCard(
+        context,
+        message: 'Connectez-vous pour réserver cette table.',
+      );
       return;
     }
 
@@ -191,7 +202,9 @@ class _ReservationModalState extends State<ReservationModal> {
         "number_of_people": int.tryParse(_peopleController.text) ?? 1,
         "date": selectedDate.toIso8601String(),
         "time": "${selectedTime.hour}:${selectedTime.minute}",
-        "notes": _notesController.text.isNotEmpty ? _notesController.text : null,
+        "notes": _notesController.text.isNotEmpty
+            ? _notesController.text
+            : null,
         "establishment_name": widget.business.name,
       },
       createdAt: DateTime.now(),
@@ -214,13 +227,15 @@ class _ReservationModalState extends State<ReservationModal> {
     return Container(
       height: MediaQuery.of(context).size.height * 0.9,
       decoration: BoxDecoration(
-        color: AppColors.scaffoldBackground,
+        color: AppColors.background,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(30)),
       ),
       child: Column(
         children: [
           ReservationModalHeader(
-            title: _getPageTitle(_pageController.hasClients ? _pageController.page!.round() : 0),
+            title: _getPageTitle(
+              _pageController.hasClients ? _pageController.page!.round() : 0,
+            ),
             businessName: widget.business.name,
             showBack: _pageController.hasClients && _pageController.page! > 0,
             onBack: () {
@@ -231,10 +246,12 @@ class _ReservationModalState extends State<ReservationModal> {
             },
             onClose: () => Navigator.of(context).pop(),
           ),
-          const Divider(height: 1, color: Colors.grey),
+          const Divider(height: 1, color: AppColors.textSecondary),
 
           ReservationProgressIndicator(
-            currentPage: _pageController.hasClients ? _pageController.page!.round() : 0,
+            currentPage: _pageController.hasClients
+                ? _pageController.page!.round()
+                : 0,
           ),
           const SizedBox(height: 16),
 
@@ -243,7 +260,8 @@ class _ReservationModalState extends State<ReservationModal> {
               pageController: _pageController,
               floors: _floors,
               selectedFloor: _selectedFloor,
-              onFloorSelected: (floor) => setState(() => _selectedFloor = floor),
+              onFloorSelected: (floor) =>
+                  setState(() => _selectedFloor = floor),
               selectedTable: _selectedTable,
               onTableSelected: (table) => setState(() {
                 _selectedTable = table;
@@ -292,10 +310,14 @@ class _ReservationModalState extends State<ReservationModal> {
 
   String _getPageTitle(int pageIndex) {
     switch (pageIndex) {
-      case 0: return 'Sélection de table';
-      case 1: return 'Informations';
-      case 2: return 'Récapitulatif';
-      default: return '';
+      case 0:
+        return 'Sélection de table';
+      case 1:
+        return 'Informations';
+      case 2:
+        return 'Récapitulatif';
+      default:
+        return '';
     }
   }
 }

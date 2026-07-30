@@ -34,16 +34,22 @@ class _PasswordFieldState extends State<PasswordField> {
           padding: EdgeInsets.all(8),
           child: SvgPicture.asset(
             "assets/icons/password.svg",
-            colorFilter: const ColorFilter.mode(AppColors.secondary, BlendMode.srcIn),
+            colorFilter: const ColorFilter.mode(
+              AppColors.secondary,
+              BlendMode.srcIn,
+            ),
           ),
         ),
         labelText: widget.label,
         hintText: widget.hint,
-        labelStyle: TextStyle(color: Colors.grey[600], fontSize: 14),
+        labelStyle: TextStyle(color: AppColors.textSecondary, fontSize: 14),
         filled: true,
         fillColor: const Color(0xFFF1F3F4),
         suffixIcon: IconButton(
-          icon: Icon(_obscureText ? Icons.visibility_off : Icons.visibility, color: AppColors.secondary),
+          icon: Icon(
+            _obscureText ? Icons.visibility_off : Icons.visibility,
+            color: AppColors.secondary,
+          ),
           onPressed: () => setState(() => _obscureText = !_obscureText),
         ),
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),

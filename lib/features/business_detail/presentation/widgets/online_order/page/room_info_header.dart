@@ -17,13 +17,13 @@ class RoomImageHeader extends StatelessWidget {
         color: AppColors.primary.withOpacity(0.1),
         image: room.images != null && room.images!.isNotEmpty
             ? DecorationImage(
-          image: NetworkImage(room.images!.first),
-          fit: BoxFit.cover,
-        )
+                image: NetworkImage(room.images!.first),
+                fit: BoxFit.cover,
+              )
             : null,
       ),
       child: room.images == null || room.images!.isEmpty
-          ? const Icon(Icons.hotel, size: 80, color: Colors.grey)
+          ? const Icon(Icons.hotel, size: 80, color: AppColors.textSecondary)
           : null,
     );
   }
@@ -49,7 +49,11 @@ class RoomInfoHeader extends StatelessWidget {
         const SizedBox(height: 8),
         Text(
           '${room.pricePerNight.toStringAsFixed(2)} € / nuit',
-          style: TextStyle(fontSize: 18, color: AppColors.primary, fontWeight: FontWeight.bold),
+          style: TextStyle(
+            fontSize: 18,
+            color: AppColors.primary,
+            fontWeight: FontWeight.bold,
+          ),
         ),
         const SizedBox(height: 8),
         Text('Capacité: ${room.capacity} personnes'),
@@ -57,13 +61,19 @@ class RoomInfoHeader extends StatelessWidget {
         Text('Disponibles: ${room.availableQuantity} chambres'),
         if (room.description != null) ...[
           const SizedBox(height: 16),
-          const Text('Description', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+          const Text(
+            'Description',
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
           const SizedBox(height: 8),
           Text(room.description!),
         ],
         if (room.amenities != null && room.amenities!.isNotEmpty) ...[
           const SizedBox(height: 16),
-          const Text('Équipements', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+          const Text(
+            'Équipements',
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
           const SizedBox(height: 8),
           Wrap(
             spacing: 8,

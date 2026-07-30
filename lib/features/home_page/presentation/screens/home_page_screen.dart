@@ -6,12 +6,14 @@ import 'package:baobabe_0_2/features/home_page/domain/usecases/get_businesses_by
 import 'package:baobabe_0_2/features/home_page/presentation/bloc/business_bloc.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/widgets/business_cards_widget.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/widgets/business_promo_carousel.dart';
-import 'package:baobabe_0_2/features/home_page/presentation/widgets/home_app_bar.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/widgets/home_search_bar.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/widgets/popular_businesses_section.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+/// Body-only content for the Home tab. The Scaffold and AppBar (HomeAppBar)
+/// are owned by MainShell, which is the single Scaffold for the app's main
+/// navigation.
 class HomePageScreen extends StatelessWidget {
   const HomePageScreen({super.key});
 
@@ -31,28 +33,25 @@ class HomePageScreen extends StatelessWidget {
           },
         ),
       ],
-      child: Scaffold(
-        appBar: HomeAppBar(),
-        body: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              AppDimens.spacerSmall,
-              HomeSearchBar(),
-              AppDimens.spacerSmall,
-              //const CategoryIcons(),
-              //AppDimens.spacerSmall,
-              const BusinessPromoCarousel(),
-              AppDimens.spacerSmall,
-              const PopularBusinessesSection(
-                maxItems: 5,
-                // onSeeAllTap: () => context.push('/popular'),
-              ),
-              AppDimens.spacerSmall,
-              const BusinessCardsWidget(),
-              AppDimens.spacerSmall,
-            ],
-          ),
+      child: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            AppDimens.spacerSmall,
+            HomeSearchBar(),
+            AppDimens.spacerSmall,
+            //const CategoryIcons(),
+            //AppDimens.spacerSmall,
+            const BusinessPromoCarousel(),
+            AppDimens.spacerSmall,
+            const PopularBusinessesSection(
+              maxItems: 5,
+              // onSeeAllTap: () => context.push('/popular'),
+            ),
+            AppDimens.spacerSmall,
+            const BusinessCardsWidget(),
+            AppDimens.spacerSmall,
+          ],
         ),
       ),
     );

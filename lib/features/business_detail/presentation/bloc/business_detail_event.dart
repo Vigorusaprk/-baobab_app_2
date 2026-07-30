@@ -22,7 +22,6 @@ class MakeReservation extends BusinessDetailEvent {
   List<Object> get props => [reservation];
 }
 
-
 class AddToCart extends BusinessDetailEvent {
   final OrderItem item;
   const AddToCart(this.item);

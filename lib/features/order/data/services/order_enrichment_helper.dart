@@ -6,29 +6,34 @@ import 'package:baobabe_0_2/features/order/domain/entities/order.dart';
 /// des informations client lorsqu'elles ne sont pas fournies directement
 /// via une relation Supabase.
 
-Future<List<Order>> getOrdersWithRelatedItems(SupabaseClient supabase, String userId) async {
+Future<List<Order>> getOrdersWithRelatedItems(
+  SupabaseClient supabase,
+  String userId,
+) async {
   final response = await supabase
       .from('orders')
       .select('*, order_items(*)')
       .eq('user_id', userId)
       .order('created_at', ascending: false);
 
-  final ordersData = (response as List<dynamic>)
-      .map((item) {
-        final map = Map<String, dynamic>.from(item as Map<String, dynamic>);
-        if (map.containsKey('order_items')) {
-          map['items'] = map['order_items'];
-        }
-        return map;
-      })
-      .toList();
+  final ordersData = (response as List<dynamic>).map((item) {
+    final map = Map<String, dynamic>.from(item as Map<String, dynamic>);
+    if (map.containsKey('order_items')) {
+      map['items'] = map['order_items'];
+    }
+    return map;
+  }).toList();
 
   final allMenuItemIds = ordersData
       .expand((order) {
         final items = order['items'];
         if (items is List) {
           return items
-              .map((item) => item is Map<String, dynamic> ? item['menu_item_id']?.toString() : null)
+              .map(
+                (item) => item is Map<String, dynamic>
+                    ? item['menu_item_id']?.toString()
+                    : null,
+              )
               .whereType<String>();
         }
         return <String>[];
@@ -45,7 +50,8 @@ Future<List<Order>> getOrdersWithRelatedItems(SupabaseClient supabase, String us
         for (final item in items) {
           if (item is Map<String, dynamic>) {
             final menuItemId = item['menu_item_id']?.toString();
-            if ((item['name'] == null || item['name'] == '') && menuItemId != null) {
+            if ((item['name'] == null || item['name'] == '') &&
+                menuItemId != null) {
               item['name'] = menuItems[menuItemId] ?? item['name'];
             }
           }
@@ -66,11 +72,13 @@ Future<List<Order>> getOrdersWithRelatedItems(SupabaseClient supabase, String us
       final businessId = order['business_id']?.toString();
       if (businessId != null && businesses.containsKey(businessId)) {
         final businessInfo = businesses[businessId]!;
-        order['establishment_name'] = (order['establishment_name']?.toString().isNotEmpty == true
-                ? order['establishment_name']
-                : businessInfo['name'])
-            .toString();
-        order['establishment_type'] = order['establishment_type'] ?? businessInfo['type'];
+        order['establishment_name'] =
+            (order['establishment_name']?.toString().isNotEmpty == true
+                    ? order['establishment_name']
+                    : businessInfo['name'])
+                .toString();
+        order['establishment_type'] =
+            order['establishment_type'] ?? businessInfo['type'];
       }
     }
   }
@@ -96,7 +104,10 @@ Future<List<Order>> getOrdersWithRelatedItems(SupabaseClient supabase, String us
   return ordersData.map((json) => Order.fromMap(json)).toList();
 }
 
-Future<List<Order>> getOrdersWithoutRelationships(SupabaseClient supabase, String userId) async {
+Future<List<Order>> getOrdersWithoutRelationships(
+  SupabaseClient supabase,
+  String userId,
+) async {
   final ordersResponse = await supabase
       .from('orders')
       .select('*')
@@ -166,11 +177,13 @@ Future<List<Order>> getOrdersWithoutRelationships(SupabaseClient supabase, Strin
       final businessId = order['business_id']?.toString();
       if (businessId != null && businesses.containsKey(businessId)) {
         final businessInfo = businesses[businessId]!;
-        order['establishment_name'] = (order['establishment_name']?.toString().isNotEmpty == true
-                ? order['establishment_name']
-                : businessInfo['name'])
-            .toString();
-        order['establishment_type'] = order['establishment_type'] ?? businessInfo['type'];
+        order['establishment_name'] =
+            (order['establishment_name']?.toString().isNotEmpty == true
+                    ? order['establishment_name']
+                    : businessInfo['name'])
+                .toString();
+        order['establishment_type'] =
+            order['establishment_type'] ?? businessInfo['type'];
       }
     }
   }
@@ -195,7 +208,10 @@ Future<List<Order>> getOrdersWithoutRelationships(SupabaseClient supabase, Strin
   return ordersData.map((json) => Order.fromMap(json)).toList();
 }
 
-Future<Map<String, String>> loadMenuItemNames(SupabaseClient supabase, List<String> ids) async {
+Future<Map<String, String>> loadMenuItemNames(
+  SupabaseClient supabase,
+  List<String> ids,
+) async {
   try {
     final response = await supabase
         .from('menu_items')
@@ -238,7 +254,10 @@ Future<Map<String, String>> loadMenuItemNames(SupabaseClient supabase, List<Stri
   }
 }
 
-Future<Map<String, Map<String, String>>> loadBusinessInfos(SupabaseClient supabase, List<String> ids) async {
+Future<Map<String, Map<String, String>>> loadBusinessInfos(
+  SupabaseClient supabase,
+  List<String> ids,
+) async {
   final response = await supabase
       .from('business')
       .select('id,name,type')
@@ -251,16 +270,16 @@ Future<Map<String, Map<String, String>>> loadBusinessInfos(SupabaseClient supaba
         final name = item['name']?.toString();
         final type = item['type']?.toString();
         if (id != null) {
-          map[id] = {
-            'name': name ?? '',
-            'type': type ?? '',
-          };
+          map[id] = {'name': name ?? '', 'type': type ?? ''};
         }
         return map;
       });
 }
 
-Future<Map<String, Map<String, String>>> loadUserInfos(SupabaseClient supabase, List<String> ids) async {
+Future<Map<String, Map<String, String>>> loadUserInfos(
+  SupabaseClient supabase,
+  List<String> ids,
+) async {
   final response = await supabase
       .from('users')
       .select('id,name,email,phone')

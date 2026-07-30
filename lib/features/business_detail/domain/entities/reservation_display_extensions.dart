@@ -30,21 +30,21 @@ extension ReservationDisplayExtensions on Reservation {
   Color get typeColor {
     switch (reservationType) {
       case 'hotel':
-        return AppColors.hotel;
+        return BusinessCategoryColors.hotel;
       case 'restaurant':
-        return AppColors.restaurant;
+        return BusinessCategoryColors.restaurant;
       case 'car_rental':
-        return AppColors.carRental;
+        return BusinessCategoryColors.carRental;
       case 'travel':
-        return AppColors.travelAgency;
+        return BusinessCategoryColors.travelAgency;
       case 'spa':
-        return AppColors.spa;
+        return BusinessCategoryColors.spa;
       case 'cinema':
-        return AppColors.cinema;
+        return BusinessCategoryColors.cinema;
       case 'toursime':
-        return AppColors.tourism;
+        return BusinessCategoryColors.tourism;
       default:
-        return Colors.grey;
+        return AppColors.textSecondary;
     }
   }
 
@@ -70,7 +70,13 @@ extension ReservationDisplayExtensions on Reservation {
   }
 
   DateTime get displayDate =>
-      date ?? checkInDate ?? rentalStartDate ?? appointmentDate ?? showtime ?? day ?? reservationDate;
+      date ??
+      checkInDate ??
+      rentalStartDate ??
+      appointmentDate ??
+      showtime ??
+      day ??
+      reservationDate;
 
   String get displayDateLabel {
     try {

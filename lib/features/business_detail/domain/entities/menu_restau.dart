@@ -26,8 +26,11 @@ class MenuItem {
       // On convertit toujours l'ID en String pour accepter UUID ou int
       id: json['id']?.toString() ?? '',
       businessId: json['business_id']?.toString() ?? '',
-      itemName: json['name'] ?? '', // CORRIGÉ : correspond au nom de colonne "name"
-      itemCategory: json['category'] ?? '', // CORRIGÉ : correspond au nom de colonne "category"
+      itemName:
+          json['name'] ?? '', // CORRIGÉ : correspond au nom de colonne "name"
+      itemCategory:
+          json['category'] ??
+          '', // CORRIGÉ : correspond au nom de colonne "category"
       price: (json['price'] is String)
           ? double.parse(json['price'])
           : (json['price'] as num).toDouble(),

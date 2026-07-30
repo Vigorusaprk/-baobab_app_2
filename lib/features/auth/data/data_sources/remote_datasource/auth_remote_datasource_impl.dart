@@ -102,12 +102,6 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
 
       final googleUser = await googleSignIn.authenticate();
 
-      if (googleUser == null) {
-        return Left(
-          AuthFailure(message: 'Google sign-in cancelled.'),
-        );
-      }
-
       final authorization =
           await googleUser.authorizationClient.authorizationForScopes(scopes) ??
           await googleUser.authorizationClient.authorizeScopes(scopes);
@@ -141,23 +135,17 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       return Left(AuthFailure(message: e.message));
     } on TimeoutException {
       return Left(
-        AuthFailure(
-          message: 'Google sign-in timed out. Please try again.',
-        ),
+        AuthFailure(message: 'Google sign-in timed out. Please try again.'),
       );
     } catch (e) {
       final errorMessage = e.toString().toLowerCase();
       if (errorMessage.contains('cancel') ||
           errorMessage.contains('user_cancel')) {
-        return Left(
-          AuthFailure(message: 'Google sign-in cancelled.'),
-        );
+        return Left(AuthFailure(message: 'Google sign-in cancelled.'));
       }
       if (errorMessage.contains('network')) {
         return Left(
-          AuthFailure(
-            message: 'Network issue. Please check your connection.',
-          ),
+          AuthFailure(message: 'Network issue. Please check your connection.'),
         );
       }
 

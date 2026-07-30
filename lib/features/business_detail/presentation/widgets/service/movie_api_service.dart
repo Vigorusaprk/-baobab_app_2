@@ -1,11 +1,11 @@
-﻿import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:baobabe_0_2/features/business_detail/domain/entities/movie.dart';
 
 class MovieApiService {
   final SupabaseClient _supabase;
 
   MovieApiService([SupabaseClient? supabase])
-      : _supabase = supabase ?? Supabase.instance.client;
+    : _supabase = supabase ?? Supabase.instance.client;
 
   Future<List<Movie>> getMoviesByCinema(String cinemaId) async {
     try {

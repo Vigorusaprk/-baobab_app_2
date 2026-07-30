@@ -3,6 +3,7 @@ import 'package:baobabe_0_2/features/home_page/domain/entities/category_entity.d
 import 'package:baobabe_0_2/features/home_page/presentation/bloc/business_bloc.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/bloc/category_bloc.dart';
 import 'package:flutter/material.dart';
+import 'package:baobabe_0_2/core/themes/app_colors.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class CategoryIcons extends StatelessWidget {
@@ -25,12 +26,15 @@ class CategoryIcons extends StatelessWidget {
             itemCount: UICategory.allCategories.length,
             itemBuilder: (context, index) {
               final uiCategory = UICategory.allCategories[index];
-              final bool isActive = selectedCategory.id == uiCategory.category.id;
+              final bool isActive =
+                  selectedCategory.id == uiCategory.category.id;
 
               return GestureDetector(
                 onTap: () {
                   // Sélection visuelle de la catégorie
-                  context.read<CategoryBloc>().add(SelectCategory(uiCategory.category));
+                  context.read<CategoryBloc>().add(
+                    SelectCategory(uiCategory.category),
+                  );
 
                   // FILTRAGE : On envoie bien le .type (Enum BusinessType)
                   context.read<BusinessBloc>().add(
@@ -49,24 +53,30 @@ class CategoryIcons extends StatelessWidget {
     );
   }
 
-  Widget _buildCategory(BuildContext context, UICategory uiCategory, bool isActive) {
+  Widget _buildCategory(
+    BuildContext context,
+    UICategory uiCategory,
+    bool isActive,
+  ) {
     return AnimatedContainer(
       duration: const Duration(milliseconds: 250),
       width: 85,
       decoration: BoxDecoration(
-        color: isActive ? Colors.white : const Color(0xFFF5F7F9),
+        color: isActive ? AppColors.white : const Color(0xFFF5F7F9),
         borderRadius: BorderRadius.circular(24),
         boxShadow: isActive
             ? [
-          BoxShadow(
-            color: uiCategory.color.withOpacity(0.2),
-            blurRadius: 12,
-            offset: const Offset(0, 6),
-          )
-        ]
+                BoxShadow(
+                  color: uiCategory.color.withOpacity(0.2),
+                  blurRadius: 12,
+                  offset: const Offset(0, 6),
+                ),
+              ]
             : [],
         border: Border.all(
-          color: isActive ? uiCategory.color.withOpacity(0.5) : Colors.transparent,
+          color: isActive
+              ? uiCategory.color.withOpacity(0.5)
+              : AppColors.transparent,
           width: 1.5,
         ),
       ),
@@ -78,12 +88,14 @@ class CategoryIcons extends StatelessWidget {
             width: 52,
             height: 52,
             decoration: BoxDecoration(
-              color: isActive ? uiCategory.color : uiCategory.color.withOpacity(0.12),
+              color: isActive
+                  ? uiCategory.color
+                  : uiCategory.color.withOpacity(0.12),
               shape: BoxShape.circle,
             ),
             child: Icon(
               uiCategory.icon,
-              color: isActive ? Colors.white : uiCategory.color,
+              color: isActive ? AppColors.white : uiCategory.color,
               size: 26,
             ),
           ),
@@ -96,10 +108,12 @@ class CategoryIcons extends StatelessWidget {
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: isActive ? FontWeight.w700 : FontWeight.w500,
-                  color: isActive ? Colors.black87 : Colors.grey[600],
-                  fontFamily: 'Poppins'
+                fontSize: 12,
+                fontWeight: isActive ? FontWeight.w700 : FontWeight.w500,
+                color: isActive
+                    ? AppColors.textPrimary
+                    : AppColors.textSecondary,
+                fontFamily: 'Poppins',
               ),
             ),
           ),

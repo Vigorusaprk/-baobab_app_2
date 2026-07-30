@@ -1,5 +1,6 @@
 import 'package:baobabe_0_2/features/home_page/data/models/ui_business.dart';
 import 'package:flutter/material.dart';
+import 'package:baobabe_0_2/core/themes/app_colors.dart';
 import 'package:go_router/go_router.dart';
 
 /// Partie "vue" pure de la section Populaires : reçoit une liste déjà
@@ -55,27 +56,27 @@ class PopularBusinessListView extends StatelessWidget {
                   fontSize: 18,
                   fontWeight: FontWeight.w800,
                   fontFamily: "Poppins",
-                  color: Colors.black,
+                  color: AppColors.textPrimary,
                 ),
               ),
-                GestureDetector(
-                  onTap: onSeeAllTap,
-                  child: const Text(
-                    'Voir tout',
-                    style: TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600,
-                      fontFamily: "Poppins",
-                      color: Colors.green,
-                    ),
+              GestureDetector(
+                onTap: onSeeAllTap,
+                child: const Text(
+                  'Voir tout',
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    fontFamily: "Poppins",
+                    color: AppColors.success,
                   ),
                 ),
+              ),
             ],
           ),
         ),
         const SizedBox(height: 12),
         ...uiBusinesses.map(
-              (uiBusiness) => Padding(
+          (uiBusiness) => Padding(
             padding: const EdgeInsets.only(bottom: 10),
             child: _PopularBusinessRow(
               uiBusiness: uiBusiness,
@@ -97,10 +98,12 @@ class _PopularBusinessRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final business = uiBusiness.business;
-    final initial = business.name.isNotEmpty ? business.name[0].toUpperCase() : '?';
+    final initial = business.name.isNotEmpty
+        ? business.name[0].toUpperCase()
+        : '?';
 
     return Material(
-      color: Colors.white,
+      color: AppColors.white,
       borderRadius: BorderRadius.circular(16),
       child: InkWell(
         borderRadius: BorderRadius.circular(16),
@@ -108,12 +111,12 @@ class _PopularBusinessRow extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: AppColors.white,
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: Colors.grey.shade200, width: 1),
+            border: Border.all(color: AppColors.textSecondary, width: 1),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.05),
+                color: AppColors.textPrimary.withOpacity(0.05),
                 blurRadius: 10,
                 offset: const Offset(0, 3),
               ),
@@ -128,12 +131,12 @@ class _PopularBusinessRow extends StatelessWidget {
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
                   color: uiBusiness.categoryColor,
-                  borderRadius: BorderRadius.circular(10)
+                  borderRadius: BorderRadius.circular(10),
                 ),
                 child: Text(
                   initial,
                   style: const TextStyle(
-                    color: Colors.white,
+                    color: AppColors.white,
                     fontSize: 18,
                     fontWeight: FontWeight.w800,
                     fontFamily: "Poppins",
@@ -154,13 +157,17 @@ class _PopularBusinessRow extends StatelessWidget {
                         fontSize: 15,
                         fontWeight: FontWeight.w700,
                         fontFamily: "Poppins",
-                        color: Colors.black,
+                        color: AppColors.textPrimary,
                       ),
                     ),
                     const SizedBox(height: 3),
                     Row(
                       children: [
-                        const Icon(Icons.star_rounded, size: 14, color: Colors.amber),
+                        const Icon(
+                          Icons.star_rounded,
+                          size: 14,
+                          color: Colors.amber,
+                        ),
                         const SizedBox(width: 3),
                         Text(
                           business.rating.toStringAsFixed(1),
@@ -168,7 +175,7 @@ class _PopularBusinessRow extends StatelessWidget {
                             fontSize: 13,
                             fontWeight: FontWeight.w600,
                             fontFamily: "Poppins",
-                            color: Colors.grey.shade700,
+                            color: AppColors.textSecondary,
                           ),
                         ),
                         Text(
@@ -176,7 +183,7 @@ class _PopularBusinessRow extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 13,
                             fontFamily: "Poppins",
-                            color: Colors.grey.shade600,
+                            color: AppColors.textSecondary,
                           ),
                         ),
                         // Distance volontairement omise : la table `business`

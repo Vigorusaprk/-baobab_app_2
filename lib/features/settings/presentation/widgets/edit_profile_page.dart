@@ -4,7 +4,6 @@ import 'package:baobabe_0_2/core/themes/app_diemens.dart';
 import 'package:baobabe_0_2/core/themes/app_fonts.dart';
 import 'package:flutter/material.dart';
 
-
 class EditProfilePage extends StatefulWidget {
   const EditProfilePage({super.key});
 
@@ -34,32 +33,32 @@ class _EditProfilePageState extends State<EditProfilePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.primaryLight,
+      backgroundColor: AppColors.secondary,
       appBar: AppBar(
-        backgroundColor: AppColors.primaryLight,
-          leading: IconButton(
-            icon: const Icon(
-              Icons.arrow_back_ios_new_rounded,
-              color: AppColors.scaffoldBackground,
-            ),
-            onPressed: () => Navigator.pop(context),
+        backgroundColor: AppColors.secondary,
+        leading: IconButton(
+          icon: const Icon(
+            Icons.arrow_back_ios_new_rounded,
+            color: AppColors.background,
           ),
+          onPressed: () => Navigator.pop(context),
+        ),
         title: Text(
-            'Modifier le profil',
-            style: TextStyle(
-              fontFamily: AppFonts.primaryFontFamily,
-              fontSize: 24,
-              fontWeight: AppFonts.bold,
-              color: AppColors.scaffoldBackground,
-            ),
-        )
+          'Modifier le profil',
+          style: TextStyle(
+            fontFamily: AppFonts.primaryFontFamily,
+            fontSize: 24,
+            fontWeight: AppFonts.bold,
+            color: AppColors.background,
+          ),
+        ),
       ),
       body: Container(
         decoration: BoxDecoration(
-          color: AppColors.scaffoldBackground,
+          color: AppColors.background,
           borderRadius: const BorderRadius.only(
-            topLeft: Radius.circular(AppDimens.BORDER_RADIUS_30),
-            topRight: Radius.circular(AppDimens.BORDER_RADIUS_30),
+            topLeft: Radius.circular(AppDimens.radius30),
+            topRight: Radius.circular(AppDimens.radius30),
           ),
         ),
         child: Padding(
@@ -68,9 +67,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
             children: [
               TextField(
                 controller: _nameController,
-                decoration:  InputDecoration(
+                decoration: InputDecoration(
                   labelText: 'Nom complet',
-                  fillColor: Colors.white,
+                  fillColor: AppColors.white,
 
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(16),
@@ -78,7 +77,10 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(16),
-                    borderSide: const BorderSide(color: AppColors.primary, width: 2.5),
+                    borderSide: const BorderSide(
+                      color: AppColors.primary,
+                      width: 2.5,
+                    ),
                   ),
                 ),
               ),
@@ -93,38 +95,48 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(16),
-                    borderSide: const BorderSide(color: AppColors.primary, width: 2.5),
+                    borderSide: const BorderSide(
+                      color: AppColors.primary,
+                      width: 2.5,
+                    ),
                   ),
                 ),
                 keyboardType: TextInputType.emailAddress,
               ),
               const SizedBox(height: 32),
 
-                GestureDetector(
-                  onTap: () {
-                    // Appeler l'API de mise à jour du profil
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Profil mis à jour (à implémenter)')),
-                    );
-                    Navigator.pop(context);
-                  },
-                  child: Container(
-                      height: 50,
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                        color: AppColors.primary,
-                        borderRadius: BorderRadius.all(
-                          Radius.circular(25)
-                        ),
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Center(
-                          child: Text('Enregistrer', style: TextStyle(color: AppColors.scaffoldBackground, fontWeight: FontWeight.bold, fontSize: 15)),
-                        ),
-                      ),
+              GestureDetector(
+                onTap: () {
+                  // Appeler l'API de mise à jour du profil
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Profil mis à jour (à implémenter)'),
+                    ),
+                  );
+                  Navigator.pop(context);
+                },
+                child: Container(
+                  height: 50,
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: AppColors.primary,
+                    borderRadius: BorderRadius.all(Radius.circular(25)),
                   ),
-                )
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Center(
+                      child: Text(
+                        'Enregistrer',
+                        style: TextStyle(
+                          color: AppColors.background,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 15,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
             ],
           ),
         ),

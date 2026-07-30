@@ -42,18 +42,23 @@ class SettingsCubit extends Cubit<SettingsState> {
       final response = await _supabase
           .from('user_profile')
           .select()
-          .eq('user_id', currentUser.id) // Filtre sur l'ID de l'utilisateur connecté
+          .eq(
+            'user_id',
+            currentUser.id,
+          ) // Filtre sur l'ID de l'utilisateur connecté
           .maybeSingle(); // Retourne un seul élément ou null s'il n'existe pas encore
 
       if (response == null) {
         // Si le profil n'existe pas encore dans la table publique, on passe des données par défaut
-        emit(SettingsLoaded(
-          userProfile: {
-            'name': currentUser.userMetadata?['name'] ?? 'Utilisateur',
-            'phone': '',
-          },
-          userAuth: currentUser,
-        ));
+        emit(
+          SettingsLoaded(
+            userProfile: {
+              'name': currentUser.userMetadata?['name'] ?? 'Utilisateur',
+              'phone': '',
+            },
+            userAuth: currentUser,
+          ),
+        );
       } else {
         emit(SettingsLoaded(userProfile: response, userAuth: currentUser));
       }

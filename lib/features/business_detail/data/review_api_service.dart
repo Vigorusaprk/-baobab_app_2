@@ -5,9 +5,14 @@ class ReviewApiService {
   final SupabaseClient _supabase;
 
   ReviewApiService({SupabaseClient? supabase})
-      : _supabase = supabase ?? Supabase.instance.client;
+    : _supabase = supabase ?? Supabase.instance.client;
 
-  Future<void> submitReview(String businessId, String userId, int rating, String? comment) async {
+  Future<void> submitReview(
+    String businessId,
+    String userId,
+    int rating,
+    String? comment,
+  ) async {
     try {
       await _supabase.from('reviews').insert({
         'business_id': businessId,
@@ -28,9 +33,7 @@ class ReviewApiService {
           .eq('business_id', businessId)
           .order('created_at', ascending: false);
 
-      return (response as List)
-          .map((json) => Review.fromJson(json))
-          .toList();
+      return (response as List).map((json) => Review.fromJson(json)).toList();
     } catch (e) {
       throw Exception('Erreur de récupération des avis Supabase : $e');
     }

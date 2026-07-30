@@ -5,7 +5,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../domain/repositories/auth_repository.dart';
 
 class AuthRepositoryImpl implements AuthRepository {
-   AuthRepositoryImpl(this.remoteDataSource);
+  AuthRepositoryImpl(this.remoteDataSource);
 
   final AuthRemoteDataSource remoteDataSource;
 
@@ -73,7 +73,7 @@ class AuthRepositoryImpl implements AuthRepository {
       await remoteDataSource.signOut();
       return const Right(null);
     } catch (e) {
-     return Left(AuthFailure(message: localFailure!.message));
+      return Left(AuthFailure(message: localFailure!.message));
     }
   }
 }

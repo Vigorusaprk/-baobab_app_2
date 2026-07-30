@@ -16,7 +16,7 @@ void showSpaReservationModal(BuildContext context, Business business) {
   showModalBottomSheet(
     context: context,
     isScrollControlled: true,
-    backgroundColor: Colors.transparent,
+    backgroundColor: AppColors.transparent,
     builder: (modalContext) => BlocProvider.value(
       value: bloc,
       child: SpaReservationModal(business: business),
@@ -26,7 +26,8 @@ void showSpaReservationModal(BuildContext context, Business business) {
 
 class SpaReservationModal extends StatefulWidget {
   final Business business;
-  const SpaReservationModal({Key? key, required this.business}) : super(key: key);
+  const SpaReservationModal({Key? key, required this.business})
+    : super(key: key);
 
   @override
   State<SpaReservationModal> createState() => _SpaReservationModalState();
@@ -88,9 +89,9 @@ class _SpaReservationModalState extends State<SpaReservationModal> {
   void _showSnackBar(String message, {bool isSuccess = false}) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-          content: Text(message),
-          backgroundColor: isSuccess ? Colors.green : Colors.red,
-          behavior: SnackBarBehavior.floating
+        content: Text(message),
+        backgroundColor: isSuccess ? AppColors.success : AppColors.error,
+        behavior: SnackBarBehavior.floating,
       ),
     );
   }
@@ -112,7 +113,10 @@ class _SpaReservationModalState extends State<SpaReservationModal> {
   Future<void> _saveReservation() async {
     final sessionUser = SessionService.instance.currentUser;
     if (sessionUser == null) {
-      showAuthRequiredCard(context, message: 'Connectez-vous pour réserver ce soin.');
+      showAuthRequiredCard(
+        context,
+        message: 'Connectez-vous pour réserver ce soin.',
+      );
       return;
     }
     final userId = sessionUser.id;
@@ -121,7 +125,8 @@ class _SpaReservationModalState extends State<SpaReservationModal> {
     try {
       final treatments = _getTreatmentsList();
       final totalAmount = _data.calculateTotal(treatments);
-      final selectedTreatmentsWithPrices = _data.getSelectedTreatmentsWithPrices(treatments);
+      final selectedTreatmentsWithPrices = _data
+          .getSelectedTreatmentsWithPrices(treatments);
       final appointmentDateTime = DateTime(
         _data.appointmentDate!.year,
         _data.appointmentDate!.month,
@@ -144,7 +149,9 @@ class _SpaReservationModalState extends State<SpaReservationModal> {
           'appointment_date': appointmentDateTime.toIso8601String(),
           'selected_treatments': selectedTreatmentsWithPrices,
           'therapist_name': _data.selectedTherapist,
-          'notes': _notesController.text.trim().isEmpty ? null : _notesController.text.trim(),
+          'notes': _notesController.text.trim().isEmpty
+              ? null
+              : _notesController.text.trim(),
           'establishment_name': widget.business.name,
         },
       );
@@ -177,10 +184,14 @@ class _SpaReservationModalState extends State<SpaReservationModal> {
 
   String _getPageTitle(int pageIndex) {
     switch (pageIndex) {
-      case 0: return 'Choisir vos soins';
-      case 1: return 'Informations';
-      case 2: return 'Récapitulatif';
-      default: return '';
+      case 0:
+        return 'Choisir vos soins';
+      case 1:
+        return 'Informations';
+      case 2:
+        return 'Récapitulatif';
+      default:
+        return '';
     }
   }
 
@@ -194,9 +205,10 @@ class _SpaReservationModalState extends State<SpaReservationModal> {
         final treatments = _getTreatmentsList();
 
         return Container(
-          height: MediaQuery.of(context).size.height * (isSmallScreen ? 0.85 : 0.9),
+          height:
+              MediaQuery.of(context).size.height * (isSmallScreen ? 0.85 : 0.9),
           decoration: BoxDecoration(
-            color: AppColors.scaffoldBackground,
+            color: AppColors.background,
             borderRadius: const BorderRadius.vertical(top: Radius.circular(30)),
           ),
           child: Column(
@@ -207,11 +219,17 @@ class _SpaReservationModalState extends State<SpaReservationModal> {
                 title: _getPageTitle(_currentPage),
                 businessName: widget.business.name,
                 showBack: _currentPage > 0,
-                onBack: () => _pageController.previousPage(duration: const Duration(milliseconds: 300), curve: Curves.easeIn),
+                onBack: () => _pageController.previousPage(
+                  duration: const Duration(milliseconds: 300),
+                  curve: Curves.easeIn,
+                ),
                 onClose: () => Navigator.of(context).pop(),
               ),
-              const Divider(height: 1, color: Colors.grey),
-              SpaModalProgressIndicator(isSmallScreen: isSmallScreen, currentPage: _currentPage),
+              const Divider(height: 1, color: AppColors.textSecondary),
+              SpaModalProgressIndicator(
+                isSmallScreen: isSmallScreen,
+                currentPage: _currentPage,
+              ),
               const SizedBox(height: 16),
               Expanded(
                 child: SpaModalPages(
@@ -222,7 +240,9 @@ class _SpaReservationModalState extends State<SpaReservationModal> {
                   selectedTreatments: _data.selectedTreatments,
                   totalAmount: _data.calculateTotal(treatments),
                   onToggleTreatment: _toggleTreatment,
-                  onSelectTreatmentNext: _data.selectedTreatments.isNotEmpty ? _nextPage : null,
+                  onSelectTreatmentNext: _data.selectedTreatments.isNotEmpty
+                      ? _nextPage
+                      : null,
                   fullNameController: _fullNameController,
                   phoneController: _phoneController,
                   notesController: _notesController,
@@ -238,15 +258,20 @@ class _SpaReservationModalState extends State<SpaReservationModal> {
                   },
                   therapistNames: _getTherapistNames(),
                   selectedTherapist: _data.selectedTherapist,
-                  onSelectTherapist: (name) => setState(() => _data.selectedTherapist = name),
+                  onSelectTherapist: (name) =>
+                      setState(() => _data.selectedTherapist = name),
                   onFieldChanged: () => setState(() {}),
                   canContinue: _validateStep2(),
                   onContinue: _nextPage,
                   businessName: widget.business.name,
-                  selectedTreatmentsWithPrices: _data.getSelectedTreatmentsWithPrices(treatments),
+                  selectedTreatmentsWithPrices: _data
+                      .getSelectedTreatmentsWithPrices(treatments),
                   isLoading: _isLoading,
                   onConfirm: _saveReservation,
-                  onEditInfo: () => _pageController.previousPage(duration: const Duration(milliseconds: 300), curve: Curves.easeIn),
+                  onEditInfo: () => _pageController.previousPage(
+                    duration: const Duration(milliseconds: 300),
+                    curve: Curves.easeIn,
+                  ),
                 ),
               ),
             ],

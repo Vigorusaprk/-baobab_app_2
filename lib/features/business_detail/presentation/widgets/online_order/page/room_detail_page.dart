@@ -11,7 +11,6 @@ import 'package:baobabe_0_2/features/business_detail/presentation/widgets/online
 import 'package:baobabe_0_2/features/home_page/domain/entities/business_entity.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:go_router/go_router.dart';
 
 class RoomDetailPage extends StatefulWidget {
   final Business hotel;
@@ -45,7 +44,11 @@ class _RoomDetailPageState extends State<RoomDetailPage> {
   Future<void> _selectDate(DateTime? current, bool isCheckIn) async {
     final picked = await showDatePicker(
       context: context,
-      initialDate: current ?? (isCheckIn ? DateTime.now() : DateTime.now().add(const Duration(days: 1))),
+      initialDate:
+          current ??
+          (isCheckIn
+              ? DateTime.now()
+              : DateTime.now().add(const Duration(days: 1))),
       firstDate: DateTime.now(),
       lastDate: DateTime.now().add(const Duration(days: 365)),
     );
@@ -61,7 +64,12 @@ class _RoomDetailPageState extends State<RoomDetailPage> {
             _checkOut = picked;
           } else {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('La date de départ doit être après la date d\'arrivée'), backgroundColor: Colors.orange),
+              const SnackBar(
+                content: Text(
+                  'La date de départ doit être après la date d\'arrivée',
+                ),
+                backgroundColor: Colors.orange,
+              ),
             );
           }
         }
@@ -83,13 +91,19 @@ class _RoomDetailPageState extends State<RoomDetailPage> {
   void _book() async {
     if (_checkIn == null || _checkOut == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Veuillez choisir les dates'), backgroundColor: Colors.orange),
+        const SnackBar(
+          content: Text('Veuillez choisir les dates'),
+          backgroundColor: Colors.orange,
+        ),
       );
       return;
     }
     if (_nameController.text.isEmpty || _phoneController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Veuillez remplir votre nom et téléphone'), backgroundColor: Colors.orange),
+        const SnackBar(
+          content: Text('Veuillez remplir votre nom et téléphone'),
+          backgroundColor: Colors.orange,
+        ),
       );
       return;
     }
@@ -97,7 +111,10 @@ class _RoomDetailPageState extends State<RoomDetailPage> {
     // Récupérer l'utilisateur connecté
     final sessionUser = SessionService.instance.currentUser;
     if (sessionUser == null) {
-      showAuthRequiredCard(context, message: 'Connectez-vous pour réserver cette chambre.');
+      showAuthRequiredCard(
+        context,
+        message: 'Connectez-vous pour réserver cette chambre.',
+      );
       return;
     }
     final userId = sessionUser.id;
@@ -133,13 +150,16 @@ class _RoomDetailPageState extends State<RoomDetailPage> {
       context.read<BusinessDetailBloc>().add(MakeReservation(reservation));
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Réservation confirmée !'), backgroundColor: Colors.green),
+          const SnackBar(
+            content: Text('Réservation confirmée !'),
+            backgroundColor: AppColors.success,
+          ),
         );
         Navigator.pop(context);
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Erreur: $e'), backgroundColor: Colors.red),
+        SnackBar(content: Text('Erreur: $e'), backgroundColor: AppColors.error),
       );
     }
   }
@@ -147,11 +167,11 @@ class _RoomDetailPageState extends State<RoomDetailPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.scaffoldBackground,
+      backgroundColor: AppColors.background,
       appBar: AppBar(
         title: Text(widget.room.roomType),
         backgroundColor: AppColors.primary,
-        foregroundColor: Colors.white,
+        foregroundColor: AppColors.white,
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -165,7 +185,10 @@ class _RoomDetailPageState extends State<RoomDetailPage> {
                 children: [
                   RoomInfoHeader(room: widget.room),
                   const SizedBox(height: 24),
-                  const Text('Réservation', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                  const Text(
+                    'Réservation',
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  ),
                   const SizedBox(height: 16),
                   RoomDateSelectors(
                     checkIn: _checkIn,
@@ -201,18 +224,27 @@ class _RoomDetailPageState extends State<RoomDetailPage> {
                   // Informations client
                   TextField(
                     controller: _nameController,
-                    decoration: const InputDecoration(labelText: 'Nom complet', border: OutlineInputBorder()),
+                    decoration: const InputDecoration(
+                      labelText: 'Nom complet',
+                      border: OutlineInputBorder(),
+                    ),
                   ),
                   const SizedBox(height: 12),
                   TextField(
                     controller: _phoneController,
-                    decoration: const InputDecoration(labelText: 'Téléphone', border: OutlineInputBorder()),
+                    decoration: const InputDecoration(
+                      labelText: 'Téléphone',
+                      border: OutlineInputBorder(),
+                    ),
                     keyboardType: TextInputType.phone,
                   ),
                   const SizedBox(height: 12),
                   TextField(
                     controller: _notesController,
-                    decoration: const InputDecoration(labelText: 'Notes (optionnel)', border: OutlineInputBorder()),
+                    decoration: const InputDecoration(
+                      labelText: 'Notes (optionnel)',
+                      border: OutlineInputBorder(),
+                    ),
                     maxLines: 2,
                   ),
                   const SizedBox(height: 24),

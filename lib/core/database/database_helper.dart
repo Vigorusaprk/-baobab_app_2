@@ -30,7 +30,9 @@ class DatabaseHelper {
 
   Future _onUpgrade(Database db, int oldVersion, int newVersion) async {
     if (oldVersion < 2) {
-      _logger.i("Database: Upgrading to version 2 (Adding cached_data table)...");
+      _logger.i(
+        "Database: Upgrading to version 2 (Adding cached_data table)...",
+      );
       await db.execute('''
         CREATE TABLE IF NOT EXISTS cached_data (
           key TEXT PRIMARY KEY,
@@ -68,15 +70,11 @@ class DatabaseHelper {
 
   Future<void> saveCache(String key, String data) async {
     final db = await instance.database;
-    await db.insert(
-      'cached_data',
-      {
-        'key': key,
-        'data': data,
-        'updated_at': DateTime.now().toIso8601String(),
-      },
-      conflictAlgorithm: ConflictAlgorithm.replace,
-    );
+    await db.insert('cached_data', {
+      'key': key,
+      'data': data,
+      'updated_at': DateTime.now().toIso8601String(),
+    }, conflictAlgorithm: ConflictAlgorithm.replace);
   }
 
   Future<String?> getCache(String key) async {
@@ -121,12 +119,7 @@ class DatabaseHelper {
     required List<Object?> whereArgs,
   }) async {
     final db = await instance.database;
-    return await db.update(
-      table,
-      data,
-      where: where,
-      whereArgs: whereArgs,
-    );
+    return await db.update(table, data, where: where, whereArgs: whereArgs);
   }
 
   Future<int> delete(
@@ -135,11 +128,7 @@ class DatabaseHelper {
     required List<Object?> whereArgs,
   }) async {
     final db = await instance.database;
-    return await db.delete(
-      table,
-      where: where,
-      whereArgs: whereArgs,
-    );
+    return await db.delete(table, where: where, whereArgs: whereArgs);
   }
 
   Future close() async {

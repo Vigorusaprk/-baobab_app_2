@@ -17,7 +17,7 @@ class ReservationFormatUtils {
     if (date == null) return AppColors.warning;
     final now = DateTime.now();
     final diff = date.difference(now);
-    if (diff.isNegative) return Colors.grey;
+    if (diff.isNegative) return AppColors.textSecondary;
     if (diff.inDays == 0) return AppColors.success;
     if (diff.inDays <= 3) return AppColors.warning;
     return AppColors.primary;
@@ -26,8 +26,18 @@ class ReservationFormatUtils {
   static String getReservationSubtitle(Reservation reservation) {
     if (reservation.date != null) {
       final months = [
-        'Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin',
-        'Juil', 'Aoû', 'Sep', 'Oct', 'Nov', 'Déc'
+        'Jan',
+        'Fév',
+        'Mar',
+        'Avr',
+        'Mai',
+        'Juin',
+        'Juil',
+        'Aoû',
+        'Sep',
+        'Oct',
+        'Nov',
+        'Déc',
       ];
       return '${reservation.date!.day} ${months[reservation.date!.month - 1]} ${reservation.date!.year}';
     }

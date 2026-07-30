@@ -1,6 +1,5 @@
 import 'package:baobabe_0_2/features/home_page/domain/entities/search_filter_entity.dart';
 import 'package:equatable/equatable.dart';
-import 'package:baobabe_0_2/features/home_page/domain/entities/business_entity.dart';
 
 abstract class SearchEvent extends Equatable {
   const SearchEvent();

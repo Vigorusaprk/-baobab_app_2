@@ -1,3 +1,3 @@
-class Constants{
-	//TODO: add constants here
+class Constants {
+  //TODO: add constants here
 }

@@ -1,5 +1,6 @@
-import 'package:baobabe_0_2/core/themes/app_colors.dart';
+import 'package:baobabe_0_2/core/themes/business_category_colors.dart';
 import 'package:flutter/material.dart';
+import 'package:baobabe_0_2/core/themes/app_colors.dart';
 
 class Reservation {
   final String id;
@@ -49,10 +50,7 @@ class Reservation {
       'type': type,
       'reservation_date': reservationDate.toIso8601String(),
       'total_amount': totalAmount,
-      'details': {
-        ...details,
-        'establishment_name': establishmentName,
-      },
+      'details': {...details, 'establishment_name': establishmentName},
       'created_at': createdAt.toIso8601String(),
     };
 
@@ -66,7 +64,9 @@ class Reservation {
   // ========== Getters spécifiques (extraits de `details`) ==========
 
   String get establishmentName =>
-      details['establishment_name'] ?? details['establishmentName'] ?? 'Établissement inconnu';
+      details['establishment_name'] ??
+      details['establishmentName'] ??
+      'Établissement inconnu';
 
   String get customerName =>
       details['customer_name'] ?? details['customerName'] ?? 'Non renseigné';
@@ -86,32 +86,31 @@ class Reservation {
   int? get numberOfPeople =>
       details['guests'] ?? details['number_of_people'] ?? details['people'];
 
-  String? get roomType =>
-      details['room_type'] ?? details['roomType'];
+  String? get roomType => details['room_type'] ?? details['roomType'];
 
-  DateTime? get checkInDate =>
-      details['check_in'] != null ? DateTime.tryParse(details['check_in']) : null;
+  DateTime? get checkInDate => details['check_in'] != null
+      ? DateTime.tryParse(details['check_in'])
+      : null;
 
-  DateTime? get checkOutDate =>
-      details['check_out'] != null ? DateTime.tryParse(details['check_out']) : null;
+  DateTime? get checkOutDate => details['check_out'] != null
+      ? DateTime.tryParse(details['check_out'])
+      : null;
 
-  int? get numberOfRooms =>
-      details['rooms'] ?? details['number_of_rooms'];
+  int? get numberOfRooms => details['rooms'] ?? details['number_of_rooms'];
 
-  int? get numberOfGuests =>
-      details['guests'] ?? details['number_of_guests'];
+  int? get numberOfGuests => details['guests'] ?? details['number_of_guests'];
 
-  String? get vehicleType =>
-      details['vehicle_type'] ?? details['vehicleType'];
+  String? get vehicleType => details['vehicle_type'] ?? details['vehicleType'];
 
-  DateTime? get rentalStartDate =>
-      details['rental_start_date'] != null ? DateTime.tryParse(details['rental_start_date']) : null;
+  DateTime? get rentalStartDate => details['rental_start_date'] != null
+      ? DateTime.tryParse(details['rental_start_date'])
+      : null;
 
-  DateTime? get rentalEndDate =>
-      details['rental_end_date'] != null ? DateTime.tryParse(details['rental_end_date']) : null;
+  DateTime? get rentalEndDate => details['rental_end_date'] != null
+      ? DateTime.tryParse(details['rental_end_date'])
+      : null;
 
-  int? get rentalDays =>
-      details['rental_days'] ?? details['rentalDays'];
+  int? get rentalDays => details['rental_days'] ?? details['rentalDays'];
 
   bool get withDriver =>
       details['with_driver'] ?? details['withDriver'] ?? false;
@@ -122,32 +121,38 @@ class Reservation {
   bool get needDelivery =>
       details['need_delivery'] ?? details['needDelivery'] ?? false;
 
-  String? get destination =>
-      details['destination'];
+  String? get destination => details['destination'];
 
   String? get departureTime =>
       details['departure_time'] ?? details['departureTime'];
 
   int? get numberOfPassengers =>
-      details['number_of_passengers'] ?? details['numberOfPassengers'] ?? details['passengers'];
+      details['number_of_passengers'] ??
+      details['numberOfPassengers'] ??
+      details['passengers'];
 
   String? get treatmentType =>
-      details['treatment_type'] ?? details['treatmentType'] ?? details['selected_treatments']?.first?['name'];
+      details['treatment_type'] ??
+      details['treatmentType'] ??
+      details['selected_treatments']?.first?['name'];
 
-  DateTime? get appointmentDate =>
-      details['appointment_date'] != null ? DateTime.tryParse(details['appointment_date']) : null;
+  DateTime? get appointmentDate => details['appointment_date'] != null
+      ? DateTime.tryParse(details['appointment_date'])
+      : null;
 
   String? get therapistName =>
       details['therapist_name'] ?? details['therapistName'];
 
   List<Map<String, dynamic>>? get selectedTreatments =>
-      (details['selected_treatments'] as List?)?.map((e) => Map<String, dynamic>.from(e)).toList();
+      (details['selected_treatments'] as List?)
+          ?.map((e) => Map<String, dynamic>.from(e))
+          .toList();
 
-  String? get movieTitle =>
-      details['movie_title'] ?? details['movieTitle'];
+  String? get movieTitle => details['movie_title'] ?? details['movieTitle'];
 
-  DateTime? get showtime =>
-      details['showtime'] != null ? DateTime.tryParse(details['showtime']) : null;
+  DateTime? get showtime => details['showtime'] != null
+      ? DateTime.tryParse(details['showtime'])
+      : null;
 
   String? get ticketType =>
       details['ticket_type'] ?? details['ticketType'] ?? 'Standard';
@@ -155,8 +160,7 @@ class Reservation {
   int? get numberOfTickets =>
       details['tickets_count'] ?? details['ticketsCount'] ?? 1;
 
-  String? get seatNumbers =>
-      details['seat_numbers'] ?? details['seatNumbers'];
+  String? get seatNumbers => details['seat_numbers'] ?? details['seatNumbers'];
 
   String? get activitiName =>
       details['activity_name'] ?? details['activityName'];
@@ -165,54 +169,85 @@ class Reservation {
       details['day'] != null ? DateTime.tryParse(details['day']) : null;
 
   List<Map<String, dynamic>>? get selectedActivities =>
-      (details['selected_activities'] as List?)?.map((e) => Map<String, dynamic>.from(e)).toList();
+      (details['selected_activities'] as List?)
+          ?.map((e) => Map<String, dynamic>.from(e))
+          .toList();
 
-  String? get notes =>
-      details['notes'];
+  String? get notes => details['notes'];
 
   // ========== Getters pour l'affichage ==========
 
   String get typeDisplayName {
     switch (type) {
-      case 'hotel': return 'Hôtel';
-      case 'restaurant': return 'Restaurant';
-      case 'car_rental': return 'Location de voiture';
-      case 'travel': return 'Voyage';
-      case 'spa': return 'Spa';
-      case 'cinema': return 'Cinéma';
-      case 'toursime': return 'Tourisme';
-      default: return type;
+      case 'hotel':
+        return 'Hôtel';
+      case 'restaurant':
+        return 'Restaurant';
+      case 'car_rental':
+        return 'Location de voiture';
+      case 'travel':
+        return 'Voyage';
+      case 'spa':
+        return 'Spa';
+      case 'cinema':
+        return 'Cinéma';
+      case 'toursime':
+        return 'Tourisme';
+      default:
+        return type;
     }
   }
 
   Color get typeColor {
     switch (type) {
-      case 'hotel': return AppColors.hotel;
-      case 'restaurant': return AppColors.restaurant;
-      case 'car_rental': return AppColors.carRental;
-      case 'travel': return AppColors.travelAgency;
-      case 'spa': return AppColors.spa;
-      case 'cinema': return AppColors.cinema;
-      case 'toursime': return AppColors.tourism;
-      default: return Colors.grey;
+      case 'hotel':
+        return BusinessCategoryColors.hotel;
+      case 'restaurant':
+        return BusinessCategoryColors.restaurant;
+      case 'car_rental':
+        return BusinessCategoryColors.carRental;
+      case 'travel':
+        return BusinessCategoryColors.travelAgency;
+      case 'spa':
+        return BusinessCategoryColors.spa;
+      case 'cinema':
+        return BusinessCategoryColors.cinema;
+      case 'toursime':
+        return BusinessCategoryColors.tourism;
+      default:
+        return AppColors.textSecondary;
     }
   }
 
   IconData get typeIcon {
     switch (type) {
-      case 'hotel': return Icons.hotel;
-      case 'restaurant': return Icons.restaurant;
-      case 'car_rental': return Icons.directions_car;
-      case 'travel': return Icons.flight_takeoff;
-      case 'spa': return Icons.spa;
-      case 'cinema': return Icons.movie;
-      case 'toursime': return Icons.tour;
-      default: return Icons.event;
+      case 'hotel':
+        return Icons.hotel;
+      case 'restaurant':
+        return Icons.restaurant;
+      case 'car_rental':
+        return Icons.directions_car;
+      case 'travel':
+        return Icons.flight_takeoff;
+      case 'spa':
+        return Icons.spa;
+      case 'cinema':
+        return Icons.movie;
+      case 'toursime':
+        return Icons.tour;
+      default:
+        return Icons.event;
     }
   }
 
   DateTime get displayDate {
-    return date ?? checkInDate ?? rentalStartDate ?? appointmentDate ?? showtime ?? day ?? reservationDate;
+    return date ??
+        checkInDate ??
+        rentalStartDate ??
+        appointmentDate ??
+        showtime ??
+        day ??
+        reservationDate;
   }
 
   // ========== Helper ==========
@@ -221,7 +256,10 @@ class Reservation {
     try {
       final parts = timeString.split(':');
       if (parts.length == 2) {
-        return TimeOfDay(hour: int.parse(parts[0]), minute: int.parse(parts[1]));
+        return TimeOfDay(
+          hour: int.parse(parts[0]),
+          minute: int.parse(parts[1]),
+        );
       }
       return null;
     } catch (_) {

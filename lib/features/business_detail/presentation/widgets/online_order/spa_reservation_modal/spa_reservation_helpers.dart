@@ -10,10 +10,13 @@ List<dynamic> getSpaTreatmentsList(Business business) {
 List<String> getSpaTherapistNames(Business business) {
   final therapists = business.specificData['therapists'];
   if (therapists is List) {
-    return therapists.map((t) {
-      if (t is Map) return t['name']?.toString() ?? '';
-      return t.toString();
-    }).where((name) => name.isNotEmpty).toList();
+    return therapists
+        .map((t) {
+          if (t is Map) return t['name']?.toString() ?? '';
+          return t.toString();
+        })
+        .where((name) => name.isNotEmpty)
+        .toList();
   }
   return [];
 }

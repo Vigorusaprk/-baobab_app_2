@@ -1,212 +1,29 @@
 import 'package:flutter/material.dart';
 
+/// Palette officielle de l'application — à respecter strictement.
+/// Toute nouvelle couleur doit être une de ces valeurs (ou une variante
+/// d'opacité de l'une d'elles), jamais une teinte inventée.
 class AppColors {
   AppColors._();
 
-  /// Couleur principale de l'application
-  static const Color primary = Color(0xFF0F2E20);
-  static const Color secondary = Color(0xFF2E7D54);
-  static const Color textColor = Color(0xFF1A1F1C);
-  // Fond général de l'application
-  static const Color scaffoldBackground = Color(0xFFF2F4F3);
-  // Surface principale (Cards)
-  static const Color surface = Colors.white;
-  // Fond des TextField
-  static const Color inputBackground = Colors.white;
-  // Couleur d'inactivité
-  static const Color inactiveColor = Color(0xFFC6D1CB);
+  // === Palette officielle ===
+  static const Color primary = Color(0xFF0F2E20); // Vert profond
+  static const Color secondary = Color(0xFF2E7D54); // Vert clair
+  static const Color secondaryLight = Color(0xFFA3C9A5); // Vert doux
+  static const Color background = Color(0xFFF2F4F3); // Gris neutre
+  static const Color textPrimary = Color(0xFF1A1F1C); // Gris foncé
+  static const Color white = Color(0xFFFFFFFF); // Blanc
 
-  static const Color primaryLight = Color(0xFF2E7D54);
-  static const Color primaryDark = Color(0xFF0F2E20);
-
-  // Variantes
-
-  static const Color primary50 = Color(0xFFE8EFEB);
-  static const Color primary100 = Color(0xFFC6D1CB);
-  static const Color primary200 = Color(0xFFA1B3A9);
-  static const Color primary300 = Color(0xFF7C9588);
-  static const Color primary400 = Color(0xFF456353);
-  static const Color primary500 = primary;
-  static const Color primary600 = Color(0xFF0D281C);
-  static const Color primary700 = Color(0xFF0A2016);
-  static const Color primary800 = Color(0xFF081811);
-  static const Color primary900 = Color(0xFF05100B);
-
-  // ===============================================================
-  // SECONDARY
-  // Vert clair (#2E7D54)
-  // ===============================================================
-
-  static const Color secondaryLight = Color(0xFFA3C9A5);
-  static const Color secondaryDark = Color(0xFF2E7D54);
-
-  static const Color secondary50 = Color(0xFFE8F3ED);
-  static const Color secondary100 = Color(0xFFC6E1D3);
-  static const Color secondary200 = Color(0xFFA1CEB6);
-  static const Color secondary300 = Color(0xFF7CBB98);
-  static const Color secondary400 = Color(0xFF55A476);
-  static const Color secondary500 = secondary;
-  static const Color secondary600 = Color(0xFF29704B);
-  static const Color secondary700 = Color(0xFF236343);
-  static const Color secondary800 = Color(0xFF1D5538);
-  static const Color secondary900 = Color(0xFF16422C);
-
-  // ... (garder ACCENT inchangé)
-
-  // ===============================================================
-  // COULEURS DE FOND
-  // ===============================================================
-
-  // Gris neutre (#F2F4F3)
-
-  /// Fond des pages secondaires
-  static const Color canvasBackground = Color(0xFFF2F4F3);
-
-  /// Surface légèrement contrastée
-  static const Color surfaceVariant = Color(0xFFF2F4F3);
-
-  // ===============================================================
-  // TEXTE
-  // ===============================================================
-
-  static const Color textPrimary = Color(0xFF1C2235);
-
+  // === Rôles dérivés de la palette officielle ===
+  static const Color surface = white;
+  static const Color textOnPrimary = white;
   static const Color textSecondary = Color(0xFF4A5168);
 
-  static const Color textBody = Color(0xFF626B83);
-
-  static const Color textMuted = Color(0xFF8C93AA);
-
-  static const Color textHint = Color(0xFFA4AABE);
-
-  static const Color textDisabled = Color(0xFFB5BAC8);
-
-  static const Color textOnPrimary = Colors.white;
-
-  static const Color textOnSecondary = Colors.white;
-
-  // ===============================================================
-  // FORMULAIRES
-  // ===============================================================
-
-  /// Bordure normale
-  static const Color inputBorder = Color(0xFFDADDEA);
-
-  /// Hover
-  static const Color inputHover = Color(0xFFECEEF8);
-
-  /// Focus
-  static const Color inputFocused = primary;
-
-  /// Désactivé
-  static const Color inputDisabled = Color(0xFFF7F8FB);
-
-  /// Erreur
-  static const Color inputError = Color(0xFFFCE8EA);
-
-  /// Bordure erreur
-  static const Color inputErrorBorder = Color(0xFFE94B5A);
-
-  /// Bordure succès
-  static const Color inputSuccessBorder = Color(0xFF15B86C);
-
-  // ===============================================================
-  // DIVIDERS
-  // ===============================================================
-
-  static const Color divider = Color(0xFFE5E8F1);
-
-  static const Color border = Color(0xFFE2E5EF);
-
-  // ===============================================================
-  // COULEURS D'ÉTAT
-  // ===============================================================
-
-  static const Color success = Color(0xFF16C47F);
-
-  static const Color warning = Color(0xFFFFB020);
-
-  static const Color error = Color(0xFFF04452);
-
-  static const Color info = Color(0xFF3A86FF);
-
-  // ===============================================================
-  // CARTES PAR CATÉGORIE
-  // ===============================================================
-
-  static const Color restaurantCard = Color(0xFFFFF6F2);
-
-  static const Color shoppingCard = Color(0xFFF5FAFF);
-
-  static const Color hotelCard = Color(0xFFF5F4FF);
-
-  static const Color spaCard = Color(0xFFF8FFF8);
-
-  static const Color travelCard = Color(0xFFF2FFFF);
-
-  static const Color cinemaCard = Color(0xFFFFF4F8);
-
-  static const Color mallCard = Color(0xFFFAF5FF);
-
-  static const Color carRentalCard = Color(0xFFF6F8FF);
-
-  // ===============================================================
-  // COULEURS DES TYPES DE BUSINESS
-  // ===============================================================
-
-  static const Color restaurant = Color(0xFFFF6B57);
-
-  static const Color fastFood = Color(0xFFFF9800);
-
-  static const Color shopping = Color(0xFF00B8D9);
-
-  static const Color mall = Color(0xFF8B5CF6);
-
-  static const Color hotel = Color(0xFF536DFE);
-
-  static const Color carRental = Color(0xFF3BB273);
-
-  static const Color travelAgency = Color(0xFF00C2A8);
-
-  static const Color spa = Color(0xFF2DD4BF);
-
-  static const Color cinema = Color(0xFFE64980);
-
-  static const Color tourism = Color(0xFF7950F2);
-
-  // ===============================================================
-  // COULEURS DES AVATARS
-  // ===============================================================
-
-  static const List<Color> avatarColors = [
-    Color(0xFFFF6B57),
-    Color(0xFF845EF7),
-    Color(0xFF3A86FF),
-    Color(0xFFFFD166),
-    Color(0xFF2DD4BF),
-    Color(0xFFE64980),
-    Color(0xFF7C5CFC),
-    Color(0xFF00C2FF),
-    Color(0xFF9CCC65),
-    Color(0xFFFF9F1C),
-  ];
-
-  // ===============================================================
-  // OMBRES
-  // Utilisées pour les cartes et les boutons
-  // ===============================================================
-
-  static const Color shadow = Color(0x14000000);
-
-  // ===============================================================
-  // BASIQUES
-  // ===============================================================
-
-  static const Color white = Colors.white;
-
-  static const Color black = Colors.black;
-
+  // === Neutres ===
   static const Color transparent = Colors.transparent;
 
-  static const Color grey = Color(0xFF9E9E9E);
+  // === États ===
+  static const Color success = Color(0xFF16C47F);
+  static const Color warning = Color(0xFFFFB020);
+  static const Color error = Color(0xFFF04452);
 }
