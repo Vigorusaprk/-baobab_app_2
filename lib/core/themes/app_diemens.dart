@@ -25,6 +25,7 @@ class AppDimens {
   static const double BORDER_RADIUS_48 = 48.0;
   static const double BORDER_RADIUS_100 = 100.0;
 
+static const double appPaddingValue = 24.0;
   static const double PADDING_3 = 3.0;
   static const double PADDING_4 = 4.0;
   static const double PADDING_5 = 5.0;
@@ -103,7 +104,8 @@ class AppDimens {
   static const allPadding8 = EdgeInsets.all(8);
 
   //** SYMMETRIC **//
-  static const appPadding = EdgeInsets.symmetric(horizontal: 24);
+  static const appPadding = EdgeInsets.symmetric(horizontal: appPaddingValue);
+
 
   //** ONLY **//
   static const paddingTop4Bottom10 = EdgeInsets.only(top: 4, bottom: 10);
@@ -132,4 +134,5 @@ class AppDimens {
   static const Widget spacerSmall = SizedBox(height: 8.0);
   static const Widget spacerMedium = SizedBox(height: 16.0);
   static const Widget spacerLarge = SizedBox(height: 24.0);
+  static const Widget spacerAppPaddingLarge = SizedBox(width: appPaddingValue);
 }

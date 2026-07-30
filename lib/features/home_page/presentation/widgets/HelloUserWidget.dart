@@ -20,78 +20,71 @@ class HelloUserWidget extends StatelessWidget {
         final user = snapshot.data;
         final userName = user?.name ?? 'Utilisateur';
 
-        return Padding(
-          padding: const EdgeInsets.only(
-            left: AppDimens.PADDING_20,
-            right: AppDimens.PADDING_20,
-            top: AppDimens.PADDING_16,
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                          "bonjours,",
-                        style: const TextStyle(
-                          fontFamily: 'Poppins',
-                          fontSize: 15,
-                          color: AppColors.primary,
-                        ),
-                      ),
-                      Text(
-                        "Ou alons nous?",
-                        style: const TextStyle(
-                          fontFamily: 'Poppins',
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.primary,
-                        ),
-                      ),
-                    ],
-                  ),
-
-                    Container(
-                      child: Row(
-                        children: [
-                          Container(
-                            padding: EdgeInsets.all(10),
-                            decoration: BoxDecoration(
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black.withOpacity(0.05),
-                                    blurRadius: 10,
-                                    offset: const Offset(0, 4),
-                                  ),
-                                ],
-                              borderRadius: BorderRadius.circular(10),
-                              color: AppColors.surface
-                            ),
-                            child: SvgPicture.asset(
-                              'assets/icons/notifications.svg',
-                              height: 30,
-                              width: 30,
-                              colorFilter: const ColorFilter.mode(
-                                AppColors.primary,
-                                BlendMode.srcIn,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: AppDimens.PADDING_10),
-                          _buildAvatar(user, userName, context),
-                        ],
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            /*Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "bonjours,",
+                      style: const TextStyle(
+                        fontFamily: 'Poppins',
+                        fontSize: 15,
+                        color: AppColors.primary,
                       ),
                     ),
-                ],
-              ),
-              const SizedBox(height: AppDimens.PADDING_16),
-              _buildSearchField(context),
-            ],
-          ),
+                    Text(
+                      "Ou alons nous?",
+                      style: const TextStyle(
+                        fontFamily: 'Poppins',
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.primary,
+                      ),
+                    ),
+                  ],
+                ),
+        
+                Container(
+                  child: Row(
+                    children: [
+                      Container(
+                        padding: EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.05),
+                              blurRadius: 10,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
+                          borderRadius: BorderRadius.circular(10),
+                          color: AppColors.surface,
+                        ),
+                        child: SvgPicture.asset(
+                          'assets/icons/notifications.svg',
+                          height: 30,
+                          width: 30,
+                          colorFilter: const ColorFilter.mode(
+                            AppColors.primary,
+                            BlendMode.srcIn,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: AppDimens.PADDING_10),
+                      _buildAvatar(user, userName, context),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: AppDimens.PADDING_16),*/
+            _buildSearchField(context),
+          ],
         );
       },
     );
@@ -122,9 +115,7 @@ class HelloUserWidget extends StatelessWidget {
               ),
               decoration: BoxDecoration(
                 color: AppColors.surface,
-                borderRadius: BorderRadius.circular(
-                  AppDimens.BORDER_RADIUS_12,
-                ),
+                borderRadius: BorderRadius.circular(AppDimens.BORDER_RADIUS_12),
                 boxShadow: [
                   BoxShadow(
                     color: Colors.black.withOpacity(0.05),
@@ -169,14 +160,10 @@ class HelloUserWidget extends StatelessWidget {
             // TODO : ouvrir les filtres
           },
           child: Container(
-            padding: const EdgeInsets.all(
-              AppDimens.PADDING_12,
-            ),
+            padding: const EdgeInsets.all(AppDimens.PADDING_12),
             decoration: BoxDecoration(
               color: AppColors.primary,
-              borderRadius: BorderRadius.circular(
-                AppDimens.BORDER_RADIUS_12,
-              ),
+              borderRadius: BorderRadius.circular(AppDimens.BORDER_RADIUS_12),
               boxShadow: [
                 BoxShadow(
                   color: Colors.black.withOpacity(0.05),
@@ -200,8 +187,11 @@ class HelloUserWidget extends StatelessWidget {
     );
   }
 
-
-  Widget _buildAvatar(AppSessionUser? user, String userName, BuildContext context) {
+  Widget _buildAvatar(
+    AppSessionUser? user,
+    String userName,
+    BuildContext context,
+  ) {
     return GestureDetector(
       onTap: () => context.go('/profile'),
       child: Container(
@@ -217,9 +207,7 @@ class HelloUserWidget extends StatelessWidget {
             ),
           ],
         ),
-        child: ClipOval(
-          child: _buildInitialsAvatar(userName),
-        ),
+        child: ClipOval(child: _buildInitialsAvatar(userName)),
       ),
     );
   }

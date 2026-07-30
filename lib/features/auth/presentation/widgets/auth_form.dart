@@ -3,6 +3,7 @@ import 'package:baobabe_0_2/features/auth/presentation/widgets/email_form.dart';
 import 'package:baobabe_0_2/features/auth/presentation/widgets/otp_form.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 
 class AuthForm extends StatefulWidget {
   const AuthForm({super.key});
@@ -47,6 +48,16 @@ class _AuthFormState extends State<AuthForm> {
           setState(() {
             isOtpForm = true;
           });
+        } else if (state is VerifyEmailOtpSuccess) {
+          // Close the OTP bottom sheet first, then close the login page
+          // itself so the user lands back on whatever screen they were on
+          // before opening the auth flow.
+          Navigator.of(context).pop();
+          if (context.canPop()) {
+            context.pop();
+          } else {
+            context.go('/home');
+          }
         }
       },
       builder: (context, state) {

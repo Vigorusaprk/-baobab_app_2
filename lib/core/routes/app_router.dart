@@ -67,6 +67,9 @@ class _BranchDepthObserver extends NavigatorObserver {
 
 final GoRouter appRouter = GoRouter(
   initialLocation: '/home',
+  refreshListenable: GoRouterRefreshStream(
+    SessionService.instance.authStateChanges,
+  ),
   redirect: (context, state) {
     final isLoggedIn = SessionService.instance.isLoggedIn;
     final isAuthRoute = state.matchedLocation.startsWith('/login') ||

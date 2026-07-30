@@ -21,7 +21,15 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return BlocListener<AuthBloc, AuthState>(
-      listener: (context, state) {},
+      listener: (context, state) {
+        if (state is AuthWithGoogleSuccess || state is AuthWithAppleSuccess) {
+          if (context.canPop()) {
+            context.pop();
+          } else {
+            context.go('/home');
+          }
+        }
+      },
       child: Scaffold(
         appBar: AppBar(
           elevation: 0,

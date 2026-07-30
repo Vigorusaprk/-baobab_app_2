@@ -39,7 +39,8 @@ class BusinessPromoCarouselView extends StatefulWidget {
   });
 
   @override
-  State<BusinessPromoCarouselView> createState() => _BusinessPromoCarouselViewState();
+  State<BusinessPromoCarouselView> createState() =>
+      _BusinessPromoCarouselViewState();
 }
 
 class _BusinessPromoCarouselViewState extends State<BusinessPromoCarouselView> {
@@ -76,40 +77,35 @@ class _BusinessPromoCarouselViewState extends State<BusinessPromoCarouselView> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         if (widget.title != null) ...[
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 4),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(
-                    left: AppDimens.PADDING_20,
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(left: AppDimens.PADDING_20),
+                child: Text(
+                  widget.title!,
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w400,
+                    fontFamily: "Poppins",
+                    color: Colors.grey,
                   ),
+                ),
+              ),
+              if (widget.onSeeAllTap != null)
+                GestureDetector(
+                  onTap: widget.onSeeAllTap,
                   child: Text(
-                    widget.title!,
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w400,
+                    'Voir tout',
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
                       fontFamily: "Poppins",
-                      color: Colors.grey,
+                      color: Colors.grey.shade600,
                     ),
                   ),
                 ),
-                if (widget.onSeeAllTap != null)
-                  GestureDetector(
-                    onTap: widget.onSeeAllTap,
-                    child: Text(
-                      'Voir tout',
-                      style: TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w600,
-                        fontFamily: "Poppins",
-                        color: Colors.grey.shade600,
-                      ),
-                    ),
-                  ),
-              ],
-            ),
+            ],
           ),
           const SizedBox(height: 10),
         ],
@@ -129,7 +125,8 @@ class _BusinessPromoCarouselViewState extends State<BusinessPromoCarouselView> {
                 child: BusinessPromoCard(
                   uiBusiness: uiBusiness,
                   isNew: uiBusiness.isNew,
-                  badgeLabel: widget.badgeLabelBuilder?.call(uiBusiness) ?? 'Nouveau',
+                  badgeLabel:
+                      widget.badgeLabelBuilder?.call(uiBusiness) ?? 'Nouveau',
                   subtitle: widget.subtitleBuilder?.call(uiBusiness),
                   onTap: () => _handleTap(uiBusiness),
                 ),
