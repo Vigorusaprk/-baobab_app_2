@@ -120,8 +120,8 @@ class _BusinessPromoCarouselViewState extends State<BusinessPromoCarouselView> {
               final uiBusiness = widget.uiBusinesses[index];
               return Padding(
                 padding: const EdgeInsets.only(
-                  left: AppDimens.small,
-                  right: AppDimens.small,
+                  left: AppDimens.large,
+                  right: AppDimens.large,
                 ),
                 child: BusinessPromoCard(
                   uiBusiness: uiBusiness,

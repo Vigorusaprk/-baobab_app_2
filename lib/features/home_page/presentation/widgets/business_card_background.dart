@@ -52,7 +52,6 @@ class _InitialsContainer extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: color,
-        borderRadius: BorderRadius.circular(28),
       ),
       width: double.infinity,
       height: 100,

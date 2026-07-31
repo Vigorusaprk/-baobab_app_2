@@ -1,4 +1,5 @@
 import 'package:baobabe_0_2/core/themes/app_colors.dart';
+import 'package:baobabe_0_2/core/themes/app_fonts.dart';
 import 'package:baobabe_0_2/features/home_page/data/models/ui_business.dart';
 import 'package:flutter/material.dart';
 
@@ -52,8 +53,7 @@ class BusinessPromoCard extends StatelessWidget {
         decoration: BoxDecoration(
           color: AppColors.white,
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: AppColors.textSecondary, width: 1),
-          boxShadow: [
+        boxShadow: [
             BoxShadow(
               color: AppColors.textPrimary.withValues(alpha: 0.06),
               blurRadius: 14,
@@ -140,12 +140,7 @@ class BusinessPromoCard extends StatelessWidget {
                           business.name,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                            color: AppColors.textPrimary,
-                            fontSize: 17,
-                            fontWeight: FontWeight.w500,
-                            fontFamily: "Poppins",
-                          ),
+                          style: AppFonts.titleMedium
                         ),
                         if (effectiveSubtitle.isNotEmpty) ...[
                           const SizedBox(height: 3),
@@ -153,11 +148,7 @@ class BusinessPromoCard extends StatelessWidget {
                             effectiveSubtitle,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                              color: AppColors.textSecondary,
-                              fontSize: 13,
-                              fontFamily: "Poppins",
-                            ),
+                            style: AppFonts.bodySmall,
                           ),
                         ],
                       ],

@@ -1,3 +1,5 @@
+import 'package:baobabe_0_2/core/themes/app_diemens.dart';
+import 'package:baobabe_0_2/core/themes/app_fonts.dart';
 import 'package:baobabe_0_2/features/home_page/data/models/ui_business.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/widgets/business_card_background.dart';
 import 'package:flutter/material.dart';
@@ -23,9 +25,8 @@ class BusinessCardWidget extends StatelessWidget {
 
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.white,
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: AppColors.textSecondary, width: 1),
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(AppDimens.radius30),
         boxShadow: [
           BoxShadow(
             color: AppColors.textPrimary.withValues(alpha: 0.06),
@@ -108,13 +109,7 @@ class BusinessCardWidget extends StatelessWidget {
               children: [
                 Text(
                   business.name,
-                  style: const TextStyle(
-                    color: AppColors.textPrimary,
-                    fontSize: 19,
-                    fontWeight: FontWeight.w800,
-                    fontFamily: "Poppins",
-                    height: 1.1,
-                  ),
+                  style: AppFonts.titleMedium,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -122,12 +117,7 @@ class BusinessCardWidget extends StatelessWidget {
                   const SizedBox(height: 6),
                   Text(
                     business.description,
-                    style: TextStyle(
-                      color: AppColors.textSecondary,
-                      fontSize: 13,
-                      fontFamily: "Poppins",
-                      height: 1.3,
-                    ),
+                    style: AppFonts.bodySmall,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),

@@ -1,3 +1,5 @@
+import 'package:baobabe_0_2/core/themes/app_diemens.dart';
+import 'package:baobabe_0_2/core/themes/app_fonts.dart';
 import 'package:baobabe_0_2/features/home_page/data/models/ui_business.dart';
 import 'package:flutter/material.dart';
 import 'package:baobabe_0_2/core/themes/app_colors.dart';
@@ -52,12 +54,7 @@ class PopularBusinessListView extends StatelessWidget {
             children: [
               Text(
                 title,
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w800,
-                  fontFamily: "Poppins",
-                  color: AppColors.textPrimary,
-                ),
+                style:AppFonts.titleMedium,
               ),
               GestureDetector(
                 onTap: onSeeAllTap,
@@ -113,7 +110,6 @@ class _PopularBusinessRow extends StatelessWidget {
           decoration: BoxDecoration(
             color: AppColors.white,
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: AppColors.textSecondary, width: 1),
             boxShadow: [
               BoxShadow(
                 color: AppColors.textPrimary.withOpacity(0.05),
@@ -153,12 +149,7 @@ class _PopularBusinessRow extends StatelessWidget {
                       business.name,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w700,
-                        fontFamily: "Poppins",
-                        color: AppColors.textPrimary,
-                      ),
+                      style: AppFonts.titleMedium,
                     ),
                     const SizedBox(height: 3),
                     Row(
@@ -168,7 +159,6 @@ class _PopularBusinessRow extends StatelessWidget {
                           size: 14,
                           color: Colors.amber,
                         ),
-                        const SizedBox(width: 3),
                         Text(
                           business.rating.toStringAsFixed(1),
                           style: TextStyle(
@@ -178,8 +168,9 @@ class _PopularBusinessRow extends StatelessWidget {
                             color: AppColors.textSecondary,
                           ),
                         ),
+                        AppDimens.spacerSmallWidth,
                         Text(
-                          '  ·  ${business.type}',
+                            business.type.name,
                           style: TextStyle(
                             fontSize: 13,
                             fontFamily: "Poppins",

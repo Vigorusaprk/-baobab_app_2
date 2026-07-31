@@ -50,7 +50,7 @@ class HomePageScreen extends StatelessWidget {
             ),
             AppDimens.spacerSmall,
             const BusinessCardsWidget(),
-            AppDimens.spacerSmall,
+            SizedBox(height: 100,)
           ],
         ),
       ),
