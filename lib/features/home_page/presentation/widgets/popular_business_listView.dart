@@ -169,12 +169,20 @@ class _PopularBusinessRow extends StatelessWidget {
                           ),
                         ),
                         AppDimens.spacerSmallWidth,
-                        Text(
-                            business.type.name,
-                          style: TextStyle(
-                            fontSize: 13,
-                            fontFamily: "Poppins",
-                            color: AppColors.textSecondary,
+                        Container(
+                          padding: EdgeInsets.symmetric(horizontal: 5, vertical: 2.5),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(20),
+                            color: uiBusiness.categoryColor.withValues(alpha: 0.3),
+                          ),
+                          child: Text(
+                              business.type.name,
+                            style: TextStyle(
+                              fontSize: 13,
+                              fontFamily: "Poppins",
+                              fontWeight: AppFonts.bold,
+                              color: uiBusiness.categoryColor,
+                            ),
                           ),
                         ),
                         // Distance volontairement omise : la table `business`

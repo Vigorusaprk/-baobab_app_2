@@ -1,3 +1,4 @@
+import 'package:baobabe_0_2/core/themes/app_diemens.dart';
 import 'package:flutter/material.dart';
 import 'package:baobabe_0_2/core/themes/app_colors.dart';
 
@@ -19,8 +20,8 @@ class SearchAppBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.background,
-        borderRadius: BorderRadius.circular(25),
+        borderRadius: BorderRadius.circular(AppDimens.radius30),
+        color: AppColors.white,
       ),
       child: Row(
         children: [
@@ -36,6 +37,7 @@ class SearchAppBar extends StatelessWidget {
                 hintText: hintText,
                 hintStyle: TextStyle(color: AppColors.textSecondary),
                 border: InputBorder.none,
+                fillColor: AppColors.transparent,
                 contentPadding: const EdgeInsets.symmetric(vertical: 12),
               ),
             ),
@@ -48,6 +50,8 @@ class SearchAppBar extends StatelessWidget {
                 onSubmitted?.call('');
               },
             ),
+
+          SizedBox(height: 15,)
         ],
       ),
     );

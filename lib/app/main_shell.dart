@@ -107,11 +107,12 @@ class _MainShellState extends State<MainShell> {
         valueListenable: widget.branchStackDepth[currentBranch],
         builder: (context, depth, _) {
           final shouldShowBar = depth == 0;
+          final shouldShowAppBar = depth == 0;
 
           return Scaffold(
             extendBody: true,
             backgroundColor: AppColors.background,
-            appBar: _appBarFor(currentBranch),
+            appBar: shouldShowAppBar ? _appBarFor(currentBranch) : null,
             body: widget.navigationShell,
             bottomNavigationBar: shouldShowBar
                 ? Container(

@@ -4,6 +4,7 @@ import 'package:baobabe_0_2/features/home_page/data/repositories/business_reposi
 import 'package:baobabe_0_2/features/home_page/domain/usecases/get_businesses.dart';
 import 'package:baobabe_0_2/features/home_page/domain/usecases/get_businesses_by_category_use_case.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/bloc/business_bloc.dart';
+import 'package:baobabe_0_2/features/home_page/presentation/widgets/Category_Icons.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/widgets/business_cards_widget.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/widgets/business_promo_carousel.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/widgets/home_search_bar.dart';
@@ -40,8 +41,8 @@ class HomePageScreen extends StatelessWidget {
             AppDimens.spacerSmall,
             HomeSearchBar(),
             AppDimens.spacerSmall,
-            //const CategoryIcons(),
-            //AppDimens.spacerSmall,
+            const CategoryIcons(),
+            AppDimens.spacerSmall,
             const BusinessPromoCarousel(),
             AppDimens.spacerSmall,
             const PopularBusinessesSection(

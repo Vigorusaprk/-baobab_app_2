@@ -22,7 +22,9 @@ class SearchPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      body: const SearchPageBody(),
+      body: const SearchPageBody(
+        showBackButton: true,
+      ),
     );
   }
 }
@@ -30,7 +32,9 @@ class SearchPage extends StatelessWidget {
 /// Body-only content shared by the Explore tab (inside MainShell) and the
 /// standalone `/search` route ([SearchPage]).
 class SearchPageBody extends StatefulWidget {
-  const SearchPageBody({super.key});
+  const SearchPageBody({super.key, this.showBackButton = false,});
+
+  final bool showBackButton;
 
   @override
   State<SearchPageBody> createState() => _SearchPageBodyState();
@@ -83,19 +87,21 @@ class _SearchPageBodyState extends State<SearchPageBody> {
             padding: const EdgeInsets.all(8.0),
             child: Row(
               children: [
-                Container(
-                  decoration: BoxDecoration(
-                    color: AppColors.primary,
-                    borderRadius: BorderRadius.circular(AppDimens.radius50),
-                  ),
-                  child: IconButton(
-                    icon: Icon(
-                      Icons.arrow_back_ios_new_rounded,
-                      color: AppColors.background,
+                if (widget.showBackButton)
+                  GestureDetector(
+                    onTap: () => Navigator.pop(context),
+                    child: Container(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: AppDimens.small,
+                        vertical: AppDimens.small,
+                      ),
+                      decoration: BoxDecoration(
+                        color: AppColors.primary,
+                        borderRadius: BorderRadius.circular(AppDimens.radius50),
+                      ),
+                      child: Icon(Icons.arrow_back_ios_new_rounded, color: AppColors.surface,),
                     ),
-                    onPressed: () => Navigator.pop(context),
                   ),
-                ),
 
                 SizedBox(width: 5),
                 Expanded(
@@ -114,7 +120,7 @@ class _SearchPageBodyState extends State<SearchPageBody> {
                     vertical: AppDimens.small,
                   ),
                   decoration: BoxDecoration(
-                    color: AppColors.secondaryLight,
+                    color: AppColors.primary,
                     borderRadius: BorderRadius.circular(AppDimens.radius50),
                   ),
                   child: SvgPicture.asset(
