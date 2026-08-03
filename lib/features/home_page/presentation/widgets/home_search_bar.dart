@@ -82,7 +82,7 @@ class HomeSearchBar extends StatelessWidget {
               // TODO : ouvrir les filtres
             },
             child: Container(
-              padding: const EdgeInsets.all(AppDimens.medium),
+              padding: const EdgeInsets.all(AppDimens.small),
               decoration: BoxDecoration(
                 color: AppColors.primary,
                 borderRadius: BorderRadius.circular(AppDimens.radius12),

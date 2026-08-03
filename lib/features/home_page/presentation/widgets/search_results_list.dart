@@ -1,4 +1,5 @@
 import 'package:baobabe_0_2/core/themes/app_diemens.dart';
+import 'package:baobabe_0_2/core/themes/app_fonts.dart';
 import 'package:baobabe_0_2/features/home_page/domain/entities/business_entity.dart'
     show Business;
 import 'package:baobabe_0_2/features/home_page/domain/entities/search_filter_entity.dart';
@@ -127,7 +128,7 @@ class SearchResultsList extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: AppColors.background,
+          color: AppColors.surface,
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
@@ -167,10 +168,7 @@ class SearchResultsList extends StatelessWidget {
                 children: [
                   Text(
                     business.name,
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: AppFonts.titleMedium,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -181,7 +179,7 @@ class SearchResultsList extends StatelessWidget {
                       const SizedBox(width: 4),
                       Text(
                         business.rating.toString(),
-                        style: const TextStyle(fontWeight: FontWeight.w600),
+                        style: AppFonts.bodySmall,
                       ),
                       const SizedBox(width: 8),
                       Container(
@@ -199,22 +197,12 @@ class SearchResultsList extends StatelessWidget {
                           ),
                           style: TextStyle(
                             color: uiBusiness.categoryColor,
-                            fontSize: 12,
+                            fontSize: 10,
                             fontWeight: FontWeight.w600,
                           ),
                         ),
                       ),
                     ],
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    business.address,
-                    style: TextStyle(
-                      color: AppColors.textSecondary,
-                      fontSize: 13,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
                   ),
                 ],
               ),

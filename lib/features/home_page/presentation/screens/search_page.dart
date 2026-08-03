@@ -216,7 +216,7 @@ class _SearchPageBodyState extends State<SearchPageBody> {
           height: 120,
           margin: const EdgeInsets.only(bottom: 12),
           decoration: BoxDecoration(
-            color: AppColors.background,
+            color: AppColors.surface,
             borderRadius: BorderRadius.circular(16),
           ),
         );

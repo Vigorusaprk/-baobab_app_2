@@ -70,7 +70,7 @@ class BusinessPromoCard extends StatelessWidget {
             Container(
               width: double.infinity,
               height: 125,
-              padding: const EdgeInsets.fromLTRB(16, 14, 16, 22),
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
               color: bannerColor,
               child: Stack(
                 clipBehavior: Clip.none,

@@ -110,29 +110,29 @@ class _BusinessPromoCarouselViewState extends State<BusinessPromoCarouselView> {
           ),
           const SizedBox(height: 10),
         ],
-        SizedBox(
-          height: widget.cardHeight,
-          child: PageView.builder(
-            controller: _pageController,
-            itemCount: widget.uiBusinesses.length,
-            padEnds: false,
-            itemBuilder: (context, index) {
-              final uiBusiness = widget.uiBusinesses[index];
-              return Padding(
-                padding: const EdgeInsets.only(
-                  left: AppDimens.large,
-                  right: AppDimens.large,
-                ),
-                child: BusinessPromoCard(
+        Container(
+          margin: EdgeInsets.only(
+            left: AppDimens.large,
+            right: AppDimens.large,
+          ),
+          child: SizedBox(
+            height: widget.cardHeight,
+            child: PageView.builder(
+              controller: _pageController,
+              itemCount: widget.uiBusinesses.length,
+              padEnds: false,
+              itemBuilder: (context, index) {
+                final uiBusiness = widget.uiBusinesses[index];
+                return BusinessPromoCard(
                   uiBusiness: uiBusiness,
                   isNew: uiBusiness.isNew,
                   badgeLabel:
                       widget.badgeLabelBuilder?.call(uiBusiness) ?? 'Nouveau',
                   subtitle: widget.subtitleBuilder?.call(uiBusiness),
                   onTap: () => _handleTap(uiBusiness),
-                ),
-              );
-            },
+                );
+              },
+            ),
           ),
         ),
       ],
