@@ -16,21 +16,24 @@ const List<String> _kBackdropAssets = [
   'assets/icons/menu-food-svgrepo-com.svg',
 ];
 
-/// One small glyph scattered inside the backdrop disc.
+/// One small glyph scattered inside the backdrop disc. Everything here is
+/// fixed at construction time — nothing about a glyph's own look changes
+/// frame to frame, only the whole field's rotation does (see
+/// [_AuthHeaderState]), which is what keeps the animation cheap.
 class _BackdropGlyph {
   _BackdropGlyph({
     required this.asset,
     required this.dx,
     required this.dy,
     required this.size,
-    required this.phase,
+    required this.opacity,
   });
 
   final String asset;
   final double dx;
   final double dy;
   final double size;
-  final double phase;
+  final double opacity;
 }
 
 /// Fills an annulus (ring) around the centered logo with many small glyphs,
@@ -58,7 +61,7 @@ List<_BackdropGlyph> _buildBackdrop({
         dx: dx,
         dy: dy,
         size: size,
-        phase: i * 0.6,
+        opacity: 0.09 + (i % 4) * 0.02,
       ),
     );
   }
@@ -93,7 +96,7 @@ class _AuthHeaderState extends State<AuthHeader>
     // instead of jumping, so the motion never has a hard cut.
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(seconds: 3),
+      duration: const Duration(seconds: 5),
     )..repeat(reverse: true);
   }
 
@@ -105,6 +108,60 @@ class _AuthHeaderState extends State<AuthHeader>
 
   @override
   Widget build(BuildContext context) {
+    // The 56 glyphs never change how they look, so they're built once as a
+    // plain static widget and handed to AnimatedBuilder's `child` — that
+    // subtree is never rebuilt by the animation. Wrapped in a
+    // RepaintBoundary, Flutter rasterizes it to a single cached layer, so
+    // every animation frame is just re-compositing that one bitmap with a
+    // new rotation matrix — cheap and GPU-driven — instead of re-painting
+    // 56 vector icons at 60fps, which is what was causing the stutter.
+    final glyphField = RepaintBoundary(
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          for (final glyph in _glyphs)
+            Transform.translate(
+              offset: Offset(glyph.dx, glyph.dy),
+              child: Opacity(
+                opacity: glyph.opacity,
+                child: SvgPicture.asset(
+                  glyph.asset,
+                  width: glyph.size,
+                  height: glyph.size,
+                  colorFilter: const ColorFilter.mode(
+                    AppColors.primary,
+                    BlendMode.srcIn,
+                  ),
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+
+    final logo = Container(
+      padding: const EdgeInsets.all(18),
+      decoration: const BoxDecoration(
+        shape: BoxShape.circle,
+        color: AppColors.white,
+        boxShadow: [
+          BoxShadow(
+            color: Color(0x1A0F2E20),
+            blurRadius: 20,
+            offset: Offset(0, 8),
+          ),
+        ],
+      ),
+      child: SvgPicture.asset(
+        IconLink.appIcon,
+        height: 48,
+        colorFilter: const ColorFilter.mode(
+          AppColors.primary,
+          BlendMode.srcIn,
+        ),
+      ),
+    );
+
     return Column(
       children: [
         SizedBox(
@@ -113,55 +170,18 @@ class _AuthHeaderState extends State<AuthHeader>
           child: AnimatedBuilder(
             animation: _controller,
             builder: (context, _) {
+              // Eased 0..1 that ping-pongs (repeat(reverse:true));
+              // easeInOut gives it zero velocity at both ends, so the
+              // reversal never reads as a jump.
               final t = Curves.easeInOut.transform(_controller.value);
+              final fieldAngle = (t - 0.5) * 0.22; // ~ -6.3° to +6.3°
+              final logoScale = 1 + (t * 0.04);
+
               return Stack(
                 alignment: Alignment.center,
                 children: [
-                  for (final glyph in _glyphs)
-                    Transform.translate(
-                      offset: Offset(glyph.dx, glyph.dy),
-                      child: Opacity(
-                        opacity:
-                            0.08 + 0.08 * math.sin(t * math.pi + glyph.phase).abs(),
-                        child: Transform.rotate(
-                          angle: math.sin(t * math.pi + glyph.phase) * 0.3,
-                          child: SvgPicture.asset(
-                            glyph.asset,
-                            width: glyph.size,
-                            height: glyph.size,
-                            colorFilter: const ColorFilter.mode(
-                              AppColors.primary,
-                              BlendMode.srcIn,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  Transform.scale(
-                    scale: 1 + (t * 0.04),
-                    child: Container(
-                      padding: const EdgeInsets.all(18),
-                      decoration: const BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: AppColors.white,
-                        boxShadow: [
-                          BoxShadow(
-                            color: Color(0x1A0F2E20),
-                            blurRadius: 20,
-                            offset: Offset(0, 8),
-                          ),
-                        ],
-                      ),
-                      child: SvgPicture.asset(
-                        IconLink.appIcon,
-                        height: 48,
-                        colorFilter: const ColorFilter.mode(
-                          AppColors.primary,
-                          BlendMode.srcIn,
-                        ),
-                      ),
-                    ),
-                  ),
+                  Transform.rotate(angle: fieldAngle, child: glyphField),
+                  Transform.scale(scale: logoScale, child: logo),
                 ],
               );
             },
