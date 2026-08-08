@@ -8,9 +8,11 @@ import 'package:baobabe_0_2/features/home_page/presentation/widgets/Category_Ico
 import 'package:baobabe_0_2/features/home_page/presentation/widgets/business_cards_widget.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/widgets/business_promo_carousel.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/widgets/home_search_bar.dart';
+import 'package:baobabe_0_2/features/home_page/presentation/widgets/home_skeleton.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/widgets/popular_businesses_section.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 
 /// Body-only content for the Home tab. The Scaffold and AppBar (HomeAppBar)
 /// are owned by MainShell, which is the single Scaffold for the app's main
@@ -34,26 +36,42 @@ class HomePageScreen extends StatelessWidget {
           },
         ),
       ],
-      child: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            AppDimens.spacerSmall,
-            HomeSearchBar(),
-            AppDimens.spacerSmall,
-            const CategoryIcons(),
-            AppDimens.spacerSmall,
-            const BusinessPromoCarousel(),
-            AppDimens.spacerSmall,
-            const PopularBusinessesSection(
-              maxItems: 5,
-              // onSeeAllTap: () => context.push('/popular'),
+      child: BlocBuilder<BusinessBloc, BusinessState>(
+        buildWhen: (previous, current) =>
+            previous.runtimeType != current.runtimeType,
+        builder: (context, state) {
+          final isLoading = state is BusinessInitial || state is BusinessLoading;
+
+          return Skeletonizer(
+            enabled: isLoading,
+            child: SingleChildScrollView(
+              physics: isLoading
+                  ? const NeverScrollableScrollPhysics()
+                  : const AlwaysScrollableScrollPhysics(),
+              child: isLoading
+                  ? const HomeSkeleton()
+                  : Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        AppDimens.spacerSmall,
+                        HomeSearchBar(),
+                        AppDimens.spacerSmall,
+                        const CategoryIcons(),
+                        AppDimens.spacerSmall,
+                        const BusinessPromoCarousel(),
+                        AppDimens.spacerSmall,
+                        const PopularBusinessesSection(
+                          maxItems: 5,
+                          // onSeeAllTap: () => context.push('/popular'),
+                        ),
+                        AppDimens.spacerSmall,
+                        const BusinessCardsWidget(),
+                        const SizedBox(height: 100),
+                      ],
+                    ),
             ),
-            AppDimens.spacerSmall,
-            const BusinessCardsWidget(),
-            SizedBox(height: 100,)
-          ],
-        ),
+          );
+        },
       ),
     );
   }

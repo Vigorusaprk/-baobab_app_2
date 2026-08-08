@@ -22,11 +22,12 @@ class BusinessCardWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final business = uiBusiness.business;
     final hasDescription = business.description.trim().isNotEmpty;
+    final interiorBorder = AppDimens.cardBorderRadius - 12.0;
 
     return Container(
       decoration: BoxDecoration(
         color: AppColors.surface,
-        borderRadius: BorderRadius.circular(AppDimens.radius30),
+        borderRadius: AppDimens.cardBorderRadiusAll,
         boxShadow: [
           BoxShadow(
             color: AppColors.textPrimary.withValues(alpha: 0.06),
@@ -43,8 +44,8 @@ class BusinessCardWidget extends StatelessWidget {
             flex: 3,
             child: ClipRRect(
               borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(24),
-                topRight: Radius.circular(24),
+                topLeft: Radius.circular(AppDimens.cardBorderRadius),
+                topRight: Radius.circular(AppDimens.cardBorderRadius),
               ),
               child: Stack(
                 fit: StackFit.expand,
@@ -62,7 +63,7 @@ class BusinessCardWidget extends StatelessWidget {
                       ),
                       decoration: BoxDecoration(
                         color: AppColors.white,
-                        borderRadius: BorderRadius.circular(8),
+                        borderRadius: BorderRadius.circular(interiorBorder),
                         boxShadow: [
                           BoxShadow(
                             color: AppColors.textPrimary.withValues(

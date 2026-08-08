@@ -1,3 +1,4 @@
+import 'package:baobabe_0_2/core/themes/app_diemens.dart';
 import 'package:baobabe_0_2/features/home_page/data/models/ui_category.dart';
 import 'package:baobabe_0_2/features/home_page/domain/entities/category_entity.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/bloc/business_bloc.dart';
@@ -42,7 +43,14 @@ class CategoryIcons extends StatelessWidget {
                   );
                 },
                 child: Padding(
-                  padding: const EdgeInsets.all(8.0),
+                  padding: EdgeInsets.only(
+                    left: index == 0 ? AppDimens.appPaddingValue : 8.0,
+                    right: index == UICategory.allCategories.length - 1
+                        ? AppDimens.appPaddingValue
+                        : 8.0,
+                    top: 8.0,
+                    bottom: 8.0,
+                  ),
                   child: _buildCategory(context, uiCategory, isActive),
                 ),
               );
@@ -63,11 +71,11 @@ class CategoryIcons extends StatelessWidget {
       width: 85,
       decoration: BoxDecoration(
         color: isActive ? AppColors.white : const Color(0xFFF5F7F9),
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: AppDimens.cardBorderRadiusAll,
         boxShadow: isActive
             ? [
                 BoxShadow(
-                  color: uiCategory.color.withOpacity(0.2),
+                  color: uiCategory.color.withValues(alpha: 0.2),
                   blurRadius: 12,
                   offset: const Offset(0, 6),
                 ),
@@ -75,7 +83,7 @@ class CategoryIcons extends StatelessWidget {
             : [],
         border: Border.all(
           color: isActive
-              ? uiCategory.color.withOpacity(0.5)
+              ? uiCategory.color.withValues(alpha: 0.5)
               : AppColors.transparent,
           width: 1.5,
         ),
@@ -90,7 +98,7 @@ class CategoryIcons extends StatelessWidget {
             decoration: BoxDecoration(
               color: isActive
                   ? uiCategory.color
-                  : uiCategory.color.withOpacity(0.12),
+                  : uiCategory.color.withValues(alpha: 0.12),
               shape: BoxShape.circle,
             ),
             child: Icon(

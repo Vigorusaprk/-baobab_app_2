@@ -1,3 +1,4 @@
+import 'package:baobabe_0_2/core/themes/app_diemens.dart';
 import 'package:flutter/material.dart';
 import 'package:baobabe_0_2/core/themes/app_colors.dart';
 import 'package:baobabe_0_2/features/home_page/data/models/ui_business.dart';
@@ -19,12 +20,12 @@ class BusinessCardBackground extends StatelessWidget {
       width: double.infinity,
       height: 100,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(28),
+        borderRadius: AppDimens.cardBorderRadiusAll,
         color: hasImage ? null : color,
       ),
       child: hasImage
           ? ClipRRect(
-              borderRadius: BorderRadius.circular(28),
+              borderRadius: AppDimens.cardBorderRadiusAll,
               child: Image.network(
                 uiBusiness.business.bgImg,
                 fit: BoxFit.cover,
@@ -50,9 +51,7 @@ class _InitialsContainer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: BoxDecoration(
-        color: color,
-      ),
+      decoration: BoxDecoration(color: color),
       width: double.infinity,
       height: 100,
       child: Center(

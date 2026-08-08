@@ -82,6 +82,23 @@ class AppTheme {
       ),
     ),
 
+    dropdownMenuTheme: DropdownMenuThemeData(
+      inputDecorationTheme: InputDecorationTheme(
+        filled: true,
+        fillColor: AppColors.white,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(AppDimens.inputBorderRadius),
+          borderSide: BorderSide.none,
+        ),
+        contentPadding: AppDimens.inputPadding,
+        hintStyle: AppFonts.inputHintTextStyle,
+        labelStyle: const TextStyle(
+          fontSize: 12,
+          fontWeight: FontWeight.normal,
+        ),
+      ),
+    ),
+
     dividerTheme: const DividerThemeData(
       thickness: AppDimens.borderWidthThin,
       color: AppColors.textSecondary,

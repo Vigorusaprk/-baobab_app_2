@@ -52,10 +52,7 @@ class PopularBusinessListView extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                title,
-                style:AppFonts.titleMedium,
-              ),
+              Text(title, style: AppFonts.titleMedium),
               GestureDetector(
                 onTap: onSeeAllTap,
                 child: const Text(
@@ -98,21 +95,23 @@ class _PopularBusinessRow extends StatelessWidget {
     final initial = business.name.isNotEmpty
         ? business.name[0].toUpperCase()
         : '?';
+    final double interiorPadding =
+        AppDimens.cardBorderRadius - AppDimens.allPadding12Number;
 
     return Material(
       color: AppColors.white,
-      borderRadius: BorderRadius.circular(16),
+      borderRadius: AppDimens.cardBorderRadiusAll,
       child: InkWell(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: AppDimens.cardBorderRadiusAll,
         onTap: onTap,
         child: Container(
-          padding: const EdgeInsets.all(12),
+          padding: AppDimens.allPadding12,
           decoration: BoxDecoration(
             color: AppColors.white,
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: AppDimens.cardBorderRadiusAll,
             boxShadow: [
               BoxShadow(
-                color: AppColors.textPrimary.withOpacity(0.05),
+                color: AppColors.textPrimary.withValues(alpha: 0.05),
                 blurRadius: 10,
                 offset: const Offset(0, 3),
               ),
@@ -127,7 +126,7 @@ class _PopularBusinessRow extends StatelessWidget {
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
                   color: uiBusiness.categoryColor,
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(interiorPadding),
                 ),
                 child: Text(
                   initial,
@@ -161,28 +160,30 @@ class _PopularBusinessRow extends StatelessWidget {
                         ),
                         Text(
                           business.rating.toStringAsFixed(1),
-                          style: TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w600,
-                            fontFamily: "Poppins",
-                            color: AppColors.textSecondary,
-                          ),
+                          style: Theme.of(context).textTheme.bodySmall
+                              ?.copyWith(color: AppColors.textSecondary),
                         ),
                         AppDimens.spacerSmallWidth,
                         Container(
-                          padding: EdgeInsets.symmetric(horizontal: 5, vertical: 2.5),
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 5,
+                            vertical: 2.5,
+                          ),
                           decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(20),
-                            color: uiBusiness.categoryColor.withValues(alpha: 0.3),
+                            borderRadius: BorderRadius.circular(
+                              interiorPadding,
+                            ),
+                            color: uiBusiness.categoryColor.withValues(
+                              alpha: 0.3,
+                            ),
                           ),
                           child: Text(
-                              business.type.name,
-                            style: TextStyle(
-                              fontSize: 13,
-                              fontFamily: "Poppins",
-                              fontWeight: AppFonts.bold,
-                              color: uiBusiness.categoryColor,
-                            ),
+                            business.type.name,
+                            style: Theme.of(context).textTheme.bodySmall
+                                ?.copyWith(
+                                  color: uiBusiness.categoryColor,
+                                  fontWeight: FontWeight.w600,
+                                ),
                           ),
                         ),
                         // Distance volontairement omise : la table `business`

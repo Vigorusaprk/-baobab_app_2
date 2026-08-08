@@ -23,10 +23,16 @@ class AppDimens {
 
   static const double appPaddingValue = 24.0;
 
+  // *** Cards *** //
+  static const double cardBorderRadius = 20.0;
+  static const cardBorderRadiusAll = BorderRadius.all(Radius.circular(cardBorderRadius));
+
   // *** PADDING *** //
 
   //** ALL **//
+  static const double allPadding12Number = 12.0;
   static const allPadding8 = EdgeInsets.all(8);
+  static const allPadding12 = EdgeInsets.all(allPadding12Number);
 
   //** SYMMETRIC **//
   static const appPadding = EdgeInsets.symmetric(horizontal: appPaddingValue);
@@ -48,6 +54,7 @@ class AppDimens {
 
   // *** Spacer *** //
   // ** Height ** //
+  static const Widget spacerMini = SizedBox(height: 4.0);
   static const Widget spacerSmall = SizedBox(height: 8.0);
   static const Widget spacerMedium = SizedBox(height: 16.0);
   static const Widget spacerLarge = SizedBox(height: 24.0);

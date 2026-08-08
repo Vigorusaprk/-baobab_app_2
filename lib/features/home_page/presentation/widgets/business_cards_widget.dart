@@ -1,4 +1,5 @@
 import 'package:baobabe_0_2/core/themes/app_diemens.dart';
+import 'package:baobabe_0_2/core/themes/app_fonts.dart';
 import 'package:baobabe_0_2/features/home_page/data/models/ui_business.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/bloc/business_bloc.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/bloc/category_bloc.dart';
@@ -6,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:baobabe_0_2/core/themes/app_colors.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 import './business_card_widget.dart';
 
 class BusinessCardsWidget extends StatefulWidget {
@@ -118,9 +120,18 @@ class _BusinessCardsWidgetState extends State<BusinessCardsWidget> {
           },
           builder: (context, state) {
             if (state is BusinessLoading) {
-              return const SizedBox(
+              return SizedBox(
                 height: _cardHeight,
-                child: Center(child: CircularProgressIndicator()),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: _cardHorizontalPadding,
+                    vertical: _cardVerticalPadding,
+                  ),
+                  child: const Skeletonizer(
+                    enabled: true,
+                    child: _BusinessCardSkeleton(),
+                  ),
+                ),
               );
             } else if (state is BusinessLoaded) {
               final uiBusinesses = state.businesses
@@ -243,5 +254,61 @@ class _BusinessCardsWidgetState extends State<BusinessCardsWidget> {
 
   void _navigateToBusinessDetail(BuildContext context, String businessId) {
     context.pushNamed('businessDetail', pathParameters: {'id': businessId});
+  }
+}
+
+/// Skeleton placeholder shaped like [BusinessCardWidget] (photo up top,
+/// rating pill, name, description). Built entirely from [Bone] widgets
+/// rather than plain Containers/Text — each part of the real card gets
+/// its own explicit bone shape instead of relying on Skeletonizer to
+/// guess one from arbitrary widgets, which is what made the previous
+/// version look off.
+class _BusinessCardSkeleton extends StatelessWidget {
+  const _BusinessCardSkeleton();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: AppDimens.cardBorderRadiusAll,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Expanded(
+            flex: 3,
+            child: ClipRRect(
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(AppDimens.cardBorderRadius),
+                topRight: Radius.circular(AppDimens.cardBorderRadius),
+              ),
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
+                  const Positioned.fill(child: Bone()),
+                  const Positioned(
+                    top: 12,
+                    right: 12,
+                    child: Bone(width: 44, height: 24, uniRadius: 8),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 14),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Bone.text(words: 2, style: AppFonts.titleMedium),
+                const SizedBox(height: 8),
+                Bone.multiText(lines: 2, style: AppFonts.bodySmall),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }

@@ -1,4 +1,5 @@
 import 'package:baobabe_0_2/core/themes/app_colors.dart';
+import 'package:baobabe_0_2/core/themes/app_diemens.dart';
 import 'package:baobabe_0_2/core/themes/app_fonts.dart';
 import 'package:baobabe_0_2/features/home_page/data/models/ui_business.dart';
 import 'package:flutter/material.dart';
@@ -46,14 +47,15 @@ class BusinessPromoCard extends StatelessWidget {
     final business = uiBusiness.business;
     final bannerColor = uiBusiness.categoryColor;
     final effectiveSubtitle = subtitle ?? business.description;
+    final interiorBorder = AppDimens.cardBorderRadius - 12;
 
     return GestureDetector(
       onTap: onTap,
       child: Container(
         decoration: BoxDecoration(
           color: AppColors.white,
-          borderRadius: BorderRadius.circular(20),
-        boxShadow: [
+          borderRadius: AppDimens.cardBorderRadiusAll,
+          boxShadow: [
             BoxShadow(
               color: AppColors.textPrimary.withValues(alpha: 0.06),
               blurRadius: 14,
@@ -109,7 +111,7 @@ class BusinessPromoCard extends StatelessWidget {
                         ),
                         decoration: BoxDecoration(
                           color: AppColors.textPrimary.withValues(alpha: 0.55),
-                          borderRadius: BorderRadius.circular(8),
+                          borderRadius: BorderRadius.circular(interiorBorder),
                         ),
                         child: Text(
                           badgeLabel,
@@ -140,10 +142,10 @@ class BusinessPromoCard extends StatelessWidget {
                           business.name,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          style: AppFonts.titleMedium
+                          style: AppFonts.titleMedium,
                         ),
                         if (effectiveSubtitle.isNotEmpty) ...[
-                          const SizedBox(height: 3),
+                          AppDimens.spacerMini,
                           Text(
                             effectiveSubtitle,
                             maxLines: 1,
@@ -154,7 +156,7 @@ class BusinessPromoCard extends StatelessWidget {
                       ],
                     ),
                   ),
-                  const SizedBox(width: 12),
+                  AppDimens.spacerMedium,
 
                   // Bouton "Voir"
                   Container(
@@ -164,15 +166,13 @@ class BusinessPromoCard extends StatelessWidget {
                     ),
                     decoration: BoxDecoration(
                       color: AppColors.secondary,
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(interiorBorder),
                     ),
                     child: Text(
                       actionLabel,
-                      style: const TextStyle(
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         color: AppColors.white,
-                        fontSize: 13,
                         fontWeight: FontWeight.w700,
-                        fontFamily: "Poppins",
                       ),
                     ),
                   ),
