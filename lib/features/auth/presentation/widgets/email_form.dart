@@ -6,7 +6,13 @@ import 'package:flutter/material.dart';
 class EmailForm extends StatelessWidget {
   final TextEditingController email;
   final VoidCallback submit;
-  const EmailForm({super.key, required this.email, required this.submit});
+  final bool isLoading;
+  const EmailForm({
+    super.key,
+    required this.email,
+    required this.submit,
+    this.isLoading = false,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -25,6 +31,7 @@ class EmailForm extends StatelessWidget {
           keyboardType: TextInputType.emailAddress,
           validator: _validateEmail,
           hintText: 'Entrer votre adresse e-mail',
+          enabled: !isLoading,
         ),
         AppDimens.spacerMedium,
         ValueListenableBuilder<TextEditingValue>(
@@ -35,6 +42,7 @@ class EmailForm extends StatelessWidget {
               onPressed: submit,
               text: 'Recevoir le code',
               isActive: hasValidEmail,
+              isLoading: isLoading,
             );
           },
         ),

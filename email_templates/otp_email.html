@@ -1,0 +1,116 @@
+<!--
+  Template email OTP — Baobabe
+  À coller dans : Supabase Dashboard > Authentication > Emails > Magic Link (ou "OTP")
+  Variable utilisée : {{ .Token }} (code à 6 chiffres fourni par Supabase)
+  CSS 100% inline (compatibilité clients mail : Gmail, Outlook, Apple Mail...)
+-->
+<!doctype html>
+<html lang="fr" xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<title>Votre code de connexion Baobabe</title>
+<!--[if mso]>
+<noscript>
+<xml>
+<o:OfficeDocumentSettings>
+<o:PixelsPerInch>96</o:PixelsPerInch>
+</o:OfficeDocumentSettings>
+</xml>
+</noscript>
+<![endif]-->
+</head>
+<body style="margin:0; padding:0; background-color:#F2F4F3; -webkit-text-size-adjust:100%; -ms-text-size-adjust:100%;">
+
+  <!-- Preheader (texte d'aperçu caché) -->
+  <div style="display:none; max-height:0; overflow:hidden; mso-hide:all; font-size:1px; line-height:1px; color:#F2F4F3;">
+    Voici votre code de connexion Baobabe. Il expire dans 10 minutes.
+  </div>
+
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#F2F4F3; padding:24px 0;">
+    <tr>
+      <td align="center">
+
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:480px; width:100%;">
+
+          <!-- En-tête -->
+          <tr>
+            <td align="center" style="padding:8px 24px 24px 24px;">
+              <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                  <td style="width:48px; height:48px;">
+                    <img src="https://wrutwzbtnquxigxetxfx.supabase.co/storage/v1/object/public/app_icon/app_icon.png" width="48" height="48" alt="Baobabe" style="display:block; width:48px; height:48px; border-radius:50%; -webkit-border-radius:50%; -moz-border-radius:50%; object-fit:cover; border:0;">
+                  </td>
+                  <td style="padding-left:12px; font-family:Arial, Helvetica, sans-serif; font-size:20px; font-weight:bold; color:#0F2E20;">
+                    Baobabe
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- Carte principale -->
+          <tr>
+            <td style="background-color:#FFFFFF; border-radius:20px; padding:40px 32px; box-shadow:0 2px 8px rgba(15,46,32,0.06);">
+
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                  <td align="center" style="font-family:Arial, Helvetica, sans-serif;">
+
+                    <h1 style="margin:0 0 12px 0; font-size:22px; line-height:28px; color:#1A1F1C; font-weight:bold;">
+                      Votre code de connexion
+                    </h1>
+
+                    <p style="margin:0 0 28px 0; font-size:15px; line-height:22px; color:#4A5168;">
+                      Utilisez le code ci-dessous pour vous connecter à votre compte Baobabe. Il est valable pendant 10 minutes.
+                    </p>
+
+                    <!-- Bloc code OTP -->
+                    <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:0 auto 28px auto;">
+                      <tr>
+                        <td style="background-color:#F2F4F3; border:1px solid #A3C9A5; border-radius:16px; padding:20px 32px;">
+                          <span style="font-family:'Courier New', Courier, monospace; font-size:36px; font-weight:bold; letter-spacing:10px; color:#0F2E20;">
+                            {{ .Token }}
+                          </span>
+                        </td>
+                      </tr>
+                    </table>
+
+                    <p style="margin:0 0 4px 0; font-size:13px; line-height:20px; color:#8C93AA;">
+                      Ne partagez ce code avec personne. L'équipe Baobabe ne vous le demandera jamais.
+                    </p>
+
+                  </td>
+                </tr>
+              </table>
+
+            </td>
+          </tr>
+
+          <!-- Note sécurité -->
+          <tr>
+            <td style="padding:24px 24px 0 24px; font-family:Arial, Helvetica, sans-serif;">
+              <p style="margin:0; font-size:13px; line-height:20px; color:#8C93AA; text-align:center;">
+                Vous n'êtes pas à l'origine de cette demande&nbsp;? Vous pouvez ignorer cet email en toute sécurité.
+              </p>
+            </td>
+          </tr>
+
+          <!-- Pied de page -->
+          <tr>
+            <td align="center" style="padding:32px 24px 8px 24px; font-family:Arial, Helvetica, sans-serif;">
+              <p style="margin:0 0 4px 0; font-size:12px; line-height:18px; color:#8C93AA;">
+                © Baobabe — <a href="mailto:support@baobabe.cd" style="color:#2E7D54; text-decoration:none;">support@baobabe.cd</a>
+              </p>
+            </td>
+          </tr>
+
+        </table>
+
+      </td>
+    </tr>
+  </table>
+
+</body>
+</html>

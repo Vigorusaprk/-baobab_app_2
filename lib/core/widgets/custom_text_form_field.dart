@@ -6,12 +6,14 @@ class CustomTextFormField extends StatelessWidget {
   final TextInputType? keyboardType;
   final FormFieldValidator<String>? validator;
   final String hintText;
+  final bool enabled;
   const CustomTextFormField({
     super.key,
     required this.controller,
     this.keyboardType,
     this.validator,
     required this.hintText,
+    this.enabled = true,
   });
 
   @override
@@ -20,6 +22,7 @@ class CustomTextFormField extends StatelessWidget {
       controller: controller,
       keyboardType: TextInputType.emailAddress,
       validator: validator,
+      enabled: enabled,
       style: AppFonts.inputTextStyle,
       decoration: InputDecoration(hintText: hintText),
     );

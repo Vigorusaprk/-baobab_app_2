@@ -58,17 +58,30 @@ class _AuthFormState extends State<AuthForm> {
           } else {
             context.go('/home');
           }
+        } else if (state is RequestEmailOtpFailure) {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(state.error)));
+        } else if (state is VerifyEmailOtpFailure) {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(state.error)));
         }
       },
       builder: (context, state) {
         return Form(
           key: _formKey,
           child: !isOtpForm
-              ? EmailForm(email: _emailController, submit: _submitEmail)
+              ? EmailForm(
+                  email: _emailController,
+                  submit: _submitEmail,
+                  isLoading: state is RequestEmailOtpLoading,
+                )
               : OtpForm(
                   submit: _submitOTP,
                   otp: _otpControllr,
                   email: _emailController.text,
+                  isLoading: state is VerifyEmailOtpLoading,
                 ),
         );
       },
