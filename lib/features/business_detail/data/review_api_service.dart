@@ -7,6 +7,10 @@ class ReviewApiService {
   ReviewApiService({SupabaseClient? supabase})
     : _supabase = supabase ?? Supabase.instance.client;
 
+  /// [userId] n'est plus transmis au serveur : l'Edge Function résout
+  /// l'auteur de l'avis depuis le JWT de la requête (plus sûr que de faire
+  /// confiance à une valeur envoyée par le client). Gardé dans la signature
+  /// pour ne pas casser les appelants existants.
   Future<void> submitReview(
     String businessId,
     String userId,
@@ -14,28 +18,29 @@ class ReviewApiService {
     String? comment,
   ) async {
     try {
-      await _supabase.from('reviews').insert({
-        'business_id': businessId,
-        'user_id': userId,
-        'rating': rating,
-        'comment': comment,
-      });
+      await _supabase.functions.invoke(
+        'create-review',
+        method: HttpMethod.post,
+        body: {'businessId': businessId, 'rating': rating, 'comment': comment},
+      );
     } catch (e) {
-      throw Exception('Erreur de soumission d\'avis Supabase : $e');
+      throw Exception('Erreur de soumission d\'avis : $e');
     }
   }
 
-  Future<List<Review>> getReviews(String businessId) async {
+  Future<List<Review>> getReviews(String businessId, {int page = 1}) async {
     try {
-      final response = await _supabase
-          .from('reviews')
-          .select()
-          .eq('business_id', businessId)
-          .order('created_at', ascending: false);
-
-      return (response as List).map((json) => Review.fromJson(json)).toList();
+      final response = await _supabase.functions.invoke(
+        'get-reviews-business',
+        method: HttpMethod.get,
+        queryParameters: {'businessId': businessId, 'page': '$page'},
+      );
+      final data = (response.data as Map<String, dynamic>)['data'] as List;
+      return data
+          .map((json) => Review.fromJson(json as Map<String, dynamic>))
+          .toList();
     } catch (e) {
-      throw Exception('Erreur de récupération des avis Supabase : $e');
+      throw Exception('Erreur de récupération des avis : $e');
     }
   }
 }

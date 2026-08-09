@@ -2,12 +2,14 @@ import 'package:baobabe_0_2/core/themes/app_colors.dart';
 import 'package:baobabe_0_2/core/themes/app_diemens.dart';
 import 'package:baobabe_0_2/features/business_detail/data/review_api_service.dart';
 import 'package:baobabe_0_2/features/business_detail/domain/entities/review.dart';
+import 'package:baobabe_0_2/features/business_detail/presentation/widgets/business_detail_skeleton.dart';
 import 'package:baobabe_0_2/features/business_detail/presentation/widgets/review_list_item.dart';
 import 'package:baobabe_0_2/features/business_detail/presentation/widgets/review_stars.dart';
 import 'package:baobabe_0_2/features/business_detail/presentation/widgets/write_review_dialog.dart';
 import 'package:baobabe_0_2/features/home_page/domain/entities/business_entity.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 
 class RestaurantReview extends StatefulWidget {
   final Business business;
@@ -42,9 +44,9 @@ class _RestaurantReviewState extends State<RestaurantReview> {
       future: _reviewsFuture,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Padding(
-            padding: EdgeInsets.all(32),
-            child: Center(child: CircularProgressIndicator()),
+          return const Skeletonizer(
+            enabled: true,
+            child: ReviewSectionSkeleton(),
           );
         }
         if (snapshot.hasError) {

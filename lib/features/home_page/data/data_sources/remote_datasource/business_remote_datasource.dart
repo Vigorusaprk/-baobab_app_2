@@ -6,6 +6,10 @@ abstract class BusinessRemoteDataSource {
   Future<List<BusinessModel>> getBusinesses();
   Future<BusinessModel> getBusinessDetail(String businessId);
   Future<List<BusinessModel>> getBusinessesByCategory(String category);
+  Future<({List<BusinessModel> items, bool hasMore})> getBusinessesPage({
+    required int page,
+    String? category,
+  });
   Future<List<MenuItem>> getMenuByBusiness(String businessId);
   Future<void> createReservation(Reservation reservation);
 }

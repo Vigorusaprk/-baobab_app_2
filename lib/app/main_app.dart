@@ -10,8 +10,7 @@ import 'package:baobabe_0_2/features/home_page/data/repositories/business_remote
 import 'package:baobabe_0_2/features/home_page/data/repositories/business_repository_impl.dart';
 import 'package:baobabe_0_2/features/home_page/data/repositories/category_repository_impl.dart';
 import 'package:baobabe_0_2/features/home_page/data/repositories/search_repository_impl.dart';
-import 'package:baobabe_0_2/features/home_page/domain/usecases/get_businesses.dart';
-import 'package:baobabe_0_2/features/home_page/domain/usecases/get_businesses_by_category_use_case.dart';
+import 'package:baobabe_0_2/features/home_page/domain/usecases/get_businesses_page.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/bloc/business_bloc.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/bloc/category_bloc.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/bloc/search_bloc.dart';
@@ -65,10 +64,7 @@ class _MainAppState extends State<MainApp> {
         ),
         BlocProvider<BusinessBloc>(
           create: (_) => BusinessBloc(
-            getBusinesses: GetBusinesses(businessRepository),
-            getBusinessesByCategory: GetBusinessesByCategory(
-              businessRepository,
-            ),
+            getBusinessesPage: GetBusinessesPage(businessRepository),
           ),
         ),
         BlocProvider<SearchBloc>(

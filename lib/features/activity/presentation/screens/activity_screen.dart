@@ -1,5 +1,6 @@
 ﻿import 'package:baobabe_0_2/core/themes/app_colors.dart';
 import 'package:baobabe_0_2/core/services/session_service.dart';
+import 'package:baobabe_0_2/features/activity/presentation/widgets/activity_skeleton.dart';
 import 'package:baobabe_0_2/features/booking_page/data/models/reservation_service.dart';
 import 'package:baobabe_0_2/features/business_detail/domain/entities/reservation.dart';
 import 'package:baobabe_0_2/features/order/domain/entities/order.dart';
@@ -143,7 +144,9 @@ class _ActivityScreenState extends State<ActivityScreen>
   }
 
   Widget _buildOrdersList() {
-    if (_loading) return const Center(child: CircularProgressIndicator());
+    if (_loading) {
+      return const ActivityListSkeleton(itemSkeleton: OrderCardSkeleton());
+    }
     if (_orders.isEmpty) return const OrderEmptyState();
     return RefreshIndicator(
       onRefresh: _loadAll,
@@ -156,7 +159,11 @@ class _ActivityScreenState extends State<ActivityScreen>
   }
 
   Widget _buildReservationsList() {
-    if (_loading) return const Center(child: CircularProgressIndicator());
+    if (_loading) {
+      return const ActivityListSkeleton(
+        itemSkeleton: ReservationCardSkeleton(),
+      );
+    }
     if (_reservations.isEmpty) return const ReservationEmptyState();
     return RefreshIndicator(
       onRefresh: _loadAll,

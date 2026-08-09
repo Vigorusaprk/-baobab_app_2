@@ -9,12 +9,13 @@ class RoomApiService {
 
   Future<List<Room>> getRoomsByHotel(String businessId) async {
     try {
-      final response = await _supabase
-          .from('rooms')
-          .select()
-          .eq('business_id', businessId);
-
-      return (response as List<dynamic>)
+      final response = await _supabase.functions.invoke(
+        'get-business-detail',
+        method: HttpMethod.get,
+        queryParameters: {'id': businessId},
+      );
+      final data = (response.data as Map<String, dynamic>)['rooms'] as List;
+      return data
           .map((json) => Room.fromJson(json as Map<String, dynamic>))
           .toList();
     } catch (e) {

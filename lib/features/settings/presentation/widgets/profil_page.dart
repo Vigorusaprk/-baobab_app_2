@@ -1,8 +1,10 @@
 import 'package:baobabe_0_2/core/bloc/settings_bloc.dart';
+import 'package:baobabe_0_2/features/settings/presentation/widgets/profile_skeleton.dart';
 import 'package:flutter/material.dart';
 import 'package:baobabe_0_2/core/themes/app_colors.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 
 class ProfilPage extends StatefulWidget {
   const ProfilPage({super.key});
@@ -34,7 +36,7 @@ class _ProfilPageState extends State<ProfilPage> {
       body: BlocBuilder<SettingsCubit, SettingsState>(
         builder: (context, state) {
           if (state is SettingsLoading) {
-            return const Center(child: CircularProgressIndicator());
+            return const Skeletonizer(enabled: true, child: ProfileSkeleton());
           }
 
           if (state is SettingsError) {

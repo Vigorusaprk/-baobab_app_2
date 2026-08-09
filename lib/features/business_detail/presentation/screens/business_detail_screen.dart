@@ -7,12 +7,14 @@ import 'package:baobabe_0_2/features/business_detail/presentation/widgets/busine
 // removed unused import: business_hero_section
 import 'package:baobabe_0_2/features/business_detail/presentation/widgets/business_info_section.dart';
 import 'package:baobabe_0_2/features/business_detail/presentation/widgets/business_specific_section.dart';
+import 'package:baobabe_0_2/features/business_detail/presentation/widgets/business_detail_skeleton.dart';
 import 'package:baobabe_0_2/features/business_detail/presentation/widgets/common/business_detail_app_bar.dart';
 import 'package:baobabe_0_2/features/business_detail/presentation/widgets/common/responsive_container.dart';
 import 'package:baobabe_0_2/features/business_detail/presentation/widgets/review.dart';
 import 'package:baobabe_0_2/features/home_page/data/models/ui_business.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 
 class BusinessDetailScreen extends StatefulWidget {
   final String businessId;
@@ -82,8 +84,9 @@ class _BusinessDetailScreenState extends State<BusinessDetailScreen> {
     // 1. ÉTAT CHARGEMENT INITIAL OU INITIALISATION
     if (state.detailStatus == BusinessDetailStatus.loading ||
         state.detailStatus == BusinessDetailStatus.initial) {
-      return const Center(
-        child: CircularProgressIndicator(color: AppColors.primary),
+      return const Skeletonizer(
+        enabled: true,
+        child: BusinessDetailSkeleton(),
       );
     }
 

@@ -15,13 +15,48 @@ class BusinessLoaded extends BusinessState {
   final List<Business> businesses;
   final BusinessType currentCategory;
 
+  /// Numéro de la dernière page chargée pour ce flux (1 = premier chargement).
+  final int page;
+
+  /// S'il reste des pages à charger sur le serveur.
+  final bool hasMore;
+
+  /// Vrai pendant qu'une page suivante se charge en arrière-plan — permet à
+  /// l'UI d'éviter de redemander LoadMoreBusinesses en boucle.
+  final bool isLoadingMore;
+
   const BusinessLoaded({
     required this.businesses,
     required this.currentCategory,
+    this.page = 1,
+    this.hasMore = false,
+    this.isLoadingMore = false,
   });
 
+  BusinessLoaded copyWith({
+    List<Business>? businesses,
+    BusinessType? currentCategory,
+    int? page,
+    bool? hasMore,
+    bool? isLoadingMore,
+  }) {
+    return BusinessLoaded(
+      businesses: businesses ?? this.businesses,
+      currentCategory: currentCategory ?? this.currentCategory,
+      page: page ?? this.page,
+      hasMore: hasMore ?? this.hasMore,
+      isLoadingMore: isLoadingMore ?? this.isLoadingMore,
+    );
+  }
+
   @override
-  List<Object> get props => [businesses, currentCategory];
+  List<Object> get props => [
+    businesses,
+    currentCategory,
+    page,
+    hasMore,
+    isLoadingMore,
+  ];
 }
 
 class BusinessError extends BusinessState {

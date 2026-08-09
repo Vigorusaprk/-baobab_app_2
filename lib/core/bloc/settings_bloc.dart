@@ -38,30 +38,18 @@ class SettingsCubit extends Cubit<SettingsState> {
         return;
       }
 
-      // 🔄 Récupération des données de la table publique 'user_profile'
-      final response = await _supabase
-          .from('user_profile')
-          .select()
-          .eq(
-            'user_id',
-            currentUser.id,
-          ) // Filtre sur l'ID de l'utilisateur connecté
-          .maybeSingle(); // Retourne un seul élément ou null s'il n'existe pas encore
+      // La table 'user_profile' interrogée ici auparavant n'existe pas dans
+      // le schéma réel (c'est 'users') : l'Edge Function get-me lit la
+      // bonne table et crée la ligne à la volée si c'est la première
+      // connexion de l'utilisateur.
+      final response = await _supabase.functions.invoke(
+        'get-me',
+        method: HttpMethod.get,
+      );
+      final profile = (response.data as Map<String, dynamic>)['data']
+          as Map<String, dynamic>;
 
-      if (response == null) {
-        // Si le profil n'existe pas encore dans la table publique, on passe des données par défaut
-        emit(
-          SettingsLoaded(
-            userProfile: {
-              'name': currentUser.userMetadata?['name'] ?? 'Utilisateur',
-              'phone': '',
-            },
-            userAuth: currentUser,
-          ),
-        );
-      } else {
-        emit(SettingsLoaded(userProfile: response, userAuth: currentUser));
-      }
+      emit(SettingsLoaded(userProfile: profile, userAuth: currentUser));
     } catch (e) {
       emit(SettingsError("Impossible de charger le profil : $e"));
     }

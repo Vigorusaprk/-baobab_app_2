@@ -5,12 +5,14 @@ class VehicleService {
     String businessId,
   ) async {
     try {
-      final response = await Supabase.instance.client
-          .from('vehicles')
-          .select()
-          .eq('business_id', businessId);
+      final response = await Supabase.instance.client.functions.invoke(
+        'get-business-detail',
+        method: HttpMethod.get,
+        queryParameters: {'id': businessId},
+      );
+      final data = (response.data as Map<String, dynamic>)['vehicles'] as List;
 
-      return (response as List<dynamic>)
+      return data
           .map(
             (item) => Map<String, dynamic>.from(item as Map<String, dynamic>),
           )

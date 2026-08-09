@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'package:connectivity_plus/connectivity_plus.dart';
-import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:baobabe_0_2/features/business_detail/domain/entities/reservation.dart';
 import 'package:baobabe_0_2/core/database/database_helper.dart';
@@ -20,15 +19,16 @@ class ReservationApiService {
         : _supabase.auth.currentUser?.id;
 
     if (finalUserId == null || finalUserId.isEmpty) {
-      final currentSessionUserId = _supabase.auth.currentUser?.id;
-      throw Exception(
-        'Utilisateur non authentifié. userId param=${userId ?? 'null'} currentSupabaseUser=$currentSessionUserId',
-      );
+      throw Exception('Utilisateur non authentifié.');
     }
 
     return finalUserId;
   }
 
+  /// [userId] n'est plus envoyé au serveur : l'Edge Function résout
+  /// l'utilisateur depuis le JWT de la requête. On garde la résolution
+  /// locale juste pour lever une erreur claire avant l'appel réseau si
+  /// personne n'est connecté.
   Future<Map<String, dynamic>> createReservation({
     required String businessId,
     required String type,
@@ -38,28 +38,23 @@ class ReservationApiService {
     String? establishmentName,
     String? userId,
   }) async {
-    final finalUserId = _resolveUserId(userId);
-    if (kDebugMode) {
-      print('ReservationApiService.createReservation: user_id=$finalUserId');
-    }
-
-    final payload = {
-      'business_id': businessId,
-      'user_id': finalUserId,
-      'type': type,
-      'reservation_date': reservationDate.toIso8601String(),
-      'total_amount': totalAmount,
-      'details': {...details, 'establishment_name': ?establishmentName},
-    };
+    _resolveUserId(userId);
 
     try {
-      final response = await _supabase
-          .from('reservations')
-          .insert(payload)
-          .select()
-          .single();
-
-      return response;
+      final response = await _supabase.functions.invoke(
+        'create-reservation',
+        method: HttpMethod.post,
+        body: {
+          'businessId': businessId,
+          'type': type,
+          'reservationDate': reservationDate.toIso8601String(),
+          'totalAmount': totalAmount,
+          'details': details,
+          if (establishmentName != null) 'establishmentName': establishmentName,
+        },
+      );
+      return (response.data as Map<String, dynamic>)['data']
+          as Map<String, dynamic>;
     } catch (e) {
       throw Exception('Erreur lors de la création de la réservation: $e');
     }
@@ -85,63 +80,19 @@ class ReservationApiService {
     }
 
     try {
-      final response = await _supabase
-          .from('reservations')
-          .select('*')
-          .eq('user_id', finalUserId)
-          .order('reservation_date', ascending: false);
-
-      final data = response as List<dynamic>;
-      if (kDebugMode) {
-        print(
-          'ReservationApiService.getReservations: fetched ${data.length} rows from Supabase.',
-        );
-      }
-
-      // Si le join a été retiré, on tente un chargement manuel des noms pour les anciennes lignes
-      final needManualBusinessLoad = data.any(
-        (item) =>
-            (item['establishment_name'] == null ||
-                item['establishment_name'].toString().isEmpty) &&
-            (item['details'] == null ||
-                (item['details'] as Map)['establishment_name'] == null) &&
-            item['business_id'] != null,
+      // `reservations-list` renvoie déjà le nom de l'établissement (embed
+      // via la FK business_id) — plus besoin du deuxième aller-retour
+      // manuel pour les anciennes lignes.
+      final response = await _supabase.functions.invoke(
+        'get-reservations-client',
+        method: HttpMethod.get,
+        queryParameters: {'pageSize': '50'},
       );
-
-      if (needManualBusinessLoad) {
-        final businessIds = data
-            .map((item) => item['business_id']?.toString())
-            .whereType<String>()
-            .toSet()
-            .toList();
-
-        if (businessIds.isNotEmpty) {
-          final businessResponse = await _supabase
-              .from('business')
-              .select('id, name')
-              .inFilter('id', businessIds);
-
-          final businessNames = {
-            for (var b in (businessResponse as List))
-              b['id'].toString(): b['name'].toString(),
-          };
-
-          for (var item in data) {
-            final bId = item['business_id']?.toString();
-            if (item['business'] == null &&
-                bId != null &&
-                businessNames.containsKey(bId)) {
-              item['business'] = {'name': businessNames[bId]};
-            }
-          }
-        }
-      }
-
+      final data = (response.data as Map<String, dynamic>)['data'] as List;
       final reservations = data
           .map((json) => Reservation.fromJson(json as Map<String, dynamic>))
           .toList();
 
-      // Sauvegarder dans le cache
       final reservationsJson = jsonEncode(
         reservations.map((e) => e.toJson()).toList(),
       );
@@ -149,7 +100,6 @@ class ReservationApiService {
 
       return reservations;
     } catch (e) {
-      // Fallback au cache en cas d'erreur API
       final cached = await _db.getCache('reservations_$finalUserId');
       if (cached != null) {
         final List<dynamic> decoded = jsonDecode(cached);
@@ -162,14 +112,14 @@ class ReservationApiService {
   }
 
   Future<void> deleteReservation(String reservationId, {String? userId}) async {
-    final finalUserId = _resolveUserId(userId);
+    _resolveUserId(userId);
 
     try {
-      await _supabase
-          .from('reservations')
-          .delete()
-          .eq('id', reservationId)
-          .eq('user_id', finalUserId);
+      await _supabase.functions.invoke(
+        'delete-reservation',
+        method: HttpMethod.post,
+        body: {'reservationId': reservationId},
+      );
     } catch (e) {
       throw Exception('Erreur lors de la suppression: $e');
     }

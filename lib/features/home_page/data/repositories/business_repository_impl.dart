@@ -2,6 +2,7 @@ import 'package:baobabe_0_2/features/business_detail/domain/entities/menu_restau
 import 'package:baobabe_0_2/features/booking_page/data/models/reservation_model.dart';
 import 'package:baobabe_0_2/features/home_page/data/data_sources/remote_datasource/business_remote_datasource.dart';
 import 'package:baobabe_0_2/features/home_page/domain/entities/business_entity.dart';
+import 'package:baobabe_0_2/features/home_page/domain/entities/businesses_page.dart';
 import 'package:baobabe_0_2/features/home_page/domain/repositories/business_repository.dart';
 
 class BusinessRepositoryImpl implements BusinessRepository {
@@ -31,6 +32,21 @@ class BusinessRepositoryImpl implements BusinessRepository {
   Future<List<Business>> getBusinessesByCategory(String category) async {
     final models = await remoteDataSource.getBusinessesByCategory(category);
     return models.map((model) => model.toEntity()).toList();
+  }
+
+  @override
+  Future<BusinessesPage> getBusinessesPage({
+    required int page,
+    String? category,
+  }) async {
+    final result = await remoteDataSource.getBusinessesPage(
+      page: page,
+      category: category,
+    );
+    return BusinessesPage(
+      items: result.items.map((model) => model.toEntity()).toList(),
+      hasMore: result.hasMore,
+    );
   }
 
   @override

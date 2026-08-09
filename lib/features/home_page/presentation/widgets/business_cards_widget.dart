@@ -137,7 +137,7 @@ class _BusinessCardsWidgetState extends State<BusinessCardsWidget> {
               final uiBusinesses = state.businesses
                   .map((business) => UIBusiness(business))
                   .toList();
-              return _buildStylizedScroll(uiBusinesses);
+              return _buildStylizedScroll(uiBusinesses, state.isLoadingMore);
             } else if (state is BusinessError) {
               return SizedBox(
                 height: _cardHeight,
@@ -177,7 +177,10 @@ class _BusinessCardsWidgetState extends State<BusinessCardsWidget> {
     );
   }
 
-  Widget _buildStylizedScroll(List<UIBusiness> uiBusinesses) {
+  Widget _buildStylizedScroll(
+    List<UIBusiness> uiBusinesses,
+    bool isLoadingMore,
+  ) {
     if (uiBusinesses.isEmpty) {
       return SizedBox(
         height: _cardHeight,
@@ -201,13 +204,28 @@ class _BusinessCardsWidgetState extends State<BusinessCardsWidget> {
       );
     }
 
+    final itemCount = uiBusinesses.length + (isLoadingMore ? 1 : 0);
+
     return SizedBox(
       height: _cardHeight,
       child: PageView.builder(
         controller: _pageController,
-        itemCount: uiBusinesses.length,
+        itemCount: itemCount,
         physics: const BouncingScrollPhysics(),
         itemBuilder: (context, index) {
+          // La carte skeleton ajoutée en fin de liste pendant le chargement
+          // de la page suivante — elle ne correspond à aucun business réel.
+          final isTrailingSkeleton = index >= uiBusinesses.length;
+
+          // Scroll infini : on prévient juste le bloc qu'on approche de la
+          // fin de la liste chargée. Toute la logique (page suivante,
+          // hasMore, anti-doublon) vit dans BusinessBloc — cette vue ne
+          // fait que remonter l'information, elle ne sait rien de la
+          // pagination elle-même.
+          if (!isTrailingSkeleton && index == uiBusinesses.length - 2) {
+            context.read<BusinessBloc>().add(const LoadMoreBusinesses());
+          }
+
           final distance = (index - _pageOffset).abs().clamp(0.0, 1.0);
           final focus = Curves.easeInOutCubic.transform(1 - distance);
 
@@ -216,7 +234,9 @@ class _BusinessCardsWidgetState extends State<BusinessCardsWidget> {
           final opacity = _baseOpacity + (focus * _opacityFactor);
 
           return Transform.translate(
-            key: ValueKey(uiBusinesses[index].business.id),
+            key: isTrailingSkeleton
+                ? const ValueKey('business-card-loading-more')
+                : ValueKey(uiBusinesses[index].business.id),
             offset: Offset(0, verticalOffset),
             child: Transform.scale(
               scale: scale,
@@ -227,7 +247,12 @@ class _BusinessCardsWidgetState extends State<BusinessCardsWidget> {
                     horizontal: _cardHorizontalPadding,
                     vertical: _cardVerticalPadding,
                   ),
-                  child: _buildPerspectiveCard(uiBusinesses[index]),
+                  child: isTrailingSkeleton
+                      ? const Skeletonizer(
+                          enabled: true,
+                          child: _BusinessCardSkeleton(),
+                        )
+                      : _buildPerspectiveCard(uiBusinesses[index]),
                 ),
               ),
             ),

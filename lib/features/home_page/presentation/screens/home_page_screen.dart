@@ -1,8 +1,7 @@
 import 'package:baobabe_0_2/core/themes/app_diemens.dart';
 import 'package:baobabe_0_2/features/home_page/data/repositories/business_remote_datasource_impl.dart';
 import 'package:baobabe_0_2/features/home_page/data/repositories/business_repository_impl.dart';
-import 'package:baobabe_0_2/features/home_page/domain/usecases/get_businesses.dart';
-import 'package:baobabe_0_2/features/home_page/domain/usecases/get_businesses_by_category_use_case.dart';
+import 'package:baobabe_0_2/features/home_page/domain/usecases/get_businesses_page.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/bloc/business_bloc.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/widgets/Category_Icons.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/widgets/business_cards_widget.dart';
@@ -30,8 +29,7 @@ class HomePageScreen extends StatelessWidget {
               remoteDataSource: BusinessRemoteDataSourceImpl(),
             );
             return BusinessBloc(
-              getBusinesses: GetBusinesses(repository),
-              getBusinessesByCategory: GetBusinessesByCategory(repository),
+              getBusinessesPage: GetBusinessesPage(repository),
             )..add(LoadBusinesses());
           },
         ),

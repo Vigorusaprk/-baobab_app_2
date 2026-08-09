@@ -16,31 +16,32 @@ class ReviewRemoteDataSourceImpl implements ReviewRemoteDataSource {
     String? comment,
   }) async {
     try {
-      // Insertion directe dans la table 'reviews' de ta base de données PostgreSQL
-      await _supabase.from('reviews').insert({
-        'business_id': businessId,
-        'user_id': userId,
-        'rating': rating,
-        'comment': comment,
-      });
+      // L'Edge Function résout l'auteur de l'avis depuis le JWT, pas depuis
+      // userId (gardé dans la signature de l'interface).
+      await _supabase.functions.invoke(
+        'create-review',
+        method: HttpMethod.post,
+        body: {'businessId': businessId, 'rating': rating, 'comment': comment},
+      );
     } catch (e) {
-      throw Exception('Erreur Supabase lors de la soumission de l\'avis : $e');
+      throw Exception('Erreur lors de la soumission de l\'avis : $e');
     }
   }
 
   @override
   Future<List<Review>> getReviews(String businessId) async {
     try {
-      // Récupération des avis triés par date de création décroissante
-      final response = await _supabase
-          .from('reviews')
-          .select()
-          .eq('business_id', businessId)
-          .order('created_at', ascending: false);
-
-      return (response as List).map((json) => Review.fromJson(json)).toList();
+      final response = await _supabase.functions.invoke(
+        'get-reviews-business',
+        method: HttpMethod.get,
+        queryParameters: {'businessId': businessId},
+      );
+      final data = (response.data as Map<String, dynamic>)['data'] as List;
+      return data
+          .map((json) => Review.fromJson(json as Map<String, dynamic>))
+          .toList();
     } catch (e) {
-      throw Exception('Erreur Supabase lors de la récupération des avis : $e');
+      throw Exception('Erreur lors de la récupération des avis : $e');
     }
   }
 }

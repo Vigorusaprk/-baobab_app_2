@@ -3,7 +3,6 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:baobabe_0_2/features/order/domain/entities/order.dart';
 import 'package:baobabe_0_2/core/database/database_helper.dart';
-import 'package:baobabe_0_2/features/order/data/services/order_enrichment_helper.dart';
 
 class OrderApiService {
   final SupabaseClient _supabase;
@@ -13,6 +12,11 @@ class OrderApiService {
   OrderApiService([SupabaseClient? supabase])
     : _supabase = supabase ?? Supabase.instance.client;
 
+  /// Délègue à l'Edge Function `create-order`, qui insère la commande et ses
+  /// lignes dans une seule transaction Postgres (create_order_with_items) —
+  /// plus de risque de commande orpheline si l'insertion des lignes échoue
+  /// après coup, comme c'était possible avec les deux inserts séquentiels
+  /// précédents.
   Future<void> createOrder({
     required String userId,
     required String businessId,
@@ -22,93 +26,21 @@ class OrderApiService {
     String? paymentMethod,
     String? notes,
   }) async {
-    final totalAmount =
-        items.fold<double>(0, (sum, item) => sum + item.total) +
-        (deliveryFee ?? 0);
-    final payload = {
-      'user_id': userId,
-      'business_id': businessId,
-      'status': 'pending',
-      'total_amount': totalAmount,
-      // Some DB schemas use `total_price` instead of `total_amount`.
-      // Include both keys to be compatible with either schema.
-      'total_price': totalAmount,
-    };
-
-    if (deliveryAddress != null) {
-      payload['delivery_address'] = deliveryAddress;
-    }
-    if (deliveryFee != null) {
-      payload['delivery_fee'] = deliveryFee;
-    }
-    if (paymentMethod != null) {
-      payload['payment_method'] = paymentMethod;
-    }
-    if (notes != null) {
-      payload['notes'] = notes;
-    }
     try {
-      final orderResponse = await _supabase
-          .from('orders')
-          .insert(payload)
-          .select()
-          .single();
-
-      final orderId = orderResponse['id']?.toString();
-      if (orderId == null || orderId.isEmpty) {
-        throw Exception('Impossible de créer la commande');
-      }
-
-      final orderItems = items.map((item) {
-        final map = {
-          'order_id': orderId,
-          'menu_item_id': item.menuItemId,
-          'quantity': item.quantity,
-          'unit_price': item.price,
-        };
-        if (item.specialInstructions != null) {
-          map['special_instructions'] = item.specialInstructions!;
-        }
-        return map;
-      }).toList();
-
-      if (orderItems.isNotEmpty) {
-        await _insertOrderItems(orderItems);
-      }
+      await _supabase.functions.invoke(
+        'create-order',
+        method: HttpMethod.post,
+        body: {
+          'businessId': businessId,
+          'items': items.map((item) => item.toMap()).toList(),
+          if (deliveryAddress != null) 'deliveryAddress': deliveryAddress,
+          if (deliveryFee != null) 'deliveryFee': deliveryFee,
+          if (paymentMethod != null) 'paymentMethod': paymentMethod,
+          if (notes != null) 'notes': notes,
+        },
+      );
     } catch (e) {
       throw Exception('Erreur lors de la création de la commande : $e');
-    }
-  }
-
-  Future<void> _insertOrderItems(List<Map<String, dynamic>> orderItems) async {
-    try {
-      await _supabase.from('order_items').insert(orderItems);
-    } catch (e) {
-      final message = e is PostgrestException ? e.message : e.toString();
-
-      if (message.contains("Could not find the 'unit_price' column") ||
-          message.contains('column "unit_price" does not exist')) {
-        final fallbackItems = orderItems.map((item) {
-          final map = Map<String, dynamic>.from(item);
-          map['price'] = map.remove('unit_price');
-          return map;
-        }).toList();
-        await _supabase.from('order_items').insert(fallbackItems);
-        return;
-      }
-
-      if (message.contains("Could not find the 'price' column") ||
-          message.contains('column "price" does not exist')) {
-        final fallbackItems = orderItems.map((item) {
-          final map = Map<String, dynamic>.from(item);
-          map['unit_price'] = map.remove('price');
-          return map;
-        }).toList();
-        await _supabase.from('order_items').insert(fallbackItems);
-        return;
-      }
-
-      rethrow;
     }
   }
 
@@ -130,26 +62,24 @@ class OrderApiService {
     }
 
     try {
-      List<Order> orders;
-      try {
-        orders = await getOrdersWithRelatedItems(_supabase, userId);
-      } catch (e) {
-        final message = e is PostgrestException ? e.message : e.toString();
-        if (message.contains('Could not find a relationship between') ||
-            message.contains('relationship between')) {
-          orders = await getOrdersWithoutRelationships(_supabase, userId);
-        } else {
-          rethrow;
-        }
-      }
+      // L'Edge Function `orders-list` renvoie déjà les commandes enrichies
+      // (lignes + noms de plats + établissement) en un seul aller-retour —
+      // plus besoin de order_enrichment_helper.dart côté client.
+      final response = await _supabase.functions.invoke(
+        'get-orders-client',
+        method: HttpMethod.get,
+        queryParameters: {'pageSize': '50'},
+      );
+      final data = (response.data as Map<String, dynamic>)['data'] as List;
+      final orders = data
+          .map((json) => Order.fromMap(json as Map<String, dynamic>))
+          .toList();
 
-      // Sauvegarder dans le cache
       final ordersJson = jsonEncode(orders.map((e) => e.toMap()).toList());
       await _db.saveCache('orders_$userId', ordersJson);
 
       return orders;
     } catch (e) {
-      // Fallback au cache en cas d'erreur API
       final cached = await _db.getCache('orders_$userId');
       if (cached != null) {
         final List<dynamic> decoded = jsonDecode(cached);
@@ -163,10 +93,11 @@ class OrderApiService {
 
   Future<void> updateOrderStatus(String orderId, OrderStatus status) async {
     try {
-      await _supabase
-          .from('orders')
-          .update({'status': status.name})
-          .eq('id', orderId);
+      await _supabase.functions.invoke(
+        'update-order-status',
+        method: HttpMethod.post,
+        body: {'orderId': orderId, 'status': status.name},
+      );
     } catch (e) {
       throw Exception('Erreur lors de la mise à jour du statut : $e');
     }

@@ -53,6 +53,67 @@ Current pattern: **construct dependencies directly where they're needed.**
 - Repositories/data sources with no app-wide state (`BusinessRepositoryImpl`, `ReservationApiService`, `OrderApiService`, etc.) are constructed directly at the call site with `SomeRepositoryImpl(remoteDataSource: SomeRemoteDataSourceImpl())`. Most data sources default to `Supabase.instance.client` when no client is passed, so `SomeRemoteDataSourceImpl()` with no arguments is normally enough.
 - If a dependency is genuinely needed in many unrelated places, prefer a small singleton service (see `SessionService` below) over reintroducing a general-purpose locator.
 
+## Backend Access — Supabase Edge Functions Only
+
+**Do not call `Supabase.instance.client.from('table_name')` directly from Flutter code for business data.** All reads/writes for businesses, menu items, rooms, vehicles, reviews, orders, reservations, and the user profile go through **Supabase Edge Functions**, not direct PostgREST `.from()` calls — see `business_remote_datasource_impl.dart`, `review_api_service.dart`, `order_service.dart`, `reservation_service.dart`, and `core/bloc/settings_bloc.dart` for the current pattern. This was a deliberate migration so the app can scale to a large data volume without shipping unbounded/unindexed queries straight from the client, and so joins/enrichment/pagination logic lives server-side once instead of being duplicated per screen.
+
+Supabase project ref: `wrutwzbtnquxigxetxfx`. Do not point Supabase MCP tools at a different project without explicitly confirming with the user — this has happened by mistake before and silently produced analysis of the wrong backend.
+
+### Where Edge Function source lives
+
+Edge Functions are **not** checked into this repository — there is no local `supabase/functions/` folder. They were authored and deployed straight to the remote project via the Supabase MCP tools (`mcp__supabase__deploy_edge_function`, `mcp__supabase__get_edge_function`, `mcp__supabase__list_edge_functions`). To inspect or change a function: fetch its current source with `get_edge_function` first, edit it, then redeploy with `deploy_edge_function` — do not assume a local file exists to edit directly.
+
+Every function shares two helpers deployed alongside it under `_shared/`:
+
+- `_shared/cors.ts` — standard CORS headers.
+- `_shared/client.ts` — `createUserClient(req)` builds a Supabase client that forwards the caller's `Authorization` JWT, so RLS policies apply exactly as they would for a direct PostgREST call (guest/anonymous browsing still works, since the anon key itself is a valid JWT). Also exports `paginationParams(url)` for consistent `?page=&pageSize=` parsing.
+
+All functions are deployed with `verify_jwt: true`.
+
+### Naming convention (mandatory for any new Edge Function)
+
+`METHOD-NOUN[-TYPE]` — e.g. `get-home`, `get-business-detail`, `create-review`, `get-orders-client`. The optional `-TYPE` suffix disambiguates *whose* view of the data it is (e.g. `-client` = the calling user's own records, as opposed to a merchant's own published listings). Do not use camelCase, verb-first-without-hyphen, or any other scheme — and do not reintroduce the old pre-migration names (`home-feed`, `business-detail`, `reviews-list`, `orders-list`, `reservations-list`, `submit-review`), which were renamed away from and may still exist as orphaned/unused functions in the dashboard pending manual deletion.
+
+### Current functions
+
+- `get-home` — paginated business list (`?category=&q=&page=&pageSize=`)
+- `get-business-detail` — `?id=` → `{business, menuItems, rooms, vehicles, reviews}`
+- `get-reviews-business` — `?businessId=&page=`
+- `create-review`
+- `get-orders-client` — paginated, server-enriched with menu/business names
+- `get-reservations-client` — paginated, server-enriched with business name
+- `create-order`, `update-order-status`
+- `create-reservation`, `delete-reservation`
+- `get-me` — merges `auth.users` + `public.users`, auto-creates the `public.users` row on first login. **Casing gotcha**: the supabase-js `User` object from `auth.users` uses **snake_case** properties (`user_metadata`, `email_confirmed_at`, `created_at`), not camelCase — a real bug hit and fixed while building this function.
+
+If a screen needs a new kind of server-side data (a new page's initial load, a new mutation), add a new Edge Function following the naming convention above rather than reaching for a direct `.from()` call, even for something that looks like a "simple" query.
+
+### Database performance rules already applied
+
+RLS policies use `(select auth.uid())` rather than a bare `auth.uid()` (avoids per-row re-evaluation), multiple-permissive-policy tables were consolidated into single policies, and every foreign key has a covering index. Keep this pattern in any new policy/migration, and check `mcp__supabase__get_advisors` after schema changes.
+
+## Pagination — Infinite Scroll Pattern
+
+Lists that page through server data (currently: the home page's business carousel) use **infinite scroll**, not page-number controls. The pattern, established in `home_page/presentation/bloc/business_bloc.dart` + `home_page/presentation/widgets/business_cards_widget.dart`, must be followed for any new paginated list:
+
+- **All pagination state and logic lives in the Bloc** — `page`, `hasMore`, `isLoadingMore` fields on the loaded state, plus a dedicated `LoadMore...` event that guards against duplicate/concurrent loads (`state is! XLoaded || !state.hasMore || state.isLoadingMore` → no-op).
+- **The widget only reports proximity to the end of the loaded list** (e.g. `if (index == items.length - 2) context.read<XBloc>().add(const LoadMoreX());`) — it must not compute page numbers, track `hasMore`, or otherwise know anything about pagination itself. This separation is a hard requirement, not a nice-to-have.
+- A failed "load more" call fails silently and resets `isLoadingMore` so the user can simply keep scrolling to retry — don't surface a blocking error dialog/snackbar for a background page fetch.
+- The remote data source returns a small record/DTO like `({List<T> items, bool hasMore})`; the domain layer wraps that in a proper named class (e.g. `BusinessesPage`) rather than leaking the raw record above the data layer.
+
+## Loading States — Skeletonizer, Not Spinners
+
+Full-page and full-section loading states use the `skeletonizer` package, **not** `CircularProgressIndicator`. Reference implementation: `home_page/presentation/screens/home_page_screen.dart` + `home_page/presentation/widgets/home_skeleton.dart`.
+
+Rules:
+
+- Wrap the loading branch in `Skeletonizer(enabled: isLoading, child: ...)`.
+- Build the skeleton from **explicit `Bone` widgets** (`Bone`, `Bone.text(words:/width:, style:)`, `Bone.multiText(lines:, style:)`, `Bone.circle(size:)`, `Bone.button(...)`) that mirror the real loaded layout section-by-section. Do **not** rely on Skeletonizer's auto-detection from plain `Container`/`Text` — it was tried and rejected because the resulting shape didn't read correctly; explicit `Bone`s are the only accepted approach here.
+- Name/locate the skeleton widget next to the real widget/screen it mirrors so the mapping is obvious — e.g. `business_detail_skeleton.dart` for `business_detail_screen.dart`, `profile_skeleton.dart` for `profil_page.dart`, `activity_skeleton.dart` for `activity_screen.dart`.
+- This covers **whole-page loading states**, and any in-page content-loading spinner that behaves the same way (e.g. a `FutureBuilder` fetching a sub-section's data, like the reviews list inside `review.dart`).
+- It does **not** cover action-in-progress overlays (submitting a reservation, placing an order, saving a form) — those block already-loaded content while a write request is in flight, which is a different UX than "this shape is about to fill in with content." Those may keep a `CircularProgressIndicator`, typically as a semi-transparent overlay.
+- Infinite-scroll "load more" indicators must also be skeleton-based: append a trailing skeleton item shaped like the real list/card item (reuse the existing item skeleton widget) while `isLoadingMore` is true, instead of a spinner or no indicator at all.
+
 ## Session / Auth State
 
 The `auth` feature (`lib/features/auth`) only exposes granular per-action Bloc states (`RequestEmailOtpSuccess`, `VerifyEmailOtpSuccess`, `AuthWithGoogleSuccess`, `SignOutSuccess`, etc.) — there is **no** `AuthenticatedState`/`UnauthenticatedState` with a `.user` field anymore.
@@ -87,6 +148,7 @@ Be careful when editing these areas:
 - `lib/core/routes/app_router.dart` — auth guard/redirects, all top-level routes.
 - `lib/core/services/session_service.dart` — single source of truth for session/user identity app-wide.
 - `lib/features/business_detail/presentation/widgets/online_order/` — many type-specific reservation modals/pages share the same `BusinessDetailBloc` provided by an ancestor `business_detail_screen.dart`; don't add a second competing provider for it.
+- Supabase Edge Functions and migrations (remote, project `wrutwzbtnquxigxetxfx`) — no local source of truth in this repo, only reachable via the Supabase MCP tools; see "Backend Access" above before touching backend data access.
 
 ## File Size Rule
 
@@ -125,6 +187,9 @@ Mandatory checks after any meaningful code change:
    - `lib/core/themes/app_fonts.dart` (`AppFonts`) for font family/weight/size — never hardcode `TextStyle` values that duplicate an existing `AppFonts` constant.
    - The relevant feature's own `presentation/widgets/` folder for a feature-local widget that already does the same job (e.g. reservation cards, filter chips, empty states already extracted during the 300-line cleanup).
    - **Always import and reuse the existing component/constant instead of duplicating it.** Only create a new shared widget/constant when nothing existing covers the need, and prefer adding it to `lib/core/widgets` or the theme files so it becomes reusable rather than duplicating it inline in a feature file.
+10. Never call `.from('table_name')` directly from Flutter for business data — go through a Supabase Edge Function following the `METHOD-NOUN[-TYPE]` naming convention (see "Backend Access — Supabase Edge Functions Only" above).
+11. Any new paginated list must use the infinite-scroll pattern with all pagination state/logic kept in the Bloc — never in the widget (see "Pagination — Infinite Scroll Pattern" above).
+12. Any new full-page or full-section loading state must use `Skeletonizer` + explicit `Bone` widgets mirroring the real layout — never a bare `CircularProgressIndicator` for content loading. The one exception is action-in-progress overlays (submit/save while content is already loaded) — see "Loading States — Skeletonizer, Not Spinners" above.
 
 ## UI And Design System
 
