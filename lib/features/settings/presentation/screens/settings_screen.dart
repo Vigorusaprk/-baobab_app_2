@@ -1,8 +1,10 @@
+import 'package:baobabe_0_2/core/services/session_service.dart';
+import 'package:baobabe_0_2/core/themes/app_diemens.dart';
+import 'package:baobabe_0_2/core/widgets/custom_divider.dart';
 import 'package:baobabe_0_2/features/settings/presentation/bloc/settings_bloc.dart';
 import 'package:baobabe_0_2/features/settings/presentation/widgets/language_picker_dialog.dart';
 import 'package:baobabe_0_2/features/settings/presentation/widgets/logout_confirmation_dialog.dart';
 import 'package:baobabe_0_2/features/settings/presentation/widgets/settings_tiles.dart';
-import 'package:baobabe_0_2/features/settings/presentation/widgets/theme_picker_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -19,30 +21,30 @@ class SettingsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final user = SessionService.instance.currentUser;
+
     return BlocBuilder<SettingsCubit, SettingsState>(
       builder: (context, settingsState) {
         return ListView(
           padding: const EdgeInsets.all(16),
           children: [
+            ProfileSummaryCard(
+              name: user?.name ?? 'Utilisateur',
+              email: user?.email ?? '',
+              onTap: () => context.pushNamed('profil-page'),
+            ),
+            AppDimens.spacerMedium,
             // Section Générale
             DetailSection(
               sectionTitle: "Générale",
               children: [
-                InfoTile(
-                  subtitle: "Profil",
-                  icon: Icons.person_outline,
-                  onTap: () {
-                    context.pushNamed('profil-page');
-                  },
-                ),
-                const Divider(color: AppColors.textSecondary),
                 InfoTile(
                   subtitle: "Notifications",
                   icon: Icons.notifications_none_outlined,
                   onTap: () {},
                   trailing: Switch(value: true, onChanged: (value) {}),
                 ),
-                const Divider(color: AppColors.textSecondary),
+                const CustomDivider(),
                 InfoTile(
                   subtitle: "Langue",
                   icon: Icons.language_outlined,
@@ -54,20 +56,9 @@ class SettingsScreen extends StatelessWidget {
                     ),
                   ),
                 ),
-                const Divider(color: AppColors.textSecondary),
-                InfoTile(
-                  subtitle: "Thème",
-                  icon: Icons.brightness_6_outlined,
-                  onTap: () => showThemePickerDialog(context),
-                  trailing: Text(
-                    _getThemeName(settingsState.themeMode),
-                    style: AppFonts.bodySmall.copyWith(
-                      color: AppColors.secondaryLight,
-                    ),
-                  ),
-                ),
               ],
             ),
+            AppDimens.spacerMedium,
             // Section Compte
             DetailSection(
               sectionTitle: "Compte",
@@ -79,7 +70,7 @@ class SettingsScreen extends StatelessWidget {
                     context.pushNamed('edit-profile');
                   },
                 ),
-                const Divider(color: AppColors.textSecondary),
+                const CustomDivider(),
                 InfoTile(
                   subtitle: "Sécurité",
                   icon: Icons.lock_outline,
@@ -87,15 +78,9 @@ class SettingsScreen extends StatelessWidget {
                     context.pushNamed('change-password');
                   },
                 ),
-                const Divider(color: AppColors.textSecondary),
-                InfoTile(
-                  subtitle: "Déconnexion",
-                  icon: Icons.logout,
-                  accentColor: AppColors.error,
-                  onTap: () => showLogoutConfirmationDialog(context),
-                ),
               ],
             ),
+            AppDimens.spacerMedium,
             // Section Aide
             DetailSection(
               sectionTitle: "FAQ & Aide",
@@ -105,13 +90,13 @@ class SettingsScreen extends StatelessWidget {
                   icon: Icons.help_outline,
                   onTap: () {},
                 ),
-                const Divider(color: AppColors.textSecondary),
+                const CustomDivider(),
                 InfoTile(
                   subtitle: "Contactez-nous",
                   icon: Icons.mail_outline,
                   onTap: () => _launchEmail(),
                 ),
-                const Divider(color: AppColors.textSecondary),
+                const CustomDivider(),
                 InfoTile(
                   subtitle: "Partager l'application",
                   icon: Icons.share_outlined,
@@ -119,6 +104,7 @@ class SettingsScreen extends StatelessWidget {
                 ),
               ],
             ),
+            AppDimens.spacerMedium,
             // Section Application
             DetailSection(
               sectionTitle: "Application",
@@ -128,13 +114,13 @@ class SettingsScreen extends StatelessWidget {
                   icon: Icons.info_outline,
                   onTap: () {},
                 ),
-                const Divider(color: AppColors.textSecondary),
+                const CustomDivider(),
                 InfoTile(
                   subtitle: "Confidentialité",
                   icon: Icons.privacy_tip_outlined,
                   onTap: () {},
                 ),
-                const Divider(color: AppColors.textSecondary),
+                const CustomDivider(),
                 InfoTile(
                   subtitle: "Conditions d'utilisation",
                   icon: Icons.description_outlined,
@@ -142,7 +128,11 @@ class SettingsScreen extends StatelessWidget {
                 ),
               ],
             ),
-            const SizedBox(height: 95),
+            AppDimens.spacerLarge,
+            SettingsLogoutButton(
+              onTap: () => showLogoutConfirmationDialog(context),
+            ),
+            AppDimens.spacerLarge,
           ],
         );
       },
@@ -159,17 +149,6 @@ class SettingsScreen extends StatelessWidget {
         return 'Lingala';
       default:
         return 'Français';
-    }
-  }
-
-  String _getThemeName(ThemeMode mode) {
-    switch (mode) {
-      case ThemeMode.light:
-        return 'Clair';
-      case ThemeMode.dark:
-        return 'Sombre';
-      case ThemeMode.system:
-        return 'Système';
     }
   }
 

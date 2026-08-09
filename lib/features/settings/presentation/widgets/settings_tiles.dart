@@ -1,4 +1,5 @@
 import 'package:baobabe_0_2/core/themes/app_colors.dart';
+import 'package:baobabe_0_2/core/themes/app_diemens.dart';
 import 'package:baobabe_0_2/core/themes/app_fonts.dart';
 import 'package:flutter/material.dart';
 
@@ -15,7 +16,7 @@ class IconBadge extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Icon(icon, color: color, size: 22),
@@ -61,6 +62,121 @@ class InfoTile extends StatelessWidget {
   }
 }
 
+/// Carte d'entête affichant un résumé du profil connecté (avatar, nom,
+/// email) au-dessus des sections de réglages, avec navigation vers la
+/// page profil au tap.
+class ProfileSummaryCard extends StatelessWidget {
+  final String name;
+  final String email;
+  final VoidCallback onTap;
+
+  const ProfileSummaryCard({
+    super.key,
+    required this.name,
+    required this.email,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(24),
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: AppColors.white,
+          borderRadius: BorderRadius.circular(24),
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.textPrimary.withOpacity(0.03),
+              blurRadius: 20,
+              offset: const Offset(0, 8),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            const CircleAvatar(
+              radius: 28,
+              backgroundColor: AppColors.secondaryLight,
+              child: Icon(Icons.person, color: AppColors.white, size: 28),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    name,
+                    style: AppFonts.bodyLarge,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    email,
+                    style: AppFonts.bodySmall.copyWith(
+                      color: AppColors.textSecondary,
+                      fontWeight: AppFonts.regular,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
+            ),
+            const Icon(Icons.chevron_right, color: AppColors.textSecondary),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Bouton de déconnexion en pilule pleine largeur, séparé des sections de
+/// réglages plutôt qu'imbriqué dans une liste.
+class SettingsLogoutButton extends StatelessWidget {
+  final VoidCallback onTap;
+
+  const SettingsLogoutButton({super.key, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(AppDimens.borderRadiusFull),
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(vertical: 16),
+        decoration: BoxDecoration(
+          color: AppColors.white,
+          borderRadius: BorderRadius.circular(AppDimens.borderRadiusFull),
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.textPrimary.withOpacity(0.03),
+              blurRadius: 20,
+              offset: const Offset(0, 8),
+            ),
+          ],
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(Icons.logout, color: AppColors.error, size: 20),
+            const SizedBox(width: 8),
+            Text(
+              'Déconnexion',
+              style: AppFonts.button.copyWith(color: AppColors.error),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 class DetailSection extends StatelessWidget {
   final String sectionTitle;
   final List<Widget> children;
@@ -76,22 +192,13 @@ class DetailSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
-          child: Text(sectionTitle, style: AppFonts.bodySmall),
-        ),
+        Text(sectionTitle, style: Theme.of(context).textTheme.titleSmall),
+        AppDimens.spacerMini,
         Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: AppColors.white,
-            borderRadius: BorderRadius.circular(24),
-            boxShadow: [
-              BoxShadow(
-                color: AppColors.textPrimary.withOpacity(0.03),
-                blurRadius: 20,
-                offset: const Offset(0, 8),
-              ),
-            ],
+            color: Theme.of(context).cardColor,
+            borderRadius: AppDimens.cardBorderRadiusAll,
           ),
           child: Column(children: children),
         ),

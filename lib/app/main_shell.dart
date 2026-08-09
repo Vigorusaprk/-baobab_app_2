@@ -1,8 +1,8 @@
 ﻿import 'package:baobabe_0_2/core/themes/app_colors.dart';
 import 'package:baobabe_0_2/core/themes/app_diemens.dart';
-import 'package:baobabe_0_2/core/themes/app_fonts.dart';
 import 'package:baobabe_0_2/features/auth/presentation/bloc/auth_session_cubit.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/widgets/home_app_bar.dart';
+import 'package:baobabe_0_2/features/settings/presentation/widgets/settings_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
@@ -87,11 +87,7 @@ class _MainShellState extends State<MainShell> {
       case _homeBranch:
         return const HomeAppBar();
       case _settingsBranch:
-        return AppBar(
-          elevation: 0,
-          backgroundColor: Colors.transparent,
-          title: Text('Paramètres', style: AppFonts.headlineLarge),
-        );
+        return SettingsAppBar();
       default:
         return null;
     }
