@@ -1,3 +1,4 @@
+import 'package:baobabe_0_2/core/animation/press_effect.dart';
 import 'package:baobabe_0_2/core/themes/app_colors.dart';
 import 'package:baobabe_0_2/core/themes/app_diemens.dart';
 import 'package:baobabe_0_2/core/themes/app_fonts.dart';
@@ -42,20 +43,22 @@ class InfoTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(12),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8.0),
-        child: Row(
-          children: [
-            IconBadge(icon: icon, color: AppColors.secondary),
-            const SizedBox(width: 16),
-            Expanded(child: Text(subtitle, style: AppFonts.bodyMedium)),
-            if (trailing != null) trailing!,
-            if (onTap != null && trailing == null)
-              Icon(Icons.chevron_right, color: AppColors.textSecondary),
-          ],
+    return PressEffect(
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(12),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8.0),
+          child: Row(
+            children: [
+              IconBadge(icon: icon, color: AppColors.secondary),
+              const SizedBox(width: 16),
+              Expanded(child: Text(subtitle, style: AppFonts.bodyMedium)),
+              if (trailing != null) trailing!,
+              if (onTap != null && trailing == null)
+                Icon(Icons.chevron_right, color: AppColors.textSecondary),
+            ],
+          ),
         ),
       ),
     );
@@ -66,12 +69,14 @@ class InfoTile extends StatelessWidget {
 /// email) au-dessus des sections de réglages, avec navigation vers la
 /// page profil au tap.
 class ProfileSummaryCard extends StatelessWidget {
+  final bool isLoggedIn;
   final String name;
   final String email;
   final VoidCallback onTap;
 
   const ProfileSummaryCard({
     super.key,
+    required this.isLoggedIn,
     required this.name,
     required this.email,
     required this.onTap,
@@ -79,56 +84,69 @@ class ProfileSummaryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(24),
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: AppColors.white,
-          borderRadius: BorderRadius.circular(24),
-          boxShadow: [
-            BoxShadow(
-              color: AppColors.textPrimary.withOpacity(0.03),
-              blurRadius: 20,
-              offset: const Offset(0, 8),
-            ),
-          ],
-        ),
-        child: Row(
-          children: [
-            const CircleAvatar(
-              radius: 28,
-              backgroundColor: AppColors.secondaryLight,
-              child: Icon(Icons.person, color: AppColors.white, size: 28),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    name,
-                    style: AppFonts.bodyLarge,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    email,
-                    style: AppFonts.bodySmall.copyWith(
-                      color: AppColors.textSecondary,
-                      fontWeight: AppFonts.regular,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
+    final title = isLoggedIn ? name : 'Se connecter';
+    final subtitle = isLoggedIn
+        ? email
+        : 'Accédez à votre profil et vos réglages';
+
+    return PressEffect(
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: AppDimens.cardBorderRadiusAll,
+        child: Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: AppColors.white,
+            borderRadius: AppDimens.cardBorderRadiusAll,
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.textPrimary.withValues(alpha: 0.03),
+                blurRadius: 20,
+                offset: const Offset(0, 8),
               ),
-            ),
-            const Icon(Icons.chevron_right, color: AppColors.textSecondary),
-          ],
+            ],
+          ),
+          child: Row(
+            children: [
+              CircleAvatar(
+                radius: 28,
+                backgroundColor: isLoggedIn
+                    ? AppColors.secondaryLight
+                    : AppColors.primary.withValues(alpha: 0.1),
+                child: Icon(
+                  isLoggedIn ? Icons.person : Icons.login_rounded,
+                  color: isLoggedIn ? AppColors.white : AppColors.primary,
+                  size: 28,
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      title,
+                      style: AppFonts.bodyLarge,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      subtitle,
+                      style: AppFonts.bodySmall.copyWith(
+                        color: AppColors.textSecondary,
+                        fontWeight: AppFonts.regular,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
+              ),
+              const Icon(Icons.chevron_right, color: AppColors.textSecondary),
+            ],
+          ),
         ),
       ),
     );
@@ -151,11 +169,11 @@ class SettingsLogoutButton extends StatelessWidget {
         width: double.infinity,
         padding: const EdgeInsets.symmetric(vertical: 16),
         decoration: BoxDecoration(
-          color: AppColors.white,
+          color: Theme.of(context).cardColor,
           borderRadius: BorderRadius.circular(AppDimens.borderRadiusFull),
           boxShadow: [
             BoxShadow(
-              color: AppColors.textPrimary.withOpacity(0.03),
+              color: AppColors.textPrimary.withValues(alpha: 0.03),
               blurRadius: 20,
               offset: const Offset(0, 8),
             ),

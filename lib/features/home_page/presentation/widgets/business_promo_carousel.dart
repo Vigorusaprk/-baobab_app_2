@@ -18,7 +18,10 @@ class BusinessPromoCarousel extends StatelessWidget {
   final String Function(UIBusiness uiBusiness)? badgeLabelBuilder;
   final String? Function(UIBusiness uiBusiness)? subtitleBuilder;
   final void Function(UIBusiness uiBusiness)? onCardTap;
-  final double cardHeight;
+
+  /// Card height. Leave null to size responsively — see
+  /// [BusinessPromoCarouselView.cardHeight].
+  final double? cardHeight;
   final double viewportFraction;
 
   const BusinessPromoCarousel({
@@ -27,7 +30,7 @@ class BusinessPromoCarousel extends StatelessWidget {
     this.badgeLabelBuilder,
     this.subtitleBuilder,
     this.onCardTap,
-    this.cardHeight = 200,
+    this.cardHeight,
     this.viewportFraction = 0.86,
   });
 

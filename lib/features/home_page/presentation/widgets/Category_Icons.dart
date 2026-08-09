@@ -21,7 +21,12 @@ class CategoryIcons extends StatelessWidget {
         }
 
         return SizedBox(
-          height: 120,
+          height: AppDimens.horizontalScrollHeight(
+            context,
+            0.14,
+            min: 100,
+            max: 140,
+          ),
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
             itemCount: UICategory.allCategories.length,
@@ -43,14 +48,7 @@ class CategoryIcons extends StatelessWidget {
                   );
                 },
                 child: Padding(
-                  padding: EdgeInsets.only(
-                    left: index == 0 ? AppDimens.appPaddingValue : 8.0,
-                    right: index == UICategory.allCategories.length - 1
-                        ? AppDimens.appPaddingValue
-                        : 8.0,
-                    top: 8.0,
-                    bottom: 8.0,
-                  ),
+                  padding: AppDimens.carouselPadding(index, UICategory.allCategories.length),
                   child: _buildCategory(context, uiCategory, isActive),
                 ),
               );

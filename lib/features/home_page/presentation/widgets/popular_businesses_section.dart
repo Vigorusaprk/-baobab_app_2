@@ -8,9 +8,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 /// Partie "données" de la section Populaires : branchée sur le même
 /// [BusinessBloc]/[CategoryBloc] que [BusinessCardsWidget] et
-/// [BusinessPromoCarousel], trie par note décroissante (puis nombre
-/// d'avis en cas d'égalité), garde les `maxItems` premiers, puis
-/// délègue l'affichage à [PopularBusinessListView].
+/// [BusinessPromoCarousel], trie [BusinessLoaded.allBusinesses] (le
+/// catalogue complet, indépendant de la catégorie actuellement filtrée
+/// pour "Découvrir") par note décroissante (puis nombre d'avis en cas
+/// d'égalité), garde les `maxItems` premiers, puis délègue l'affichage à
+/// [PopularBusinessListView].
 ///
 /// ⚠️ Pas de vrai critère "popularité" dédié côté base pour l'instant
 /// (pas de compteur de vues/commandes) — le tri par `rating` est une
@@ -23,7 +25,7 @@ class PopularBusinessesSection extends StatelessWidget {
 
   const PopularBusinessesSection({
     super.key,
-    this.maxItems = 5,
+    this.maxItems = 3,
     this.title = 'Populaires',
     this.onSeeAllTap,
     this.onItemTap,
@@ -37,14 +39,14 @@ class PopularBusinessesSection extends StatelessWidget {
           buildWhen: (previous, current) {
             if (previous.runtimeType != current.runtimeType) return true;
             if (current is BusinessLoaded && previous is BusinessLoaded) {
-              return previous.businesses != current.businesses;
+              return previous.allBusinesses != current.allBusinesses;
             }
             return false;
           },
           builder: (context, state) {
             if (state is! BusinessLoaded) return const SizedBox.shrink();
 
-            final sorted = [...state.businesses]
+            final sorted = [...state.allBusinesses]
               ..sort((a, b) {
                 final ratingCompare = b.rating.compareTo(a.rating);
                 if (ratingCompare != 0) return ratingCompare;
@@ -55,11 +57,7 @@ class PopularBusinessesSection extends StatelessWidget {
             final uiBusinesses = top.map((b) => UIBusiness(b)).toList();
 
             return Padding(
-              padding: const EdgeInsets.only(
-                left: AppDimens.large,
-                right: AppDimens.large,
-                top: AppDimens.medium,
-              ),
+              padding: AppDimens.appPadding,
               child: PopularBusinessListView(
                 uiBusinesses: uiBusinesses,
                 title: title,

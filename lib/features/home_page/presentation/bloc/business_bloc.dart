@@ -39,6 +39,7 @@ class BusinessBloc extends Bloc<BusinessEvent, BusinessState> {
         BusinessLoaded(
           businesses: page.items,
           currentCategory: BusinessType.all,
+          allBusinesses: page.items,
           page: 1,
           hasMore: page.hasMore,
         ),
@@ -60,6 +61,7 @@ class BusinessBloc extends Bloc<BusinessEvent, BusinessState> {
         BusinessLoaded(
           businesses: List.from(_allBusinesses),
           currentCategory: event.category,
+          allBusinesses: List.from(_allBusinesses),
           page: _allBusinessesPage,
           hasMore: _allBusinessesHasMore,
         ),
@@ -80,6 +82,7 @@ class BusinessBloc extends Bloc<BusinessEvent, BusinessState> {
       BusinessLoaded(
         businesses: filtered,
         currentCategory: event.category,
+        allBusinesses: List.from(_allBusinesses),
         page: 1,
         hasMore: true,
       ),
@@ -124,6 +127,7 @@ class BusinessBloc extends Bloc<BusinessEvent, BusinessState> {
       emit(
         current.copyWith(
           businesses: [...current.businesses, ...page.items],
+          allBusinesses: List.from(_allBusinesses),
           page: nextPage,
           hasMore: page.hasMore,
           isLoadingMore: false,

@@ -106,8 +106,7 @@ class _MainShellState extends State<MainShell> {
           final shouldShowAppBar = depth == 0;
 
           return Scaffold(
-            extendBody: true,
-            backgroundColor: AppColors.background,
+            backgroundColor: Theme.of(context).scaffoldBackgroundColor,
             appBar: shouldShowAppBar ? _appBarFor(currentBranch) : null,
             body: widget.navigationShell,
             bottomNavigationBar: shouldShowBar

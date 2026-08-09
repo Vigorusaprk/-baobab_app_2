@@ -1,5 +1,6 @@
 import 'package:baobabe_0_2/core/themes/app_diemens.dart';
 import 'package:baobabe_0_2/core/themes/app_fonts.dart';
+import 'package:baobabe_0_2/core/widgets/see_all.dart';
 import 'package:baobabe_0_2/features/home_page/data/models/ui_business.dart';
 import 'package:flutter/material.dart';
 import 'package:baobabe_0_2/core/themes/app_colors.dart';
@@ -47,26 +48,14 @@ class PopularBusinessListView extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 4),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(title, style: AppFonts.titleMedium),
-              GestureDetector(
-                onTap: onSeeAllTap,
-                child: const Text(
-                  'Voir tout',
-                  style: TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w600,
-                    fontFamily: "Poppins",
-                    color: AppColors.success,
-                  ),
-                ),
-              ),
-            ],
-          ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(title, style: Theme.of(context).textTheme.titleMedium),
+            SeeAll(
+              onTap: onSeeAllTap,
+            ),
+          ],
         ),
         const SizedBox(height: 12),
         ...uiBusinesses.map(

@@ -59,12 +59,10 @@ class HomePageScreen extends StatelessWidget {
                         const BusinessPromoCarousel(),
                         AppDimens.spacerSmall,
                         const PopularBusinessesSection(
-                          maxItems: 5,
                           // onSeeAllTap: () => context.push('/popular'),
                         ),
                         AppDimens.spacerSmall,
                         const BusinessCardsWidget(),
-                        const SizedBox(height: 100),
                       ],
                     ),
             ),

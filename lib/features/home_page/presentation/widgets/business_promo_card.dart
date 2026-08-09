@@ -67,6 +67,7 @@ class BusinessPromoCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
+
           children: [
             // --- Bloc coloré : badge + nom en filigrane ---
             Container(
@@ -156,7 +157,7 @@ class BusinessPromoCard extends StatelessWidget {
                       ],
                     ),
                   ),
-                  AppDimens.spacerMedium,
+                  AppDimens.spacerMediumWidth,
 
                   // Bouton "Voir"
                   Container(

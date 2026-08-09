@@ -1,7 +1,7 @@
 import 'package:baobabe_0_2/core/themes/app_diemens.dart';
+import 'package:baobabe_0_2/core/widgets/see_all.dart';
 import 'package:baobabe_0_2/features/home_page/data/models/ui_business.dart';
 import 'package:flutter/material.dart';
-import 'package:baobabe_0_2/core/themes/app_colors.dart';
 import 'package:go_router/go_router.dart';
 import './business_promo_card.dart';
 
@@ -16,7 +16,12 @@ class BusinessPromoCarouselView extends StatefulWidget {
   final String Function(UIBusiness uiBusiness)? badgeLabelBuilder;
   final String? Function(UIBusiness uiBusiness)? subtitleBuilder;
   final void Function(UIBusiness uiBusiness)? onCardTap;
-  final double cardHeight;
+
+  /// Card height. Leave null to size responsively (a fraction of the
+  /// screen height) instead of forcing one fixed pixel value on every
+  /// device — pass an explicit value only when a specific height is
+  /// genuinely required by the caller.
+  final double? cardHeight;
   final double viewportFraction;
 
   /// Titre de la section affiché au-dessus du carrousel (ex: "Sponsorisé").
@@ -33,7 +38,7 @@ class BusinessPromoCarouselView extends StatefulWidget {
     this.badgeLabelBuilder,
     this.subtitleBuilder,
     this.onCardTap,
-    this.cardHeight = 200,
+    this.cardHeight,
     this.viewportFraction = 0.86,
     this.title,
     this.onSeeAllTap,
@@ -78,61 +83,48 @@ class _BusinessPromoCarouselViewState extends State<BusinessPromoCarouselView> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         if (widget.title != null) ...[
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(left: AppDimens.large),
-                child: Text(
+          Padding(
+            padding: AppDimens.appPadding,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
                   widget.title!,
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w400,
-                    fontFamily: "Poppins",
-                    color: AppColors.textSecondary,
-                  ),
+                  style: Theme.of(context).textTheme.titleMedium,
                 ),
-              ),
-              if (widget.onSeeAllTap != null)
-                GestureDetector(
-                  onTap: widget.onSeeAllTap,
-                  child: Text(
-                    'Voir tout',
-                    style: TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600,
-                      fontFamily: "Poppins",
-                      color: AppColors.textSecondary,
-                    ),
-                  ),
-                ),
-            ],
+                if (widget.onSeeAllTap != null) SeeAll(onTap: widget.onSeeAllTap),
+              ],
+            ),
           ),
-          const SizedBox(height: 10),
         ],
-        Container(
-          margin: EdgeInsets.only(
-            left: AppDimens.large,
-            right: AppDimens.large,
+        SizedBox(
+          height: AppDimens.horizontalScrollHeight(
+            context,
+            0.35,
+            min: 220,
+            max: 220,
           ),
-          child: SizedBox(
-            height: widget.cardHeight,
-            child: PageView.builder(
-              controller: _pageController,
-              itemCount: widget.uiBusinesses.length,
-              padEnds: false,
-              itemBuilder: (context, index) {
-                final uiBusiness = widget.uiBusinesses[index];
-                return BusinessPromoCard(
+          child: PageView.builder(
+            controller: _pageController,
+            itemCount: widget.uiBusinesses.length,
+            padEnds: false,
+            itemBuilder: (context, index) {
+              final uiBusiness = widget.uiBusinesses[index];
+              return Padding(
+                padding: AppDimens.carouselPadding(
+                  index,
+                  widget.uiBusinesses.length,
+                ),
+                child: BusinessPromoCard(
                   uiBusiness: uiBusiness,
                   isNew: uiBusiness.isNew,
                   badgeLabel:
                       widget.badgeLabelBuilder?.call(uiBusiness) ?? 'Nouveau',
                   subtitle: widget.subtitleBuilder?.call(uiBusiness),
                   onTap: () => _handleTap(uiBusiness),
-                );
-              },
-            ),
+                ),
+              );
+            },
           ),
         ),
       ],

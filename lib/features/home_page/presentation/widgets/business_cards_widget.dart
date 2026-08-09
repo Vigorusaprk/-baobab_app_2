@@ -1,5 +1,6 @@
 import 'package:baobabe_0_2/core/themes/app_diemens.dart';
 import 'package:baobabe_0_2/core/themes/app_fonts.dart';
+import 'package:baobabe_0_2/core/widgets/see_all.dart';
 import 'package:baobabe_0_2/features/home_page/data/models/ui_business.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/bloc/business_bloc.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/bloc/category_bloc.dart';
@@ -32,7 +33,12 @@ class _BusinessCardsWidgetState extends State<BusinessCardsWidget> {
   double _pageOffset = 0;
 
   static const double _viewportFraction = 0.82;
-  static const double _cardHeight = 490;
+
+  /// Sized as a fraction of the screen height instead of a fixed pixel
+  /// value, so the card scales with the device instead of looking
+  /// cramped on small phones or oversized on tablets.
+  double get _cardHeight =>
+      AppDimens.horizontalScrollHeight(context, 0.58, min: 420, max: 560);
   static const double _cardVerticalPadding = 20;
   static const double _cardHorizontalPadding = 10;
   static const double _baseScale = 0.9;
@@ -67,35 +73,15 @@ class _BusinessCardsWidgetState extends State<BusinessCardsWidget> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: const EdgeInsets.only(left: AppDimens.large),
+          padding: AppDimens.appPadding,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
                 widget.title,
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w800,
-                  fontFamily: "Poppins",
-                  color: AppColors.textPrimary,
-                ),
+                style: Theme.of(context).textTheme.titleMedium,
               ),
-
-              Padding(
-                padding: const EdgeInsets.only(right: AppDimens.large),
-                child: GestureDetector(
-                  onTap: widget.onSeeAllTap,
-                  child: const Text(
-                    'Voir tout',
-                    style: TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600,
-                      fontFamily: "Poppins",
-                      color: AppColors.success,
-                    ),
-                  ),
-                ),
-              ),
+              SeeAll(onTap: widget.onSeeAllTap),
             ],
           ),
         ),
@@ -243,10 +229,7 @@ class _BusinessCardsWidgetState extends State<BusinessCardsWidget> {
               child: Opacity(
                 opacity: opacity,
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: _cardHorizontalPadding,
-                    vertical: _cardVerticalPadding,
-                  ),
+                  padding: const EdgeInsets.only(bottom: _cardVerticalPadding),
                   child: isTrailingSkeleton
                       ? const Skeletonizer(
                           enabled: true,

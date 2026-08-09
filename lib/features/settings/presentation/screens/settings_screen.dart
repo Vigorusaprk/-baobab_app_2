@@ -1,5 +1,7 @@
+import 'package:baobabe_0_2/core/services/get_app_version.dart';
 import 'package:baobabe_0_2/core/services/session_service.dart';
 import 'package:baobabe_0_2/core/themes/app_diemens.dart';
+import 'package:baobabe_0_2/core/widgets/auth_required_card.dart';
 import 'package:baobabe_0_2/core/widgets/custom_divider.dart';
 import 'package:baobabe_0_2/features/settings/presentation/bloc/settings_bloc.dart';
 import 'package:baobabe_0_2/features/settings/presentation/widgets/language_picker_dialog.dart';
@@ -22,6 +24,7 @@ class SettingsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final user = SessionService.instance.currentUser;
+    final isLoggedIn = user != null;
 
     return BlocBuilder<SettingsCubit, SettingsState>(
       builder: (context, settingsState) {
@@ -29,9 +32,12 @@ class SettingsScreen extends StatelessWidget {
           padding: const EdgeInsets.all(16),
           children: [
             ProfileSummaryCard(
-              name: user?.name ?? 'Utilisateur',
+              isLoggedIn: isLoggedIn,
+              name: user?.name ?? '',
               email: user?.email ?? '',
-              onTap: () => context.pushNamed('profil-page'),
+              onTap: () => isLoggedIn
+                  ? context.pushNamed('profil-page')
+                  : context.push('/login'),
             ),
             AppDimens.spacerMedium,
             // Section Générale
@@ -41,8 +47,15 @@ class SettingsScreen extends StatelessWidget {
                 InfoTile(
                   subtitle: "Notifications",
                   icon: Icons.notifications_none_outlined,
-                  onTap: () {},
-                  trailing: Switch(value: true, onChanged: (value) {}),
+                  onTap: () {
+                    if (!isLoggedIn) _requireLogin(context);
+                  },
+                  trailing: Switch(
+                    value: isLoggedIn,
+                    onChanged: (value) {
+                      if (!isLoggedIn) _requireLogin(context);
+                    },
+                  ),
                 ),
                 const CustomDivider(),
                 InfoTile(
@@ -55,28 +68,6 @@ class SettingsScreen extends StatelessWidget {
                       color: AppColors.secondaryLight,
                     ),
                   ),
-                ),
-              ],
-            ),
-            AppDimens.spacerMedium,
-            // Section Compte
-            DetailSection(
-              sectionTitle: "Compte",
-              children: [
-                InfoTile(
-                  subtitle: "Informations personnelles",
-                  icon: Icons.account_circle_outlined,
-                  onTap: () {
-                    context.pushNamed('edit-profile');
-                  },
-                ),
-                const CustomDivider(),
-                InfoTile(
-                  subtitle: "Sécurité",
-                  icon: Icons.lock_outline,
-                  onTap: () {
-                    context.pushNamed('change-password');
-                  },
                 ),
               ],
             ),
@@ -110,12 +101,6 @@ class SettingsScreen extends StatelessWidget {
               sectionTitle: "Application",
               children: [
                 InfoTile(
-                  subtitle: "Version 1.0.0",
-                  icon: Icons.info_outline,
-                  onTap: () {},
-                ),
-                const CustomDivider(),
-                InfoTile(
                   subtitle: "Confidentialité",
                   icon: Icons.privacy_tip_outlined,
                   onTap: () {},
@@ -128,14 +113,24 @@ class SettingsScreen extends StatelessWidget {
                 ),
               ],
             ),
-            AppDimens.spacerLarge,
-            SettingsLogoutButton(
-              onTap: () => showLogoutConfirmationDialog(context),
-            ),
-            AppDimens.spacerLarge,
+            if (isLoggedIn) ...[
+              AppDimens.spacerLarge,
+              SettingsLogoutButton(
+                onTap: () => showLogoutConfirmationDialog(context),
+              ),
+            ],
+            AppDimens.spacerMini,
+            const VersionText(),
           ],
         );
       },
+    );
+  }
+
+  void _requireLogin(BuildContext context) {
+    showAuthRequiredCard(
+      context,
+      message: 'Connectez-vous pour activer les notifications.',
     );
   }
 
