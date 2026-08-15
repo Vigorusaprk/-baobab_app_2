@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'package:baobabe_0_2/features/home_page/presentation/screens/budget_finder_page.dart';
+import 'package:baobabe_0_2/features/home_page/presentation/screens/notifications_section.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -162,6 +164,16 @@ final GoRouter appRouter = GoRouter(
           child: BusinessDetailScreen(businessId: businessId),
         );
       },
+    ),
+    GoRoute(
+      path: '/notifications',
+      name: 'notifications',
+      builder: (context, state) => const NotificationsPage(),
+    ),
+    GoRoute(
+      path: '/budget-finder',
+      name: 'budgetFinder',
+      builder: (context, state) => const BudgetFinderPage(),
     ),
     GoRoute(
       path: '/search',

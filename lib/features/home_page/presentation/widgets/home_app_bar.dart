@@ -2,6 +2,7 @@
 import 'package:baobabe_0_2/core/widgets/custom_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:go_router/go_router.dart';
 
 class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
   const HomeAppBar({super.key});
@@ -35,31 +36,32 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
         ],
       ),
       actions: [
-        Container(
-          padding: EdgeInsets.all(10),
-          decoration: BoxDecoration(
-            boxShadow: [
-              BoxShadow(
-                color: AppColors.textPrimary.withValues(alpha: 0.05),
-                blurRadius: 10,
-                offset: const Offset(0, 4),
+        GestureDetector(
+          onTap: () => context.pushNamed('notifications'),
+          child: Container(
+            padding: EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              boxShadow: [
+                BoxShadow(
+                  color: AppColors.textPrimary.withValues(alpha: 0.05),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+              borderRadius: BorderRadius.circular(10),
+              color: AppColors.surface,
+            ),
+            child: SvgPicture.asset(
+              'assets/icons/notifications.svg',
+              height: 30,
+              width: 30,
+              colorFilter: const ColorFilter.mode(
+                AppColors.primary,
+                BlendMode.srcIn,
               ),
-            ],
-            borderRadius: BorderRadius.circular(10),
-            color: AppColors.surface,
-          ),
-          child: SvgPicture.asset(
-            'assets/icons/notifications.svg',
-            height: 30,
-            width: 30,
-            colorFilter: const ColorFilter.mode(
-              AppColors.primary,
-              BlendMode.srcIn,
             ),
           ),
         ),
-        //const SizedBox(width: AppDimens.small),
-        //_buildAvatar(user, userName, context),
       ],
     );
   }

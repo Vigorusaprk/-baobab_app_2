@@ -5,6 +5,7 @@ import 'package:baobabe_0_2/features/home_page/presentation/screens/search_page.
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:go_router/go_router.dart';
 
 class HomeSearchBar extends StatelessWidget {
   const HomeSearchBar({super.key});
@@ -79,7 +80,7 @@ class HomeSearchBar extends StatelessWidget {
 
           GestureDetector(
             onTap: () {
-              // TODO : ouvrir les filtres
+              context.pushNamed('budgetFinder');
             },
             child: Container(
               padding: const EdgeInsets.all(AppDimens.small),
