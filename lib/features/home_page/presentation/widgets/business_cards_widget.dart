@@ -96,11 +96,15 @@ class _BusinessCardsWidgetState extends State<BusinessCardsWidget> {
     return BlocBuilder<CategoryBloc, CategoryState>(
       builder: (context, categoryState) {
         return BlocBuilder<BusinessBloc, BusinessState>(
-          // Optimisation : on ne rebuild que si l'état du business change vraiment
+          // Optimisation : on ne rebuild que si l'état du business change
+          // vraiment. `isLoadingMore` en fait partie — c'est lui qui fait
+          // apparaître la carte skeleton en fin de liste pendant qu'une
+          // page suivante se charge.
           buildWhen: (previous, current) {
             if (previous.runtimeType != current.runtimeType) return true;
             if (current is BusinessLoaded && previous is BusinessLoaded) {
-              return previous.businesses != current.businesses;
+              return previous.businesses != current.businesses ||
+                  previous.isLoadingMore != current.isLoadingMore;
             }
             return false;
           },

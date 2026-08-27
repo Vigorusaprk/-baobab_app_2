@@ -1,4 +1,4 @@
-import 'package:baobabe_0_2/core/themes/app_diemens.dart';
+import 'package:baobabe_0_2/core/widgets/custom_card.dart';
 import 'package:baobabe_0_2/features/home_page/domain/entities/search_filter_entity.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/bloc/search_bloc.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/bloc/search_event.dart';
@@ -22,9 +22,7 @@ class SearchPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      body: const SearchPageBody(
-        showBackButton: true,
-      ),
+      body: const SearchPageBody(showBackButton: true),
     );
   }
 }
@@ -32,7 +30,7 @@ class SearchPage extends StatelessWidget {
 /// Body-only content shared by the Explore tab (inside MainShell) and the
 /// standalone `/search` route ([SearchPage]).
 class SearchPageBody extends StatefulWidget {
-  const SearchPageBody({super.key, this.showBackButton = false,});
+  const SearchPageBody({super.key, this.showBackButton = false});
 
   final bool showBackButton;
 
@@ -90,16 +88,12 @@ class _SearchPageBodyState extends State<SearchPageBody> {
                 if (widget.showBackButton)
                   GestureDetector(
                     onTap: () => Navigator.pop(context),
-                    child: Container(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: AppDimens.small,
-                        vertical: AppDimens.small,
+                    child: CustomCard(
+                      color: Theme.of(context).primaryColor,
+                      child: Icon(
+                        Icons.arrow_back_ios_new_rounded,
+                        color: AppColors.surface,
                       ),
-                      decoration: BoxDecoration(
-                        color: AppColors.primary,
-                        borderRadius: BorderRadius.circular(AppDimens.radius50),
-                      ),
-                      child: Icon(Icons.arrow_back_ios_new_rounded, color: AppColors.surface,),
                     ),
                   ),
 
@@ -114,15 +108,8 @@ class _SearchPageBodyState extends State<SearchPageBody> {
                 ),
 
                 SizedBox(width: 5),
-                Container(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: AppDimens.small,
-                    vertical: AppDimens.small,
-                  ),
-                  decoration: BoxDecoration(
-                    color: AppColors.primary,
-                    borderRadius: BorderRadius.circular(AppDimens.radius50),
-                  ),
+                CustomCard(
+                  color: Theme.of(context).primaryColor,
                   child: SvgPicture.asset(
                     'assets/icons/filter.svg',
                     height: 25,

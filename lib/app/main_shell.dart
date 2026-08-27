@@ -1,7 +1,6 @@
 ﻿import 'package:baobabe_0_2/core/themes/app_colors.dart';
 import 'package:baobabe_0_2/core/themes/app_diemens.dart';
 import 'package:baobabe_0_2/features/auth/presentation/bloc/auth_session_cubit.dart';
-import 'package:baobabe_0_2/features/home_page/presentation/widgets/home_app_bar.dart';
 import 'package:baobabe_0_2/features/settings/presentation/widgets/settings_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -84,8 +83,9 @@ class _MainShellState extends State<MainShell> {
 
   PreferredSizeWidget? _appBarFor(int currentBranch) {
     switch (currentBranch) {
-      case _homeBranch:
-        return const HomeAppBar();
+      // Pas d'AppBar sur l'accueil : HomeSliverHeader en tient lieu. Il
+      // défile avec la page puis reste épinglé en version compacte, ce
+      // qu'une AppBar de Scaffold ne permet pas.
       case _settingsBranch:
         return SettingsAppBar();
       default:

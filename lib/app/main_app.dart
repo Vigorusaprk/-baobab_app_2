@@ -11,6 +11,7 @@ import 'package:baobabe_0_2/features/home_page/data/repositories/business_reposi
 import 'package:baobabe_0_2/features/home_page/data/repositories/category_repository_impl.dart';
 import 'package:baobabe_0_2/features/home_page/data/repositories/search_repository_impl.dart';
 import 'package:baobabe_0_2/features/home_page/domain/usecases/get_businesses_page.dart';
+import 'package:baobabe_0_2/features/home_page/domain/usecases/get_home_feed.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/bloc/business_bloc.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/bloc/category_bloc.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/bloc/search_bloc.dart';
@@ -64,6 +65,7 @@ class _MainAppState extends State<MainApp> {
         ),
         BlocProvider<BusinessBloc>(
           create: (_) => BusinessBloc(
+            getHomeFeed: GetHomeFeed(businessRepository),
             getBusinessesPage: GetBusinessesPage(businessRepository),
           ),
         ),

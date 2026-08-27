@@ -5,14 +5,15 @@ import 'package:baobabe_0_2/features/home_page/presentation/widgets/business_pro
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-/// Partie "données" du carrousel promo : branchée sur le même
-/// [BusinessBloc]/[CategoryBloc] que [BusinessCardsWidget], filtre la
-/// liste, puis délègue tout l'affichage à [BusinessPromoCarouselView].
+/// Partie "données" du carrousel promo : affiche
+/// [BusinessLoaded.newBusinesses], c'est-à-dire les établissements récents
+/// **de la catégorie sélectionnée**, déjà filtrés par date et triés par
+/// l'Edge Function `get-home`. Délègue tout l'affichage à
+/// [BusinessPromoCarouselView].
 ///
-/// Par défaut (sans `filter` personnalisé), affiche uniquement les
-/// business **nouveaux** (créés il y a moins de 30 jours).
-/// Le badge "Nouveau" est affiché dynamiquement selon la date de
-/// création via [UIBusiness.isNew].
+/// Le paramètre [filter] permet à un appelant de restreindre encore la
+/// liste reçue (cas particuliers), mais le filtrage "nouveauté" par défaut
+/// est fait côté serveur — plus dans le Dart.
 class BusinessPromoCarousel extends StatelessWidget {
   final bool Function(dynamic business)? filter;
   final String Function(UIBusiness uiBusiness)? badgeLabelBuilder;
@@ -42,7 +43,7 @@ class BusinessPromoCarousel extends StatelessWidget {
           buildWhen: (previous, current) {
             if (previous.runtimeType != current.runtimeType) return true;
             if (current is BusinessLoaded && previous is BusinessLoaded) {
-              return previous.businesses != current.businesses;
+              return previous.newBusinesses != current.newBusinesses;
             }
             return false;
           },
@@ -52,13 +53,11 @@ class BusinessPromoCarousel extends StatelessWidget {
             // BusinessCardsWidget sur la même page.
             if (state is! BusinessLoaded) return const SizedBox.shrink();
 
-            // Filtre par défaut : uniquement les nouveaux (< 30 jours)
+            // La sélection "nouveauté" vient du serveur ; `filter` ne sert
+            // qu'à restreindre davantage si un appelant le demande.
             final filtered = filter != null
-                ? state.businesses.where(filter!).toList()
-                : state.businesses.where((b) {
-                    final ui = UIBusiness(b);
-                    return ui.isNew;
-                  }).toList();
+                ? state.newBusinesses.where(filter!).toList()
+                : state.newBusinesses;
 
             final uiBusinesses = filtered.map((b) => UIBusiness(b)).toList();
 

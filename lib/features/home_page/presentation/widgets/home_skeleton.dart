@@ -4,12 +4,16 @@ import 'package:baobabe_0_2/core/themes/app_fonts.dart';
 import 'package:flutter/material.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
-/// Full mock of the Home tab's layout, shown (wrapped in [Skeletonizer])
-/// while [BusinessBloc] is still loading its first page of data. Mirrors
-/// the shape of every real section — [HomeSearchBar], `CategoryIcons`,
-/// `BusinessPromoCarousel`, `PopularBusinessesSection`,
-/// `BusinessCardsWidget` — using explicit [Bone] shapes so each part
-/// reads clearly instead of a single generic spinner.
+/// Mock des sections **pilotées par les données** de l'accueil
+/// (`BusinessPromoCarousel`, `PopularBusinessesSection`,
+/// `BusinessCardsWidget`), affiché dans un [Skeletonizer] pendant que
+/// [BusinessBloc] charge une catégorie. Utilise des [Bone] explicites pour
+/// que chaque partie se lise clairement plutôt qu'un spinner générique.
+///
+/// La barre de recherche et la liste des catégories n'en font volontairement
+/// pas partie : leur contenu ne dépend d'aucune requête, elles restent
+/// affichées telles quelles pendant le chargement — sinon la catégorie que
+/// l'utilisateur vient de taper disparaîtrait sous ses doigts.
 class HomeSkeleton extends StatelessWidget {
   const HomeSkeleton({super.key});
 
@@ -18,11 +22,6 @@ class HomeSkeleton extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        AppDimens.spacerSmall,
-        const _SearchBarSkeleton(),
-        AppDimens.spacerSmall,
-        const _CategoryIconsSkeleton(),
-        AppDimens.spacerSmall,
         const _SectionTitleSkeleton(),
         const SizedBox(height: 10),
         const _PromoCardSkeleton(),
@@ -40,62 +39,6 @@ class HomeSkeleton extends StatelessWidget {
         const _BusinessCardSkeleton(),
         const SizedBox(height: 100),
       ],
-    );
-  }
-}
-
-/// Mirrors [HomeSearchBar]: a search field bone + a filter button bone.
-class _SearchBarSkeleton extends StatelessWidget {
-  const _SearchBarSkeleton();
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: AppDimens.appPadding,
-      child: Row(
-        children: [
-          const Expanded(child: Bone(height: 52, uniRadius: AppDimens.radius12)),
-          AppDimens.spacerSmallWidth,
-          const Bone(width: 52, height: 52, uniRadius: AppDimens.radius12),
-        ],
-      ),
-    );
-  }
-}
-
-/// Mirrors `CategoryIcons`: a horizontal row of circle-and-label cards.
-class _CategoryIconsSkeleton extends StatelessWidget {
-  const _CategoryIconsSkeleton();
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      height: 120,
-      child: ListView.builder(
-        scrollDirection: Axis.horizontal,
-        itemCount: 6,
-        itemBuilder: (context, index) {
-          return Padding(
-            padding: EdgeInsets.only(
-              left: index == 0 ? AppDimens.appPaddingValue : 8.0,
-              right: index == 5 ? AppDimens.appPaddingValue : 8.0,
-              top: 8.0,
-              bottom: 8.0,
-            ),
-            child: SizedBox(
-              width: 85,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Bone.circle(size: 52),
-                  const SizedBox(height: 10),
-                  Bone.text(words: 1, style: AppFonts.bodySmall),
-                ],
-              ),
-            ),
-          );
-        },
-      ),
     );
   }
 }

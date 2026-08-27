@@ -1,92 +1,78 @@
 import 'package:baobabe_0_2/features/home_page/domain/entities/business_entity.dart';
 import 'package:baobabe_0_2/features/home_page/domain/usecases/get_businesses_page.dart';
+import 'package:baobabe_0_2/features/home_page/domain/usecases/get_home_feed.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 part 'business_event.dart';
 part 'business_state.dart';
 
+/// Pilote toute la page d'accueil. Le filtrage par catégorie est fait côté
+/// serveur (`get-home`) : changer de catégorie recharge les trois sections
+/// d'un coup, plutôt que de laisser chaque widget re-filtrer une liste
+/// commune dans son coin.
 class BusinessBloc extends Bloc<BusinessEvent, BusinessState> {
+  final GetHomeFeed getHomeFeed;
   final GetBusinessesPage getBusinessesPage;
 
-  /// Cache local du flux "tous les business" non filtré — sert à revenir
-  /// instantanément dessus quand l'utilisateur repasse à la catégorie
-  /// "all", sans refaire d'appel réseau. Sa propre pagination est suivie
-  /// séparément de celle d'un flux filtré par catégorie.
-  List<Business> _allBusinesses = [];
-  int _allBusinessesPage = 1;
-  bool _allBusinessesHasMore = false;
+  /// Jeton de la dernière demande de page d'accueil. Un tap rapide sur
+  /// plusieurs catégories lance plusieurs requêtes concurrentes : seule la
+  /// plus récente a le droit d'émettre, sinon une réponse lente pourrait
+  /// écraser l'affichage d'une catégorie sélectionnée après elle.
+  int _homeRequestId = 0;
 
-  BusinessBloc({required this.getBusinessesPage}) : super(BusinessInitial()) {
+  BusinessBloc({required this.getHomeFeed, required this.getBusinessesPage})
+    : super(BusinessInitial()) {
     on<LoadBusinesses>(_onLoadBusinesses);
     on<LoadBusinessesByCategory>(_onLoadBusinessesByCategory);
     on<LoadMoreBusinesses>(_onLoadMoreBusinesses);
   }
 
+  /// Paramètre `category` envoyé au serveur. "Tout" est représenté côté
+  /// client par [BusinessType.all] ou [BusinessType.other] : dans les deux
+  /// cas, aucun filtre.
+  String? _categoryParam(BusinessType category) =>
+      (category == BusinessType.all || category == BusinessType.other)
+      ? null
+      : category.name;
+
   Future<void> _onLoadBusinesses(
     LoadBusinesses event,
     Emitter<BusinessState> emit,
+  ) => _loadHome(BusinessType.all, emit);
+
+  Future<void> _onLoadBusinessesByCategory(
+    LoadBusinessesByCategory event,
+    Emitter<BusinessState> emit,
+  ) => _loadHome(event.category, emit);
+
+  Future<void> _loadHome(
+    BusinessType category,
+    Emitter<BusinessState> emit,
   ) async {
+    final requestId = ++_homeRequestId;
     emit(BusinessLoading());
+
     try {
-      final page = await getBusinessesPage(
-        const GetBusinessesPageParams(page: 1),
+      final feed = await getHomeFeed(
+        GetHomeFeedParams(category: _categoryParam(category)),
       );
-      _allBusinesses = page.items;
-      _allBusinessesPage = 1;
-      _allBusinessesHasMore = page.hasMore;
+      if (requestId != _homeRequestId) return;
+
       emit(
         BusinessLoaded(
-          businesses: page.items,
-          currentCategory: BusinessType.all,
-          allBusinesses: page.items,
+          businesses: feed.discover.items,
+          currentCategory: category,
+          newBusinesses: feed.newBusinesses,
+          popularBusinesses: feed.popularBusinesses,
           page: 1,
-          hasMore: page.hasMore,
+          hasMore: feed.discover.hasMore,
         ),
       );
     } catch (e) {
+      if (requestId != _homeRequestId) return;
       emit(BusinessError("Erreur lors du chargement : ${e.toString()}"));
     }
-  }
-
-  void _onLoadBusinessesByCategory(
-    LoadBusinessesByCategory event,
-    Emitter<BusinessState> emit,
-  ) {
-    // Si la catégorie est 'all' ou 'other', on réaffiche le cache local
-    // avec sa propre pagination — pas besoin de refaire une requête.
-    if (event.category == BusinessType.all ||
-        event.category == BusinessType.other) {
-      emit(
-        BusinessLoaded(
-          businesses: List.from(_allBusinesses),
-          currentCategory: event.category,
-          allBusinesses: List.from(_allBusinesses),
-          page: _allBusinessesPage,
-          hasMore: _allBusinessesHasMore,
-        ),
-      );
-      return;
-    }
-
-    // Filtrage synchrone dans ce qui est déjà en cache. `hasMore` reste à
-    // true : le serveur peut avoir davantage de résultats de cette
-    // catégorie que ce qui est actuellement chargé localement —
-    // LoadMoreBusinesses ira les chercher directement filtrés côté serveur.
-    final filtered = _allBusinesses.where((business) {
-      return business.type.name.toLowerCase() ==
-          event.category.name.toLowerCase();
-    }).toList();
-
-    emit(
-      BusinessLoaded(
-        businesses: filtered,
-        currentCategory: event.category,
-        allBusinesses: List.from(_allBusinesses),
-        page: 1,
-        hasMore: true,
-      ),
-    );
   }
 
   Future<void> _onLoadMoreBusinesses(
@@ -103,37 +89,34 @@ class BusinessBloc extends Bloc<BusinessEvent, BusinessState> {
       return;
     }
 
+    final requestId = _homeRequestId;
     emit(current.copyWith(isLoadingMore: true));
 
-    final isFiltered =
-        current.currentCategory != BusinessType.all &&
-        current.currentCategory != BusinessType.other;
     final nextPage = current.page + 1;
 
     try {
+      // Seule la section "Découvrir" est paginée : "Nouveautés" et
+      // "Populaires" ne bougent pas et ne sont donc pas redemandées.
       final page = await getBusinessesPage(
         GetBusinessesPageParams(
           page: nextPage,
-          category: isFiltered ? current.currentCategory.name : null,
+          category: _categoryParam(current.currentCategory),
         ),
       );
-
-      if (!isFiltered) {
-        _allBusinesses = [..._allBusinesses, ...page.items];
-        _allBusinessesPage = nextPage;
-        _allBusinessesHasMore = page.hasMore;
-      }
+      // Un changement de catégorie a eu lieu entre-temps : cette page
+      // appartient à l'ancienne liste, on la jette.
+      if (requestId != _homeRequestId) return;
 
       emit(
         current.copyWith(
           businesses: [...current.businesses, ...page.items],
-          allBusinesses: List.from(_allBusinesses),
           page: nextPage,
           hasMore: page.hasMore,
           isLoadingMore: false,
         ),
       );
     } catch (_) {
+      if (requestId != _homeRequestId) return;
       // Échec silencieux : l'utilisateur redevient libre de scroller pour
       // réessayer, plutôt que de rester bloqué sur isLoadingMore=true.
       emit(current.copyWith(isLoadingMore: false));

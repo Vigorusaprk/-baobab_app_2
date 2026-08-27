@@ -1,4 +1,4 @@
-import 'package:baobabe_0_2/core/themes/app_diemens.dart';
+import 'package:baobabe_0_2/core/widgets/custom_card.dart';
 import 'package:flutter/material.dart';
 import 'package:baobabe_0_2/core/themes/app_colors.dart';
 
@@ -9,20 +9,17 @@ class SearchAppBar extends StatelessWidget {
   final bool autofocus;
 
   const SearchAppBar({
-    Key? key,
+    super.key,
     required this.controller,
     this.onSubmitted,
     this.hintText = 'Rechercher...',
     this.autofocus = true,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(AppDimens.radius30),
-        color: AppColors.white,
-      ),
+    return CustomCard(
+      hasPadding: false,
       child: Row(
         children: [
           const SizedBox(width: 12),
@@ -51,7 +48,7 @@ class SearchAppBar extends StatelessWidget {
               },
             ),
 
-          SizedBox(height: 15,)
+          SizedBox(height: 15),
         ],
       ),
     );

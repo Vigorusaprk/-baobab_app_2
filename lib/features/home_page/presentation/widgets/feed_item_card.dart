@@ -1,4 +1,3 @@
-import 'package:baobabe_0_2/core/themes/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import '../../domain/entities/feed_item.dart';

@@ -29,7 +29,7 @@ class SettingsScreen extends StatelessWidget {
     return BlocBuilder<SettingsCubit, SettingsState>(
       builder: (context, settingsState) {
         return ListView(
-          padding: const EdgeInsets.all(16),
+          padding: AppDimens.appPadding,
           children: [
             ProfileSummaryCard(
               isLoggedIn: isLoggedIn,

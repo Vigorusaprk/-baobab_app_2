@@ -11,16 +11,21 @@ class BusinessInitial extends BusinessState {}
 
 class BusinessLoading extends BusinessState {}
 
+/// Page d'accueil chargée pour [currentCategory]. Les trois listes viennent
+/// telles quelles de l'Edge Function `get-home` : elles sont déjà filtrées
+/// sur cette catégorie, triées et tronquées côté serveur. Aucune vue ne
+/// doit re-filtrer ou re-trier — changer de catégorie recharge le tout.
 class BusinessLoaded extends BusinessState {
+  /// Section "Découvrir" : la liste paginée (scroll infini).
   final List<Business> businesses;
+
   final BusinessType currentCategory;
 
-  /// Cache non filtré (catégorie "all") maintenu par le bloc en parallèle
-  /// de [businesses] — indépendant de la catégorie actuellement
-  /// sélectionnée pour le carrousel "Découvrir". Sert de source pour tout
-  /// ce qui doit refléter l'ensemble du catalogue plutôt que la vue
-  /// filtrée courante (ex: la section "Populaires").
-  final List<Business> allBusinesses;
+  /// Section "Nouveautés" : établissements récents de la catégorie.
+  final List<Business> newBusinesses;
+
+  /// Section "Populaires" : meilleures notes de la catégorie.
+  final List<Business> popularBusinesses;
 
   /// Numéro de la dernière page chargée pour ce flux (1 = premier chargement).
   final int page;
@@ -35,7 +40,8 @@ class BusinessLoaded extends BusinessState {
   const BusinessLoaded({
     required this.businesses,
     required this.currentCategory,
-    this.allBusinesses = const [],
+    this.newBusinesses = const [],
+    this.popularBusinesses = const [],
     this.page = 1,
     this.hasMore = false,
     this.isLoadingMore = false,
@@ -44,7 +50,8 @@ class BusinessLoaded extends BusinessState {
   BusinessLoaded copyWith({
     List<Business>? businesses,
     BusinessType? currentCategory,
-    List<Business>? allBusinesses,
+    List<Business>? newBusinesses,
+    List<Business>? popularBusinesses,
     int? page,
     bool? hasMore,
     bool? isLoadingMore,
@@ -52,7 +59,8 @@ class BusinessLoaded extends BusinessState {
     return BusinessLoaded(
       businesses: businesses ?? this.businesses,
       currentCategory: currentCategory ?? this.currentCategory,
-      allBusinesses: allBusinesses ?? this.allBusinesses,
+      newBusinesses: newBusinesses ?? this.newBusinesses,
+      popularBusinesses: popularBusinesses ?? this.popularBusinesses,
       page: page ?? this.page,
       hasMore: hasMore ?? this.hasMore,
       isLoadingMore: isLoadingMore ?? this.isLoadingMore,
@@ -63,7 +71,8 @@ class BusinessLoaded extends BusinessState {
   List<Object> get props => [
     businesses,
     currentCategory,
-    allBusinesses,
+    newBusinesses,
+    popularBusinesses,
     page,
     hasMore,
     isLoadingMore,

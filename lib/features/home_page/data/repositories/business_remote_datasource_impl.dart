@@ -41,12 +41,14 @@ class BusinessRemoteDataSourceImpl implements BusinessRemoteDataSource {
     }
 
     try {
+      // `section=discover` : on veut ici une liste à plat, pas le bundle
+      // complet de la page d'accueil (voir getHomeFeed).
       final response = await _supabase.functions.invoke(
         'get-home',
         method: HttpMethod.get,
-        queryParameters: {'pageSize': '50'},
+        queryParameters: {'section': 'discover', 'pageSize': '50'},
       );
-      final data = (response.data as Map<String, dynamic>)['data'] as List;
+      final data = _discoverItems(response.data as Map<String, dynamic>);
       final businesses = data
           .map((json) => BusinessModel.fromJson(json as Map<String, dynamic>))
           .toList();
@@ -65,9 +67,16 @@ class BusinessRemoteDataSourceImpl implements BusinessRemoteDataSource {
             .toList();
       }
       throw Exception(
-        'Erreur Edge Function (home-feed) lors du chargement des businesses : $e',
+        'Erreur Edge Function (get-home) lors du chargement des businesses : $e',
       );
     }
+  }
+
+  /// Extrait la liste d'une réponse `get-home` en mode `section=discover`,
+  /// dont la charge utile est `{ discover: { data: [...], hasMore } }`.
+  List<dynamic> _discoverItems(Map<String, dynamic> json) {
+    final discover = json['discover'] as Map<String, dynamic>?;
+    return (discover?['data'] as List?) ?? const [];
   }
 
   @override
@@ -126,9 +135,13 @@ class BusinessRemoteDataSourceImpl implements BusinessRemoteDataSource {
       final response = await _supabase.functions.invoke(
         'get-home',
         method: HttpMethod.get,
-        queryParameters: {'category': category, 'pageSize': '50'},
+        queryParameters: {
+          'section': 'discover',
+          'category': category,
+          'pageSize': '50',
+        },
       );
-      final data = (response.data as Map<String, dynamic>)['data'] as List;
+      final data = _discoverItems(response.data as Map<String, dynamic>);
       final businesses = data
           .map((json) => BusinessModel.fromJson(json as Map<String, dynamic>))
           .toList();
@@ -147,9 +160,77 @@ class BusinessRemoteDataSourceImpl implements BusinessRemoteDataSource {
             .toList();
       }
       throw Exception(
-        'Erreur Edge Function (home-feed) lors de la recherche par catégorie : $e',
+        'Erreur Edge Function (get-home) lors de la recherche par catégorie : $e',
       );
     }
+  }
+
+  @override
+  Future<
+    ({
+      List<BusinessModel> newBusinesses,
+      List<BusinessModel> popularBusinesses,
+      List<BusinessModel> discoverItems,
+      bool discoverHasMore,
+    })
+  >
+  getHomeFeed({String? category}) async {
+    final cacheKey = 'home_feed_${category ?? 'all'}';
+
+    if (!await _isOnline) {
+      final cached = await _db.getCache(cacheKey);
+      if (cached != null) return _decodeHomeFeed(jsonDecode(cached));
+      return (
+        newBusinesses: <BusinessModel>[],
+        popularBusinesses: <BusinessModel>[],
+        discoverItems: <BusinessModel>[],
+        discoverHasMore: false,
+      );
+    }
+
+    try {
+      final response = await _supabase.functions.invoke(
+        'get-home',
+        method: HttpMethod.get,
+        queryParameters: {
+          if (category != null && category.isNotEmpty) 'category': category,
+        },
+      );
+      final json = response.data as Map<String, dynamic>;
+      final feed = _decodeHomeFeed(json);
+
+      await _db.saveCache(cacheKey, jsonEncode(json));
+      return feed;
+    } catch (e) {
+      final cached = await _db.getCache(cacheKey);
+      if (cached != null) return _decodeHomeFeed(jsonDecode(cached));
+      throw Exception(
+        'Erreur Edge Function (get-home) lors du chargement de la page d\'accueil : $e',
+      );
+    }
+  }
+
+  /// Convertit la charge utile `get-home` (réseau ou cache — même forme)
+  /// en modèles.
+  ({
+    List<BusinessModel> newBusinesses,
+    List<BusinessModel> popularBusinesses,
+    List<BusinessModel> discoverItems,
+    bool discoverHasMore,
+  })
+  _decodeHomeFeed(Map<String, dynamic> json) {
+    List<BusinessModel> parse(Object? list) =>
+        ((list as List?) ?? const [])
+            .map((item) => BusinessModel.fromJson(item as Map<String, dynamic>))
+            .toList();
+
+    final discover = json['discover'] as Map<String, dynamic>?;
+    return (
+      newBusinesses: parse(json['newBusinesses']),
+      popularBusinesses: parse(json['popularBusinesses']),
+      discoverItems: parse(discover?['data']),
+      discoverHasMore: discover?['hasMore'] as bool? ?? false,
+    );
   }
 
   @override
@@ -157,23 +238,28 @@ class BusinessRemoteDataSourceImpl implements BusinessRemoteDataSource {
     required int page,
     String? category,
   }) async {
-    // Pas de secours hors-ligne ici : la 1ère page (getBusinesses) a déjà
-    // son cache, "charger plus" est un enrichissement progressif, pas le
+    // Pas de secours hors-ligne ici : la 1ère page (getHomeFeed) a déjà son
+    // cache, "charger plus" est un enrichissement progressif, pas le
     // contenu principal de l'écran.
+    //
+    // `section=discover` : seule la liste paginée est recalculée côté
+    // serveur — inutile de refaire "Nouveautés" et "Populaires" à chaque
+    // cran de scroll, ils ne changent pas.
     final response = await _supabase.functions.invoke(
       'get-home',
       method: HttpMethod.get,
       queryParameters: {
+        'section': 'discover',
         'page': '$page',
         if (category != null && category.isNotEmpty) 'category': category,
       },
     );
     final json = response.data as Map<String, dynamic>;
-    final data = json['data'] as List;
-    final items = data
+    final discover = json['discover'] as Map<String, dynamic>?;
+    final items = _discoverItems(json)
         .map((item) => BusinessModel.fromJson(item as Map<String, dynamic>))
         .toList();
-    return (items: items, hasMore: json['hasMore'] as bool? ?? false);
+    return (items: items, hasMore: discover?['hasMore'] as bool? ?? false);
   }
 
   @override

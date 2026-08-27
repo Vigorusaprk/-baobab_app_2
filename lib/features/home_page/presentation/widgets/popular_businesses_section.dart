@@ -6,26 +6,22 @@ import 'package:baobabe_0_2/features/home_page/presentation/widgets/popular_busi
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-/// Partie "données" de la section Populaires : branchée sur le même
-/// [BusinessBloc]/[CategoryBloc] que [BusinessCardsWidget] et
-/// [BusinessPromoCarousel], trie [BusinessLoaded.allBusinesses] (le
-/// catalogue complet, indépendant de la catégorie actuellement filtrée
-/// pour "Découvrir") par note décroissante (puis nombre d'avis en cas
-/// d'égalité), garde les `maxItems` premiers, puis délègue l'affichage à
-/// [PopularBusinessListView].
+/// Partie "données" de la section Populaires : affiche
+/// [BusinessLoaded.popularBusinesses], c'est-à-dire les mieux notés **de la
+/// catégorie sélectionnée**, déjà triés et tronqués par l'Edge Function
+/// `get-home`. Rien n'est trié ni filtré ici : changer de catégorie
+/// recharge la liste côté serveur.
 ///
 /// ⚠️ Pas de vrai critère "popularité" dédié côté base pour l'instant
 /// (pas de compteur de vues/commandes) — le tri par `rating` est une
 /// approximation raisonnable en attendant mieux.
 class PopularBusinessesSection extends StatelessWidget {
-  final int maxItems;
   final String title;
   final VoidCallback? onSeeAllTap;
   final void Function(UIBusiness uiBusiness)? onItemTap;
 
   const PopularBusinessesSection({
     super.key,
-    this.maxItems = 3,
     this.title = 'Populaires',
     this.onSeeAllTap,
     this.onItemTap,
@@ -39,22 +35,16 @@ class PopularBusinessesSection extends StatelessWidget {
           buildWhen: (previous, current) {
             if (previous.runtimeType != current.runtimeType) return true;
             if (current is BusinessLoaded && previous is BusinessLoaded) {
-              return previous.allBusinesses != current.allBusinesses;
+              return previous.popularBusinesses != current.popularBusinesses;
             }
             return false;
           },
           builder: (context, state) {
             if (state is! BusinessLoaded) return const SizedBox.shrink();
 
-            final sorted = [...state.allBusinesses]
-              ..sort((a, b) {
-                final ratingCompare = b.rating.compareTo(a.rating);
-                if (ratingCompare != 0) return ratingCompare;
-                return b.reviewCount.compareTo(a.reviewCount);
-              });
-
-            final top = sorted.take(maxItems).toList();
-            final uiBusinesses = top.map((b) => UIBusiness(b)).toList();
+            final uiBusinesses = state.popularBusinesses
+                .map((b) => UIBusiness(b))
+                .toList();
 
             return Padding(
               padding: AppDimens.appPadding,

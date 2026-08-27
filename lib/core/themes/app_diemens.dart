@@ -39,9 +39,10 @@ class AppDimens {
   static const double elevationDefault = 2.0;
   static const double borderWidthThin = 1.0;
 
-  static const double appPaddingValue = 24.0;
+  static const double appPaddingValue = 16.0;
 
   // *** Cards *** //
+  static const double smallCardBorderRadius = 12.0;
   static const double cardBorderRadius = 20.0;
   static const cardBorderRadiusAll = BorderRadius.all(
     Radius.circular(cardBorderRadius),
