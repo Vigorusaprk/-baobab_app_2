@@ -1,7 +1,7 @@
 import 'package:baobabe_0_2/core/themes/app_colors.dart';
 import 'package:baobabe_0_2/core/themes/app_diemens.dart';
 import 'package:baobabe_0_2/core/themes/app_fonts.dart';
-import 'package:baobabe_0_2/features/home_page/domain/repositories/mock_feed_repository.dart';
+import 'package:baobabe_0_2/features/home_page/data/repositories/activity_feed_repository.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/widgets/feed_filter_chips.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -12,7 +12,6 @@ import '../widgets/feed_item_card.dart';
 import '../widgets/feed_empty_state.dart';
 
 /// Page racine. Fournit le BLoC et route go_router vers ici.
-/// TODO: remplacer MockFeedRepository() par l'implémentation Supabase
 /// une fois la table `feed_items` prête.
 class NotificationsPage extends StatelessWidget {
   const NotificationsPage({Key? key}) : super(key: key);
@@ -20,7 +19,7 @@ class NotificationsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => FeedBloc(repository: MockFeedRepository())
+      create: (_) => FeedBloc(repository: ActivityFeedRepository())
         ..add(const LoadFeedItems()),
       child: const _NotificationsView(),
     );

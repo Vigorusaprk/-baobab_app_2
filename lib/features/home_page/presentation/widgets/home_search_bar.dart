@@ -70,7 +70,7 @@ class HomeSearchBar extends StatelessWidget {
                     const SizedBox(width: AppDimens.medium),
                     const Expanded(
                       child: Text(
-                        "Où voulez-vous aller ?",
+                        "Restaurant, concert, cosmétique…",
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
                           fontFamily: 'Poppins',

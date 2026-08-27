@@ -1,11 +1,11 @@
 import 'dart:convert';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:logger/logger.dart';
-import '../database/database_helper.dart';
+import '../database/local_cache.dart';
 import '../../features/booking_page/data/models/reservation_service.dart';
 
 class SyncService {
-  final DatabaseHelper _db = DatabaseHelper.instance;
+  final LocalCache _db = LocalCache.instance;
   final Connectivity _connectivity = Connectivity();
   final Logger _logger = Logger();
   final ReservationApiService _reservationApi;
@@ -47,14 +47,14 @@ class SyncService {
     String type,
     Map<String, dynamic> data,
   ) async {
-    await _db.insert('pending_operations', {
+    await _db.enqueueOperation({
       'table_name': table,
       'operation_type': type,
       'data': jsonEncode(data),
       'status': 'pending',
       'created_at': DateTime.now().toIso8601String(),
     });
-    _logger.d("Local: Operation stored in pending_operations.");
+    _logger.d("Local: Operation stored in pending queue.");
   }
 
   /// Exemple spécifique pour une réservation
@@ -81,7 +81,7 @@ class SyncService {
 class SyncManager {
   final SyncService syncService;
   final ReservationApiService _reservationApi;
-  final DatabaseHelper _db = DatabaseHelper.instance;
+  final LocalCache _db = LocalCache.instance;
   final Connectivity _connectivity = Connectivity();
   final Logger _logger = Logger();
 
@@ -98,12 +98,13 @@ class SyncManager {
   }
 
   Future<void> processPendingOperations() async {
-    final pending = await _db.query(
-      'pending_operations',
-      where: 'status = ?',
-      whereArgs: ['pending'],
-      orderBy: 'created_at ASC',
-    );
+    final all = await _db.pendingOperations();
+    final pending = all.where((e) => e.data['status'] == 'pending').toList()
+      ..sort(
+        (a, b) => (a.data['created_at'] as String? ?? '').compareTo(
+          b.data['created_at'] as String? ?? '',
+        ),
+      );
 
     if (pending.isEmpty) {
       _logger.d("SyncManager: No pending operations to sync.");
@@ -112,20 +113,15 @@ class SyncManager {
 
     _logger.i("SyncManager: Found ${pending.length} pending operations.");
 
-    for (var op in pending) {
-      final id = op['id'];
+    for (final op in pending) {
+      final key = op.key;
       try {
-        await _db.update(
-          'pending_operations',
-          {'status': 'syncing'},
-          where: 'id = ?',
-          whereArgs: [id],
-        );
+        await _db.updateOperation(key, {...op.data, 'status': 'syncing'});
 
-        final data = jsonDecode(op['data'] as String);
+        final data = jsonDecode(op.data['data'] as String);
 
-        if (op['table_name'] == 'reservations') {
-          if (op['operation_type'] == 'INSERT') {
+        if (op.data['table_name'] == 'reservations') {
+          if (op.data['operation_type'] == 'INSERT') {
             await _reservationApi.createReservation(
               businessId: data['business_id'],
               type: data['type'],
@@ -138,20 +134,15 @@ class SyncManager {
           }
         }
 
-        await _db.delete(
-          'pending_operations',
-          where: 'id = ?',
-          whereArgs: [id],
-        );
-        _logger.i("SyncManager: Item $id synced and removed.");
+        await _db.removeOperation(key);
+        _logger.i("SyncManager: Item $key synced and removed.");
       } catch (e) {
-        _logger.e("SyncManager: Failed to sync $id: $e");
-        await _db.update(
-          'pending_operations',
-          {'status': 'failed', 'error_message': e.toString()},
-          where: 'id = ?',
-          whereArgs: [id],
-        );
+        _logger.e("SyncManager: Failed to sync $key: $e");
+        await _db.updateOperation(key, {
+          ...op.data,
+          'status': 'failed',
+          'error_message': e.toString(),
+        });
       }
     }
   }

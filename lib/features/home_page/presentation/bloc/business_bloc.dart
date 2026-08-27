@@ -24,45 +24,41 @@ class BusinessBloc extends Bloc<BusinessEvent, BusinessState> {
   BusinessBloc({required this.getHomeFeed, required this.getBusinessesPage})
     : super(BusinessInitial()) {
     on<LoadBusinesses>(_onLoadBusinesses);
-    on<LoadBusinessesByCategory>(_onLoadBusinessesByCategory);
+    on<LoadBusinessesBySlug>(_onLoadBusinessesBySlug);
     on<LoadMoreBusinesses>(_onLoadMoreBusinesses);
   }
 
-  /// Paramètre `category` envoyé au serveur. "Tout" est représenté côté
-  /// client par [BusinessType.all] ou [BusinessType.other] : dans les deux
-  /// cas, aucun filtre.
-  String? _categoryParam(BusinessType category) =>
-      (category == BusinessType.all || category == BusinessType.other)
-      ? null
-      : category.name;
+  /// Slug de la catégorie "aucun filtre", ajoutée côté client.
+  static const String allSlug = 'all';
+
+  /// Paramètre `category` envoyé au serveur : rien à filtrer pour "Tout".
+  static String? _categoryParam(String slug) =>
+      (slug.isEmpty || slug == allSlug || slug == 'other') ? null : slug;
 
   Future<void> _onLoadBusinesses(
     LoadBusinesses event,
     Emitter<BusinessState> emit,
-  ) => _loadHome(BusinessType.all, emit);
+  ) => _loadHome(allSlug, emit);
 
-  Future<void> _onLoadBusinessesByCategory(
-    LoadBusinessesByCategory event,
+  Future<void> _onLoadBusinessesBySlug(
+    LoadBusinessesBySlug event,
     Emitter<BusinessState> emit,
-  ) => _loadHome(event.category, emit);
+  ) => _loadHome(event.slug, emit);
 
-  Future<void> _loadHome(
-    BusinessType category,
-    Emitter<BusinessState> emit,
-  ) async {
+  Future<void> _loadHome(String slug, Emitter<BusinessState> emit) async {
     final requestId = ++_homeRequestId;
     emit(BusinessLoading());
 
     try {
       final feed = await getHomeFeed(
-        GetHomeFeedParams(category: _categoryParam(category)),
+        GetHomeFeedParams(category: _categoryParam(slug)),
       );
       if (requestId != _homeRequestId) return;
 
       emit(
         BusinessLoaded(
           businesses: feed.discover.items,
-          currentCategory: category,
+          currentSlug: slug,
           newBusinesses: feed.newBusinesses,
           popularBusinesses: feed.popularBusinesses,
           page: 1,
@@ -100,7 +96,7 @@ class BusinessBloc extends Bloc<BusinessEvent, BusinessState> {
       final page = await getBusinessesPage(
         GetBusinessesPageParams(
           page: nextPage,
-          category: _categoryParam(current.currentCategory),
+          category: _categoryParam(current.currentSlug),
         ),
       );
       // Un changement de catégorie a eu lieu entre-temps : cette page

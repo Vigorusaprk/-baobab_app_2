@@ -1,9 +1,7 @@
-import 'package:baobabe_0_2/core/themes/app_diemens.dart';
-import 'package:baobabe_0_2/core/themes/app_fonts.dart';
 import 'package:baobabe_0_2/core/widgets/see_all.dart';
 import 'package:baobabe_0_2/features/home_page/data/models/ui_business.dart';
+import 'package:baobabe_0_2/features/home_page/presentation/widgets/business_list_row.dart';
 import 'package:flutter/material.dart';
-import 'package:baobabe_0_2/core/themes/app_colors.dart';
 import 'package:go_router/go_router.dart';
 
 /// Partie "vue" pure de la section Populaires : reçoit une liste déjà
@@ -61,131 +59,13 @@ class PopularBusinessListView extends StatelessWidget {
         ...uiBusinesses.map(
           (uiBusiness) => Padding(
             padding: const EdgeInsets.only(bottom: 10),
-            child: _PopularBusinessRow(
+            child: BusinessListRow(
               uiBusiness: uiBusiness,
               onTap: () => _handleTap(context, uiBusiness),
             ),
           ),
         ),
       ],
-    );
-  }
-}
-
-class _PopularBusinessRow extends StatelessWidget {
-  final UIBusiness uiBusiness;
-  final VoidCallback onTap;
-
-  const _PopularBusinessRow({required this.uiBusiness, required this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    final business = uiBusiness.business;
-    final initial = business.name.isNotEmpty
-        ? business.name[0].toUpperCase()
-        : '?';
-    final double interiorPadding =
-        AppDimens.cardBorderRadius - AppDimens.allPadding12Number;
-
-    return Material(
-      color: AppColors.white,
-      borderRadius: AppDimens.cardBorderRadiusAll,
-      child: InkWell(
-        borderRadius: AppDimens.cardBorderRadiusAll,
-        onTap: onTap,
-        child: Container(
-          padding: AppDimens.allPadding12,
-          decoration: BoxDecoration(
-            color: AppColors.white,
-            borderRadius: AppDimens.cardBorderRadiusAll,
-            boxShadow: [
-              BoxShadow(
-                color: AppColors.textPrimary.withValues(alpha: 0.05),
-                blurRadius: 10,
-                offset: const Offset(0, 3),
-              ),
-            ],
-          ),
-          child: Row(
-            children: [
-              // Avatar rond avec l'initiale du nom
-              Container(
-                width: 45,
-                height: 45,
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                  color: uiBusiness.categoryColor,
-                  borderRadius: BorderRadius.circular(interiorPadding),
-                ),
-                child: Text(
-                  initial,
-                  style: const TextStyle(
-                    color: AppColors.white,
-                    fontSize: 18,
-                    fontWeight: FontWeight.w800,
-                    fontFamily: "Poppins",
-                  ),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      business.name,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: AppFonts.titleMedium,
-                    ),
-                    const SizedBox(height: 3),
-                    Row(
-                      children: [
-                        const Icon(
-                          Icons.star_rounded,
-                          size: 14,
-                          color: Colors.amber,
-                        ),
-                        Text(
-                          business.rating.toStringAsFixed(1),
-                          style: Theme.of(context).textTheme.bodySmall
-                              ?.copyWith(color: AppColors.textSecondary),
-                        ),
-                        AppDimens.spacerSmallWidth,
-                        Container(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: 5,
-                            vertical: 2.5,
-                          ),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(
-                              interiorPadding,
-                            ),
-                            color: uiBusiness.categoryColor.withValues(
-                              alpha: 0.3,
-                            ),
-                          ),
-                          child: Text(
-                            business.type.name,
-                            style: Theme.of(context).textTheme.bodySmall
-                                ?.copyWith(
-                                  color: uiBusiness.categoryColor,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                          ),
-                        ),
-                        // Distance volontairement omise : la table `business`
-                        // n'a pas encore de latitude/longitude côté Supabase.
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
     );
   }
 }

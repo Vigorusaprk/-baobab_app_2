@@ -95,7 +95,7 @@ class ReservationDetailPage extends StatelessWidget {
                     ]),
                     const SizedBox(height: 16),
                     if (reservation.type == 'restaurant')
-                      _buildInfoCard('Détails du restaurant', [
+                      _buildInfoCard('Détails de la table', [
                         _buildRow(
                           'Table',
                           reservation.tableNumber ?? 'Non spécifiée',

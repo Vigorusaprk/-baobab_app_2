@@ -81,7 +81,7 @@ class _ActivityScreenState extends State<ActivityScreen>
                 Icon(Icons.assignment, color: AppColors.primary, size: 32),
                 const SizedBox(width: 12),
                 Text(
-                  'Mes Activites',
+                  'Mes activités',
                   style: TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
@@ -128,7 +128,7 @@ class _ActivityScreenState extends State<ActivityScreen>
               dividerHeight: 0,
               tabs: const [
                 Tab(text: 'Commandes'),
-                Tab(text: 'Reservations'),
+                Tab(text: 'Réservations'),
               ],
             ),
           ),

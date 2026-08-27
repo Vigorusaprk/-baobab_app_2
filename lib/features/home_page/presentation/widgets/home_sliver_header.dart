@@ -25,7 +25,7 @@ import 'package:go_router/go_router.dart';
 class HomeSliverHeaderMetrics {
   const HomeSliverHeaderMetrics._();
 
-  /// Bloc « Bonjours, / Où allons-nous ? » + cloche : c'est lui qui
+  /// Bloc d'accueil (salutation + proposition) + cloche : c'est lui qui
   /// disparaît pour laisser la place à la barre épinglée.
   static const double greetingHeight = 58;
 
@@ -162,28 +162,34 @@ class _GreetingRow extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: const [
-              Text(
-                "Bonjours,",
-                style: TextStyle(
-                  fontFamily: 'Poppins',
-                  fontSize: 15,
-                  color: AppColors.primary,
+          // Le bloc a une hauteur fixe : le texte doit tenir sur une
+          // ligne, d'où la formulation courte et le garde-fou d'ellipse.
+          const Expanded(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "Bonjour,",
+                  style: TextStyle(
+                    fontFamily: 'Poppins',
+                    fontSize: 15,
+                    color: AppColors.primary,
+                  ),
                 ),
-              ),
-              Text(
-                "Ou alons nous?",
-                style: TextStyle(
-                  fontFamily: 'Poppins',
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.primary,
+                Text(
+                  "Commandez ou réservez",
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontFamily: 'Poppins',
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.primary,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
           GestureDetector(
             onTap: () => context.pushNamed('notifications'),

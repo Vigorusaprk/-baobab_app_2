@@ -11,6 +11,7 @@ import 'package:baobabe_0_2/features/home_page/presentation/widgets/home_sliver_
 import 'package:baobabe_0_2/features/home_page/presentation/widgets/popular_businesses_section.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
 /// Body-only content for the Home tab. The Scaffold is owned by MainShell.
@@ -70,6 +71,21 @@ class _HomePageScreenState extends State<HomePageScreen> {
     return false;
   }
 
+  /// Ouvre la liste complete pour la categorie actuellement affichee.
+  ///
+  /// "Populaires" et "Decouvrir" partagent le meme classement (note, puis
+  /// nombre d'avis) : leur "Voir tout" mene donc a la meme liste, filtree
+  /// sur la categorie selectionnee pour que la page corresponde a ce que
+  /// l'utilisateur avait sous les yeux.
+  void _openAllBusinesses(BuildContext context) {
+    final state = context.read<BusinessBloc>().state;
+    final slug = state is BusinessLoaded
+        ? state.currentSlug
+        : BusinessBloc.allSlug;
+
+    context.pushNamed('allBusinesses', extra: {'categorySlug': slug});
+  }
+
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
@@ -114,11 +130,13 @@ class _HomePageScreenState extends State<HomePageScreen> {
                           children: [
                             const BusinessPromoCarousel(),
                             AppDimens.spacerSmall,
-                            const PopularBusinessesSection(
-                              // onSeeAllTap: () => context.push('/popular'),
+                            PopularBusinessesSection(
+                              onSeeAllTap: () => _openAllBusinesses(context),
                             ),
                             AppDimens.spacerSmall,
-                            const BusinessCardsWidget(),
+                            BusinessCardsWidget(
+                              onSeeAllTap: () => _openAllBusinesses(context),
+                            ),
                           ],
                         ),
                 ),

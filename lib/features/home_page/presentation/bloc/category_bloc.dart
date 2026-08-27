@@ -27,14 +27,16 @@ class CategoryBloc extends Bloc<CategoryEvent, CategoryState> {
       emit(
         CategoriesLoaded(
           categories: categories,
-          selectedCategory: categories.first,
+          // "Tout" est la sélection de départ : on n'impose pas la
+          // première catégorie de la liste, qui filtrerait d'emblée.
+          selectedCategory: Category.all,
         ),
       );
     } catch (e) {
       emit(
         CategoriesLoaded(
-          categories: Category.allCategories,
-          selectedCategory: Category.allCategories.first,
+          categories: Category.fallback,
+          selectedCategory: Category.all,
         ),
       );
     }

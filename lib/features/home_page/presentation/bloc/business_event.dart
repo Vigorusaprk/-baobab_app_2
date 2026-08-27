@@ -9,13 +9,18 @@ abstract class BusinessEvent extends Equatable {
 
 class LoadBusinesses extends BusinessEvent {}
 
-class LoadBusinessesByCategory extends BusinessEvent {
-  final BusinessType category;
+/// Recharge l'accueil pour une catégorie, désignée par son slug.
+///
+/// Un slug plutôt qu'une valeur d'énumération : les catégories viennent du
+/// serveur, et une catégorie créée en base doit fonctionner sans que
+/// l'application connaisse son nom à la compilation.
+class LoadBusinessesBySlug extends BusinessEvent {
+  final String slug;
 
-  const LoadBusinessesByCategory(this.category);
+  const LoadBusinessesBySlug(this.slug);
 
   @override
-  List<Object> get props => [category];
+  List<Object> get props => [slug];
 }
 
 /// Demande la page suivante du flux actuellement affiché (scroll infini).

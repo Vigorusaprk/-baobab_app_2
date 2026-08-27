@@ -48,10 +48,10 @@ class _MainShellState extends State<MainShell> {
   ];
 
   final List<String> _labels = const [
-    'Home',
-    'Explore',
-    'Mes activites',
-    'Parametre',
+    'Accueil',
+    'Explorer',
+    'Mes activités',
+    'Paramètres',
   ];
 
   @override

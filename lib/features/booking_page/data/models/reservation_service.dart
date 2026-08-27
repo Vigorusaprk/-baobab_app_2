@@ -2,11 +2,11 @@ import 'dart:convert';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:baobabe_0_2/features/business_detail/domain/entities/reservation.dart';
-import 'package:baobabe_0_2/core/database/database_helper.dart';
+import 'package:baobabe_0_2/core/database/local_cache.dart';
 
 class ReservationApiService {
   final SupabaseClient _supabase;
-  final DatabaseHelper _db = DatabaseHelper.instance;
+  final LocalCache _db = LocalCache.instance;
   final Connectivity _connectivity = Connectivity();
 
   ReservationApiService([SupabaseClient? supabase])

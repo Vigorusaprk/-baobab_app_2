@@ -151,7 +151,7 @@ class _SearchPageBodyState extends State<SearchPageBody> {
               builder: (context, state) {
                 if (state is SearchInitial) {
                   return _buildEmptyState(
-                    'Recherchez un établissement',
+                    'Rechercher un commerçant ou une offre',
                     Icons.search,
                   );
                 } else if (state is SearchLoading) {
@@ -175,7 +175,7 @@ class _SearchPageBodyState extends State<SearchPageBody> {
                 } else if (state is SearchResultsLoaded) {
                   if (state.results.isEmpty) {
                     return _buildEmptyState(
-                      'Aucun résultat trouvé',
+                      'Aucun résultat',
                       Icons.search_off,
                     );
                   }

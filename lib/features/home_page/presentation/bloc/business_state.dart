@@ -11,7 +11,7 @@ class BusinessInitial extends BusinessState {}
 
 class BusinessLoading extends BusinessState {}
 
-/// Page d'accueil chargée pour [currentCategory]. Les trois listes viennent
+/// Page d'accueil chargée pour [currentSlug]. Les trois listes viennent
 /// telles quelles de l'Edge Function `get-home` : elles sont déjà filtrées
 /// sur cette catégorie, triées et tronquées côté serveur. Aucune vue ne
 /// doit re-filtrer ou re-trier — changer de catégorie recharge le tout.
@@ -19,7 +19,8 @@ class BusinessLoaded extends BusinessState {
   /// Section "Découvrir" : la liste paginée (scroll infini).
   final List<Business> businesses;
 
-  final BusinessType currentCategory;
+  /// Slug de la catégorie affichée. `all` = aucun filtre.
+  final String currentSlug;
 
   /// Section "Nouveautés" : établissements récents de la catégorie.
   final List<Business> newBusinesses;
@@ -39,7 +40,7 @@ class BusinessLoaded extends BusinessState {
 
   const BusinessLoaded({
     required this.businesses,
-    required this.currentCategory,
+    required this.currentSlug,
     this.newBusinesses = const [],
     this.popularBusinesses = const [],
     this.page = 1,
@@ -49,7 +50,7 @@ class BusinessLoaded extends BusinessState {
 
   BusinessLoaded copyWith({
     List<Business>? businesses,
-    BusinessType? currentCategory,
+    String? currentSlug,
     List<Business>? newBusinesses,
     List<Business>? popularBusinesses,
     int? page,
@@ -58,7 +59,7 @@ class BusinessLoaded extends BusinessState {
   }) {
     return BusinessLoaded(
       businesses: businesses ?? this.businesses,
-      currentCategory: currentCategory ?? this.currentCategory,
+      currentSlug: currentSlug ?? this.currentSlug,
       newBusinesses: newBusinesses ?? this.newBusinesses,
       popularBusinesses: popularBusinesses ?? this.popularBusinesses,
       page: page ?? this.page,
@@ -70,7 +71,7 @@ class BusinessLoaded extends BusinessState {
   @override
   List<Object> get props => [
     businesses,
-    currentCategory,
+    currentSlug,
     newBusinesses,
     popularBusinesses,
     page,

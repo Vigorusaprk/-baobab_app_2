@@ -78,7 +78,7 @@ class ReservationEmptyState extends StatelessWidget {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Explorez nos hôtels, restaurants et services pour réserver',
+                    'Table, séance, concert, prestation : réservez en quelques gestes',
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 13,

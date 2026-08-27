@@ -1,4 +1,6 @@
-import 'package:baobabe_0_2/features/home_page/data/repositories/category_repository_impl.dart';
+import 'package:baobabe_0_2/features/home_page/domain/entities/business_entity.dart';
+import 'package:baobabe_0_2/features/home_page/domain/entities/category_entity.dart';
+import 'package:baobabe_0_2/features/home_page/domain/repositories/category_repository.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/bloc/category_bloc.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/widgets/Category_Icons.dart';
 import 'package:flutter/material.dart';
@@ -10,12 +12,22 @@ import 'package:flutter_test/flutter_test.dart';
 /// collant de l'accueil : passage continu d'une vignette en colonne
 /// (icône au-dessus du libellé) à une pastille en ligne (icône à gauche
 /// du libellé), sans saut ni débordement.
+/// Dépôt factice : les catégories viennent normalement du serveur, mais ce
+/// test porte sur la géométrie de la bande, pas sur le réseau.
+class _FakeCategoryRepository implements CategoryRepository {
+  @override
+  Future<List<Category>> getCategories() async => Category.fallback;
+
+  @override
+  Future<Category> getCategoryByType(BusinessType type) async => Category.all;
+}
+
 void main() {
   Widget harness(double collapseProgress) {
     return MaterialApp(
       home: Scaffold(
         body: BlocProvider(
-          create: (_) => CategoryBloc(categoryRepository: CategoryRepositoryImpl()),
+          create: (_) => CategoryBloc(categoryRepository: _FakeCategoryRepository()),
           child: Align(
             alignment: Alignment.topLeft,
             child: CategoryIcons(collapseProgress: collapseProgress),

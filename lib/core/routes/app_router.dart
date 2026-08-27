@@ -13,6 +13,7 @@ import 'package:baobabe_0_2/features/auth/presentation/screens/auth_screen.dart'
 import 'package:baobabe_0_2/app/main_shell.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/screens/home_page_screen.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/screens/search_page.dart';
+import 'package:baobabe_0_2/features/home_page/presentation/screens/all_businesses_screen.dart';
 import 'package:baobabe_0_2/features/booking_page/presentation/screens/boking_detail_screen.dart';
 import 'package:baobabe_0_2/features/activity/presentation/screens/activity_screen.dart';
 import 'package:baobabe_0_2/features/order/presentation/screens/order_detail_page.dart';
@@ -174,6 +175,21 @@ final GoRouter appRouter = GoRouter(
       path: '/budget-finder',
       name: 'budgetFinder',
       builder: (context, state) => const BudgetFinderPage(),
+    ),
+    GoRoute(
+      path: '/businesses',
+      name: 'allBusinesses',
+      pageBuilder: (context, state) {
+        // Destination du "Voir tout" de l'accueil : la categorie affichee
+        // et son libelle sont passes tels quels pour que la liste complete
+        // corresponde exactement a ce que l'utilisateur voyait.
+        final extra = state.extra as Map<String, dynamic>?;
+        return MaterialPage(
+          child: AllBusinessesScreen(
+            categorySlug: extra?['categorySlug'] as String?,
+          ),
+        );
+      },
     ),
     GoRoute(
       path: '/search',

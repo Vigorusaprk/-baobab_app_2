@@ -1,5 +1,6 @@
-import 'package:baobabe_0_2/features/home_page/domain/repositories/mock_budget_finder_repository.dart';
+import 'package:baobabe_0_2/features/home_page/data/repositories/budget_finder_repository_impl.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../domain/entities/budget_filter.dart';
 import '../bloc/budget_finder_bloc.dart';
@@ -8,15 +9,15 @@ import '../bloc/budget_finder_state.dart';
 import '../widgets/budget_filter_panel.dart';
 import '../widgets/business_results_list.dart';
 
-/// Page racine. TODO: remplacer MockBudgetFinderRepository() par
-/// l'implémentation Supabase une fois branchée sur `business_with_avg_price`.
+/// Recherche par budget : quels commerçants proposent quelque chose dans
+/// la fourchette de prix choisie, tous types d'offres confondus.
 class BudgetFinderPage extends StatelessWidget {
   const BudgetFinderPage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => BudgetFinderBloc(repository: MockBudgetFinderRepository())
+      create: (_) => BudgetFinderBloc(repository: BudgetFinderRepositoryImpl())
         ..add(const LoadBusinesses()),
       child: const _BudgetFinderView(),
     );
@@ -29,7 +30,7 @@ class _BudgetFinderView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Trouver un établissement')),
+      appBar: AppBar(title: const Text('Trouver selon mon budget')),
       body: BlocBuilder<BudgetFinderBloc, BudgetFinderState>(
         builder: (context, state) {
           final budget = state is BudgetFinderLoaded
@@ -64,9 +65,10 @@ class _BudgetFinderView extends StatelessWidget {
     final loaded = state as BudgetFinderLoaded;
     return BusinessResultsList(
       matches: loaded.matches,
-      onTap: (match) {
-        // TODO: ouvrir les détails du business, ou une bottom sheet.
-      },
+      onTap: (match) => context.pushNamed(
+        'businessDetail',
+        pathParameters: {'id': match.business.id},
+      ),
     );
   }
 }

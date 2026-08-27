@@ -82,7 +82,7 @@ class OrderEmptyState extends StatelessWidget {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Explorez nos restaurants et magasins pour commencer',
+                    'Plats, produits, cosmétiques : commandez ce dont vous avez besoin',
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 13,

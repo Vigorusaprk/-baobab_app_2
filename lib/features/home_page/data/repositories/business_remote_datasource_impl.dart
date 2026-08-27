@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'package:baobabe_0_2/core/database/database_helper.dart';
+import 'package:baobabe_0_2/core/database/local_cache.dart';
 import 'package:baobabe_0_2/features/business_detail/domain/entities/menu_restau.dart';
 import 'package:baobabe_0_2/features/booking_page/data/models/reservation_model.dart';
 import 'package:baobabe_0_2/features/home_page/data/data_sources/remote_datasource/business_remote_datasource.dart';
@@ -14,7 +14,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 /// centralisée côté serveur plutôt que dupliquée dans chaque client.
 class BusinessRemoteDataSourceImpl implements BusinessRemoteDataSource {
   final SupabaseClient _supabase;
-  final DatabaseHelper _db = DatabaseHelper.instance;
+  final LocalCache _db = LocalCache.instance;
   final Connectivity _connectivity = Connectivity();
 
   BusinessRemoteDataSourceImpl({SupabaseClient? supabase})
