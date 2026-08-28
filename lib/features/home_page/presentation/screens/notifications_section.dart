@@ -3,6 +3,7 @@ import 'package:baobabe_0_2/core/themes/app_diemens.dart';
 import 'package:baobabe_0_2/core/themes/app_fonts.dart';
 import 'package:baobabe_0_2/features/home_page/data/repositories/activity_feed_repository.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/widgets/feed_filter_chips.dart';
+import 'package:baobabe_0_2/features/home_page/presentation/widgets/list_skeletons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../bloc/feed_bloc.dart';
@@ -61,7 +62,7 @@ class _NotificationsView extends StatelessWidget {
       body: BlocBuilder<FeedBloc, FeedState>(
         builder: (context, state) {
           if (state is FeedLoading || state is FeedInitial) {
-            return const Center(child: CircularProgressIndicator());
+            return const FeedListSkeleton();
           }
           if (state is FeedError) {
             return Center(child: Text(state.message));

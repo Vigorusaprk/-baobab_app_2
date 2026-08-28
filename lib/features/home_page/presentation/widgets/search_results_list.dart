@@ -6,6 +6,7 @@ import 'package:baobabe_0_2/features/home_page/domain/entities/search_filter_ent
 import 'package:baobabe_0_2/features/home_page/presentation/bloc/search_state.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/bloc/search_event.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/bloc/search_bloc.dart';
+import 'package:baobabe_0_2/features/home_page/presentation/widgets/list_skeletons.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/widgets/search_active_filters_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:baobabe_0_2/core/themes/app_colors.dart';
@@ -83,12 +84,13 @@ class SearchResultsList extends StatelessWidget {
     );
   }
 
+  /// Tuile de fin de liste pendant le chargement de la page suivante :
+  /// exactement la forme de ce qui va s'y afficher, plutôt qu'un spinner
+  /// qui ne dit rien de ce qui arrive.
   Widget _buildLoadingMore() {
     return const Padding(
-      padding: EdgeInsets.symmetric(vertical: 16),
-      child: Center(
-        child: CircularProgressIndicator(color: AppColors.secondary),
-      ),
+      padding: EdgeInsets.only(bottom: 12),
+      child: SearchResultSkeleton(),
     );
   }
 

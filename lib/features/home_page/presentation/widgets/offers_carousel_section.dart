@@ -3,7 +3,9 @@ import 'package:baobabe_0_2/core/themes/app_diemens.dart';
 import 'package:baobabe_0_2/features/business_detail/domain/entities/offer.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/widgets/offer_card_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:baobabe_0_2/core/themes/app_fonts.dart';
 import 'package:go_router/go_router.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 
 /// Carrousel horizontal d'offres, avec son titre.
 ///
@@ -38,7 +40,13 @@ class OffersCarouselSection extends StatelessWidget {
     this.onReachedEnd,
   });
 
-  static const double _cardWidth = 190;
+  static const double cardWidth = 190;
+
+  /// Hauteur du rail, partagée avec [OffersCarouselSkeleton] : un squelette
+  /// plus haut ou plus court que le contenu réel fait sauter la page au
+  /// moment où les données arrivent.
+  static double railHeight(BuildContext context) =>
+      AppDimens.horizontalScrollHeight(context, 0.30, min: 220, max: 280);
 
   @override
   Widget build(BuildContext context) {
@@ -58,12 +66,7 @@ class OffersCarouselSection extends StatelessWidget {
         ),
         const SizedBox(height: 10),
         SizedBox(
-          height: AppDimens.horizontalScrollHeight(
-            context,
-            0.30,
-            min: 220,
-            max: 280,
-          ),
+          height: railHeight(context),
           child: ListView.separated(
             scrollDirection: Axis.horizontal,
             physics: const BouncingScrollPhysics(),
@@ -73,7 +76,7 @@ class OffersCarouselSection extends StatelessWidget {
             itemBuilder: (context, index) {
               if (index >= offers.length) {
                 return _SeeMoreTile(
-                  width: _cardWidth,
+                  width: cardWidth,
                   onTap: onSeeMore!,
                   isLoading: isLoadingMore,
                 );
@@ -85,7 +88,7 @@ class OffersCarouselSection extends StatelessWidget {
 
               final offer = offers[index];
               return SizedBox(
-                width: _cardWidth,
+                width: cardWidth,
                 child: OfferCardWidget(
                   offer: offer,
                   // On ouvre l'offre, pas la boutique : l'utilisateur a
@@ -149,6 +152,52 @@ class _SeeMoreTile extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+/// Squelette d'un [OffersCarouselSection] : le titre puis le rail de
+/// cartes, aux mêmes dimensions que le contenu réel.
+///
+/// Partagé par l'accueil, la fiche d'un commerçant et la fiche d'une offre —
+/// les trois montrent le même rail, ils doivent donc charger pareil.
+class OffersCarouselSkeleton extends StatelessWidget {
+  /// Largeur du faux titre. Varie d'une section à l'autre ; approcher la
+  /// vraie longueur évite un saut au moment où le texte s'affiche.
+  final double titleWidth;
+  final int cardCount;
+
+  const OffersCarouselSkeleton({
+    super.key,
+    this.titleWidth = 120,
+    this.cardCount = 3,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: AppDimens.appPadding,
+          child: Bone.text(width: titleWidth, style: AppFonts.titleMedium),
+        ),
+        const SizedBox(height: 10),
+        SizedBox(
+          height: OffersCarouselSection.railHeight(context),
+          child: ListView.separated(
+            scrollDirection: Axis.horizontal,
+            physics: const NeverScrollableScrollPhysics(),
+            padding: AppDimens.appPadding,
+            itemCount: cardCount,
+            separatorBuilder: (_, _) => const SizedBox(width: 12),
+            itemBuilder: (_, _) => const SizedBox(
+              width: OffersCarouselSection.cardWidth,
+              child: OfferCardSkeleton(),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

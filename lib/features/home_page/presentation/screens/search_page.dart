@@ -6,6 +6,7 @@ import 'package:baobabe_0_2/features/home_page/presentation/bloc/search_state.da
 import 'package:baobabe_0_2/features/home_page/presentation/widgets/search_active_filters_bar.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/widgets/search_bar.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/widgets/search_results_list.dart';
+import 'package:baobabe_0_2/features/home_page/presentation/widgets/list_skeletons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:baobabe_0_2/core/themes/app_colors.dart';
@@ -194,20 +195,16 @@ class _SearchPageBodyState extends State<SearchPageBody> {
     );
   }
 
+  /// Squelette des résultats : la forme exacte des cartes à venir, plutôt
+  /// que des rectangles gris de dimensions arbitraires.
   Widget _buildLoadingState() {
     return ListView.builder(
       padding: const EdgeInsets.all(16),
       itemCount: 5,
-      itemBuilder: (context, index) {
-        return Container(
-          height: 120,
-          margin: const EdgeInsets.only(bottom: 12),
-          decoration: BoxDecoration(
-            color: AppColors.surface,
-            borderRadius: BorderRadius.circular(16),
-          ),
-        );
-      },
+      itemBuilder: (context, index) => const Padding(
+        padding: EdgeInsets.only(bottom: 12),
+        child: SearchResultSkeleton(),
+      ),
     );
   }
 

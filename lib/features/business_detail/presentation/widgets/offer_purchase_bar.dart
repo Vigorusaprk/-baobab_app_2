@@ -1,5 +1,6 @@
 import 'package:baobabe_0_2/core/themes/app_colors.dart';
 import 'package:baobabe_0_2/core/themes/app_diemens.dart';
+import 'package:baobabe_0_2/core/widgets/custom_loading.dart';
 import 'package:baobabe_0_2/features/business_detail/presentation/bloc/offer_detail_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -224,14 +225,7 @@ class _SubmitButton extends StatelessWidget {
       ),
       onPressed: onPressed,
       child: isLoading
-          ? const SizedBox(
-              width: 18,
-              height: 18,
-              child: CircularProgressIndicator(
-                strokeWidth: 2,
-                color: AppColors.white,
-              ),
-            )
+          ? const CustomLoadingButton(size: 22, color: AppColors.white)
           : Text(
               total == null
                   ? label

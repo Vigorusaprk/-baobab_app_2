@@ -231,6 +231,13 @@ carrousels → contact → horaires → commodités → avis. Le catalogue est l
 seule porte vers l'achat, et chaque offre y parle pour elle-même — un bouton
 « Commander » générique obligeait à deviner ce qu'on allait trouver derrière.
 
+Les anciens tunnels spécialisés (menu de restaurant, chambres d'hôtel,
+flotte de location, panier — `online_order/`, `offer_catalogue_page`,
+`business_action*`) **ont été supprimés** : leur unique porte d'entrée était
+la section d'actions. Ne pas les recréer ; un besoin propre à un métier
+s'exprime dans la fiche d'offre générique (quantité, date, jauge), pas dans
+un parcours parallèle réservé à une catégorie.
+
 `remainingCapacity` est calculé par `public.offer_remaining_capacity()`, une
 fonction `SECURITY DEFINER` : la RLS de `reservations` ne montre à chacun que
 les siennes, donc compter les places prises depuis le client donnait toujours
@@ -248,16 +255,36 @@ Lists that page through server data (currently: the home page's business carouse
 
 ## Loading States — Skeletonizer, Not Spinners
 
-Full-page and full-section loading states use the `skeletonizer` package, **not** `CircularProgressIndicator`. Reference implementation: `home_page/presentation/screens/home_page_screen.dart` + `home_page/presentation/widgets/home_skeleton.dart`.
+**Il ne reste aucun `CircularProgressIndicator` dans `lib/`**, et il ne doit
+pas en réapparaître. Un chargement se montre avec un `Skeletonizer` et des
+`Bone` **explicites** qui reprennent la forme de ce qui va s'afficher : un
+spinner centré ne dit rien du contenu à venir, et une forme approximative
+fait sauter la page au moment du remplacement.
 
-Rules:
+La seule exception est le **bouton en cours d'action** (envoyer, publier,
+commander), qui utilise `CustomLoadingButton` — jamais un indicateur brut.
 
-- Wrap the loading branch in `Skeletonizer(enabled: isLoading, child: ...)`.
-- Build the skeleton from **explicit `Bone` widgets** (`Bone`, `Bone.text(words:/width:, style:)`, `Bone.multiText(lines:, style:)`, `Bone.circle(size:)`, `Bone.button(...)`) that mirror the real loaded layout section-by-section. Do **not** rely on Skeletonizer's auto-detection from plain `Container`/`Text` — it was tried and rejected because the resulting shape didn't read correctly; explicit `Bone`s are the only accepted approach here.
-- Name/locate the skeleton widget next to the real widget/screen it mirrors so the mapping is obvious — e.g. `business_detail_skeleton.dart` for `business_detail_screen.dart`, `profile_skeleton.dart` for `profil_page.dart`, `activity_skeleton.dart` for `activity_screen.dart`.
-- This covers **whole-page loading states**, and any in-page content-loading spinner that behaves the same way (e.g. a `FutureBuilder` fetching a sub-section's data, like the reviews list inside `review.dart`).
-- It does **not** cover action-in-progress overlays (submitting a reservation, placing an order, saving a form) — those block already-loaded content while a write request is in flight, which is a different UX than "this shape is about to fill in with content." Those may keep a `CircularProgressIndicator`, typically as a semi-transparent overlay.
-- Infinite-scroll "load more" indicators must also be skeleton-based: append a trailing skeleton item shaped like the real list/card item (reuse the existing item skeleton widget) while `isLoadingMore` is true, instead of a spinner or no indicator at all.
+Squelettes partagés, à réutiliser plutôt qu'à redessiner :
+
+- `OffersCarouselSkeleton` (`offers_carousel_section.dart`) — le rail
+  d'offres, utilisé par l'accueil, la fiche commerçant et la fiche d'offre.
+  Sa hauteur et sa largeur de carte viennent de `OffersCarouselSection`
+  (`railHeight()`, `cardWidth`) : les deux ne peuvent pas diverger.
+- `OfferCardSkeleton`, `BusinessListRowSkeleton` — les cartes elles-mêmes,
+  définies à côté du vrai composant.
+- `SearchResultSkeleton`, `FeedListSkeleton`, `BudgetResultsSkeleton`
+  (`list_skeletons.dart`) — les listes verticales.
+- `HomeSkeleton`, `BusinessDetailSkeleton`, `OfferDetailSkeleton`,
+  `MerchantSpaceSkeleton`, `ProfileSkeleton`, `ActivityListSkeleton` — les
+  pages entières.
+
+**Quand une page change de structure, son squelette change avec elle.** Il a
+déjà dérivé une fois : l'accueil affichait encore le squelette de l'ancien
+carrousel promotionnel longtemps après la refonte en triptyque.
+`test/home_skeleton_test.dart` épingle désormais cette correspondance.
+
+Le scroll infini suit la même règle : la tuile de fin de liste est un
+squelette de l'élément qui arrive, pas un spinner.
 
 ## Session / Auth State
 
@@ -334,7 +361,11 @@ Mandatory checks after any meaningful code change:
    - **Always import and reuse the existing component/constant instead of duplicating it.** Only create a new shared widget/constant when nothing existing covers the need, and prefer adding it to `lib/core/widgets` or the theme files so it becomes reusable rather than duplicating it inline in a feature file.
 10. Never call `.from('table_name')` directly from Flutter for business data — go through a Supabase Edge Function following the `METHOD-NOUN[-TYPE]` naming convention (see "Backend Access — Supabase Edge Functions Only" above).
 11. Any new paginated list must use the infinite-scroll pattern with all pagination state/logic kept in the Bloc — never in the widget (see "Pagination — Infinite Scroll Pattern" above).
-12. Any new full-page or full-section loading state must use `Skeletonizer` + explicit `Bone` widgets mirroring the real layout — never a bare `CircularProgressIndicator` for content loading. The one exception is action-in-progress overlays (submit/save while content is already loaded) — see "Loading States — Skeletonizer, Not Spinners" above.
+12. **Aucun `CircularProgressIndicator` dans `lib/`.** Tout chargement de
+    contenu passe par `Skeletonizer` + des `Bone` explicites reprenant la
+    forme réelle ; un bouton en action utilise `CustomLoadingButton`. Un
+    squelette doit être mis à jour en même temps que la page qu'il reflète
+    (voir « Loading States — Skeletonizer, Not Spinners » ci-dessus).
 14. Toute offre publiée passe par la table `offers` et son `fulfilment`
     (`order` / `booking`) — jamais une table par métier, jamais un `switch` sur
     `BusinessType` pour décider des actions possibles (voir « Le moule

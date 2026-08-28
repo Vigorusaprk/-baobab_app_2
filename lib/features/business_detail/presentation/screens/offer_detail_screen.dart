@@ -3,11 +3,13 @@ import 'package:baobabe_0_2/core/themes/app_diemens.dart';
 import 'package:baobabe_0_2/core/widgets/auth_required_card.dart';
 import 'package:baobabe_0_2/features/business_detail/presentation/bloc/offer_detail_cubit.dart';
 import 'package:baobabe_0_2/features/business_detail/presentation/widgets/offer_detail_sections.dart';
+import 'package:baobabe_0_2/features/business_detail/presentation/widgets/offer_detail_skeleton.dart';
 import 'package:baobabe_0_2/features/business_detail/presentation/widgets/offer_purchase_bar.dart';
 import 'package:baobabe_0_2/features/business_detail/presentation/widgets/review_list_item.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/widgets/offers_carousel_section.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 
 /// La fiche d'une offre.
 ///
@@ -117,7 +119,10 @@ class _OfferDetailView extends StatelessWidget {
             return _Failure(message: state.message);
           }
           if (state is! OfferDetailLoaded) {
-            return const Center(child: CircularProgressIndicator());
+            return const Skeletonizer(
+              enabled: true,
+              child: OfferDetailSkeleton(),
+            );
           }
           return _Content(state: state);
         },

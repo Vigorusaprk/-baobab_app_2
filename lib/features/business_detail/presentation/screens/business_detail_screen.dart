@@ -44,33 +44,9 @@ class _BusinessDetailScreenState extends State<BusinessDetailScreen> {
         );
         return BusinessDetailBloc(
           getBusinessDetail: GetBusinessDetail(repository),
-          repository: repository,
-          businessId: widget.businessId,
         )..add(LoadBusinessDetail(widget.businessId));
       },
-      child: BlocConsumer<BusinessDetailBloc, BusinessDetailState>(
-        listener: (context, state) {
-          // Gestion des retours visuels (Toasts / SnackBars) pour les réservations
-          if (state.reservationStatus == ReservationStatus.success) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Demande envoyée. Le commerçant doit la confirmer.'),
-                backgroundColor: AppColors.success,
-                behavior: SnackBarBehavior.floating,
-              ),
-            );
-          } else if (state.reservationStatus == ReservationStatus.error) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(
-                  state.reservationErrorMessage ?? 'Échec de la réservation.',
-                ),
-                backgroundColor: AppColors.error,
-                behavior: SnackBarBehavior.floating,
-              ),
-            );
-          }
-        },
+      child: BlocBuilder<BusinessDetailBloc, BusinessDetailState>(
         builder: (context, state) {
           return Scaffold(
             backgroundColor: AppColors.background,
@@ -126,55 +102,42 @@ class _BusinessDetailScreenState extends State<BusinessDetailScreen> {
       final business = state.business!;
       final uiBusiness = UIBusiness(business);
 
-      return Stack(
-        children: [
-          CustomScrollView(
-            controller: _scrollController,
-            slivers: [
-              BusinessDetailAppBar(
-                business: business,
-                uiBusiness: uiBusiness,
-                scrollController: _scrollController,
-              ),
-              SliverToBoxAdapter(
-                child: ResponsiveContainer(
-                  // L'ordre suit les questions de l'utilisateur : qu'est-ce
-                  // que c'est, qu'est-ce qu'on y trouve, comment les
-                  // joindre, quand ils ouvrent, ce qu'on en dit.
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const SizedBox(height: 24),
-                      BusinessAboutSection(business: business),
-                      const SizedBox(height: 24),
-                      BusinessOffersSection(businessId: business.id),
-                      const BusinessSectionTitle('Contact & Accès'),
-                      BusinessContactSection(business: business),
-                      const SizedBox(height: 24),
-                      if (business.openingHours.isNotEmpty) ...[
-                        const BusinessSectionTitle("Horaires d'ouverture"),
-                        BusinessHoursSection(business: business),
-                        const SizedBox(height: 24),
-                      ],
-                      BusinessSpecificSection(business: business),
-                      const SizedBox(height: 24),
-                      RestaurantReview(business: business),
-                      const SizedBox(height: 32),
-                    ],
-                  ),
-                ),
-              ),
-            ],
+      return CustomScrollView(
+        controller: _scrollController,
+        slivers: [
+          BusinessDetailAppBar(
+            business: business,
+            uiBusiness: uiBusiness,
+            scrollController: _scrollController,
           ),
-
-          // Indicateur de chargement en surimpression (Overlay) pendant qu'une réservation est envoyée
-          if (state.reservationStatus == ReservationStatus.loading)
-            Container(
-              color: AppColors.textPrimary.withValues(alpha: 0.3),
-              child: const Center(
-                child: CircularProgressIndicator(color: AppColors.primary),
+          SliverToBoxAdapter(
+            child: ResponsiveContainer(
+              // L'ordre suit les questions de l'utilisateur : qu'est-ce que
+              // c'est, qu'est-ce qu'on y trouve, comment les joindre, quand
+              // ils ouvrent, ce qu'on en dit.
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 24),
+                  BusinessAboutSection(business: business),
+                  const SizedBox(height: 24),
+                  BusinessOffersSection(businessId: business.id),
+                  const BusinessSectionTitle('Contact & Accès'),
+                  BusinessContactSection(business: business),
+                  const SizedBox(height: 24),
+                  if (business.openingHours.isNotEmpty) ...[
+                    const BusinessSectionTitle("Horaires d'ouverture"),
+                    BusinessHoursSection(business: business),
+                    const SizedBox(height: 24),
+                  ],
+                  BusinessSpecificSection(business: business),
+                  const SizedBox(height: 24),
+                  RestaurantReview(business: business),
+                  const SizedBox(height: 32),
+                ],
               ),
             ),
+          ),
         ],
       );
     }

@@ -1,4 +1,5 @@
 import 'package:baobabe_0_2/features/home_page/data/repositories/budget_finder_repository_impl.dart';
+import 'package:baobabe_0_2/features/home_page/presentation/widgets/list_skeletons.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -57,7 +58,7 @@ class _BudgetFinderView extends StatelessWidget {
 
   Widget _buildBody(BuildContext context, BudgetFinderState state) {
     if (state is BudgetFinderInitial || state is BudgetFinderLoading) {
-      return const Center(child: CircularProgressIndicator());
+      return const BudgetResultsSkeleton();
     }
     if (state is BudgetFinderError) {
       return Center(child: Text(state.message));

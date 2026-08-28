@@ -1,7 +1,7 @@
 import 'package:baobabe_0_2/core/themes/app_colors.dart';
 import 'package:baobabe_0_2/core/themes/app_fonts.dart';
 import 'package:baobabe_0_2/features/business_detail/presentation/widgets/common/responsive_container.dart';
-import 'package:baobabe_0_2/features/home_page/presentation/widgets/offer_card_widget.dart';
+import 'package:baobabe_0_2/features/home_page/presentation/widgets/offers_carousel_section.dart';
 import 'package:flutter/material.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
@@ -27,7 +27,7 @@ class BusinessDetailSkeleton extends StatelessWidget {
                 SizedBox(height: 24),
                 _AboutSectionSkeleton(),
                 SizedBox(height: 24),
-                _OffersSectionSkeleton(),
+                OffersCarouselSkeleton(titleWidth: 140),
                 SizedBox(height: 24),
                 _BlockSkeleton(titleWidth: 150),
                 SizedBox(height: 24),
@@ -113,72 +113,27 @@ class _BlockSkeleton extends StatelessWidget {
   }
 }
 
-/// Mirrors [BusinessOffersSection]: un titre puis un carrousel de cartes
-/// d'offre.
-class _OffersSectionSkeleton extends StatelessWidget {
-  const _OffersSectionSkeleton();
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Bone.text(width: 140, style: AppFonts.titleMedium),
-        const SizedBox(height: 12),
-        SizedBox(
-          height: 240,
-          child: ListView.separated(
-            scrollDirection: Axis.horizontal,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: 3,
-            separatorBuilder: (_, _) => const SizedBox(width: 12),
-            itemBuilder: (_, _) =>
-                const SizedBox(width: 190, child: OfferCardSkeleton()),
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-/// Mirrors [BusinessSpecificSection]: a couple of item rows (menu items,
-/// rooms, vehicles, movies... — shape varies by business type but is
-/// consistently icon + title + subtitle).
+/// Mirrors [BusinessSpecificSection] : une grappe de badges « Commodités ».
 class _SpecificSectionSkeleton extends StatelessWidget {
   const _SpecificSectionSkeleton();
 
   @override
   Widget build(BuildContext context) {
     return Column(
-      children: List.generate(2, (index) {
-        return Padding(
-          padding: EdgeInsets.only(bottom: index == 1 ? 0 : 12),
-          child: Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: AppColors.white,
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: Row(
-              children: [
-                const Bone(width: 64, height: 64, uniRadius: 12),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Bone.text(width: 140, style: AppFonts.titleMedium),
-                      const SizedBox(height: 6),
-                      Bone.text(width: 80, style: AppFonts.bodySmall),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-        );
-      }),
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Bone.text(width: 180, style: AppFonts.titleMedium),
+        const SizedBox(height: 12),
+        const Wrap(
+          spacing: 10,
+          runSpacing: 10,
+          children: [
+            Bone(width: 110, height: 34, uniRadius: 17),
+            Bone(width: 90, height: 34, uniRadius: 17),
+            Bone(width: 130, height: 34, uniRadius: 17),
+          ],
+        ),
+      ],
     );
   }
 }

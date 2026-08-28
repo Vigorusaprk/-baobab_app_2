@@ -1,8 +1,6 @@
 import 'package:baobabe_0_2/core/themes/app_diemens.dart';
 import 'package:baobabe_0_2/features/business_detail/data/offer_api_service.dart';
 import 'package:baobabe_0_2/features/business_detail/domain/entities/offer.dart';
-import 'package:baobabe_0_2/features/business_detail/presentation/widgets/business_info_section.dart';
-import 'package:baobabe_0_2/features/home_page/presentation/widgets/offer_card_widget.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/widgets/offers_carousel_section.dart';
 import 'package:flutter/material.dart';
 import 'package:skeletonizer/skeletonizer.dart';
@@ -58,7 +56,12 @@ class _BusinessOffersSectionState extends State<BusinessOffersSection> {
 
   @override
   Widget build(BuildContext context) {
-    if (_loading) return const _OffersSkeleton();
+    if (_loading) {
+      return const Skeletonizer(
+        enabled: true,
+        child: OffersCarouselSkeleton(titleWidth: 140),
+      );
+    }
 
     // Rien à montrer : la section disparaît plutôt que d'annoncer un
     // catalogue inexistant.
@@ -77,39 +80,6 @@ class _BusinessOffersSectionState extends State<BusinessOffersSection> {
           AppDimens.spacerMedium,
         ],
       ],
-    );
-  }
-}
-
-class _OffersSkeleton extends StatelessWidget {
-  const _OffersSkeleton();
-
-  @override
-  Widget build(BuildContext context) {
-    return Skeletonizer(
-      enabled: true,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const BusinessSectionTitle('Ce qu\'on y trouve'),
-          SizedBox(
-            height: AppDimens.horizontalScrollHeight(
-              context,
-              0.30,
-              min: 220,
-              max: 280,
-            ),
-            child: ListView.separated(
-              scrollDirection: Axis.horizontal,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: 3,
-              separatorBuilder: (_, _) => const SizedBox(width: 12),
-              itemBuilder: (_, _) =>
-                  const SizedBox(width: 190, child: OfferCardSkeleton()),
-            ),
-          ),
-        ],
-      ),
     );
   }
 }

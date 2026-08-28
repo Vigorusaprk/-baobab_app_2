@@ -3,6 +3,7 @@ import 'package:baobabe_0_2/core/services/session_service.dart';
 import 'package:baobabe_0_2/core/themes/app_fonts.dart';
 import 'package:baobabe_0_2/core/themes/app_theme.dart';
 import 'package:baobabe_0_2/core/widgets/auth_required_card.dart';
+import 'package:baobabe_0_2/core/widgets/custom_loading.dart';
 import 'package:baobabe_0_2/features/business_detail/data/review_api_service.dart';
 import 'package:baobabe_0_2/features/home_page/domain/entities/business_entity.dart';
 import 'package:flutter/material.dart';
@@ -186,11 +187,10 @@ class _WriteReviewModalState extends State<WriteReviewModal> {
                     style: AppTheme.silvaTheme.elevatedButtonTheme.style,
                     onPressed: _isLoading ? null : _submit,
                     child: _isLoading
-                        ? const SizedBox(
-                      width: 18,
-                      height: 18,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    )
+                        ? const CustomLoadingButton(
+                            size: 22,
+                            color: AppColors.white,
+                          )
                         : const Text('Envoyer'),
                   ),
                 ],

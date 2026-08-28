@@ -4,10 +4,12 @@ import 'package:baobabe_0_2/features/merchant/presentation/cubit/merchant_cubit.
 import 'package:baobabe_0_2/features/merchant/presentation/screens/merchant_dashboard_screen.dart';
 import 'package:baobabe_0_2/features/merchant/presentation/screens/merchant_inbox_screen.dart';
 import 'package:baobabe_0_2/features/merchant/presentation/screens/merchant_offers_screen.dart';
+import 'package:baobabe_0_2/features/merchant/presentation/widgets/merchant_space_skeleton.dart';
 import 'package:baobabe_0_2/features/merchant/presentation/widgets/merchant_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 
 /// L'application vue par un commerçant.
 ///
@@ -40,8 +42,29 @@ class _MerchantShellState extends State<MerchantShell> {
           return _buildShell(context, state);
         }
         if (state is MerchantUnknown || state is MerchantLoading) {
-          return const Scaffold(
-            body: Center(child: CircularProgressIndicator()),
+          // On ne sait pas encore : on montre la forme de l'espace plutôt
+          // qu'un spinner, pour que l'écran ne change pas de nature quand
+          // les chiffres arrivent.
+          return Scaffold(
+            backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+            appBar: AppBar(
+              backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+              elevation: 0,
+              titleSpacing: AppDimens.appPaddingValue,
+              title: const Skeletonizer(
+                enabled: true,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Bone.text(width: 140),
+                    SizedBox(height: 4),
+                    Bone.text(width: 90),
+                  ],
+                ),
+              ),
+            ),
+            body: const MerchantSpaceSkeleton(),
           );
         }
 
