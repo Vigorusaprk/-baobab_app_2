@@ -164,12 +164,12 @@ class _GreetingRow extends StatelessWidget {
         children: [
           // Le bloc a une hauteur fixe : le texte doit tenir sur une
           // ligne, d'où la formulation courte et le garde-fou d'ellipse.
-          const Expanded(
+          Expanded(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
+                const Text(
                   "Bonjour,",
                   style: TextStyle(
                     fontFamily: 'Poppins',
@@ -178,14 +178,11 @@ class _GreetingRow extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  "Commandez ou réservez",
+                  "Qu'allons nous faire aujourd'hui ?",
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    fontFamily: 'Poppins',
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.primary,
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
               ],
