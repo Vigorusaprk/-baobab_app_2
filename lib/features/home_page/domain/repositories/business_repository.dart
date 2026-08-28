@@ -12,6 +12,13 @@ abstract class BusinessRepository {
   /// toutes catégories), déjà filtrées et triées côté serveur.
   Future<HomeFeed> getHomeFeed({String? category});
 
+  /// Page suivante d'une section paginée de l'accueil : `discover` ou `new`.
+  Future<OffersPage> getOffersPage({
+    required String section,
+    required int page,
+    String? category,
+  });
+
   Future<BusinessesPage> getBusinessesPage({required int page, String? category});
   Future<Business> getBusinessDetail(String businessId);
   Future<List<BusinessReview>> getBusinessReviews(String businessId);

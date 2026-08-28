@@ -1,6 +1,7 @@
 ﻿import 'package:baobabe_0_2/core/themes/app_colors.dart';
 import 'package:baobabe_0_2/core/themes/app_diemens.dart';
 import 'package:baobabe_0_2/features/auth/presentation/bloc/auth_session_cubit.dart';
+import 'package:baobabe_0_2/features/merchant/presentation/cubit/merchant_cubit.dart';
 import 'package:baobabe_0_2/features/settings/presentation/widgets/settings_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -97,8 +98,22 @@ class _MainShellState extends State<MainShell> {
   Widget build(BuildContext context) {
     final int currentBranch = widget.navigationShell.currentIndex;
 
-    return BlocListener<AuthSessionCubit, AuthSessionState>(
-      listener: (context, state) => _handleAuthSessionChanged(state),
+    return MultiBlocListener(
+      listeners: [
+        BlocListener<AuthSessionCubit, AuthSessionState>(
+          listener: (context, state) => _handleAuthSessionChanged(state),
+        ),
+        // Un commerçant ouvre l'application sur son commerce, pas sur le
+        // catalogue. Une seule fois par lancement : ensuite il circule
+        // librement entre les deux, sans être ramené de force ici.
+        BlocListener<MerchantCubit, MerchantState>(
+          listener: (context, state) {
+            if (context.read<MerchantCubit>().consumeLanding()) {
+              context.goNamed('merchant');
+            }
+          },
+        ),
+      ],
       child: ValueListenableBuilder<int>(
         valueListenable: widget.branchStackDepth[currentBranch],
         builder: (context, depth, _) {

@@ -236,7 +236,8 @@ class _OfferCataloguePageState extends State<OfferCataloguePage> {
           content: Text(
             _isOrder
                 ? 'Commande envoyée. Retrouvez-la dans Mes activités.'
-                : 'Réservation confirmée. Retrouvez-la dans Mes activités.',
+                : 'Demande envoyée. Le commerçant doit la confirmer. '
+                      'Suivez-la dans Mes activités.',
           ),
           backgroundColor: AppColors.success,
           behavior: SnackBarBehavior.floating,

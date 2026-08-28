@@ -134,7 +134,7 @@ class _CarDetailPageState extends State<CarDetailPage> {
 
       if (mounted) {
         _showSnackBar(
-          '✅ Réservation enregistrée avec succès!',
+          'Demande envoyée. Le loueur doit la confirmer.',
           AppColors.success,
         );
         Future.delayed(const Duration(seconds: 1), () {

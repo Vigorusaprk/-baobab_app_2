@@ -11,17 +11,27 @@ class ReviewApiService {
   /// l'auteur de l'avis depuis le JWT de la requête (plus sûr que de faire
   /// confiance à une valeur envoyée par le client). Gardé dans la signature
   /// pour ne pas casser les appelants existants.
+  ///
+  /// [offerId] vise une offre précise : l'avis note alors ce qui a été
+  /// consommé, et la note du commerce se recalcule comme la moyenne des
+  /// avis reçus par ses offres.
   Future<void> submitReview(
     String businessId,
     String userId,
     int rating,
-    String? comment,
-  ) async {
+    String? comment, {
+    String? offerId,
+  }) async {
     try {
       await _supabase.functions.invoke(
         'create-review',
         method: HttpMethod.post,
-        body: {'businessId': businessId, 'rating': rating, 'comment': comment},
+        body: {
+          'businessId': businessId,
+          'rating': rating,
+          'comment': comment,
+          if (offerId != null) 'offerId': offerId,
+        },
       );
     } catch (e) {
       throw Exception('Erreur de soumission d\'avis : $e');

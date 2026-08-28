@@ -30,3 +30,10 @@ class LoadBusinessesBySlug extends BusinessEvent {
 class LoadMoreBusinesses extends BusinessEvent {
   const LoadMoreBusinesses();
 }
+
+/// Charge la page suivante des nouveautés, derrière le bouton « Voir plus »
+/// en fin de carrousel. Le bloc ignore l'événement s'il n'y a plus rien ou
+/// si un chargement est déjà en cours.
+class LoadMoreNewOffers extends BusinessEvent {
+  const LoadMoreNewOffers();
+}

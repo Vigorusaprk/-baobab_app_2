@@ -1,6 +1,7 @@
 ﻿import 'package:baobabe_0_2/core/themes/app_colors.dart';
 import 'package:baobabe_0_2/core/services/session_service.dart';
 import 'package:baobabe_0_2/features/activity/presentation/widgets/activity_skeleton.dart';
+import 'package:baobabe_0_2/features/activity/presentation/widgets/rate_offer_sheet.dart';
 import 'package:baobabe_0_2/features/booking_page/data/models/reservation_service.dart';
 import 'package:baobabe_0_2/features/business_detail/domain/entities/reservation.dart';
 import 'package:baobabe_0_2/features/order/domain/entities/order.dart';
@@ -211,6 +212,53 @@ class _ActivityScreenState extends State<ActivityScreen>
     }
   }
 
+  /// Propose de noter ce qui a été livré.
+  ///
+  /// Une commande peut contenir plusieurs offres : on demande d'abord
+  /// laquelle, plutôt que d'attribuer arbitrairement la note à la première.
+  /// Seules les lignes rattachées à une offre sont notables — les commandes
+  /// passées avant le moule `offers` n'en portent pas.
+  Future<void> _rateOrder(Order order) async {
+    final rateable = order.items.where((i) => i.offerId != null).toList();
+    if (rateable.isEmpty) {
+      _notify('Cette commande ne peut pas être notée.', AppColors.error);
+      return;
+    }
+
+    var item = rateable.first;
+    if (rateable.length > 1) {
+      final chosen = await showModalBottomSheet<OrderItem>(
+        context: context,
+        builder: (_) => SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Padding(
+                padding: EdgeInsets.all(16),
+                child: Text('Que souhaitez-vous noter ?'),
+              ),
+              for (final line in rateable)
+                ListTile(
+                  title: Text(line.name),
+                  onTap: () => Navigator.of(context).pop(line),
+                ),
+            ],
+          ),
+        ),
+      );
+      if (chosen == null || !mounted) return;
+      item = chosen;
+    }
+
+    final rated = await showRateOfferSheet(
+      context,
+      businessId: order.establishmentId,
+      offerId: item.offerId!,
+      offerName: item.name,
+    );
+    if (rated && mounted) await _loadAll();
+  }
+
   Widget _buildOrdersList() {
     if (_loading) {
       return const ActivityListSkeleton(itemSkeleton: OrderCardSkeleton());
@@ -225,6 +273,9 @@ class _ActivityScreenState extends State<ActivityScreen>
           order: _orders[i],
           onCancel: _orders[i].status.canBeCancelledByCustomer
               ? () => _cancelOrder(_orders[i])
+              : null,
+          onRate: _orders[i].status == OrderStatus.delivered
+              ? () => _rateOrder(_orders[i])
               : null,
         ),
       ),

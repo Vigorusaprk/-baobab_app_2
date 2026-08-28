@@ -1,0 +1,155 @@
+import 'package:baobabe_0_2/core/themes/app_colors.dart';
+import 'package:baobabe_0_2/core/themes/app_diemens.dart';
+import 'package:baobabe_0_2/features/business_detail/domain/entities/offer.dart';
+import 'package:baobabe_0_2/features/home_page/presentation/widgets/offer_card_widget.dart';
+import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+
+/// Carrousel horizontal d'offres, avec son titre.
+///
+/// Sert les sections « Nouveautés » et « Découvrir » : même présentation,
+/// contenus différents. Quand [hasMore] est vrai, une dernière tuile « Voir
+/// plus » clôt la liste plutôt que de la laisser se terminer sans indice
+/// qu'il en existe d'autres.
+class OffersCarouselSection extends StatelessWidget {
+  final String title;
+  final List<Offer> offers;
+
+  /// Reste-t-il des offres au-delà de celles affichées ?
+  final bool hasMore;
+
+  /// Déclenché par la tuile de fin. Sans lui, elle n'est pas affichée.
+  final VoidCallback? onSeeMore;
+
+  /// Tuile supplémentaire pendant le chargement d'une page suivante.
+  final bool isLoadingMore;
+
+  /// Signalé quand l'utilisateur approche de la fin : la vue ne connaît
+  /// rien de la pagination, elle se contente de prévenir.
+  final VoidCallback? onReachedEnd;
+
+  const OffersCarouselSection({
+    super.key,
+    required this.title,
+    required this.offers,
+    this.hasMore = false,
+    this.onSeeMore,
+    this.isLoadingMore = false,
+    this.onReachedEnd,
+  });
+
+  static const double _cardWidth = 190;
+
+  @override
+  Widget build(BuildContext context) {
+    // Une section sans contenu disparaît entièrement : mieux vaut aucune
+    // section qu'un titre suivi du vide.
+    if (offers.isEmpty) return const SizedBox.shrink();
+
+    final showSeeMore = hasMore && onSeeMore != null;
+    final itemCount = offers.length + (showSeeMore ? 1 : 0);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: AppDimens.appPadding,
+          child: Text(title, style: Theme.of(context).textTheme.titleMedium),
+        ),
+        const SizedBox(height: 10),
+        SizedBox(
+          height: AppDimens.horizontalScrollHeight(
+            context,
+            0.30,
+            min: 220,
+            max: 280,
+          ),
+          child: ListView.separated(
+            scrollDirection: Axis.horizontal,
+            physics: const BouncingScrollPhysics(),
+            padding: AppDimens.appPadding,
+            itemCount: itemCount,
+            separatorBuilder: (_, _) => const SizedBox(width: 12),
+            itemBuilder: (context, index) {
+              if (index >= offers.length) {
+                return _SeeMoreTile(
+                  width: _cardWidth,
+                  onTap: onSeeMore!,
+                  isLoading: isLoadingMore,
+                );
+              }
+
+              if (onReachedEnd != null && index == offers.length - 2) {
+                onReachedEnd!();
+              }
+
+              final offer = offers[index];
+              return SizedBox(
+                width: _cardWidth,
+                child: OfferCardWidget(
+                  offer: offer,
+                  onTap: () {
+                    final businessId = offer.businessId;
+                    if (businessId == null) return;
+                    context.pushNamed(
+                      'businessDetail',
+                      pathParameters: {'id': businessId},
+                    );
+                  },
+                ),
+              );
+            },
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+/// Tuile de fin de liste : indique qu'il reste des offres et permet de les
+/// charger sans quitter la page.
+class _SeeMoreTile extends StatelessWidget {
+  final double width;
+  final VoidCallback onTap;
+  final bool isLoading;
+
+  const _SeeMoreTile({
+    required this.width,
+    required this.onTap,
+    this.isLoading = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: width,
+      child: Material(
+        color: AppColors.white,
+        borderRadius: AppDimens.cardBorderRadiusAll,
+        child: InkWell(
+          borderRadius: AppDimens.cardBorderRadiusAll,
+          onTap: isLoading ? null : onTap,
+          child: Center(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  isLoading ? Icons.more_horiz_rounded : Icons.arrow_forward,
+                  color: AppColors.primary,
+                ),
+                AppDimens.spacerSmall,
+                Text(
+                  isLoading ? 'Chargement…' : 'Voir plus',
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.primary,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}

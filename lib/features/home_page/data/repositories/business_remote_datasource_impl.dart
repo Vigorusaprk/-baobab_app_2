@@ -3,7 +3,9 @@ import 'package:baobabe_0_2/core/database/local_cache.dart';
 import 'package:baobabe_0_2/features/business_detail/domain/entities/menu_restau.dart';
 import 'package:baobabe_0_2/features/booking_page/data/models/reservation_model.dart';
 import 'package:baobabe_0_2/features/home_page/data/data_sources/remote_datasource/business_remote_datasource.dart';
+import 'package:baobabe_0_2/features/business_detail/domain/entities/offer.dart';
 import 'package:baobabe_0_2/features/home_page/data/models/business_model.dart';
+import 'package:baobabe_0_2/features/home_page/domain/entities/home_feed.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -46,9 +48,9 @@ class BusinessRemoteDataSourceImpl implements BusinessRemoteDataSource {
       final response = await _supabase.functions.invoke(
         'get-home',
         method: HttpMethod.get,
-        queryParameters: {'section': 'discover', 'pageSize': '50'},
+        queryParameters: {'section': 'businesses', 'pageSize': '50'},
       );
-      final data = _discoverItems(response.data as Map<String, dynamic>);
+      final data = _businessItems(response.data as Map<String, dynamic>);
       final businesses = data
           .map((json) => BusinessModel.fromJson(json as Map<String, dynamic>))
           .toList();
@@ -72,11 +74,11 @@ class BusinessRemoteDataSourceImpl implements BusinessRemoteDataSource {
     }
   }
 
-  /// Extrait la liste d'une réponse `get-home` en mode `section=discover`,
-  /// dont la charge utile est `{ discover: { data: [...], hasMore } }`.
-  List<dynamic> _discoverItems(Map<String, dynamic> json) {
-    final discover = json['discover'] as Map<String, dynamic>?;
-    return (discover?['data'] as List?) ?? const [];
+  /// Extrait la liste d'une réponse `get-home` en mode `section=businesses`,
+  /// dont la charge utile est `{ businesses: { data: [...], hasMore } }`.
+  List<dynamic> _businessItems(Map<String, dynamic> json) {
+    final page = json['businesses'] as Map<String, dynamic>?;
+    return (page?['data'] as List?) ?? const [];
   }
 
   @override
@@ -136,12 +138,12 @@ class BusinessRemoteDataSourceImpl implements BusinessRemoteDataSource {
         'get-home',
         method: HttpMethod.get,
         queryParameters: {
-          'section': 'discover',
+          'section': 'businesses',
           'category': category,
           'pageSize': '50',
         },
       );
-      final data = _discoverItems(response.data as Map<String, dynamic>);
+      final data = _businessItems(response.data as Map<String, dynamic>);
       final businesses = data
           .map((json) => BusinessModel.fromJson(json as Map<String, dynamic>))
           .toList();
@@ -166,26 +168,13 @@ class BusinessRemoteDataSourceImpl implements BusinessRemoteDataSource {
   }
 
   @override
-  Future<
-    ({
-      List<BusinessModel> newBusinesses,
-      List<BusinessModel> popularBusinesses,
-      List<BusinessModel> discoverItems,
-      bool discoverHasMore,
-    })
-  >
-  getHomeFeed({String? category}) async {
+  Future<HomeFeed> getHomeFeed({String? category}) async {
     final cacheKey = 'home_feed_${category ?? 'all'}';
 
     if (!await _isOnline) {
       final cached = await _db.getCache(cacheKey);
       if (cached != null) return _decodeHomeFeed(jsonDecode(cached));
-      return (
-        newBusinesses: <BusinessModel>[],
-        popularBusinesses: <BusinessModel>[],
-        discoverItems: <BusinessModel>[],
-        discoverHasMore: false,
-      );
+      return const HomeFeed();
     }
 
     try {
@@ -198,38 +187,59 @@ class BusinessRemoteDataSourceImpl implements BusinessRemoteDataSource {
       );
       final json = response.data as Map<String, dynamic>;
       final feed = _decodeHomeFeed(json);
-
       await _db.saveCache(cacheKey, jsonEncode(json));
       return feed;
     } catch (e) {
       final cached = await _db.getCache(cacheKey);
       if (cached != null) return _decodeHomeFeed(jsonDecode(cached));
       throw Exception(
-        'Erreur Edge Function (get-home) lors du chargement de la page d\'accueil : $e',
+        "Erreur Edge Function (get-home) lors du chargement de la page d'accueil : $e",
       );
     }
   }
 
-  /// Convertit la charge utile `get-home` (réseau ou cache — même forme)
-  /// en modèles.
-  ({
-    List<BusinessModel> newBusinesses,
-    List<BusinessModel> popularBusinesses,
-    List<BusinessModel> discoverItems,
-    bool discoverHasMore,
-  })
-  _decodeHomeFeed(Map<String, dynamic> json) {
-    List<BusinessModel> parse(Object? list) =>
-        ((list as List?) ?? const [])
-            .map((item) => BusinessModel.fromJson(item as Map<String, dynamic>))
-            .toList();
+  @override
+  Future<OffersPage> getOffersPage({
+    required String section,
+    required int page,
+    String? category,
+  }) async {
+    // Pas de secours hors-ligne : la première page a déjà son cache, les
+    // suivantes sont un enrichissement progressif.
+    final response = await _supabase.functions.invoke(
+      'get-home',
+      method: HttpMethod.get,
+      queryParameters: {
+        'section': section,
+        'page': '$page',
+        if (category != null && category.isNotEmpty) 'category': category,
+      },
+    );
+    final json = response.data as Map<String, dynamic>;
+    final key = section == 'new' ? 'newOffers' : 'discoverOffers';
+    return _decodeOffersPage(json[key]);
+  }
 
-    final discover = json['discover'] as Map<String, dynamic>?;
-    return (
-      newBusinesses: parse(json['newBusinesses']),
-      popularBusinesses: parse(json['popularBusinesses']),
-      discoverItems: parse(discover?['data']),
-      discoverHasMore: discover?['hasMore'] as bool? ?? false,
+  /// Convertit la charge utile `get-home` (réseau ou cache — même forme).
+  HomeFeed _decodeHomeFeed(Map<String, dynamic> json) {
+    return HomeFeed(
+      newOffers: _decodeOffersPage(json['newOffers']),
+      popularBusinesses: ((json['popularBusinesses'] as List?) ?? const [])
+          .map((e) => BusinessModel.fromJson(Map<String, dynamic>.from(e as Map)))
+          .map((m) => m.toEntity())
+          .toList(),
+      discoverOffers: _decodeOffersPage(json['discoverOffers']),
+    );
+  }
+
+  OffersPage _decodeOffersPage(Object? raw) {
+    if (raw is! Map) return const OffersPage();
+    final map = Map<String, dynamic>.from(raw);
+    return OffersPage(
+      items: ((map['data'] as List?) ?? const [])
+          .map((e) => Offer.fromJson(Map<String, dynamic>.from(e as Map)))
+          .toList(),
+      hasMore: map['hasMore'] == true,
     );
   }
 
@@ -242,24 +252,23 @@ class BusinessRemoteDataSourceImpl implements BusinessRemoteDataSource {
     // cache, "charger plus" est un enrichissement progressif, pas le
     // contenu principal de l'écran.
     //
-    // `section=discover` : seule la liste paginée est recalculée côté
-    // serveur — inutile de refaire "Nouveautés" et "Populaires" à chaque
-    // cran de scroll, ils ne changent pas.
+    // `section=businesses` : cette pagination alimente l'écran « Voir tout »,
+    // qui liste des commerçants — pas les offres de l'accueil.
     final response = await _supabase.functions.invoke(
       'get-home',
       method: HttpMethod.get,
       queryParameters: {
-        'section': 'discover',
+        'section': 'businesses',
         'page': '$page',
         if (category != null && category.isNotEmpty) 'category': category,
       },
     );
     final json = response.data as Map<String, dynamic>;
-    final discover = json['discover'] as Map<String, dynamic>?;
-    final items = _discoverItems(json)
+    final page_ = json['businesses'] as Map<String, dynamic>?;
+    final items = _businessItems(json)
         .map((item) => BusinessModel.fromJson(item as Map<String, dynamic>))
         .toList();
-    return (items: items, hasMore: discover?['hasMore'] as bool? ?? false);
+    return (items: items, hasMore: page_?['hasMore'] as bool? ?? false);
   }
 
   @override

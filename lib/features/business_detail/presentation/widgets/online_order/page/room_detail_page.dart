@@ -151,7 +151,7 @@ class _RoomDetailPageState extends State<RoomDetailPage> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Réservation confirmée !'),
+            content: Text("Demande envoyée. L'hôtel doit la confirmer."),
             backgroundColor: AppColors.success,
           ),
         );

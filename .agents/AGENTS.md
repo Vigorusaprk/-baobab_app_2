@@ -76,19 +76,23 @@ All functions are deployed with `verify_jwt: true`.
 
 ### Current functions
 
-- `get-home` — bundle de l'accueil filtré par catégorie : `{newBusinesses, popularBusinesses, discover}`. `?section=discover&page=N` ne renvoie que la liste paginée (scroll infini).
+- `get-home` — bundle de l'accueil filtré par catégorie : `{newOffers, popularBusinesses, discoverOffers}`. `?section=new&page=N`, `?section=discover&page=N` et `?section=businesses` renvoient une liste paginée seule (voir « Les trois sections de l'accueil » ci-dessous).
 - `get-categories` — catégories de la marketplace, mises en cache par l'app
 - `get-business-detail` — `?id=` → `{business, offers, capabilities, menuItems, rooms, vehicles, reviews}`
 - `get-businesses-budget` — recherche par prix d'entrée réel (`?min=&max=&category=`)
 - `get-reviews-business` — `?businessId=&page=`
-- `create-review`
+- `create-review` — `offerId` facultatif : un avis vise une offre précise, ou le commerce
 - `get-orders-client` — paginé, noms d'articles figés à la commande
 - `get-reservations-client` — paginé, nom du commerçant côté serveur
 - `create-order` — n'accepte que des offres et des quantités ; prix et total calculés en base
 - `cancel-order-client` — annulation par le client tant que la commande n'est pas préparée
-- `update-order-status` — côté commerçant
+- `update-order-status` — côté commerçant, statut validé contre une liste blanche
+- `update-reservation-status` — le commerçant confirme, refuse ou clôt une réservation
 - `create-reservation` — vérifie disponibilité, capacité et date ; calcule le montant
 - `delete-reservation`
+- `get-merchant-space` — tout l'espace commerçant en un appel, **et** la réponse à « cet utilisateur est-il commerçant ? » (`business: null` ⇒ non)
+- `create-merchant-application` — dépôt d'une demande de compte commerçant
+- `create-offer` / `update-offer` — publication et modification d'une offre par son commerçant
 - `get-me` — merges `auth.users` + `public.users`, auto-creates the `public.users` row on first login. **Casing gotcha**: the supabase-js `User` object from `auth.users` uses **snake_case** properties (`user_metadata`, `email_confirmed_at`, `created_at`), not camelCase — a real bug hit and fixed while building this function.
 
 If a screen needs a new kind of server-side data (a new page's initial load, a new mutation), add a new Edge Function following the naming convention above rather than reaching for a direct `.from()` call, even for something that looks like a "simple" query.
@@ -148,6 +152,65 @@ Le catalogue (`business`, `offers`, `menu_items`, `rooms`, `vehicles`,
 `reviews`) doit rester lisible par le rôle `anon`. Une policy réservée à
 `authenticated` vide la page de découverte pour un visiteur, ce qui contredit
 le principe de navigation libre documenté plus haut.
+
+### Les trois sections de l'accueil
+
+Elles ne montrent délibérément **pas la même chose**. Quand les trois
+affichaient des commerçants, une catégorie n'en comptant qu'un faisait lire
+trois fois le même nom, et on ne savait pas si une carte était une offre ou
+une enseigne.
+
+- **Nouveautés** — les offres publiées depuis moins de `NEW_WINDOW_DAYS`
+  (30 jours). Section **entièrement masquée** quand il n'y a rien de récent :
+  un titre suivi du vide est pire qu'une absence. Limitée à `NEW_PAGE_SIZE`,
+  avec une tuile « Voir plus » en fin de liste s'il en reste.
+- **Populaires** — les 3 meilleurs **commerçants**.
+- **Découvrir** — les meilleures **offres**, en scroll infini.
+
+Les cartes d'offre (`OfferCardWidget`) et de commerçant sont volontairement
+différentes : prix + « chez X » d'un côté, note + catégorie de l'autre.
+
+### Les notes : on note une offre, pas un commerce
+
+`reviews.offer_id` désigne ce qui a été consommé. Le trigger
+`refresh_ratings()` recalcule `offers.rating` **et** `business.rating`, cette
+dernière étant la **moyenne des notes des offres** du commerce. Aucun client
+n'écrit jamais une note directement. Le bouton « Noter » n'apparaît que sur
+une commande `delivered` — il n'y a rien à juger d'un plat pas encore goûté.
+
+## L'espace commerçant
+
+Devenir commerçant passe par `submit_merchant_application`, une fonction
+`SECURITY DEFINER` : `business` n'a **volontairement aucune policy
+d'insertion**, personne ne doit pouvoir créer un commerce arbitraire via
+l'API REST. La fonction est le guichet contrôlé — elle valide, crée le
+commerce, la fiche `public.users` et la ligne `business_staff` propriétaire.
+En l'absence de panneau d'administration, elle accepte à la volée ; les trois
+états (`pending`/`approved`/`rejected`) existent déjà pour que la modération
+n'impose aucune reprise de l'interface.
+
+**Un commerçant a une application différente.** `MerchantShell` (`/merchant`)
+apporte sa propre coquille et sa propre barre de navigation — il ne s'insère
+pas dans le `StatefulShellRoute` du client. Au lancement, `MerchantCubit`
+répond « commerçant ? » et l'application s'ouvre sur cet espace **une seule
+fois** (`consumeLanding()`), après quoi les deux mondes restent accessibles
+l'un depuis l'autre. Un commerçant reste un client : il doit pouvoir commander
+ailleurs, et son historique ne doit jamais devenir inatteignable.
+
+`MerchantCubit` vit au niveau de l'application : la réponse conditionne à la
+fois la navigation et les paramètres. Toute écriture relit l'espace derrière
+elle (`_mutate`) plutôt que de recoller un état local — les compteurs du
+tableau de bord sont calculés par le serveur, en tenir une seconde version
+côté client serait deux vérités pour une même chose.
+
+Le commerce n'est **jamais lu depuis la requête** : `create-offer` le déduit
+de la ligne `business_staff` de l'appelant. Retirer une offre la **désactive**
+(`is_active = false`) au lieu de la supprimer : elle est référencée par des
+commandes passées, et un historique qui perd le nom de ce qui a été acheté ne
+vaut plus rien.
+
+Une réservation naît `pending` : le commerçant doit la confirmer. Les textes
+côté client disent donc « Demande envoyée », jamais « Réservation confirmée ».
 
 ## Pagination — Infinite Scroll Pattern
 
@@ -257,6 +320,19 @@ Mandatory checks after any meaningful code change:
 16. Le cache local passe par `LocalCache` (Hive), jamais `sqflite` : celui-ci
     n'existe pas sur le web, et comme le cache s'écrit à l'intérieur du `try`
     réseau, son échec s'y confondait avec une panne et faisait échouer l'écran.
+17. Une note se pose sur une **offre**. La note d'un commerce est dérivée, pas
+    saisie : ne jamais écrire dans `business.rating` ni `offers.rating` depuis
+    l'application (voir « Les notes » ci-dessus).
+18. Le commerce d'un commerçant se déduit **toujours** côté serveur de sa ligne
+    `business_staff` ; ne jamais accepter un `businessId` venu de la requête
+    pour une écriture (voir « L'espace commerçant » ci-dessus).
+19. Une offre se retire (`is_active = false`), elle ne se supprime pas : les
+    commandes et réservations passées la référencent.
+20. Une policy d'UPDATE réservée au client doit borner ce qu'il peut écrire.
+    « Le client peut annuler sa commande » autorisait en réalité *n'importe
+    quelle* mise à jour de sa commande, y compris se déclarer livré ;
+    l'annulation passe désormais par `cancel_order()` seule. Vérifier le
+    `WITH CHECK` de toute nouvelle policy d'écriture.
 13. **`lib/core/themes/app_theme.dart` (`AppTheme.silvaTheme`) is the single source of truth for the app's `ThemeData`.** The app currently ships one theme only (light — `brightness: Brightness.light`, no `darkTheme` wired into `MaterialApp.router`). When a task calls for visual/theming work:
     - Never invent a one-off color palette or a screen-specific "look" (e.g. a dark card style copied from a design mockup) that doesn't route through `AppColors`/`AppTheme`. If a design reference (mockup, screenshot) implies colors that don't exist in `AppColors`, restyle the layout using the existing palette instead of introducing new literals — ask the user first if the existing palette genuinely cannot express the design.
     - If a real second theme (e.g. an actual dark mode) is ever needed, it must be added properly: new tokens in `AppColors`, a second `ThemeData` in `AppTheme`, and `darkTheme`/`themeMode` wired into `MaterialApp.router` in `lib/app/main_app.dart` — not a scoped-to-one-screen imitation. Don't half-build this (e.g. a theme picker UI that stores a `ThemeMode` nobody consumes) — a `SettingsCubit.themeMode` + theme-picker dialog like this existed and was removed for being fully decorative; don't reintroduce that pattern.

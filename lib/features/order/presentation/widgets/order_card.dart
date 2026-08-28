@@ -13,7 +13,17 @@ class OrderCard extends StatelessWidget {
   /// masque le bouton plutôt que d'en afficher un qui échouerait.
   final VoidCallback? onCancel;
 
-  const OrderCard({super.key, required this.order, this.onCancel});
+  /// Proposé une fois la commande livrée : le client note ce qu'il a
+  /// réellement reçu. Absent tant que la commande est en cours — il n'y a
+  /// rien à juger d'un plat qu'on n'a pas encore goûté.
+  final VoidCallback? onRate;
+
+  const OrderCard({
+    super.key,
+    required this.order,
+    this.onCancel,
+    this.onRate,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -193,6 +203,20 @@ class OrderCard extends StatelessWidget {
                       label: const Text('Annuler la commande'),
                       style: TextButton.styleFrom(
                         foregroundColor: AppColors.error,
+                      ),
+                    ),
+                  ),
+                ],
+                if (onRate != null) ...[
+                  const SizedBox(height: AppDimens.small),
+                  SizedBox(
+                    width: double.infinity,
+                    child: TextButton.icon(
+                      onPressed: onRate,
+                      icon: const Icon(Icons.star_border_rounded, size: 18),
+                      label: const Text('Noter ma commande'),
+                      style: TextButton.styleFrom(
+                        foregroundColor: AppColors.primary,
                       ),
                     ),
                   ),

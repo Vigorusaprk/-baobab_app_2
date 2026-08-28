@@ -10,11 +10,12 @@ import 'package:baobabe_0_2/features/home_page/data/repositories/business_remote
 import 'package:baobabe_0_2/features/home_page/data/repositories/business_repository_impl.dart';
 import 'package:baobabe_0_2/features/home_page/data/repositories/category_repository_impl.dart';
 import 'package:baobabe_0_2/features/home_page/data/repositories/search_repository_impl.dart';
-import 'package:baobabe_0_2/features/home_page/domain/usecases/get_businesses_page.dart';
+import 'package:baobabe_0_2/features/home_page/domain/usecases/get_offers_page.dart';
 import 'package:baobabe_0_2/features/home_page/domain/usecases/get_home_feed.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/bloc/business_bloc.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/bloc/category_bloc.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/bloc/search_bloc.dart';
+import 'package:baobabe_0_2/features/merchant/presentation/cubit/merchant_cubit.dart';
 import 'package:baobabe_0_2/features/settings/presentation/bloc/settings_bloc.dart'
     as theme_settings;
 import 'package:flutter/material.dart';
@@ -66,7 +67,7 @@ class _MainAppState extends State<MainApp> {
         BlocProvider<BusinessBloc>(
           create: (_) => BusinessBloc(
             getHomeFeed: GetHomeFeed(businessRepository),
-            getBusinessesPage: GetBusinessesPage(businessRepository),
+            getOffersPage: GetOffersPage(businessRepository),
           ),
         ),
         BlocProvider<SearchBloc>(
@@ -76,6 +77,10 @@ class _MainAppState extends State<MainApp> {
             ),
           ),
         ),
+        // Au niveau de l'application : la réponse « cet utilisateur est-il
+        // commerçant ? » conditionne l'écran d'ouverture et le contenu des
+        // paramètres, qui ne peuvent pas chacun refaire l'appel.
+        BlocProvider<MerchantCubit>(create: (_) => MerchantCubit()),
         BlocProvider<SettingsCubit>(create: (_) => SettingsCubit()),
         BlocProvider<theme_settings.SettingsCubit>(
           create: (_) => theme_settings.SettingsCubit(),

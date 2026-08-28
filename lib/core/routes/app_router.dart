@@ -22,8 +22,12 @@ import 'package:baobabe_0_2/features/settings/presentation/widgets/profil_page.d
 import 'package:baobabe_0_2/features/settings/presentation/widgets/edit_profile_page.dart';
 import 'package:baobabe_0_2/features/business_detail/presentation/screens/business_detail_screen.dart';
 import 'package:baobabe_0_2/features/business_detail/presentation/widgets/online_order/page/plat_detail.dart';
+import 'package:baobabe_0_2/features/merchant/presentation/screens/become_merchant_page.dart';
+import 'package:baobabe_0_2/features/merchant/presentation/screens/merchant_shell.dart';
+import 'package:baobabe_0_2/features/merchant/presentation/screens/offer_form_page.dart';
 
 // Modèles/Entités
+import 'package:baobabe_0_2/features/business_detail/domain/entities/offer.dart';
 import 'package:baobabe_0_2/features/business_detail/domain/entities/reservation.dart';
 import 'package:baobabe_0_2/features/order/domain/entities/order.dart';
 
@@ -241,6 +245,32 @@ final GoRouter appRouter = GoRouter(
         );
       },
     ),
+    // --- ESPACE COMMERÇANT ---
+    //
+    // Hors du shell client : un commerçant ne navigue plus dans un
+    // catalogue, il gère un commerce. MerchantShell apporte sa propre
+    // coquille et sa propre barre de navigation.
+    GoRoute(
+      path: '/merchant',
+      name: 'merchant',
+      pageBuilder: (context, state) =>
+          const NoTransitionPage(child: MerchantShell()),
+      routes: [
+        GoRoute(
+          path: 'offer',
+          name: 'offerForm',
+          pageBuilder: (context, state) =>
+              MaterialPage(child: OfferFormPage(offer: state.extra as Offer?)),
+        ),
+      ],
+    ),
+    GoRoute(
+      path: '/become-merchant',
+      name: 'becomeMerchant',
+      pageBuilder: (context, state) =>
+          const MaterialPage(child: BecomeMerchantPage()),
+    ),
+
     GoRoute(
       path: '/profil-page',
       name: 'profil-page',

@@ -1,5 +1,6 @@
 import 'package:baobabe_0_2/features/home_page/domain/entities/business_entity.dart';
-import 'package:baobabe_0_2/features/home_page/domain/usecases/get_businesses_page.dart';
+import 'package:baobabe_0_2/features/business_detail/domain/entities/offer.dart';
+import 'package:baobabe_0_2/features/home_page/domain/usecases/get_offers_page.dart';
 import 'package:baobabe_0_2/features/home_page/domain/usecases/get_home_feed.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -13,7 +14,7 @@ part 'business_state.dart';
 /// commune dans son coin.
 class BusinessBloc extends Bloc<BusinessEvent, BusinessState> {
   final GetHomeFeed getHomeFeed;
-  final GetBusinessesPage getBusinessesPage;
+  final GetOffersPage getOffersPage;
 
   /// Jeton de la dernière demande de page d'accueil. Un tap rapide sur
   /// plusieurs catégories lance plusieurs requêtes concurrentes : seule la
@@ -21,11 +22,12 @@ class BusinessBloc extends Bloc<BusinessEvent, BusinessState> {
   /// écraser l'affichage d'une catégorie sélectionnée après elle.
   int _homeRequestId = 0;
 
-  BusinessBloc({required this.getHomeFeed, required this.getBusinessesPage})
+  BusinessBloc({required this.getHomeFeed, required this.getOffersPage})
     : super(BusinessInitial()) {
     on<LoadBusinesses>(_onLoadBusinesses);
     on<LoadBusinessesBySlug>(_onLoadBusinessesBySlug);
     on<LoadMoreBusinesses>(_onLoadMoreBusinesses);
+    on<LoadMoreNewOffers>(_onLoadMoreNewOffers);
   }
 
   /// Slug de la catégorie "aucun filtre", ajoutée côté client.
@@ -57,12 +59,13 @@ class BusinessBloc extends Bloc<BusinessEvent, BusinessState> {
 
       emit(
         BusinessLoaded(
-          businesses: feed.discover.items,
-          currentSlug: slug,
-          newBusinesses: feed.newBusinesses,
+          newOffers: feed.newOffers.items,
+          hasMoreNewOffers: feed.newOffers.hasMore,
           popularBusinesses: feed.popularBusinesses,
+          discoverOffers: feed.discoverOffers.items,
+          currentSlug: slug,
           page: 1,
-          hasMore: feed.discover.hasMore,
+          hasMore: feed.discoverOffers.hasMore,
         ),
       );
     } catch (e) {
@@ -93,8 +96,9 @@ class BusinessBloc extends Bloc<BusinessEvent, BusinessState> {
     try {
       // Seule la section "Découvrir" est paginée : "Nouveautés" et
       // "Populaires" ne bougent pas et ne sont donc pas redemandées.
-      final page = await getBusinessesPage(
-        GetBusinessesPageParams(
+      final page = await getOffersPage(
+        GetOffersPageParams(
+          section: 'discover',
           page: nextPage,
           category: _categoryParam(current.currentSlug),
         ),
@@ -105,7 +109,7 @@ class BusinessBloc extends Bloc<BusinessEvent, BusinessState> {
 
       emit(
         current.copyWith(
-          businesses: [...current.businesses, ...page.items],
+          discoverOffers: [...current.discoverOffers, ...page.items],
           page: nextPage,
           hasMore: page.hasMore,
           isLoadingMore: false,
@@ -116,6 +120,47 @@ class BusinessBloc extends Bloc<BusinessEvent, BusinessState> {
       // Échec silencieux : l'utilisateur redevient libre de scroller pour
       // réessayer, plutôt que de rester bloqué sur isLoadingMore=true.
       emit(current.copyWith(isLoadingMore: false));
+    }
+  }
+
+  /// Page suivante des nouveautés, demandée par le bouton « Voir plus ».
+  Future<void> _onLoadMoreNewOffers(
+    LoadMoreNewOffers event,
+    Emitter<BusinessState> emit,
+  ) async {
+    final current = state;
+    if (current is! BusinessLoaded ||
+        !current.hasMoreNewOffers ||
+        current.isLoadingMoreNewOffers) {
+      return;
+    }
+
+    final requestId = _homeRequestId;
+    emit(current.copyWith(isLoadingMoreNewOffers: true));
+    final nextPage = current.newOffersPage + 1;
+
+    try {
+      final page = await getOffersPage(
+        GetOffersPageParams(
+          section: 'new',
+          page: nextPage,
+          category: _categoryParam(current.currentSlug),
+        ),
+      );
+      if (requestId != _homeRequestId) return;
+
+      emit(
+        current.copyWith(
+          newOffers: [...current.newOffers, ...page.items],
+          newOffersPage: nextPage,
+          hasMoreNewOffers: page.hasMore,
+          isLoadingMoreNewOffers: false,
+        ),
+      );
+    } catch (_) {
+      if (requestId != _homeRequestId) return;
+      // Échec silencieux : le bouton reste disponible pour réessayer.
+      emit(current.copyWith(isLoadingMoreNewOffers: false));
     }
   }
 }

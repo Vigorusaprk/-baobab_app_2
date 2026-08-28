@@ -1,26 +1,38 @@
+import 'package:baobabe_0_2/features/business_detail/domain/entities/offer.dart';
 import 'package:baobabe_0_2/features/home_page/domain/entities/business_entity.dart';
-import 'package:baobabe_0_2/features/home_page/domain/entities/businesses_page.dart';
 
-/// Contenu complet de la page d'accueil pour une catégorie donnée, tel que
-/// renvoyé par l'Edge Function `get-home` en un seul appel.
+/// Une page d'offres, avec l'information « y en a-t-il d'autres ? ».
+class OffersPage {
+  final List<Offer> items;
+  final bool hasMore;
+
+  const OffersPage({this.items = const [], this.hasMore = false});
+
+  bool get isEmpty => items.isEmpty;
+}
+
+/// Contenu de la page d'accueil pour une catégorie, renvoyé par l'Edge
+/// Function `get-home` en un seul appel.
 ///
-/// Les trois listes sont déjà filtrées, triées et tronquées côté serveur :
-/// l'UI se contente de les afficher. Quand l'utilisateur change de
-/// catégorie, c'est ce bloc entier qui est re-demandé, ce qui garantit que
-/// toutes les sections de la page restent cohérentes entre elles.
+/// Les trois sections répondent chacune à une question différente, et ne
+/// montrent délibérément pas la même chose : elles affichaient auparavant
+/// toutes les trois des commerçants, si bien qu'on ne pouvait pas les
+/// distinguer — sur une catégorie ne comptant qu'un commerçant, on voyait
+/// trois fois le même nom.
 class HomeFeed {
-  /// Établissements créés récemment (section "Nouveautés").
-  final List<Business> newBusinesses;
+  /// « Quoi de neuf ? » — offres publiées récemment. [OffersPage.hasMore]
+  /// indique s'il en reste au-delà de ce que le carrousel montre.
+  final OffersPage newOffers;
 
-  /// Meilleures notes de la catégorie (section "Populaires").
+  /// « Chez qui aller ? » — les meilleurs commerçants.
   final List<Business> popularBusinesses;
 
-  /// Première page de la liste paginée (section "Découvrir").
-  final BusinessesPage discover;
+  /// « Quoi prendre ? » — les offres les mieux notées, paginées.
+  final OffersPage discoverOffers;
 
   const HomeFeed({
-    required this.newBusinesses,
-    required this.popularBusinesses,
-    required this.discover,
+    this.newOffers = const OffersPage(),
+    this.popularBusinesses = const [],
+    this.discoverOffers = const OffersPage(),
   });
 }

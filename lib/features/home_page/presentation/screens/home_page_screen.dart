@@ -1,11 +1,10 @@
 import 'package:baobabe_0_2/core/themes/app_diemens.dart';
 import 'package:baobabe_0_2/features/home_page/data/repositories/business_remote_datasource_impl.dart';
 import 'package:baobabe_0_2/features/home_page/data/repositories/business_repository_impl.dart';
-import 'package:baobabe_0_2/features/home_page/domain/usecases/get_businesses_page.dart';
+import 'package:baobabe_0_2/features/home_page/domain/usecases/get_offers_page.dart';
 import 'package:baobabe_0_2/features/home_page/domain/usecases/get_home_feed.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/bloc/business_bloc.dart';
-import 'package:baobabe_0_2/features/home_page/presentation/widgets/business_cards_widget.dart';
-import 'package:baobabe_0_2/features/home_page/presentation/widgets/business_promo_carousel.dart';
+import 'package:baobabe_0_2/features/home_page/presentation/widgets/offers_carousel_section.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/widgets/home_skeleton.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/widgets/home_sliver_header.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/widgets/popular_businesses_section.dart';
@@ -71,12 +70,8 @@ class _HomePageScreenState extends State<HomePageScreen> {
     return false;
   }
 
-  /// Ouvre la liste complete pour la categorie actuellement affichee.
-  ///
-  /// "Populaires" et "Decouvrir" partagent le meme classement (note, puis
-  /// nombre d'avis) : leur "Voir tout" mene donc a la meme liste, filtree
-  /// sur la categorie selectionnee pour que la page corresponde a ce que
-  /// l'utilisateur avait sous les yeux.
+  /// Ouvre la liste complète des commerçants de la catégorie affichée.
+  /// Réservé à « Populaires », la seule section qui parle de commerçants.
   void _openAllBusinesses(BuildContext context) {
     final state = context.read<BusinessBloc>().state;
     final slug = state is BusinessLoaded
@@ -97,7 +92,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
             );
             return BusinessBloc(
               getHomeFeed: GetHomeFeed(repository),
-              getBusinessesPage: GetBusinessesPage(repository),
+              getOffersPage: GetOffersPage(repository),
             )..add(LoadBusinesses());
           },
         ),
@@ -125,19 +120,10 @@ class _HomePageScreenState extends State<HomePageScreen> {
                 SliverToBoxAdapter(
                   child: isLoading
                       ? const Skeletonizer(enabled: true, child: HomeSkeleton())
-                      : Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const BusinessPromoCarousel(),
-                            AppDimens.spacerSmall,
-                            PopularBusinessesSection(
-                              onSeeAllTap: () => _openAllBusinesses(context),
-                            ),
-                            AppDimens.spacerSmall,
-                            BusinessCardsWidget(
-                              onSeeAllTap: () => _openAllBusinesses(context),
-                            ),
-                          ],
+                      : _Sections(
+                          state: state,
+                          onSeeAllBusinesses: () =>
+                              _openAllBusinesses(context),
                         ),
                 ),
               ],
@@ -145,6 +131,48 @@ class _HomePageScreenState extends State<HomePageScreen> {
           );
         },
       ),
+    );
+  }
+}
+
+/// Les trois sections de l'accueil, dans l'ordre où elles répondent aux
+/// questions de l'utilisateur : quoi de neuf, chez qui aller, quoi prendre.
+class _Sections extends StatelessWidget {
+  final BusinessState state;
+  final VoidCallback onSeeAllBusinesses;
+
+  const _Sections({required this.state, required this.onSeeAllBusinesses});
+
+  @override
+  Widget build(BuildContext context) {
+    if (state is! BusinessLoaded) return const SizedBox.shrink();
+    final loaded = state as BusinessLoaded;
+    final bloc = context.read<BusinessBloc>();
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Disparaît d'elle-même quand rien n'est récent : la section ne
+        // sait afficher que des offres, pas un vide.
+        OffersCarouselSection(
+          title: 'Nouveautés',
+          offers: loaded.newOffers,
+          hasMore: loaded.hasMoreNewOffers,
+          isLoadingMore: loaded.isLoadingMoreNewOffers,
+          onSeeMore: () => bloc.add(const LoadMoreNewOffers()),
+        ),
+        if (loaded.newOffers.isNotEmpty) AppDimens.spacerMedium,
+        PopularBusinessesSection(onSeeAllTap: onSeeAllBusinesses),
+        AppDimens.spacerMedium,
+        OffersCarouselSection(
+          title: 'Découvrir',
+          offers: loaded.discoverOffers,
+          isLoadingMore: loaded.isLoadingMore,
+          // Scroll infini : la vue prévient seulement qu'on approche de la
+          // fin, le bloc décide s'il y a une page suivante.
+          onReachedEnd: () => bloc.add(const LoadMoreBusinesses()),
+        ),
+      ],
     );
   }
 }

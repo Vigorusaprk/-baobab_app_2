@@ -42,6 +42,27 @@ class Offer extends Equatable {
 
   final Map<String, dynamic> metadata;
 
+  /// Note de l'offre elle-même, moyenne des avis la visant. La note d'un
+  /// commerçant découle de celles de ses offres.
+  final double rating;
+  final int reviewCount;
+
+  /// Chez qui l'offre est proposée. Renseigné quand l'offre est affichée
+  /// hors de la fiche du commerçant — sur l'accueil, une carte d'offre doit
+  /// pouvoir dire d'où elle vient.
+  final String? businessId;
+  final String? businessName;
+  final String? businessType;
+  final String? businessImage;
+
+  /// Depuis quand l'offre est publiée, pour la section « Nouveautés ».
+  final DateTime? createdAt;
+
+  /// Une offre retirée par le commerçant reste en base — les commandes
+  /// passées la référencent — mais disparaît du catalogue. Seul l'espace
+  /// commerçant la voit encore.
+  final bool isActive;
+
   const Offer({
     required this.id,
     required this.name,
@@ -55,6 +76,14 @@ class Offer extends Equatable {
     this.startsAt,
     this.endsAt,
     this.metadata = const {},
+    this.rating = 0,
+    this.reviewCount = 0,
+    this.businessId,
+    this.businessName,
+    this.businessType,
+    this.businessImage,
+    this.createdAt,
+    this.isActive = true,
   });
 
   bool get isOrderable => fulfilment == Fulfilment.order;
@@ -64,6 +93,15 @@ class Offer extends Equatable {
   bool get hasFixedDate => startsAt != null;
 
   bool get isFree => price <= 0;
+
+  /// Visuel à afficher : celui de l'offre, à défaut celui du commerçant —
+  /// une carte sans image serait un trou dans la liste.
+  String? get displayImage {
+    final own = imageUrl;
+    if (own != null && own.isNotEmpty) return own;
+    final fallback = businessImage;
+    return (fallback != null && fallback.isNotEmpty) ? fallback : null;
+  }
 
   factory Offer.fromJson(Map<String, dynamic> json) {
     DateTime? parseDate(Object? value) {
@@ -88,6 +126,25 @@ class Offer extends Equatable {
       metadata: json['metadata'] is Map
           ? Map<String, dynamic>.from(json['metadata'] as Map)
           : const {},
+      rating: (json['rating'] as num?)?.toDouble() ??
+          double.tryParse(json['rating']?.toString() ?? '') ??
+          0,
+      reviewCount: (json['review_count'] as num?)?.toInt() ?? 0,
+      businessId: json['business_id']?.toString() ??
+          (json['business'] is Map
+              ? (json['business'] as Map)['id']?.toString()
+              : null),
+      businessName: json['business'] is Map
+          ? (json['business'] as Map)['name']?.toString()
+          : json['business_name']?.toString(),
+      businessType: json['business'] is Map
+          ? (json['business'] as Map)['type']?.toString()
+          : json['business_type']?.toString(),
+      businessImage: json['business'] is Map
+          ? (json['business'] as Map)['bgImg']?.toString()
+          : null,
+      createdAt: parseDate(json['created_at']),
+      isActive: json['is_active'] as bool? ?? true,
     );
   }
 
@@ -104,6 +161,10 @@ class Offer extends Equatable {
     capacity,
     startsAt,
     endsAt,
+    rating,
+    reviewCount,
+    businessId,
+    isActive,
   ];
 }
 

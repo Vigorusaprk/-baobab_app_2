@@ -11,57 +11,72 @@ class BusinessInitial extends BusinessState {}
 
 class BusinessLoading extends BusinessState {}
 
-/// Page d'accueil chargée pour [currentSlug]. Les trois listes viennent
-/// telles quelles de l'Edge Function `get-home` : elles sont déjà filtrées
-/// sur cette catégorie, triées et tronquées côté serveur. Aucune vue ne
-/// doit re-filtrer ou re-trier — changer de catégorie recharge le tout.
+/// Page d'accueil chargée pour [currentSlug].
+///
+/// Les trois sections viennent telles quelles de `get-home` : déjà filtrées
+/// sur la catégorie, triées et tronquées côté serveur. Elles ne montrent
+/// délibérément pas la même chose — auparavant les trois affichaient des
+/// commerçants, donc sur une catégorie n'en comptant qu'un, on lisait trois
+/// fois le même nom.
 class BusinessLoaded extends BusinessState {
-  /// Section "Découvrir" : la liste paginée (scroll infini).
-  final List<Business> businesses;
+  /// « Quoi de neuf ? » — offres récentes.
+  final List<Offer> newOffers;
 
-  /// Slug de la catégorie affichée. `all` = aucun filtre.
-  final String currentSlug;
+  /// Reste-t-il des nouveautés au-delà de ce que le carrousel montre ?
+  /// Commande l'affichage du bouton « Voir plus » en fin de liste.
+  final bool hasMoreNewOffers;
 
-  /// Section "Nouveautés" : établissements récents de la catégorie.
-  final List<Business> newBusinesses;
-
-  /// Section "Populaires" : meilleures notes de la catégorie.
+  /// « Chez qui aller ? » — les meilleurs commerçants.
   final List<Business> popularBusinesses;
 
-  /// Numéro de la dernière page chargée pour ce flux (1 = premier chargement).
+  /// « Quoi prendre ? » — les offres les mieux notées, en scroll infini.
+  final List<Offer> discoverOffers;
+
+  final String currentSlug;
+
+  /// Dernière page chargée des nouveautés, et chargement en cours.
+  final int newOffersPage;
+  final bool isLoadingMoreNewOffers;
+
+  /// Dernière page chargée de « Découvrir ».
   final int page;
-
-  /// S'il reste des pages à charger sur le serveur.
   final bool hasMore;
-
-  /// Vrai pendant qu'une page suivante se charge en arrière-plan — permet à
-  /// l'UI d'éviter de redemander LoadMoreBusinesses en boucle.
   final bool isLoadingMore;
 
   const BusinessLoaded({
-    required this.businesses,
-    required this.currentSlug,
-    this.newBusinesses = const [],
+    this.newOffers = const [],
+    this.hasMoreNewOffers = false,
     this.popularBusinesses = const [],
+    this.discoverOffers = const [],
+    this.newOffersPage = 1,
+    this.isLoadingMoreNewOffers = false,
+    required this.currentSlug,
     this.page = 1,
     this.hasMore = false,
     this.isLoadingMore = false,
   });
 
   BusinessLoaded copyWith({
-    List<Business>? businesses,
-    String? currentSlug,
-    List<Business>? newBusinesses,
+    List<Offer>? newOffers,
+    bool? hasMoreNewOffers,
     List<Business>? popularBusinesses,
+    List<Offer>? discoverOffers,
+    int? newOffersPage,
+    bool? isLoadingMoreNewOffers,
+    String? currentSlug,
     int? page,
     bool? hasMore,
     bool? isLoadingMore,
   }) {
     return BusinessLoaded(
-      businesses: businesses ?? this.businesses,
-      currentSlug: currentSlug ?? this.currentSlug,
-      newBusinesses: newBusinesses ?? this.newBusinesses,
+      newOffers: newOffers ?? this.newOffers,
+      hasMoreNewOffers: hasMoreNewOffers ?? this.hasMoreNewOffers,
       popularBusinesses: popularBusinesses ?? this.popularBusinesses,
+      discoverOffers: discoverOffers ?? this.discoverOffers,
+      newOffersPage: newOffersPage ?? this.newOffersPage,
+      isLoadingMoreNewOffers:
+          isLoadingMoreNewOffers ?? this.isLoadingMoreNewOffers,
+      currentSlug: currentSlug ?? this.currentSlug,
       page: page ?? this.page,
       hasMore: hasMore ?? this.hasMore,
       isLoadingMore: isLoadingMore ?? this.isLoadingMore,
@@ -70,10 +85,13 @@ class BusinessLoaded extends BusinessState {
 
   @override
   List<Object> get props => [
-    businesses,
-    currentSlug,
-    newBusinesses,
+    newOffers,
+    hasMoreNewOffers,
     popularBusinesses,
+    discoverOffers,
+    newOffersPage,
+    isLoadingMoreNewOffers,
+    currentSlug,
     page,
     hasMore,
     isLoadingMore,

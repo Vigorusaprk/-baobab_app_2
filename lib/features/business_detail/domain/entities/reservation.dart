@@ -19,6 +19,11 @@ class Reservation {
   final String? userId;
   final DateTime? createdAt;
 
+  /// Où en est la demande côté commerçant : `pending`, `confirmed`,
+  /// `cancelled` ou `completed`. Une réservation n'est pas acquise du seul
+  /// fait d'avoir été envoyée — le commerçant doit la confirmer.
+  final String status;
+
   // Restaurant
   final String? tableNumber;
   final String? floor;
@@ -80,6 +85,7 @@ class Reservation {
     required this.reservationDate,
     this.userId,
     this.createdAt,
+    this.status = 'pending',
 
     // Restaurant
     this.tableNumber,
@@ -194,6 +200,7 @@ class Reservation {
           ? DateTime.tryParse(json['created_at'].toString())
           : null,
       reservationDate: mainResDate,
+      status: json['status']?.toString() ?? 'pending',
 
       // Restaurant
       tableNumber:

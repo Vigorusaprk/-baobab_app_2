@@ -36,19 +36,19 @@ class BusinessRepositoryImpl implements BusinessRepository {
   }
 
   @override
-  Future<HomeFeed> getHomeFeed({String? category}) async {
-    final feed = await remoteDataSource.getHomeFeed(category: category);
-    return HomeFeed(
-      newBusinesses: feed.newBusinesses.map((m) => m.toEntity()).toList(),
-      popularBusinesses: feed.popularBusinesses
-          .map((m) => m.toEntity())
-          .toList(),
-      discover: BusinessesPage(
-        items: feed.discoverItems.map((m) => m.toEntity()).toList(),
-        hasMore: feed.discoverHasMore,
-      ),
-    );
-  }
+  Future<HomeFeed> getHomeFeed({String? category}) =>
+      remoteDataSource.getHomeFeed(category: category);
+
+  @override
+  Future<OffersPage> getOffersPage({
+    required String section,
+    required int page,
+    String? category,
+  }) => remoteDataSource.getOffersPage(
+    section: section,
+    page: page,
+    category: category,
+  );
 
   @override
   Future<BusinessesPage> getBusinessesPage({

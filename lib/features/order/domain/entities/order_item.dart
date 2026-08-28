@@ -7,12 +7,18 @@ class OrderItem {
   final int quantity;
   final String? specialInstructions;
 
+  /// L'offre commandée, quand la commande est passée par le moule `offers`.
+  /// C'est elle que le client note ensuite — la note du commerce découle
+  /// de celles de ses offres.
+  final String? offerId;
+
   OrderItem({
     required this.menuItemId,
     required this.name,
     required this.price,
     required this.quantity,
     this.specialInstructions,
+    this.offerId,
   });
 
   // --- Partie modifiée : Ajout de la méthode copyWith ---
@@ -22,6 +28,7 @@ class OrderItem {
     double? price,
     int? quantity,
     String? specialInstructions,
+    String? offerId,
   }) {
     return OrderItem(
       menuItemId: menuItemId ?? this.menuItemId,
@@ -29,6 +36,7 @@ class OrderItem {
       price: price ?? this.price,
       quantity: quantity ?? this.quantity,
       specialInstructions: specialInstructions ?? this.specialInstructions,
+      offerId: offerId ?? this.offerId,
     );
   }
   // -----------------------------------------------------
@@ -40,6 +48,7 @@ class OrderItem {
       'price': price,
       'quantity': quantity,
       'special_instructions': specialInstructions,
+      'offer_id': offerId,
     };
   }
 
@@ -63,6 +72,7 @@ class OrderItem {
           0.0,
       quantity: toIntOrNull(map['quantity']) ?? 0,
       specialInstructions: map['special_instructions']?.toString(),
+      offerId: map['offer_id']?.toString(),
     );
   }
 

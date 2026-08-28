@@ -53,7 +53,7 @@ class _BusinessDetailScreenState extends State<BusinessDetailScreen> {
           if (state.reservationStatus == ReservationStatus.success) {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
-                content: Text('Réservation effectuée avec succès ! 🎉'),
+                content: Text('Demande envoyée. Le commerçant doit la confirmer.'),
                 backgroundColor: AppColors.success,
                 behavior: SnackBarBehavior.floating,
               ),

@@ -140,17 +140,13 @@ class ReservationCard extends StatelessWidget {
                               vertical: AppDimens.small,
                             ),
                             decoration: BoxDecoration(
-                              color: ReservationFormatUtils.getStatusColor(
-                                reservation.displayDate,
-                              ),
+                              color: ReservationFormatUtils.getStatusColor(reservation),
                               borderRadius: BorderRadius.circular(
                                 AppDimens.radius10,
                               ),
                             ),
                             child: Text(
-                              ReservationFormatUtils.getStatusText(
-                                reservation.displayDate,
-                              ),
+                              ReservationFormatUtils.getStatusText(reservation),
                               style: TextStyle(
                                 color: AppColors.white,
                                 fontSize: 12,

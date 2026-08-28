@@ -3,6 +3,7 @@ import 'package:baobabe_0_2/core/services/session_service.dart';
 import 'package:baobabe_0_2/core/themes/app_diemens.dart';
 import 'package:baobabe_0_2/core/widgets/auth_required_card.dart';
 import 'package:baobabe_0_2/core/widgets/custom_divider.dart';
+import 'package:baobabe_0_2/features/merchant/presentation/widgets/merchant_settings_tile.dart';
 import 'package:baobabe_0_2/features/settings/presentation/bloc/settings_bloc.dart';
 import 'package:baobabe_0_2/features/settings/presentation/widgets/language_picker_dialog.dart';
 import 'package:baobabe_0_2/features/settings/presentation/widgets/logout_confirmation_dialog.dart';
@@ -71,6 +72,10 @@ class SettingsScreen extends StatelessWidget {
                 ),
               ],
             ),
+            AppDimens.spacerMedium,
+            // Section Commerce : la porte d'entrée vers l'espace
+            // commerçant, ou vers la demande pour en ouvrir un.
+            MerchantSettingsSection(isLoggedIn: isLoggedIn),
             AppDimens.spacerMedium,
             // Section Aide
             DetailSection(
