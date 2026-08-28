@@ -1,65 +1,68 @@
 import 'package:baobabe_0_2/core/themes/app_colors.dart';
 import 'package:baobabe_0_2/features/home_page/domain/entities/business_entity.dart';
 import 'package:flutter/material.dart';
-import 'business_contact_section.dart';
-import 'business_hours_section.dart';
 
-class BusinessInfoSection extends StatelessWidget {
-  final Business business;
+/// Titre d'une section de la fiche commerçant.
+///
+/// Partagé par les sections qui composent la page : elles sont désormais
+/// posées une à une par l'écran, dans un ordre qui suit ce que
+/// l'utilisateur cherche — ce qu'est ce commerce, ce qu'il propose, comment
+/// le joindre, quand il ouvre, ce qu'on en dit.
+class BusinessSectionTitle extends StatelessWidget {
+  final String title;
 
-  const BusinessInfoSection({super.key, required this.business});
+  const BusinessSectionTitle(this.title, {super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // Description Card
-        if (business.description.isNotEmpty) ...[
-          _buildSectionTitle("À propos"),
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              color: const Color(0xFFF8F9FA),
-              borderRadius: BorderRadius.circular(24),
-            ),
-            child: Text(
-              business.description,
-              style: TextStyle(
-                color: AppColors.textSecondary,
-                fontSize: 15,
-                height: 1.6,
-              ),
-            ),
-          ),
-          const SizedBox(height: 24),
-        ],
-    
-        _buildSectionTitle("Contact & Accès"),
-        BusinessContactSection(business: business),
-    
-        const SizedBox(height: 24),
-    
-        _buildSectionTitle("Horaires d'ouverture"),
-        BusinessHoursSection(business: business),
-    
-        const SizedBox(height: 32),
-      ],
-    );
-  }
-
-  Widget _buildSectionTitle(String title) {
     return Padding(
       padding: const EdgeInsets.only(left: 4, bottom: 12),
       child: Text(
         title,
-        style: TextStyle(
+        style: const TextStyle(
           fontSize: 18,
           fontWeight: FontWeight.bold,
           color: AppColors.primary,
         ),
       ),
+    );
+  }
+}
+
+/// « À propos » : la présentation du commerce.
+///
+/// Disparaît entièrement quand le commerçant n'a rien écrit — un titre
+/// suivi d'un cadre vide n'apprend rien.
+class BusinessAboutSection extends StatelessWidget {
+  final Business business;
+
+  const BusinessAboutSection({super.key, required this.business});
+
+  @override
+  Widget build(BuildContext context) {
+    if (business.description.isEmpty) return const SizedBox.shrink();
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const BusinessSectionTitle('À propos'),
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: const Color(0xFFF8F9FA),
+            borderRadius: BorderRadius.circular(24),
+          ),
+          child: Text(
+            business.description,
+            style: const TextStyle(
+              color: AppColors.textSecondary,
+              fontSize: 15,
+              height: 1.6,
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

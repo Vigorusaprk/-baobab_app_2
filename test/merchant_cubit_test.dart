@@ -203,6 +203,23 @@ void main() {
       expect(body['startsAt'], '2026-09-15T19:00:00.000Z');
     });
 
+    test("une offre en boutique n'emporte ni places ni date", () {
+      final body = const OfferDraft(
+        name: 'Pagne wax 6 yards',
+        fulfilment: Fulfilment.inStore,
+        price: 22,
+        capacity: 10,
+      ).toBody();
+
+      expect(body['fulfilment'], 'in_store');
+      expect(
+        body['capacity'],
+        isNull,
+        reason: "une jauge de places n'a de sens que pour une réservation",
+      );
+      expect(body['startsAt'], isNull);
+    });
+
     test('modifier une offre repart de ses valeurs actuelles', () {
       final draft = OfferDraft.from(
         const Offer(

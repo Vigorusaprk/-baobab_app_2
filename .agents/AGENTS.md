@@ -79,6 +79,7 @@ All functions are deployed with `verify_jwt: true`.
 - `get-home` — bundle de l'accueil filtré par catégorie : `{newOffers, popularBusinesses, discoverOffers}`. `?section=new&page=N`, `?section=discover&page=N` et `?section=businesses` renvoient une liste paginée seule (voir « Les trois sections de l'accueil » ci-dessous).
 - `get-categories` — catégories de la marketplace, mises en cache par l'app
 - `get-business-detail` — `?id=` → `{business, offers, capabilities, menuItems, rooms, vehicles, reviews}`
+- `get-offer-detail` — `?id=` → `{offer, business, reviews, otherOffers, remainingCapacity}` : tout ce qu'il faut pour décider devant une offre, sans être passé par la fiche du commerçant
 - `get-businesses-budget` — recherche par prix d'entrée réel (`?min=&max=&category=`)
 - `get-reviews-business` — `?businessId=&page=`
 - `create-review` — `offerId` facultatif : un avis vise une offre précise, ou le commerce
@@ -101,7 +102,7 @@ If a screen needs a new kind of server-side data (a new page's initial load, a n
 
 RLS policies use `(select auth.uid())` rather than a bare `auth.uid()` (avoids per-row re-evaluation), multiple-permissive-policy tables were consolidated into single policies, and every foreign key has a covering index. Keep this pattern in any new policy/migration, and check `mcp__supabase__get_advisors` after schema changes.
 
-## Le moule `offers` — commander ou réserver
+## Le moule `offers` — commander, réserver, ou passer en boutique
 
 Tout ce qu'un commerçant publie vit dans **une seule table `offers`** : un plat,
 un cosmétique, une chambre, un véhicule, un soin, une séance, un concert, une
@@ -111,6 +112,11 @@ Le champ structurant est `fulfilment` :
 
 - **`order`** → l'utilisateur *commande* (panier, quantités, `order_items`)
 - **`booking`** → l'utilisateur *réserve* (une offre, une quantité, une date)
+- **`in_store`** → l'offre est *disponible en boutique* : la plateforme la
+  référence et la montre, la transaction se fait sur place. Aucun bouton
+  d'achat, et le serveur refuse explicitement de la commander ou de la
+  réserver. `capacity` et `starts_at` sont forcés à `null` — une jauge de
+  places sur un produit qu'on vient chercher ne veut rien dire.
 
 Autres colonnes utiles : `merchant_id` (qui a publié), `capacity` (places),
 `starts_at` (offre datée comme une séance ; vide quand c'est le client qui
@@ -211,6 +217,25 @@ vaut plus rien.
 
 Une réservation naît `pending` : le commerçant doit la confirmer. Les textes
 côté client disent donc « Demande envoyée », jamais « Réservation confirmée ».
+
+## L'offre est une destination, la fiche commerçant une présentation
+
+Cliquer sur une offre ouvre **sa** fiche (`/offer/:id`), jamais celle du
+commerce : l'utilisateur a cliqué sur une chose précise, l'envoyer sur le
+catalogue entier le forcerait à la rechercher. C'est sur cette fiche qu'on
+commande ou qu'on réserve.
+
+La fiche du commerçant **ne porte plus aucun bouton d'action**. Elle se lit
+dans l'ordre des questions qu'on se pose : à propos → son catalogue en
+carrousels → contact → horaires → commodités → avis. Le catalogue est la
+seule porte vers l'achat, et chaque offre y parle pour elle-même — un bouton
+« Commander » générique obligeait à deviner ce qu'on allait trouver derrière.
+
+`remainingCapacity` est calculé par `public.offer_remaining_capacity()`, une
+fonction `SECURITY DEFINER` : la RLS de `reservations` ne montre à chacun que
+les siennes, donc compter les places prises depuis le client donnait toujours
+zéro et affichait une offre presque complète comme entièrement libre. La
+fonction ne divulgue qu'un nombre agrégé, jamais qui a réservé.
 
 ## Pagination — Infinite Scroll Pattern
 
@@ -328,6 +353,12 @@ Mandatory checks after any meaningful code change:
     pour une écriture (voir « L'espace commerçant » ci-dessus).
 19. Une offre se retire (`is_active = false`), elle ne se supprime pas : les
     commandes et réservations passées la référencent.
+21. Un clic sur une offre ouvre `/offer/:id` ; un clic sur un commerçant
+    ouvre `/business/:id`. Ne jamais renvoyer l'un vers l'autre.
+22. Le troisième `fulfilment`, `in_store`, n'ouvre aucune transaction dans
+    l'application. Tout code qui suppose « commande ou réservation » (badge,
+    bouton, message d'erreur, statistique) doit traiter ce cas explicitement
+    plutôt que de le ranger dans le `else`.
 20. Une policy d'UPDATE réservée au client doit borner ce qu'il peut écrire.
     « Le client peut annuler sa commande » autorisait en réalité *n'importe
     quelle* mise à jour de sa commande, y compris se déclarer livré ;

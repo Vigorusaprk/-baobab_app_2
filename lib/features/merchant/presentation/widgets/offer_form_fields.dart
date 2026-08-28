@@ -71,3 +71,21 @@ class DateField extends StatelessWidget {
     );
   }
 }
+
+/// Phrase d'explication sous un champ, pour dire ce qu'un choix implique
+/// sans allonger son libellé.
+class FieldHint extends StatelessWidget {
+  final String text;
+
+  const FieldHint(this.text, {super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      text,
+      style: Theme.of(
+        context,
+      ).textTheme.bodySmall?.copyWith(color: AppColors.textSecondary),
+    );
+  }
+}

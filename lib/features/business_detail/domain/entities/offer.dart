@@ -2,15 +2,38 @@ import 'package:equatable/equatable.dart';
 
 /// Manière d'acquérir une offre. C'est la seule distinction structurante de
 /// la plateforme : on **commande** un produit (pizza, cosmétique), on
-/// **réserve** une place ou un créneau (table, séance, concert, soin).
+/// **réserve** une place ou un créneau (table, séance, concert, soin), ou
+/// l'offre est simplement **disponible en boutique** — elle se voit dans
+/// l'application, elle se prend sur place.
 enum Fulfilment {
   order,
-  booking;
+  booking,
+  inStore;
 
-  static Fulfilment fromJson(String? value) =>
-      value == 'order' ? Fulfilment.order : Fulfilment.booking;
+  static Fulfilment fromJson(String? value) {
+    switch (value) {
+      case 'order':
+        return Fulfilment.order;
+      case 'in_store':
+        return Fulfilment.inStore;
+      default:
+        return Fulfilment.booking;
+    }
+  }
 
-  String get asJson => name;
+  String get asJson => this == Fulfilment.inStore ? 'in_store' : name;
+
+  /// Ce que l'utilisateur peut en faire, dit en deux mots sur une carte.
+  String get badge {
+    switch (this) {
+      case Fulfilment.order:
+        return 'À commander';
+      case Fulfilment.booking:
+        return 'À réserver';
+      case Fulfilment.inStore:
+        return 'En boutique';
+    }
+  }
 }
 
 /// Une offre publiée par un commerçant.
@@ -88,6 +111,10 @@ class Offer extends Equatable {
 
   bool get isOrderable => fulfilment == Fulfilment.order;
   bool get isBookable => fulfilment == Fulfilment.booking;
+
+  /// Ni commande ni réservation : l'offre se trouve sur place. Rien à
+  /// valider dans l'application, donc aucun bouton d'achat.
+  bool get isInStoreOnly => fulfilment == Fulfilment.inStore;
 
   /// Une offre datée impose sa date ; sinon le client choisit la sienne.
   bool get hasFixedDate => startsAt != null;
@@ -177,24 +204,33 @@ class Offer extends Equatable {
 class BusinessCapabilities extends Equatable {
   final bool canOrder;
   final bool canBook;
+
+  /// Le commerçant expose au moins une offre à retrouver sur place.
+  final bool hasInStore;
+
   final int orderableCount;
   final int bookableCount;
+  final int inStoreCount;
 
   const BusinessCapabilities({
     this.canOrder = false,
     this.canBook = false,
+    this.hasInStore = false,
     this.orderableCount = 0,
     this.bookableCount = 0,
+    this.inStoreCount = 0,
   });
 
-  bool get hasAny => canOrder || canBook;
+  bool get hasAny => canOrder || canBook || hasInStore;
 
   factory BusinessCapabilities.fromJson(Map<String, dynamic> json) {
     return BusinessCapabilities(
       canOrder: json['canOrder'] == true,
       canBook: json['canBook'] == true,
+      hasInStore: json['hasInStore'] == true,
       orderableCount: (json['orderableCount'] as num?)?.toInt() ?? 0,
       bookableCount: (json['bookableCount'] as num?)?.toInt() ?? 0,
+      inStoreCount: (json['inStoreCount'] as num?)?.toInt() ?? 0,
     );
   }
 
@@ -202,8 +238,10 @@ class BusinessCapabilities extends Equatable {
   List<Object?> get props => [
     canOrder,
     canBook,
+    hasInStore,
     orderableCount,
     bookableCount,
+    inStoreCount,
   ];
 }
 

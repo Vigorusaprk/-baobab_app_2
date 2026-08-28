@@ -146,9 +146,14 @@ class _Visual extends StatelessWidget {
           left: 8,
           child: _Badge(
             // Dire l'action possible dès la carte évite d'ouvrir une fiche
-            // pour découvrir qu'on ne peut que réserver, ou l'inverse.
-            label: offer.isOrderable ? 'À commander' : 'À réserver',
-            color: offer.isOrderable ? AppColors.secondary : AppColors.primary,
+            // pour découvrir qu'on ne peut que réserver, ou l'inverse — ou
+            // qu'il faut simplement passer en boutique.
+            label: offer.fulfilment.badge,
+            color: offer.isOrderable
+                ? AppColors.secondary
+                : offer.isBookable
+                ? AppColors.primary
+                : AppColors.warning,
           ),
         ),
         if (offer.startsAt != null)

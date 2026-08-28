@@ -76,6 +76,12 @@ class OfferDraft {
     );
   }
 
+  /// Une jauge de places et une date n'ont de sens que pour une
+  /// réservation. Les neutraliser ici plutôt que dans le formulaire évite
+  /// qu'un appelant distrait ne fasse réapparaître « il reste 2 places »
+  /// sur un produit qu'on vient simplement chercher.
+  bool get _isBookable => fulfilment == Fulfilment.booking;
+
   Map<String, dynamic> toBody() {
     return {
       'name': name,
@@ -83,8 +89,8 @@ class OfferDraft {
       'price': price,
       'fulfilment': fulfilment.asJson,
       'section': section,
-      'capacity': capacity,
-      'startsAt': startsAt?.toUtc().toIso8601String(),
+      'capacity': _isBookable ? capacity : null,
+      'startsAt': _isBookable ? startsAt?.toUtc().toIso8601String() : null,
       'imageUrl': imageUrl,
       if (categorySlug != null) 'categorySlug': categorySlug,
     };

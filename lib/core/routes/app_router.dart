@@ -21,7 +21,7 @@ import 'package:baobabe_0_2/features/settings/presentation/screens/settings_scre
 import 'package:baobabe_0_2/features/settings/presentation/widgets/profil_page.dart';
 import 'package:baobabe_0_2/features/settings/presentation/widgets/edit_profile_page.dart';
 import 'package:baobabe_0_2/features/business_detail/presentation/screens/business_detail_screen.dart';
-import 'package:baobabe_0_2/features/business_detail/presentation/widgets/online_order/page/plat_detail.dart';
+import 'package:baobabe_0_2/features/business_detail/presentation/screens/offer_detail_screen.dart';
 import 'package:baobabe_0_2/features/merchant/presentation/screens/become_merchant_page.dart';
 import 'package:baobabe_0_2/features/merchant/presentation/screens/merchant_shell.dart';
 import 'package:baobabe_0_2/features/merchant/presentation/screens/offer_form_page.dart';
@@ -170,6 +170,16 @@ final GoRouter appRouter = GoRouter(
         );
       },
     ),
+    // Une offre est une destination à part entière : on y arrive depuis
+    // l'accueil, la recherche ou le catalogue d'un commerçant, et c'est là
+    // qu'on commande ou qu'on réserve.
+    GoRoute(
+      path: '/offer/:id',
+      name: 'offerDetail',
+      pageBuilder: (context, state) => MaterialPage(
+        child: OfferDetailScreen(offerId: state.pathParameters['id']!),
+      ),
+    ),
     GoRoute(
       path: '/notifications',
       name: 'notifications',
@@ -199,21 +209,6 @@ final GoRouter appRouter = GoRouter(
       path: '/search',
       name: 'search',
       pageBuilder: (context, state) => const MaterialPage(child: SearchPage()),
-    ),
-    GoRoute(
-      path: '/plat',
-      name: 'platDetail',
-      pageBuilder: (context, state) {
-        final extra = state.extra as Map<String, dynamic>?;
-        return MaterialPage(
-          child: PlatDetail(
-            menuItem: extra?['menuItem'],
-            restaurantId: extra?['restaurantId'],
-            restaurantName: extra?['restaurantName'],
-            restaurantType: extra?['restaurantType'],
-          ),
-        );
-      },
     ),
     GoRoute(
       path: '/order-detail',

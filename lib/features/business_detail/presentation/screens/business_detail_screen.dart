@@ -3,9 +3,10 @@ import 'package:baobabe_0_2/features/home_page/data/repositories/business_remote
 import 'package:baobabe_0_2/features/home_page/data/repositories/business_repository_impl.dart';
 import 'package:baobabe_0_2/features/business_detail/domain/usecases/get_business_detail.dart';
 import 'package:baobabe_0_2/features/business_detail/presentation/bloc/business_detail_bloc.dart';
-import 'package:baobabe_0_2/features/business_detail/presentation/widgets/business_actions_section.dart';
-// removed unused import: business_hero_section
+import 'package:baobabe_0_2/features/business_detail/presentation/widgets/business_contact_section.dart';
+import 'package:baobabe_0_2/features/business_detail/presentation/widgets/business_hours_section.dart';
 import 'package:baobabe_0_2/features/business_detail/presentation/widgets/business_info_section.dart';
+import 'package:baobabe_0_2/features/business_detail/presentation/widgets/business_offers_section.dart';
 import 'package:baobabe_0_2/features/business_detail/presentation/widgets/business_specific_section.dart';
 import 'package:baobabe_0_2/features/business_detail/presentation/widgets/business_detail_skeleton.dart';
 import 'package:baobabe_0_2/features/business_detail/presentation/widgets/common/business_detail_app_bar.dart';
@@ -137,14 +138,25 @@ class _BusinessDetailScreenState extends State<BusinessDetailScreen> {
               ),
               SliverToBoxAdapter(
                 child: ResponsiveContainer(
+                  // L'ordre suit les questions de l'utilisateur : qu'est-ce
+                  // que c'est, qu'est-ce qu'on y trouve, comment les
+                  // joindre, quand ils ouvrent, ce qu'on en dit.
                   child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const SizedBox(height: 24),
-                      BusinessInfoSection(business: business),
+                      BusinessAboutSection(business: business),
                       const SizedBox(height: 24),
+                      BusinessOffersSection(businessId: business.id),
+                      const BusinessSectionTitle('Contact & Accès'),
+                      BusinessContactSection(business: business),
+                      const SizedBox(height: 24),
+                      if (business.openingHours.isNotEmpty) ...[
+                        const BusinessSectionTitle("Horaires d'ouverture"),
+                        BusinessHoursSection(business: business),
+                        const SizedBox(height: 24),
+                      ],
                       BusinessSpecificSection(business: business),
-                      const SizedBox(height: 24),
-                      BusinessActionSection(business: business),
                       const SizedBox(height: 24),
                       RestaurantReview(business: business),
                       const SizedBox(height: 32),

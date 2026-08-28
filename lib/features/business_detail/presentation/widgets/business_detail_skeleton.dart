@@ -1,14 +1,16 @@
 import 'package:baobabe_0_2/core/themes/app_colors.dart';
 import 'package:baobabe_0_2/core/themes/app_fonts.dart';
 import 'package:baobabe_0_2/features/business_detail/presentation/widgets/common/responsive_container.dart';
+import 'package:baobabe_0_2/features/home_page/presentation/widgets/offer_card_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
 /// Full mock of the business detail page, shown (wrapped in [Skeletonizer])
-/// while [BusinessDetailBloc] is still loading its first response. Mirrors
-/// [BusinessDetailAppBar]'s hero image, [BusinessInfoSection],
-/// [BusinessSpecificSection], [BusinessActionSection] and
-/// [RestaurantReview] using explicit [Bone] shapes.
+/// while [BusinessDetailBloc] is still loading its first response.
+///
+/// Il suit l'ordre réel de la page : à propos, catalogue, contact, horaires,
+/// commodités, avis. Un squelette qui annonce une rangée de boutons d'action
+/// alors que la page n'en a plus promet quelque chose qui n'arrivera pas.
 class BusinessDetailSkeleton extends StatelessWidget {
   const BusinessDetailSkeleton({super.key});
 
@@ -20,13 +22,18 @@ class BusinessDetailSkeleton extends StatelessWidget {
         SliverToBoxAdapter(
           child: ResponsiveContainer(
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: const [
                 SizedBox(height: 24),
-                _InfoSectionSkeleton(),
+                _AboutSectionSkeleton(),
+                SizedBox(height: 24),
+                _OffersSectionSkeleton(),
+                SizedBox(height: 24),
+                _BlockSkeleton(titleWidth: 150),
+                SizedBox(height: 24),
+                _BlockSkeleton(titleWidth: 170),
                 SizedBox(height: 24),
                 _SpecificSectionSkeleton(),
-                SizedBox(height: 24),
-                _ActionSectionSkeleton(),
                 SizedBox(height: 24),
                 ReviewSectionSkeleton(),
                 SizedBox(height: 32),
@@ -61,10 +68,9 @@ class _HeroSkeleton extends StatelessWidget {
   }
 }
 
-/// Mirrors [BusinessInfoSection]: description card, contact block and
-/// hours block, each under their own section title.
-class _InfoSectionSkeleton extends StatelessWidget {
-  const _InfoSectionSkeleton();
+/// Mirrors [BusinessAboutSection]: a section title over a description card.
+class _AboutSectionSkeleton extends StatelessWidget {
+  const _AboutSectionSkeleton();
 
   @override
   Widget build(BuildContext context) {
@@ -82,14 +88,54 @@ class _InfoSectionSkeleton extends StatelessWidget {
           ),
           child: Bone.multiText(lines: 3, style: AppFonts.bodyMedium),
         ),
-        const SizedBox(height: 24),
-        Bone.text(width: 150, style: AppFonts.titleMedium),
+      ],
+    );
+  }
+}
+
+/// Un titre de section suivi d'un bloc plein : la forme partagée du contact
+/// et des horaires.
+class _BlockSkeleton extends StatelessWidget {
+  final double titleWidth;
+
+  const _BlockSkeleton({required this.titleWidth});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Bone.text(width: titleWidth, style: AppFonts.titleMedium),
         const SizedBox(height: 12),
         const Bone(width: double.infinity, height: 90, uniRadius: 20),
-        const SizedBox(height: 24),
-        Bone.text(width: 170, style: AppFonts.titleMedium),
+      ],
+    );
+  }
+}
+
+/// Mirrors [BusinessOffersSection]: un titre puis un carrousel de cartes
+/// d'offre.
+class _OffersSectionSkeleton extends StatelessWidget {
+  const _OffersSectionSkeleton();
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Bone.text(width: 140, style: AppFonts.titleMedium),
         const SizedBox(height: 12),
-        const Bone(width: double.infinity, height: 90, uniRadius: 20),
+        SizedBox(
+          height: 240,
+          child: ListView.separated(
+            scrollDirection: Axis.horizontal,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: 3,
+            separatorBuilder: (_, _) => const SizedBox(width: 12),
+            itemBuilder: (_, _) =>
+                const SizedBox(width: 190, child: OfferCardSkeleton()),
+          ),
+        ),
       ],
     );
   }
@@ -133,40 +179,6 @@ class _SpecificSectionSkeleton extends StatelessWidget {
           ),
         );
       }),
-    );
-  }
-}
-
-/// Mirrors [BusinessActionSection]: a centered wrap of circular action
-/// buttons with a label underneath each.
-class _ActionSectionSkeleton extends StatelessWidget {
-  const _ActionSectionSkeleton();
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: AppColors.white,
-        borderRadius: BorderRadius.circular(24),
-      ),
-      child: Wrap(
-        spacing: 15,
-        runSpacing: 20,
-        alignment: WrapAlignment.center,
-        children: List.generate(
-          2,
-          (_) => const Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Bone.circle(size: 56),
-              SizedBox(height: 8),
-              Bone(width: 60, height: 10, uniRadius: 4),
-            ],
-          ),
-        ),
-      ),
     );
   }
 }

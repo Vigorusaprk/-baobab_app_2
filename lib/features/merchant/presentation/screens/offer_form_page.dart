@@ -11,10 +11,11 @@ import 'package:go_router/go_router.dart';
 
 /// Publication ou modification d'une offre.
 ///
-/// Un seul formulaire pour les deux cas de figure : ce qui distingue un
+/// Un seul formulaire pour les trois cas de figure : ce qui distingue un
 /// plat d'une séance de spa n'est pas sa nature mais la case cochée ici —
-/// se commande, ou se réserve. Les champs propres à la réservation
-/// (nombre de places, date) n'apparaissent que dans ce second cas.
+/// se commande, se réserve, ou se trouve simplement en boutique. Les champs
+/// propres à la réservation (nombre de places, date) n'apparaissent que
+/// dans ce second cas.
 class OfferFormPage extends StatefulWidget {
   /// Offre existante à modifier, ou `null` pour une publication.
   final Offer? offer;
@@ -71,6 +72,23 @@ class _OfferFormPageState extends State<OfferFormPage> {
       controller.dispose();
     }
     super.dispose();
+  }
+
+  /// Ce que le choix implique pour le commerçant, dit une fois plutôt que
+  /// laissé à deviner : « en boutique » n'ouvre aucune transaction dans
+  /// l'application.
+  String get _fulfilmentHint {
+    switch (_fulfilment) {
+      case Fulfilment.order:
+        return "Vos clients la commandent depuis l'application et vous "
+            'recevez la commande à préparer.';
+      case Fulfilment.booking:
+        return 'Vos clients réservent une place ou un créneau, que vous '
+            'confirmez ensuite.';
+      case Fulfilment.inStore:
+        return "L'offre est visible dans l'application mais ne se commande "
+            'ni ne se réserve : vos clients viennent la chercher sur place.';
+    }
   }
 
   Future<void> _pickDate() async {
@@ -161,22 +179,32 @@ class _OfferFormPageState extends State<OfferFormPage> {
           children: [
             FieldLabel('Comment vos clients l\'obtiennent'),
             SegmentedButton<Fulfilment>(
+              // Libellés courts : trois segments doivent tenir sur une
+              // ligne, même sur un petit écran.
               segments: const [
                 ButtonSegment(
                   value: Fulfilment.order,
-                  label: Text('À commander'),
+                  label: Text('Commande'),
                   icon: Icon(Icons.shopping_bag_outlined),
                 ),
                 ButtonSegment(
                   value: Fulfilment.booking,
-                  label: Text('À réserver'),
+                  label: Text('Réservation'),
                   icon: Icon(Icons.event_available_outlined),
                 ),
+                ButtonSegment(
+                  value: Fulfilment.inStore,
+                  label: Text('En boutique'),
+                  icon: Icon(Icons.storefront_outlined),
+                ),
               ],
+              showSelectedIcon: false,
               selected: {_fulfilment},
               onSelectionChanged: (value) =>
                   setState(() => _fulfilment = value.first),
             ),
+            AppDimens.spacerSmall,
+            FieldHint(_fulfilmentHint),
             AppDimens.spacerMedium,
             FieldLabel('Nom'),
             CustomTextFormField(

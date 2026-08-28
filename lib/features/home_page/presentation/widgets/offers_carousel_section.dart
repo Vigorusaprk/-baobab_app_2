@@ -88,14 +88,13 @@ class OffersCarouselSection extends StatelessWidget {
                 width: _cardWidth,
                 child: OfferCardWidget(
                   offer: offer,
-                  onTap: () {
-                    final businessId = offer.businessId;
-                    if (businessId == null) return;
-                    context.pushNamed(
-                      'businessDetail',
-                      pathParameters: {'id': businessId},
-                    );
-                  },
+                  // On ouvre l'offre, pas la boutique : l'utilisateur a
+                  // cliqué sur une chose précise, l'envoyer sur le
+                  // catalogue entier du commerçant lui ferait la chercher.
+                  onTap: () => context.pushNamed(
+                    'offerDetail',
+                    pathParameters: {'id': offer.id},
+                  ),
                 ),
               );
             },

@@ -88,10 +88,12 @@ class _OfferTile extends StatelessWidget {
                     ),
                     AppDimens.spacerSmallWidth,
                     StatusChip(
-                      label: offer.isOrderable ? 'Commande' : 'Réservation',
+                      label: offer.fulfilment.badge,
                       color: offer.isOrderable
                           ? AppColors.secondary
-                          : AppColors.primary,
+                          : offer.isBookable
+                          ? AppColors.primary
+                          : AppColors.warning,
                     ),
                   ],
                 ),
