@@ -9,7 +9,11 @@ import 'package:baobabe_0_2/features/order/domain/entities/order.dart';
 class OrderCard extends StatelessWidget {
   final Order order;
 
-  const OrderCard({super.key, required this.order});
+  /// Fourni uniquement quand l'annulation est encore possible ; null
+  /// masque le bouton plutôt que d'en afficher un qui échouerait.
+  final VoidCallback? onCancel;
+
+  const OrderCard({super.key, required this.order, this.onCancel});
 
   @override
   Widget build(BuildContext context) {
@@ -179,6 +183,20 @@ class OrderCard extends StatelessWidget {
                     ],
                   ),
                 ),
+                if (onCancel != null) ...[
+                  const SizedBox(height: AppDimens.small),
+                  SizedBox(
+                    width: double.infinity,
+                    child: TextButton.icon(
+                      onPressed: onCancel,
+                      icon: const Icon(Icons.close_rounded, size: 18),
+                      label: const Text('Annuler la commande'),
+                      style: TextButton.styleFrom(
+                        foregroundColor: AppColors.error,
+                      ),
+                    ),
+                  ),
+                ],
               ],
             ),
           ),

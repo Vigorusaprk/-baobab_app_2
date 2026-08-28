@@ -143,6 +143,74 @@ class _ActivityScreenState extends State<ActivityScreen>
     );
   }
 
+  /// Demande confirmation avant une action irréversible, en nommant ce
+  /// qui va être annulé plutôt qu'un « Oui / Non » sans contexte.
+  Future<bool> _confirm(String title, String message, String action) async {
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text(title),
+        content: Text(message),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, false),
+            child: const Text('Revenir'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, true),
+            child: Text(action, style: const TextStyle(color: AppColors.error)),
+          ),
+        ],
+      ),
+    );
+    return ok ?? false;
+  }
+
+  void _notify(String message, Color color) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: color,
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
+  }
+
+  Future<void> _cancelOrder(Order order) async {
+    if (!await _confirm(
+      'Annuler la commande ?',
+      'La commande chez ${order.establishmentName} sera annulée.',
+      'Annuler la commande',
+    )) {
+      return;
+    }
+    try {
+      await _orderApi.cancelOrder(order.id);
+      _notify('Commande annulée.', AppColors.success);
+      await _loadAll();
+    } catch (e) {
+      _notify("$e", AppColors.error);
+    }
+  }
+
+  Future<void> _deleteReservation(Reservation reservation) async {
+    if (!await _confirm(
+      'Supprimer la réservation ?',
+      'Votre réservation chez ${reservation.establishmentName} sera supprimée.',
+      'Supprimer',
+    )) {
+      return;
+    }
+    try {
+      await _resApi.deleteReservation(reservation.id.toString());
+      _notify('Réservation supprimée.', AppColors.success);
+      await _loadAll();
+    } catch (e) {
+      _notify("$e", AppColors.error);
+    }
+  }
+
   Widget _buildOrdersList() {
     if (_loading) {
       return const ActivityListSkeleton(itemSkeleton: OrderCardSkeleton());
@@ -153,7 +221,12 @@ class _ActivityScreenState extends State<ActivityScreen>
       child: ListView.builder(
         padding: const EdgeInsets.all(16),
         itemCount: _orders.length,
-        itemBuilder: (_, i) => OrderCard(order: _orders[i]),
+        itemBuilder: (_, i) => OrderCard(
+          order: _orders[i],
+          onCancel: _orders[i].status.canBeCancelledByCustomer
+              ? () => _cancelOrder(_orders[i])
+              : null,
+        ),
       ),
     );
   }
@@ -170,8 +243,10 @@ class _ActivityScreenState extends State<ActivityScreen>
       child: ListView.builder(
         padding: const EdgeInsets.all(16),
         itemCount: _reservations.length,
-        itemBuilder: (_, i) =>
-            ReservationCard(reservation: _reservations[i], onDelete: () {}),
+        itemBuilder: (_, i) => ReservationCard(
+          reservation: _reservations[i],
+          onDelete: () => _deleteReservation(_reservations[i]),
+        ),
       ),
     );
   }

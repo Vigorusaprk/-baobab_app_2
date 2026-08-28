@@ -29,13 +29,18 @@ class ReservationApiService {
   /// l'utilisateur depuis le JWT de la requête. On garde la résolution
   /// locale juste pour lever une erreur claire avant l'appel réseau si
   /// personne n'est connecté.
+  /// Réserve [quantity] unité(s) de l'offre [offerId].
+  ///
+  /// Le montant n'est plus transmis : le serveur le calcule depuis le
+  /// catalogue, vérifie qu'il reste des places et refuse une date passée.
+  /// [reservationDate] est ignorée pour une offre déjà datée (séance,
+  /// concert), qui impose la sienne.
   Future<Map<String, dynamic>> createReservation({
-    required String businessId,
-    required String type,
-    required DateTime reservationDate,
-    required double totalAmount,
-    required Map<String, dynamic> details,
-    String? establishmentName,
+    required String offerId,
+    int quantity = 1,
+    DateTime? reservationDate,
+    String? notes,
+    Map<String, dynamic>? details,
     String? userId,
   }) async {
     _resolveUserId(userId);
@@ -45,12 +50,12 @@ class ReservationApiService {
         'create-reservation',
         method: HttpMethod.post,
         body: {
-          'businessId': businessId,
-          'type': type,
-          'reservationDate': reservationDate.toIso8601String(),
-          'totalAmount': totalAmount,
-          'details': details,
-          if (establishmentName != null) 'establishmentName': establishmentName,
+          'offerId': offerId,
+          'quantity': quantity,
+          if (reservationDate != null)
+            'reservationDate': reservationDate.toIso8601String(),
+          if (notes != null) 'notes': notes,
+          if (details != null) 'details': details,
         },
       );
       return (response.data as Map<String, dynamic>)['data']

@@ -104,7 +104,6 @@ class _CarDetailPageState extends State<CarDetailPage> {
 
     try {
       final rentalDays = _getRentalDays();
-      final totalAmount = _calculateTotalPrice();
 
       final details = {
         'vehicle_id': widget.vehicle.id,
@@ -118,15 +117,19 @@ class _CarDetailPageState extends State<CarDetailPage> {
         'customer_name': _customerNameController.text,
         'phone': _phoneNumberController.text,
         'notes': _notesController.text,
+        // Estimation locale conservée pour mémoire : le montant retenu est
+        // celui que le serveur calcule depuis le catalogue.
+        'estimated_total': _calculateTotalPrice(),
       };
 
+      // La quantité, ce sont les jours de location : le serveur applique
+      // le tarif du catalogue et calcule le montant. Les options et les
+      // coordonnées voyagent dans `details`, qu'il conserve tel quel.
       await _reservationService.createReservation(
-        businessId: widget.businessId,
-        type: 'car_rental',
-        reservationDate: DateTime.now(),
-        totalAmount: totalAmount,
+        offerId: widget.vehicle.id,
+        quantity: rentalDays,
+        reservationDate: _startDate,
         details: details,
-        establishmentName: widget.businessName,
       );
 
       if (mounted) {

@@ -76,14 +76,19 @@ All functions are deployed with `verify_jwt: true`.
 
 ### Current functions
 
-- `get-home` — paginated business list (`?category=&q=&page=&pageSize=`)
-- `get-business-detail` — `?id=` → `{business, menuItems, rooms, vehicles, reviews}`
+- `get-home` — bundle de l'accueil filtré par catégorie : `{newBusinesses, popularBusinesses, discover}`. `?section=discover&page=N` ne renvoie que la liste paginée (scroll infini).
+- `get-categories` — catégories de la marketplace, mises en cache par l'app
+- `get-business-detail` — `?id=` → `{business, offers, capabilities, menuItems, rooms, vehicles, reviews}`
+- `get-businesses-budget` — recherche par prix d'entrée réel (`?min=&max=&category=`)
 - `get-reviews-business` — `?businessId=&page=`
 - `create-review`
-- `get-orders-client` — paginated, server-enriched with menu/business names
-- `get-reservations-client` — paginated, server-enriched with business name
-- `create-order`, `update-order-status`
-- `create-reservation`, `delete-reservation`
+- `get-orders-client` — paginé, noms d'articles figés à la commande
+- `get-reservations-client` — paginé, nom du commerçant côté serveur
+- `create-order` — n'accepte que des offres et des quantités ; prix et total calculés en base
+- `cancel-order-client` — annulation par le client tant que la commande n'est pas préparée
+- `update-order-status` — côté commerçant
+- `create-reservation` — vérifie disponibilité, capacité et date ; calcule le montant
+- `delete-reservation`
 - `get-me` — merges `auth.users` + `public.users`, auto-creates the `public.users` row on first login. **Casing gotcha**: the supabase-js `User` object from `auth.users` uses **snake_case** properties (`user_metadata`, `email_confirmed_at`, `created_at`), not camelCase — a real bug hit and fixed while building this function.
 
 If a screen needs a new kind of server-side data (a new page's initial load, a new mutation), add a new Edge Function following the naming convention above rather than reaching for a direct `.from()` call, even for something that looks like a "simple" query.
@@ -91,6 +96,58 @@ If a screen needs a new kind of server-side data (a new page's initial load, a n
 ### Database performance rules already applied
 
 RLS policies use `(select auth.uid())` rather than a bare `auth.uid()` (avoids per-row re-evaluation), multiple-permissive-policy tables were consolidated into single policies, and every foreign key has a covering index. Keep this pattern in any new policy/migration, and check `mcp__supabase__get_advisors` after schema changes.
+
+## Le moule `offers` — commander ou réserver
+
+Tout ce qu'un commerçant publie vit dans **une seule table `offers`** : un plat,
+un cosmétique, une chambre, un véhicule, un soin, une séance, un concert, une
+prestation. Il n'y a **pas de table par métier**, et il ne doit pas y en avoir.
+
+Le champ structurant est `fulfilment` :
+
+- **`order`** → l'utilisateur *commande* (panier, quantités, `order_items`)
+- **`booking`** → l'utilisateur *réserve* (une offre, une quantité, une date)
+
+Autres colonnes utiles : `merchant_id` (qui a publié), `capacity` (places),
+`starts_at` (offre datée comme une séance ; vide quand c'est le client qui
+choisit sa date), `section` (regroupement interne au catalogue), `metadata`.
+
+**Ce qu'un commerçant permet de faire n'est jamais déduit de son type.** Les
+capacités viennent des offres réellement publiées, via `capabilities` renvoyé
+par `get-business-detail` (ou la vue `business_capabilities`). Un `switch` sur
+`BusinessType` pour décider des actions est un anti-pattern ici : il laissait
+sans aucun bouton les catégories non prévues, et en affichait qui ne menaient
+nulle part pour celles dont le catalogue n'existait pas.
+
+### Le serveur fait autorité sur l'argent
+
+Le client n'envoie **jamais** de prix ni de total. Il envoie des identifiants
+d'offres et des quantités ; `create_order_with_items` et
+`create_reservation_for_offer` lisent les prix en base, calculent le montant,
+vérifient la capacité restante et refusent une date passée. Toute nouvelle
+écriture financière doit suivre cette règle — auparavant le prix venait de la
+requête, on pouvait donc commander à n'importe quel montant.
+
+Ces deux fonctions acceptent aussi les identifiants historiques
+(`menu_items`, `rooms`, `vehicles`) et retrouvent l'offre correspondante par
+`metadata->>'legacy_id'` : c'est ce qui permet aux tunnels menu, hôtel et
+location de continuer à fonctionner sans réécriture.
+
+### Piège RLS : la récursion sur `business_staff`
+
+Une policy de `business_staff` qui interroge `business_staff` provoque
+`infinite recursion detected in policy`, et **bloque tout ce qui traverse
+cette table** — donc commandes et réservations, dont le `RETURNING` déclenche
+la policy de lecture. Passer par `private.is_business_staff(...)`, une fonction
+`SECURITY DEFINER` hors du schéma exposé par l'API. Ne jamais remettre une
+fonction d'aide aux policies dans `public` : PostgREST l'exposerait.
+
+### Découverte sans compte
+
+Le catalogue (`business`, `offers`, `menu_items`, `rooms`, `vehicles`,
+`reviews`) doit rester lisible par le rôle `anon`. Une policy réservée à
+`authenticated` vide la page de découverte pour un visiteur, ce qui contredit
+le principe de navigation libre documenté plus haut.
 
 ## Pagination — Infinite Scroll Pattern
 
@@ -190,6 +247,16 @@ Mandatory checks after any meaningful code change:
 10. Never call `.from('table_name')` directly from Flutter for business data — go through a Supabase Edge Function following the `METHOD-NOUN[-TYPE]` naming convention (see "Backend Access — Supabase Edge Functions Only" above).
 11. Any new paginated list must use the infinite-scroll pattern with all pagination state/logic kept in the Bloc — never in the widget (see "Pagination — Infinite Scroll Pattern" above).
 12. Any new full-page or full-section loading state must use `Skeletonizer` + explicit `Bone` widgets mirroring the real layout — never a bare `CircularProgressIndicator` for content loading. The one exception is action-in-progress overlays (submit/save while content is already loaded) — see "Loading States — Skeletonizer, Not Spinners" above.
+14. Toute offre publiée passe par la table `offers` et son `fulfilment`
+    (`order` / `booking`) — jamais une table par métier, jamais un `switch` sur
+    `BusinessType` pour décider des actions possibles (voir « Le moule
+    `offers` » ci-dessus).
+15. Le client n'envoie jamais un prix ni un total : le serveur les calcule
+    depuis le catalogue. Toute nouvelle écriture financière doit suivre cette
+    règle.
+16. Le cache local passe par `LocalCache` (Hive), jamais `sqflite` : celui-ci
+    n'existe pas sur le web, et comme le cache s'écrit à l'intérieur du `try`
+    réseau, son échec s'y confondait avec une panne et faisait échouer l'écran.
 13. **`lib/core/themes/app_theme.dart` (`AppTheme.silvaTheme`) is the single source of truth for the app's `ThemeData`.** The app currently ships one theme only (light — `brightness: Brightness.light`, no `darkTheme` wired into `MaterialApp.router`). When a task calls for visual/theming work:
     - Never invent a one-off color palette or a screen-specific "look" (e.g. a dark card style copied from a design mockup) that doesn't route through `AppColors`/`AppTheme`. If a design reference (mockup, screenshot) implies colors that don't exist in `AppColors`, restyle the layout using the existing palette instead of introducing new literals — ask the user first if the existing palette genuinely cannot express the design.
     - If a real second theme (e.g. an actual dark mode) is ever needed, it must be added properly: new tokens in `AppColors`, a second `ThemeData` in `AppTheme`, and `darkTheme`/`themeMode` wired into `MaterialApp.router` in `lib/app/main_app.dart` — not a scoped-to-one-screen imitation. Don't half-build this (e.g. a theme picker UI that stores a `ThemeMode` nobody consumes) — a `SettingsCubit.themeMode` + theme-picker dialog like this existed and was removed for being fully decorative; don't reintroduce that pattern.

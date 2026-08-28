@@ -222,15 +222,12 @@ class _OfferCataloguePageState extends State<OfferCataloguePage> {
     try {
       if (_isOrder) {
         await _selection.submitOrder(
-          business: widget.business,
+          businessId: widget.business.id,
           offers: _offers,
           userId: user.id,
         );
       } else {
-        await _selection.submitBooking(
-          business: widget.business,
-          offers: _offers,
-        );
+        await _selection.submitBooking(offers: _offers);
       }
 
       if (!mounted) return;

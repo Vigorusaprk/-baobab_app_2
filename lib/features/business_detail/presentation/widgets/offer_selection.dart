@@ -1,6 +1,5 @@
 import 'package:baobabe_0_2/features/booking_page/data/models/reservation_service.dart';
 import 'package:baobabe_0_2/features/business_detail/domain/entities/offer.dart';
-import 'package:baobabe_0_2/features/home_page/domain/entities/business_entity.dart';
 import 'package:baobabe_0_2/features/order/domain/entities/order_item.dart';
 import 'package:baobabe_0_2/features/order/presentation/widgets/order_service.dart';
 
@@ -52,7 +51,7 @@ class OfferSelection {
 
   /// Passe la commande des offres sélectionnées.
   Future<void> submitOrder({
-    required Business business,
+    required String businessId,
     required List<Offer> offers,
     required String userId,
     OrderApiService? service,
@@ -60,7 +59,7 @@ class OfferSelection {
     final selected = selectedFrom(offers);
     return (service ?? OrderApiService()).createOrder(
       userId: userId,
-      businessId: business.id,
+      businessId: businessId,
       items: selected
           .map(
             (o) => OrderItem(
@@ -74,37 +73,29 @@ class OfferSelection {
     );
   }
 
-  /// Enregistre la réservation des offres sélectionnées.
+  /// Enregistre la réservation de l'offre sélectionnée.
   ///
-  /// Le détail conserve chaque offre retenue, sa quantité et sa date : c'est
-  /// ce qui permet à l'historique d'afficher une réservation lisible quelle
-  /// que soit la catégorie, sans code par métier.
+  /// On réserve *une* chose (un concert, une table, un soin) alors qu'on
+  /// commande *plusieurs* articles : garder une seule offre par
+  /// réservation rend le décompte des places exact, ce qu'un panier
+  /// multi-offres aurait rendu approximatif.
+  ///
+  /// Le montant n'est pas transmis : le serveur le calcule, vérifie qu'il
+  /// reste des places et refuse une date passée.
   Future<void> submitBooking({
-    required Business business,
     required List<Offer> offers,
     ReservationApiService? service,
   }) {
     final selected = selectedFrom(offers);
+    if (selected.isEmpty) {
+      throw StateError('Aucune offre sélectionnée');
+    }
+    final offer = selected.first;
+
     return (service ?? ReservationApiService()).createReservation(
-      businessId: business.id,
-      type: business.type.name,
-      reservationDate: effectiveDate(offers) ?? DateTime.now(),
-      totalAmount: totalFor(offers),
-      establishmentName: business.name,
-      details: {
-        'offers': selected
-            .map(
-              (o) => {
-                'offer_id': o.id,
-                'name': o.name,
-                'price': o.price,
-                'quantity': quantityOf(o),
-                if (o.startsAt != null)
-                  'starts_at': o.startsAt!.toIso8601String(),
-              },
-            )
-            .toList(),
-      },
+      offerId: offer.id,
+      quantity: quantityOf(offer),
+      reservationDate: offer.hasFixedDate ? null : chosenDate,
     );
   }
 }

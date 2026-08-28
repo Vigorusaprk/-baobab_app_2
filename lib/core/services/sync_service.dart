@@ -57,23 +57,20 @@ class SyncService {
     _logger.d("Local: Operation stored in pending queue.");
   }
 
-  /// Exemple spécifique pour une réservation
+  /// Réservation, éventuellement rejouée plus tard si le réseau manque.
   Future<void> createReservation(Map<String, dynamic> reservationData) async {
     await handleOperation(
       tableName: 'reservations',
       operationType: 'INSERT',
       data: reservationData,
-      apiCall: () async {
-        await _reservationApi.createReservation(
-          businessId: reservationData['business_id'],
-          type: reservationData['type'],
-          reservationDate: DateTime.parse(reservationData['reservation_date']),
-          totalAmount: (reservationData['total_amount'] as num).toDouble(),
-          details: reservationData['details'],
-          userId: reservationData['user_id'],
-          establishmentName: reservationData['establishment_name'],
-        );
-      },
+      apiCall: () => _reservationApi.createReservation(
+        offerId: reservationData['offer_id'] as String,
+        quantity: (reservationData['quantity'] as num?)?.toInt() ?? 1,
+        reservationDate: reservationData['reservation_date'] == null
+            ? null
+            : DateTime.parse(reservationData['reservation_date'] as String),
+        notes: reservationData['notes'] as String?,
+      ),
     );
   }
 }
@@ -123,13 +120,12 @@ class SyncManager {
         if (op.data['table_name'] == 'reservations') {
           if (op.data['operation_type'] == 'INSERT') {
             await _reservationApi.createReservation(
-              businessId: data['business_id'],
-              type: data['type'],
-              reservationDate: DateTime.parse(data['reservation_date']),
-              totalAmount: (data['total_amount'] as num).toDouble(),
-              details: data['details'],
-              userId: data['user_id'],
-              establishmentName: data['establishment_name'],
+              offerId: data['offer_id'] as String,
+              quantity: (data['quantity'] as num?)?.toInt() ?? 1,
+              reservationDate: data['reservation_date'] == null
+                  ? null
+                  : DateTime.parse(data['reservation_date'] as String),
+              notes: data['notes'] as String?,
             );
           }
         }

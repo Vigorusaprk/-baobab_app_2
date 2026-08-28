@@ -32,7 +32,19 @@ class OrderApiService {
         method: HttpMethod.post,
         body: {
           'businessId': businessId,
-          'items': items.map((item) => item.toMap()).toList(),
+          // On n'envoie que quoi et combien : les prix, les noms et le
+          // total sont établis par le serveur à partir du catalogue. Le
+          // client n'a plus voix au chapitre sur le montant.
+          'items': items
+              .map(
+                (item) => {
+                  'offerId': item.menuItemId,
+                  'quantity': item.quantity,
+                  if (item.specialInstructions != null)
+                    'specialInstructions': item.specialInstructions,
+                },
+              )
+              .toList(),
           if (deliveryAddress != null) 'deliveryAddress': deliveryAddress,
           if (deliveryFee != null) 'deliveryFee': deliveryFee,
           if (paymentMethod != null) 'paymentMethod': paymentMethod,
@@ -41,6 +53,20 @@ class OrderApiService {
       );
     } catch (e) {
       throw Exception('Erreur lors de la création de la commande : $e');
+    }
+  }
+
+  /// Annule une commande du client. Le serveur refuse si le commerçant a
+  /// déjà commencé la préparation.
+  Future<void> cancelOrder(String orderId) async {
+    try {
+      await _supabase.functions.invoke(
+        'cancel-order-client',
+        method: HttpMethod.post,
+        body: {'orderId': orderId},
+      );
+    } catch (e) {
+      throw Exception("Impossible d'annuler la commande : $e");
     }
   }
 
