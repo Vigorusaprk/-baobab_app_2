@@ -22,7 +22,7 @@ class PopularBusinessesSection extends StatelessWidget {
 
   const PopularBusinessesSection({
     super.key,
-    this.title = 'Populaires',
+    this.title = 'Nos commerces populaires',
     this.onSeeAllTap,
     this.onItemTap,
   });

@@ -54,7 +54,7 @@ class OffersCarouselSection extends StatelessWidget {
       children: [
         Padding(
           padding: AppDimens.appPadding,
-          child: Text(title, style: Theme.of(context).textTheme.titleMedium),
+          child: Text(title, style: Theme.of(context).textTheme.titleSmall),
         ),
         const SizedBox(height: 10),
         SizedBox(

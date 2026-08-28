@@ -49,10 +49,8 @@ class PopularBusinessListView extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(title, style: Theme.of(context).textTheme.titleMedium),
-            SeeAll(
-              onTap: onSeeAllTap,
-            ),
+            Text(title, style: Theme.of(context).textTheme.titleSmall),
+            SeeAll(onTap: onSeeAllTap),
           ],
         ),
         const SizedBox(height: 12),

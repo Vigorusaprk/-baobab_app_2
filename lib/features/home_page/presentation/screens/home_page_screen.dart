@@ -101,7 +101,8 @@ class _HomePageScreenState extends State<HomePageScreen> {
         buildWhen: (previous, current) =>
             previous.runtimeType != current.runtimeType,
         builder: (context, state) {
-          final isLoading = state is BusinessInitial || state is BusinessLoading;
+          final isLoading =
+              state is BusinessInitial || state is BusinessLoading;
 
           return NotificationListener<ScrollEndNotification>(
             onNotification: _snapHeader,
@@ -122,8 +123,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
                       ? const Skeletonizer(enabled: true, child: HomeSkeleton())
                       : _Sections(
                           state: state,
-                          onSeeAllBusinesses: () =>
-                              _openAllBusinesses(context),
+                          onSeeAllBusinesses: () => _openAllBusinesses(context),
                         ),
                 ),
               ],
@@ -165,7 +165,7 @@ class _Sections extends StatelessWidget {
         PopularBusinessesSection(onSeeAllTap: onSeeAllBusinesses),
         AppDimens.spacerMedium,
         OffersCarouselSection(
-          title: 'Découvrir',
+          title: 'Découvrir nos meilleurs offres',
           offers: loaded.discoverOffers,
           isLoadingMore: loaded.isLoadingMore,
           // Scroll infini : la vue prévient seulement qu'on approche de la
