@@ -54,7 +54,7 @@ class MerchantDashboardScreen extends StatelessWidget {
                 value: '${stats.revenue.toStringAsFixed(0)} \$',
                 label: 'Encaissé',
                 icon: Icons.payments_outlined,
-                color: AppColors.success,
+                color: AppColors.successContent,
               ),
               MerchantStatCard(
                 value: '${stats.offerCount}',
@@ -65,7 +65,7 @@ class MerchantDashboardScreen extends StatelessWidget {
                 value: '${stats.pendingOrders}',
                 label: 'Commandes à traiter',
                 icon: Icons.receipt_long_outlined,
-                color: AppColors.warning,
+                color: AppColors.warningContent,
               ),
               MerchantStatCard(
                 value: '${stats.upcomingReservations}',
@@ -110,7 +110,7 @@ class MerchantDashboardScreen extends StatelessWidget {
                           const Icon(
                             Icons.star_rounded,
                             size: 16,
-                            color: Colors.amber,
+                            color: AppColors.rating,
                           ),
                           AppDimens.spacerMiniWidth,
                           Text(
@@ -179,7 +179,7 @@ class _ToHandleBanner extends StatelessWidget {
       child: Row(
         children: [
           const Icon(Icons.notifications_active_outlined,
-              color: AppColors.warning),
+              color: AppColors.warningContent),
           AppDimens.spacerMediumWidth,
           Expanded(
             child: Text(
@@ -206,7 +206,7 @@ class _AllClearBanner extends StatelessWidget {
     return MerchantCard(
       child: Row(
         children: [
-          const Icon(Icons.check_circle_outline, color: AppColors.success),
+          const Icon(Icons.check_circle_outline, color: AppColors.successContent),
           AppDimens.spacerMediumWidth,
           Expanded(
             child: Text(

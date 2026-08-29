@@ -72,7 +72,7 @@ class FeedListSkeleton extends StatelessWidget {
           decoration: BoxDecoration(
             color: AppColors.white,
             borderRadius: BorderRadius.circular(AppDimens.radius16),
-            border: Border.all(color: Colors.grey.shade300),
+            border: Border.all(color: AppColors.secondaryLight),
           ),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,

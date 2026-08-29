@@ -51,7 +51,7 @@ class SearchResultsList extends StatelessWidget {
               Container(
                 padding: EdgeInsets.symmetric(horizontal: 10),
                 decoration: BoxDecoration(
-                  color: AppColors.secondaryLight,
+                  color: AppColors.secondary,
                   borderRadius: BorderRadius.circular(AppDimens.radius10),
                 ),
                 child: _buildSortDropdown(),
@@ -97,8 +97,8 @@ class SearchResultsList extends StatelessWidget {
   Widget _buildSortDropdown() {
     return DropdownButton<SortBy>(
       borderRadius: BorderRadius.circular(AppDimens.radius20),
-      dropdownColor: AppColors.secondaryLight,
-      style: TextStyle(color: AppColors.background),
+      dropdownColor: AppColors.white,
+      style: const TextStyle(color: AppColors.textPrimary),
       value: state.activeFilters.sortBy,
       underline: const SizedBox(),
       items: SortBy.values.map((sortBy) {
@@ -177,7 +177,7 @@ class SearchResultsList extends StatelessWidget {
                   const SizedBox(height: 4),
                   Row(
                     children: [
-                      const Icon(Icons.star, color: Colors.amber, size: 16),
+                      const Icon(Icons.star, color: AppColors.rating, size: 16),
                       const SizedBox(width: 4),
                       Text(
                         business.rating.toString(),

@@ -1,3 +1,4 @@
+import 'package:baobabe_0_2/core/themes/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import '../../domain/entities/feed_item.dart';
@@ -22,10 +23,10 @@ class FeedItemCard extends StatelessWidget {
         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
-          color: item.isRead ? Colors.grey.shade100 : Colors.white,
+          color: item.isRead ? AppColors.background : AppColors.white,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: _isPromo ? Colors.amber.shade300 : Colors.grey.shade300,
+            color: _isPromo ? AppColors.rating : AppColors.secondaryLight,
           ),
         ),
         child: Row(
@@ -36,7 +37,7 @@ class FeedItemCard extends StatelessWidget {
               height: 30,
               width: 30,
               colorFilter: ColorFilter.mode(
-                _isPromo ? Colors.amber.shade700 : Colors.blueGrey,
+                _isPromo ? AppColors.ratingContent : AppColors.textSecondary,
                 BlendMode.srcIn,
               ),
             ),
@@ -58,7 +59,7 @@ class FeedItemCard extends StatelessWidget {
                     Text(
                       item.actionLabel!,
                       style: TextStyle(
-                        color: Colors.amber.shade800,
+                        color: AppColors.ratingContent,
                         fontWeight: FontWeight.w600,
                       ),
                     ),

@@ -93,7 +93,10 @@ class _OfferTile extends StatelessWidget {
                           ? AppColors.secondary
                           : offer.isBookable
                           ? AppColors.primary
-                          : AppColors.warning,
+                          : AppColors.warningContent,
+                      surface: offer.isInStoreOnly
+                          ? AppColors.warningSurface
+                          : AppColors.primarySurface,
                     ),
                   ],
                 ),
@@ -108,7 +111,11 @@ class _OfferTile extends StatelessWidget {
                 ),
                 if (!offer.isActive) ...[
                   AppDimens.spacerSmall,
-                  const StatusChip(label: 'Retirée', color: AppColors.error),
+                  const StatusChip(
+                    label: 'Retirée',
+                    color: AppColors.errorContent,
+                    surface: AppColors.errorSurface,
+                  ),
                 ],
               ],
             ),

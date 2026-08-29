@@ -78,7 +78,7 @@ class MerchantSettingsSection extends StatelessWidget {
                   ? Text(
                       application.businessName,
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: AppColors.secondaryLight,
+                        color: AppColors.textSecondary,
                       ),
                     )
                   : null,
@@ -104,7 +104,7 @@ class _PendingBadge extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
-        color: AppColors.error,
+        color: AppColors.errorContent,
         borderRadius: BorderRadius.circular(AppDimens.radius20),
       ),
       child: Text(

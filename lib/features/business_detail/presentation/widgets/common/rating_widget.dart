@@ -23,14 +23,14 @@ class RatingWidget extends StatelessWidget {
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
           decoration: BoxDecoration(
-            color: Colors.amber.withOpacity(0.15),
+            color: AppColors.ratingSurface,
             borderRadius: BorderRadius.circular(8),
           ),
           child: Row(
             children: [
               Icon(
                 Icons.star_rounded,
-                color: Colors.amber[800],
+                color: AppColors.ratingContent,
                 size: iconSize,
               ),
               const SizedBox(width: 4),
@@ -38,7 +38,7 @@ class RatingWidget extends StatelessWidget {
                 rating.toStringAsFixed(1),
                 style: TextStyle(
                   fontWeight: FontWeight.w900,
-                  color: Colors.amber[900],
+                  color: AppColors.ratingContent,
                   fontSize: iconSize - 2,
                 ),
               ),

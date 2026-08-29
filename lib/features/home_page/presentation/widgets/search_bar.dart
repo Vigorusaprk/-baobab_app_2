@@ -23,7 +23,7 @@ class SearchAppBar extends StatelessWidget {
       child: Row(
         children: [
           const SizedBox(width: 12),
-          Icon(Icons.search, color: AppColors.secondaryLight, size: 25),
+          Icon(Icons.search, color: AppColors.textSecondary, size: 25),
           const SizedBox(width: 8),
           Expanded(
             child: TextField(

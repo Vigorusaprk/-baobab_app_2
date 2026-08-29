@@ -48,6 +48,7 @@ class ReceivedOrderCard extends StatelessWidget {
               StatusChip(
                 label: order.status.displayName,
                 color: order.status.color,
+                surface: order.status.surface,
               ),
             ],
           ),
@@ -91,7 +92,7 @@ class ReceivedOrderCard extends StatelessWidget {
                   onPressed: () => _apply(context, OrderStatus.cancelled),
                   child: const Text(
                     'Refuser',
-                    style: TextStyle(color: AppColors.error),
+                    style: TextStyle(color: AppColors.errorContent),
                   ),
                 ),
               if (next != null)

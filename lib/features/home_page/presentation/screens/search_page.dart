@@ -215,7 +215,7 @@ class _SearchPageBodyState extends State<SearchPageBody> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.error_outline, size: 64, color: AppColors.error),
+            Icon(Icons.error_outline, size: 64, color: AppColors.errorContent),
             const SizedBox(height: 16),
             Text(
               'Erreur de recherche',

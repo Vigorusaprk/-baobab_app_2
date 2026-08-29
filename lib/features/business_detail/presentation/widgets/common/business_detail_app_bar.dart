@@ -40,7 +40,7 @@ class BusinessDetailAppBar extends StatelessWidget {
               ? Icons.favorite_rounded
               : Icons.favorite_outline_rounded,
           () {},
-          iconColor: business.isFavorite ? AppColors.error : AppColors.primary,
+          iconColor: business.isFavorite ? AppColors.errorContent : AppColors.primary,
         ),
         const SizedBox(width: 7),
       ],

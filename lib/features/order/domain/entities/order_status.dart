@@ -28,20 +28,48 @@ extension OrderStatusExtension on OrderStatus {
     }
   }
 
+  /// La couleur du statut, tirée du système et non d'un arc-en-ciel.
+  ///
+  /// Elle n'encode pas six catégories mais **qui tient la balle** : ambre
+  /// quand on attend une réponse, vert de la marque quand ça avance,
+  /// vert de réussite quand c'est prêt, neutre quand c'est terminé, rouge
+  /// quand c'est arrêté. Le libellé, lui, dit toujours l'étape exacte —
+  /// la couleur n'est jamais le seul porteur de l'information.
+  ///
+  /// Une commande livrée redevient neutre volontairement : elles finissent
+  /// par former l'essentiel de l'historique, et les laisser en vert
+  /// noierait les rares qui demandent encore quelque chose.
   Color get color {
     switch (this) {
       case OrderStatus.pending:
-        return Colors.orange;
+        return AppColors.warningContent;
       case OrderStatus.confirmed:
-        return Colors.blue;
+        return AppColors.secondary;
       case OrderStatus.preparing:
-        return Colors.purple;
+        return AppColors.primary;
       case OrderStatus.ready:
-        return Colors.teal;
+        return AppColors.successContent;
       case OrderStatus.delivered:
-        return AppColors.success;
+        return AppColors.textSecondary;
       case OrderStatus.cancelled:
-        return AppColors.error;
+        return AppColors.errorContent;
+    }
+  }
+
+  /// Le fond de pastille assorti, explicite plutôt qu'obtenu par opacité.
+  Color get surface {
+    switch (this) {
+      case OrderStatus.pending:
+        return AppColors.warningSurface;
+      case OrderStatus.confirmed:
+      case OrderStatus.preparing:
+        return AppColors.primarySurface;
+      case OrderStatus.ready:
+        return AppColors.successSurface;
+      case OrderStatus.delivered:
+        return AppColors.background;
+      case OrderStatus.cancelled:
+        return AppColors.errorSurface;
     }
   }
 }

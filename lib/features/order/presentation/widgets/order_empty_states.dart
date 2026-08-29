@@ -161,7 +161,7 @@ class OrderFilteredEmptyState extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
-                      color: AppColors.secondaryLight,
+                      color: AppColors.primary,
                       fontFamily: AppFonts.primaryFontFamily,
                     ),
                   ),
@@ -181,9 +181,9 @@ class OrderFilteredEmptyState extends StatelessWidget {
                     child: OutlinedButton(
                       onPressed: onShowAll,
                       style: OutlinedButton.styleFrom(
-                        foregroundColor: AppColors.secondaryLight,
+                        foregroundColor: AppColors.secondary,
                         side: const BorderSide(
-                          color: AppColors.secondaryLight,
+                          color: AppColors.secondary,
                           width: 2,
                         ),
                         shape: RoundedRectangleBorder(

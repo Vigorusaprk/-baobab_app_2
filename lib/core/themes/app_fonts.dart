@@ -21,7 +21,7 @@ class AppFonts {
     fontFamily: primaryFontFamily,
     fontSize: 28,
     fontWeight: bold,
-    color: AppColors.secondaryLight,
+    color: AppColors.primary,
   );
 
   static const TextStyle titleMedium = TextStyle(
@@ -45,11 +45,15 @@ class AppFonts {
     color: AppColors.textPrimary,
   );
 
+  // `secondaryLight` était la couleur par défaut de ce style, à 1,83:1 sur
+  // blanc. Comme il est câblé dans le thème, tout `textTheme.bodySmall` sans
+  // surcharge héritait d'un texte illisible — le défaut d'un token ne doit
+  // jamais être la valeur qu'il faut corriger à chaque appel.
   static const TextStyle bodySmall = TextStyle(
     fontFamily: primaryFontFamily,
     fontSize: 12,
     fontWeight: bold,
-    color: AppColors.secondaryLight,
+    color: AppColors.textSecondary,
   );
 
   static const TextStyle button = TextStyle(

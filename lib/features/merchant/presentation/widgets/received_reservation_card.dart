@@ -13,12 +13,32 @@ class ReceivedReservationCard extends StatelessWidget {
 
   const ReceivedReservationCard({required this.reservation});
 
-  static const Map<ReservationStatus, Color> _colors = {
-    ReservationStatus.pending: AppColors.warning,
-    ReservationStatus.confirmed: AppColors.success,
-    ReservationStatus.cancelled: AppColors.error,
-    ReservationStatus.completed: AppColors.secondary,
+  /// Même grammaire que le cycle d'une commande : ambre tant qu'on attend
+  /// une réponse, vert quand c'est accepté, neutre quand c'est derrière
+  /// nous, rouge quand c'est arrêté.
+  static const Map<ReservationStatus, (Color, Color)> _palette = {
+    ReservationStatus.pending: (
+      AppColors.warningContent,
+      AppColors.warningSurface,
+    ),
+    ReservationStatus.confirmed: (
+      AppColors.successContent,
+      AppColors.successSurface,
+    ),
+    ReservationStatus.cancelled: (
+      AppColors.errorContent,
+      AppColors.errorSurface,
+    ),
+    ReservationStatus.completed: (
+      AppColors.textSecondary,
+      AppColors.background,
+    ),
   };
+
+  static const (Color, Color) _fallback = (
+    AppColors.textSecondary,
+    AppColors.background,
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -40,7 +60,8 @@ class ReceivedReservationCard extends StatelessWidget {
               ),
               StatusChip(
                 label: status.label,
-                color: _colors[status] ?? AppColors.textSecondary,
+                color: (_palette[status] ?? _fallback).$1,
+                surface: (_palette[status] ?? _fallback).$2,
               ),
             ],
           ),
@@ -76,7 +97,7 @@ class ReceivedReservationCard extends StatelessWidget {
                   onPressed: () => _apply(context, ReservationStatus.cancelled),
                   child: const Text(
                     'Refuser',
-                    style: TextStyle(color: AppColors.error),
+                    style: TextStyle(color: AppColors.errorContent),
                   ),
                 ),
                 FilledButton(

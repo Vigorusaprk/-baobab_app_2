@@ -57,7 +57,7 @@ class _RestaurantReviewState extends State<RestaurantReview> {
                 children: [
                   const Icon(
                     Icons.error_outline,
-                    color: AppColors.error,
+                    color: AppColors.errorContent,
                     size: 48,
                   ),
                   const SizedBox(height: 16),

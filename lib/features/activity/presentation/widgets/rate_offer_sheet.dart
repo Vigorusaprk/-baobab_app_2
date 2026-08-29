@@ -80,7 +80,7 @@ class _RateOfferSheetState extends State<_RateOfferSheet> {
       messenger.showSnackBar(
         SnackBar(
           content: const Text('Votre avis n\'a pas pu être envoyé.'),
-          backgroundColor: AppColors.error,
+          backgroundColor: AppColors.errorContent,
         ),
       );
     }
@@ -130,7 +130,7 @@ class _RateOfferSheetState extends State<_RateOfferSheet> {
                     value <= _rating
                         ? Icons.star_rounded
                         : Icons.star_border_rounded,
-                    color: Colors.amber,
+                    color: AppColors.rating,
                     size: 34,
                   ),
                 );

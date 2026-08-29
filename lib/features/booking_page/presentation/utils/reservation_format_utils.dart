@@ -21,12 +21,14 @@ class ReservationFormatUtils {
     return _dateText(reservation.displayDate);
   }
 
+  /// La pastille est un aplat surmonté de blanc : la couleur doit donc être
+  /// une valeur `...Content`, assez profonde pour porter du texte blanc.
   static Color getStatusColor(Reservation reservation) {
     switch (reservation.status) {
       case 'pending':
-        return AppColors.warning;
+        return AppColors.warningContent;
       case 'cancelled':
-        return AppColors.error;
+        return AppColors.errorContent;
       case 'completed':
         return AppColors.secondary;
     }
@@ -43,11 +45,11 @@ class ReservationFormatUtils {
   }
 
   static Color _dateColor(DateTime? date) {
-    if (date == null) return AppColors.warning;
+    if (date == null) return AppColors.warningContent;
     final diff = date.difference(DateTime.now());
     if (diff.isNegative) return AppColors.textSecondary;
-    if (diff.inDays == 0) return AppColors.success;
-    if (diff.inDays <= 3) return AppColors.warning;
+    if (diff.inDays == 0) return AppColors.successContent;
+    if (diff.inDays <= 3) return AppColors.warningContent;
     return AppColors.primary;
   }
 

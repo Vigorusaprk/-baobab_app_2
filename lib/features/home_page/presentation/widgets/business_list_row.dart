@@ -91,7 +91,7 @@ class BusinessListRow extends StatelessWidget {
                         const Icon(
                           Icons.star_rounded,
                           size: 14,
-                          color: Colors.amber,
+                          color: AppColors.rating,
                         ),
                         Text(
                           business.rating.toStringAsFixed(1),

@@ -24,7 +24,7 @@ void showLogoutConfirmationDialog(BuildContext context) {
             context.read<AuthBloc>().add(SignOutEvent());
             context.go('/login');
           },
-          style: ElevatedButton.styleFrom(backgroundColor: AppColors.error),
+          style: ElevatedButton.styleFrom(backgroundColor: AppColors.errorContent),
           child: Text("Se déconnecter"),
         ),
       ],

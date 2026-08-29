@@ -39,7 +39,7 @@ class OfferDetailHeader extends StatelessWidget {
                   ? AppColors.secondary
                   : offer.isBookable
                   ? AppColors.primary
-                  : AppColors.warning,
+                  : AppColors.warningContent,
             ),
           ),
         ],

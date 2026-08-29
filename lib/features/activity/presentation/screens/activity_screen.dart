@@ -159,7 +159,7 @@ class _ActivityScreenState extends State<ActivityScreen>
           ),
           TextButton(
             onPressed: () => Navigator.pop(dialogContext, true),
-            child: Text(action, style: const TextStyle(color: AppColors.error)),
+            child: Text(action, style: const TextStyle(color: AppColors.errorContent)),
           ),
         ],
       ),
@@ -188,10 +188,10 @@ class _ActivityScreenState extends State<ActivityScreen>
     }
     try {
       await _orderApi.cancelOrder(order.id);
-      _notify('Commande annulée.', AppColors.success);
+      _notify('Commande annulée.', AppColors.successContent);
       await _loadAll();
     } catch (e) {
-      _notify("$e", AppColors.error);
+      _notify("$e", AppColors.errorContent);
     }
   }
 
@@ -205,10 +205,10 @@ class _ActivityScreenState extends State<ActivityScreen>
     }
     try {
       await _resApi.deleteReservation(reservation.id.toString());
-      _notify('Réservation supprimée.', AppColors.success);
+      _notify('Réservation supprimée.', AppColors.successContent);
       await _loadAll();
     } catch (e) {
-      _notify("$e", AppColors.error);
+      _notify("$e", AppColors.errorContent);
     }
   }
 
@@ -221,7 +221,7 @@ class _ActivityScreenState extends State<ActivityScreen>
   Future<void> _rateOrder(Order order) async {
     final rateable = order.items.where((i) => i.offerId != null).toList();
     if (rateable.isEmpty) {
-      _notify('Cette commande ne peut pas être notée.', AppColors.error);
+      _notify('Cette commande ne peut pas être notée.', AppColors.errorContent);
       return;
     }
 

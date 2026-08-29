@@ -202,7 +202,7 @@ class OrderCard extends StatelessWidget {
                       icon: const Icon(Icons.close_rounded, size: 18),
                       label: const Text('Annuler la commande'),
                       style: TextButton.styleFrom(
-                        foregroundColor: AppColors.error,
+                        foregroundColor: AppColors.errorContent,
                       ),
                     ),
                   ),

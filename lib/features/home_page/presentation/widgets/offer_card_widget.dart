@@ -92,7 +92,7 @@ class OfferCardWidget extends StatelessWidget {
                             const Icon(
                               Icons.star_rounded,
                               size: 15,
-                              color: Colors.amber,
+                              color: AppColors.rating,
                             ),
                             Text(
                               offer.rating.toStringAsFixed(1),
@@ -153,7 +153,7 @@ class _Visual extends StatelessWidget {
                 ? AppColors.secondary
                 : offer.isBookable
                 ? AppColors.primary
-                : AppColors.warning,
+                : AppColors.warningContent,
           ),
         ),
         if (offer.startsAt != null)

@@ -55,18 +55,29 @@ class MerchantStatCard extends StatelessWidget {
 
 /// Pastille de statut, reprise à l'identique pour les commandes et les
 /// réservations : le commerçant lit la même forme dans les deux listes.
+///
+/// [surface] est explicite plutôt qu'obtenue en posant [color] à 12 %
+/// d'opacité : le contraste dépendait alors de ce qu'il y avait derrière la
+/// pastille, donc invérifiable — et il tombait à 3,8:1 là où un libellé en
+/// demande 4,5.
 class StatusChip extends StatelessWidget {
   final String label;
   final Color color;
+  final Color surface;
 
-  const StatusChip({super.key, required this.label, required this.color});
+  const StatusChip({
+    super.key,
+    required this.label,
+    required this.color,
+    this.surface = AppColors.background,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.12),
+        color: surface,
         borderRadius: BorderRadius.circular(AppDimens.radius20),
       ),
       child: Text(

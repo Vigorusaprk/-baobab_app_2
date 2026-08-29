@@ -48,14 +48,14 @@ class _ProfilPageState extends State<ProfilPage> {
                   children: [
                     const Icon(
                       Icons.error_outline,
-                      color: AppColors.error,
+                      color: AppColors.errorContent,
                       size: 48,
                     ),
                     const SizedBox(height: 16),
                     Text(
                       state.message,
                       textAlign: TextAlign.center,
-                      style: const TextStyle(color: AppColors.error),
+                      style: const TextStyle(color: AppColors.errorContent),
                     ),
                     const SizedBox(height: 16),
                     ElevatedButton(

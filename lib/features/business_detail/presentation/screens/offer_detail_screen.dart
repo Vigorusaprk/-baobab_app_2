@@ -98,7 +98,9 @@ class _OfferDetailView extends StatelessWidget {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
-        backgroundColor: isError ? AppColors.error : AppColors.success,
+        backgroundColor: isError
+            ? AppColors.errorContent
+            : AppColors.successContent,
         behavior: SnackBarBehavior.floating,
       ),
     );
@@ -185,7 +187,7 @@ class _Content extends StatelessWidget {
                     const Icon(
                       Icons.star_rounded,
                       size: 18,
-                      color: Colors.amber,
+                      color: AppColors.rating,
                     ),
                     Text(
                       '${offer.rating.toStringAsFixed(1)} '
@@ -259,7 +261,7 @@ class _Failure extends StatelessWidget {
               textAlign: TextAlign.center,
               style: Theme.of(
                 context,
-              ).textTheme.bodyMedium?.copyWith(color: AppColors.error),
+              ).textTheme.bodyMedium?.copyWith(color: AppColors.errorContent),
             ),
             AppDimens.spacerMedium,
             ElevatedButton(

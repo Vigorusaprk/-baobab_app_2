@@ -92,7 +92,7 @@ class _WriteReviewModalState extends State<WriteReviewModal> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Erreur: $e'),
-            backgroundColor: AppColors.error,
+            backgroundColor: AppColors.errorContent,
           ),
         );
       }
@@ -139,7 +139,7 @@ class _WriteReviewModalState extends State<WriteReviewModal> {
                       index < _rating
                           ? Icons.star_rounded
                           : Icons.star_border_rounded,
-                      color: Colors.amber,
+                      color: AppColors.rating,
                       size: 32,
                     ),
                     onPressed: () => setState(() => _rating = index + 1),

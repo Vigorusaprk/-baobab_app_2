@@ -103,7 +103,7 @@ class _InStoreNotice extends StatelessWidget {
         top: false,
         child: Row(
           children: [
-            const Icon(Icons.storefront_outlined, color: AppColors.warning),
+            const Icon(Icons.storefront_outlined, color: AppColors.warningContent),
             AppDimens.spacerMediumWidth,
             Expanded(
               child: Text(
@@ -217,7 +217,7 @@ class _SubmitButton extends StatelessWidget {
     return FilledButton(
       style: FilledButton.styleFrom(
         backgroundColor: AppColors.primary,
-        disabledBackgroundColor: AppColors.secondaryLight,
+        disabledBackgroundColor: AppColors.secondary,
         padding: const EdgeInsets.symmetric(vertical: 16),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppDimens.borderButton),

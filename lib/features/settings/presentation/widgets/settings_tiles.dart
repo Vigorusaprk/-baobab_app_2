@@ -111,7 +111,7 @@ class ProfileSummaryCard extends StatelessWidget {
               CircleAvatar(
                 radius: 28,
                 backgroundColor: isLoggedIn
-                    ? AppColors.secondaryLight
+                    ? AppColors.secondary
                     : AppColors.primary.withValues(alpha: 0.1),
                 child: Icon(
                   isLoggedIn ? Icons.person : Icons.login_rounded,
@@ -182,11 +182,11 @@ class SettingsLogoutButton extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.logout, color: AppColors.error, size: 20),
+            const Icon(Icons.logout, color: AppColors.errorContent, size: 20),
             const SizedBox(width: 8),
             Text(
               'Déconnexion',
-              style: AppFonts.button.copyWith(color: AppColors.error),
+              style: AppFonts.button.copyWith(color: AppColors.errorContent),
             ),
           ],
         ),

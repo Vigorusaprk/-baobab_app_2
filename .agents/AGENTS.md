@@ -399,6 +399,46 @@ Mandatory checks after any meaningful code change:
     - Never invent a one-off color palette or a screen-specific "look" (e.g. a dark card style copied from a design mockup) that doesn't route through `AppColors`/`AppTheme`. If a design reference (mockup, screenshot) implies colors that don't exist in `AppColors`, restyle the layout using the existing palette instead of introducing new literals — ask the user first if the existing palette genuinely cannot express the design.
     - If a real second theme (e.g. an actual dark mode) is ever needed, it must be added properly: new tokens in `AppColors`, a second `ThemeData` in `AppTheme`, and `darkTheme`/`themeMode` wired into `MaterialApp.router` in `lib/app/main_app.dart` — not a scoped-to-one-screen imitation. Don't half-build this (e.g. a theme picker UI that stores a `ThemeMode` nobody consumes) — a `SettingsCubit.themeMode` + theme-picker dialog like this existed and was removed for being fully decorative; don't reintroduce that pattern.
 
+## Couleur : deux rôles par teinte sémantique
+
+Une couleur d'état sert à deux choses qui n'ont pas les mêmes exigences :
+**remplir une surface** et **porter du texte**. `success`, `warning` et
+`error` ont été choisies pour la première ; employées pour la seconde, ou
+surmontées de blanc, elles descendaient à 1,83:1.
+
+Chacune a donc trois valeurs dans `AppColors` :
+
+| suffixe | emploi |
+|---|---|
+| *(aucun)* — `warning` | aplat large surmonté de texte **foncé**, icône décorative |
+| `...Content` — `warningContent` | **texte, icône signifiante, ou fond plein à texte blanc** |
+| `...Surface` — `warningSurface` | fond de pastille, à marier avec le `...Content` de la même teinte |
+
+Les `...Content` ont été calculées pour satisfaire **trois** contraintes à la
+fois : ≥ 4,5:1 en texte sur blanc, ≥ 4,5:1 sous du blanc, et ≥ 4,5:1 sur leur
+propre `...Surface`. Ne pas les retoucher à l'œil : la valeur est le résultat
+d'un calcul, pas d'un goût.
+
+Deux règles qui en découlent :
+
+- **`secondaryLight` n'est jamais une couleur de texte, et rien de blanc ne se
+  pose dessus** (1,83:1). C'est une teinte de bordure et d'aplat décoratif.
+- **Une pastille reçoit une surface explicite, jamais un `withValues(alpha:)`
+  de sa propre couleur** : le contraste dépendrait alors de ce qu'il y a
+  derrière, donc invérifiable — et il tombait à 3,8:1.
+
+La note a un token unique, `AppColors.rating` : elle était déclinée en quatre
+nuances d'ambre selon le fichier, sur le signal même qui porte la confiance
+dans le produit. L'étoile reste vive parce qu'un chiffre l'accompagne
+toujours ; dès qu'un **texte** exprime la note, c'est `ratingContent`.
+
+Le cycle de vie d'une commande (`OrderStatus.color` / `.surface`) n'encode pas
+six catégories mais **qui tient la balle** : ambre en attente, vert de la
+marque pendant le traitement, vert de réussite quand c'est prêt, neutre une
+fois terminé, rouge si c'est arrêté. Une commande livrée redevient neutre
+volontairement : elles finissent par former l'essentiel de l'historique, et
+les laisser en vert noierait les rares qui demandent encore quelque chose.
+
 ## UI And Design System
 
 A dedicated design system pass (colors, typography, spacing, component consistency) is planned but has **not started**. Until a `ui-design-systems` reference file exists in this repo, do not perform a broad visual redesign — only make the minimal visual changes required by the task at hand, using the existing `AppColors`/`AppDimens`/`AppFonts` constants under `lib/core/themes`, and never colors/styles outside of what `AppTheme.silvaTheme` (`lib/core/themes/app_theme.dart`) already defines or composes from those constants (see rule 13 above).

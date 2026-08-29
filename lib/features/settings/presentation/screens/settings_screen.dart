@@ -66,7 +66,7 @@ class SettingsScreen extends StatelessWidget {
                   trailing: Text(
                     _getLanguageName(settingsState.locale.languageCode),
                     style: AppFonts.bodySmall.copyWith(
-                      color: AppColors.secondaryLight,
+                      color: AppColors.textSecondary,
                     ),
                   ),
                 ),

@@ -20,7 +20,7 @@ class OrderDetailPage extends StatelessWidget {
           style: TextStyle(
             fontSize: 22,
             fontWeight: FontWeight.bold,
-            color: AppColors.secondaryLight,
+            color: AppColors.primary,
             fontFamily: 'Poppins',
           ),
         ),
@@ -28,7 +28,7 @@ class OrderDetailPage extends StatelessWidget {
         leading: IconButton(
           icon: Container(
             decoration: BoxDecoration(
-              color: AppColors.secondaryLight,
+              color: AppColors.secondary,
               shape: BoxShape.circle,
             ),
             child: Center(

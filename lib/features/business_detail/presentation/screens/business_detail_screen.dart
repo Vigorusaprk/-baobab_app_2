@@ -79,7 +79,7 @@ class _BusinessDetailScreenState extends State<BusinessDetailScreen> {
                 state.detailErrorMessage ??
                     "Impossible de charger les détails.",
                 textAlign: TextAlign.center,
-                style: const TextStyle(color: AppColors.error, fontSize: 16),
+                style: const TextStyle(color: AppColors.errorContent, fontSize: 16),
               ),
               const SizedBox(height: 16),
               ElevatedButton(

@@ -242,12 +242,12 @@ class _ErrorView extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.error_outline, size: 60, color: AppColors.error),
+            const Icon(Icons.error_outline, size: 60, color: AppColors.errorContent),
             AppDimens.spacerMedium,
             Text(
               message,
               textAlign: TextAlign.center,
-              style: const TextStyle(color: AppColors.error),
+              style: const TextStyle(color: AppColors.errorContent),
             ),
             AppDimens.spacerMedium,
             ElevatedButton(onPressed: onRetry, child: const Text('Réessayer')),

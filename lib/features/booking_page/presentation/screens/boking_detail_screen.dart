@@ -275,7 +275,7 @@ class ReservationDetailPage extends StatelessWidget {
             const SizedBox(height: 5),
             Text(
               'Réservation du ${DateFormat('dd/MM/yyyy à HH:mm').format(reservation.reservationDate)}',
-              style: const TextStyle(color: AppColors.secondaryLight),
+              style: const TextStyle(color: AppColors.textSecondary),
             ),
           ],
         ),

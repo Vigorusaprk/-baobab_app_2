@@ -214,7 +214,7 @@ class _NavBar extends StatelessWidget {
                       children: [
                         Badge(
                           isLabelVisible: showBadge,
-                          backgroundColor: AppColors.error,
+                          backgroundColor: AppColors.errorContent,
                           child: Icon(
                             isSelected ? tab.filled : tab.outlined,
                             size: 20,
