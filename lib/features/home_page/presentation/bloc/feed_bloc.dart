@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../domain/repositories/feed_repository.dart';
 import 'feed_event.dart';
@@ -18,7 +19,7 @@ class FeedBloc extends Bloc<FeedEvent, FeedState> {
       final items = await repository.getFeedItems();
       emit(FeedLoaded(allItems: items, activeFilter: FeedFilter.all));
     } catch (e) {
-      debugPrint('Chargement de l'accueil — échec : $e');
+      debugPrint('Chargement de l\'accueil — échec : $e');
       emit(
         const FeedError(
           "L'accueil n'a pas pu être chargé. Vérifiez votre connexion "
