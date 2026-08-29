@@ -23,6 +23,7 @@ class OrderDetailPage extends StatelessWidget {
         ),
 
         leading: IconButton(
+          tooltip: 'Retour',
           icon: Container(
             decoration: BoxDecoration(
               color: Theme.of(context).colorScheme.secondary,

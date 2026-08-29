@@ -60,6 +60,7 @@ class DateField extends StatelessWidget {
               ),
               if (value != null)
                 IconButton(
+                  tooltip: 'Retirer la date imposée',
                   icon: const Icon(Icons.close, size: 18),
                   onPressed: onClear,
                 ),

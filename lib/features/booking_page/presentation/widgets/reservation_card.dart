@@ -240,7 +240,10 @@ class ReservationCard extends StatelessWidget {
       return Card(
         child: Padding(
           padding: const EdgeInsets.all(16),
-          child: Text('Erreur d’affichage : $e'),
+          child: const Text(
+            'Cette ligne n’a pas pu s’afficher.',
+            textAlign: TextAlign.center,
+          ),
         ),
       );
     }

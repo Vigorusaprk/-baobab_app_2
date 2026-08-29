@@ -148,6 +148,7 @@ class _OfferMenu extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return PopupMenuButton<String>(
+      tooltip: 'Actions sur cette offre',
       icon: Icon(
         Icons.more_vert,
         color: Theme.of(context).colorScheme.onSurfaceVariant,

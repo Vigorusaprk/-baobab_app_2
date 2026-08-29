@@ -26,6 +26,10 @@ class ReceivedOrderCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final next = _nextStep[order.status];
+    // Un changement de statut est en vol : on ferme les boutons plutôt que
+    // d'en envoyer un second par-dessus.
+    final merchantState = context.watch<MerchantCubit>().state;
+    final busy = merchantState is MerchantReady && merchantState.isWorking;
     final canRefuse =
         order.status == OrderStatus.pending ||
         order.status == OrderStatus.confirmed;
@@ -88,7 +92,9 @@ class ReceivedOrderCard extends StatelessWidget {
               const Spacer(),
               if (canRefuse)
                 TextButton(
-                  onPressed: () => _apply(context, OrderStatus.cancelled),
+                  onPressed: busy
+                      ? null
+                      : () => _apply(context, OrderStatus.cancelled),
                   child: Text(
                     'Refuser',
                     style: TextStyle(
@@ -101,7 +107,7 @@ class ReceivedOrderCard extends StatelessWidget {
                   style: FilledButton.styleFrom(
                     backgroundColor: Theme.of(context).colorScheme.primary,
                   ),
-                  onPressed: () => _apply(context, next.$1),
+                  onPressed: busy ? null : () => _apply(context, next.$1),
                   child: Text(next.$2),
                 ),
             ],

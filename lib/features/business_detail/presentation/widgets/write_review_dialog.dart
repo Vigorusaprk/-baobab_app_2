@@ -90,7 +90,7 @@ class _WriteReviewModalState extends State<WriteReviewModal> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Erreur: $e'),
+            content: const Text("Votre avis n'a pas pu être envoyé."),
             backgroundColor: Theme.of(context).colorScheme.error,
           ),
         );
@@ -139,6 +139,7 @@ class _WriteReviewModalState extends State<WriteReviewModal> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: List.generate(5, (index) {
                   return IconButton(
+                    tooltip: '${index + 1} étoile${index > 0 ? 's' : ''}',
                     icon: Icon(
                       index < _rating
                           ? Icons.star_rounded

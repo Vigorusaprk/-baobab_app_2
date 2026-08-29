@@ -79,12 +79,8 @@ class SettingsScreen extends StatelessWidget {
             DetailSection(
               sectionTitle: "FAQ & Aide",
               children: [
-                InfoTile(
-                  subtitle: "Centre d'aide",
-                  icon: Icons.help_outline,
-                  onTap: () {},
-                ),
-                const CustomDivider(),
+                // « Centre d'aide » a été retiré : il n'ouvrait rien.
+                // Il reviendra avec la page qu'il promet.
                 InfoTile(
                   subtitle: "Contactez-nous",
                   icon: Icons.mail_outline,
@@ -98,24 +94,11 @@ class SettingsScreen extends StatelessWidget {
                 ),
               ],
             ),
-            AppDimens.spacerMedium,
-            // Section Application
-            DetailSection(
-              sectionTitle: "Application",
-              children: [
-                InfoTile(
-                  subtitle: "Confidentialité",
-                  icon: Icons.privacy_tip_outlined,
-                  onTap: () {},
-                ),
-                const CustomDivider(),
-                InfoTile(
-                  subtitle: "Conditions d'utilisation",
-                  icon: Icons.description_outlined,
-                  onTap: () {},
-                ),
-              ],
-            ),
+            // La section « Application » (Confidentialité, Conditions
+            // d'utilisation) a été retirée : les deux pages n'existent pas,
+            // et PRODUCT.md note que le cadre juridique n'est pas arrêté.
+            // Une entrée qui n'ouvre rien vaut moins qu'une entrée absente ;
+            // elles reviendront avec leur contenu.
             if (isLoggedIn) ...[
               AppDimens.spacerLarge,
               SettingsLogoutButton(

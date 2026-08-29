@@ -35,6 +35,7 @@ class ReservationDetailPage extends StatelessWidget {
         centerTitle: true,
         elevation: 0,
         leading: IconButton(
+          tooltip: 'Retour',
           icon: Container(
             decoration: BoxDecoration(
               border: Border.all(

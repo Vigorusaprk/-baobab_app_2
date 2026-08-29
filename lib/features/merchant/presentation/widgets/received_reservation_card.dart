@@ -34,6 +34,9 @@ class ReceivedReservationCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final status = reservation.status;
+    // Voir [ReceivedOrderCard] : on ne double pas une demande en vol.
+    final merchantState = context.watch<MerchantCubit>().state;
+    final busy = merchantState is MerchantReady && merchantState.isWorking;
 
     return MerchantCard(
       child: Column(
@@ -85,7 +88,9 @@ class ReceivedReservationCard extends StatelessWidget {
               const Spacer(),
               if (status == ReservationStatus.pending) ...[
                 TextButton(
-                  onPressed: () => _apply(context, ReservationStatus.cancelled),
+                  onPressed: busy
+                      ? null
+                      : () => _apply(context, ReservationStatus.cancelled),
                   child: Text(
                     'Refuser',
                     style: TextStyle(
@@ -97,7 +102,9 @@ class ReceivedReservationCard extends StatelessWidget {
                   style: FilledButton.styleFrom(
                     backgroundColor: Theme.of(context).colorScheme.primary,
                   ),
-                  onPressed: () => _apply(context, ReservationStatus.confirmed),
+                  onPressed: busy
+                      ? null
+                      : () => _apply(context, ReservationStatus.confirmed),
                   child: const Text('Confirmer'),
                 ),
               ] else if (status == ReservationStatus.confirmed)
@@ -105,7 +112,9 @@ class ReceivedReservationCard extends StatelessWidget {
                   style: FilledButton.styleFrom(
                     backgroundColor: Theme.of(context).colorScheme.primary,
                   ),
-                  onPressed: () => _apply(context, ReservationStatus.completed),
+                  onPressed: busy
+                      ? null
+                      : () => _apply(context, ReservationStatus.completed),
                   child: const Text('Honorée'),
                 ),
             ],

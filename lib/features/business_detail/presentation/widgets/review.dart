@@ -60,7 +60,12 @@ class _RestaurantReviewState extends State<RestaurantReview> {
                     size: 48,
                   ),
                   const SizedBox(height: 16),
-                  Text('Erreur: ${snapshot.error}'),
+                  // Une trace d'exception ne dit rien à qui lit un avis :
+                  // on nomme ce qui a échoué et ce qu'on peut faire.
+                  const Text(
+                    "Les avis n'ont pas pu être chargés.",
+                    textAlign: TextAlign.center,
+                  ),
                   const SizedBox(height: 16),
                   ElevatedButton(
                     onPressed: _refreshReviews,

@@ -30,22 +30,14 @@ class BusinessDetailAppBar extends StatelessWidget {
             context,
             Icons.arrow_back_ios_new_rounded,
             () => Navigator.pop(context),
+            tooltip: 'Retour',
           ),
         ],
       ),
-      actions: [
-        _buildCircleButton(
-          context,
-          business.isFavorite
-              ? Icons.favorite_rounded
-              : Icons.favorite_outline_rounded,
-          () {},
-          iconColor: business.isFavorite
-              ? Theme.of(context).colorScheme.error
-              : Theme.of(context).colorScheme.primary,
-        ),
-        const SizedBox(width: 7),
-      ],
+      // Pas de bouton « favori » : rien ne le mémorise côté serveur
+      // (`toggleFavorite` n'existe pas encore). Un cœur qui ne retient rien
+      // est une promesse non tenue — il reviendra avec la fonctionnalité.
+      actions: const [],
       flexibleSpace: LayoutBuilder(
         builder: (BuildContext context, BoxConstraints constraints) {
           final double topPadding = MediaQuery.of(context).padding.top;
@@ -124,6 +116,7 @@ class BusinessDetailAppBar extends StatelessWidget {
     BuildContext context,
     IconData icon,
     VoidCallback onTap, {
+    required String tooltip,
     Color? iconColor,
   }) {
     iconColor ??= Theme.of(context).colorScheme.primary;
@@ -135,6 +128,7 @@ class BusinessDetailAppBar extends StatelessWidget {
           shape: BoxShape.circle,
         ),
         child: IconButton(
+          tooltip: tooltip,
           icon: Icon(icon, color: iconColor, size: 20),
           onPressed: onTap,
         ),

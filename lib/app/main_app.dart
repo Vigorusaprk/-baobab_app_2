@@ -105,6 +105,23 @@ class _MainAppState extends State<MainApp> {
           Locale('en', 'US'),
           Locale('ln', 'CD'),
         ],
+        // Le lingala n'existe pas dans les locales de Flutter : un téléphone
+        // réglé dessus laissait l'application à moitié localisée — textes
+        // français, sélecteur de date en anglais. Tant que les traductions
+        // n'existent pas, toute locale que le socle ne sait pas rendre
+        // retombe sur le français, qui est la langue réellement écrite.
+        localeResolutionCallback: (deviceLocale, supported) {
+          const fallback = Locale('fr', 'FR');
+          if (deviceLocale == null) return fallback;
+          final localisable = GlobalMaterialLocalizations.delegate;
+          for (final locale in supported) {
+            if (locale.languageCode == deviceLocale.languageCode &&
+                localisable.isSupported(locale)) {
+              return locale;
+            }
+          }
+          return fallback;
+        },
       ),
     );
   }

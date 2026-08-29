@@ -125,6 +125,7 @@ class _RateOfferSheetState extends State<_RateOfferSheet> {
               children: List.generate(5, (index) {
                 final value = index + 1;
                 return IconButton(
+                  tooltip: '$value étoile${value > 1 ? 's' : ''}',
                   onPressed: () => setState(() => _rating = value),
                   icon: Icon(
                     value <= _rating

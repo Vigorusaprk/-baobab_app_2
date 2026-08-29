@@ -22,7 +22,7 @@ class CustomCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: color ?? Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(
-          borderRadius ?? AppDimens.smallCardBorderRadius,
+          borderRadius ?? AppDimens.cardBorderRadius,
         ),
         boxShadow: [
           BoxShadow(

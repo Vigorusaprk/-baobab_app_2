@@ -1,4 +1,5 @@
 import 'package:baobabe_0_2/core/themes/other_theme.dart';
+import 'package:baobabe_0_2/core/widgets/custom_card.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
@@ -25,10 +26,7 @@ class OrderCard extends StatelessWidget {
     try {
       final dateFormat = DateFormat('dd/MM/yyyy HH:mm');
 
-      return Card(
-        color: Theme.of(context).colorScheme.surfaceContainerLowest,
-        margin: const EdgeInsets.only(bottom: 12),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      return CustomCard(
         child: InkWell(
           onTap: () => context.pushNamed('orderDetail', extra: order),
           borderRadius: BorderRadius.circular(16),
@@ -44,7 +42,7 @@ class OrderCard extends StatelessWidget {
                       width: 50,
                       height: 50,
                       decoration: BoxDecoration(
-                        color: order.typeColor(context).withOpacity(0.1),
+                        color: order.typeColor(context).withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Icon(
@@ -212,7 +210,10 @@ class OrderCard extends StatelessWidget {
       return Card(
         child: Padding(
           padding: const EdgeInsets.all(16),
-          child: Text('Erreur d’affichage : $e'),
+          child: const Text(
+            'Cette ligne n’a pas pu s’afficher.',
+            textAlign: TextAlign.center,
+          ),
         ),
       );
     }

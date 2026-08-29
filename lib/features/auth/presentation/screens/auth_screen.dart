@@ -34,6 +34,7 @@ class _LoginPageState extends State<LoginPage> {
         appBar: AppBar(
           elevation: 0,
           leading: IconButton(
+            tooltip: 'Retour',
             icon: const Icon(Icons.arrow_back_ios_new_rounded),
             onPressed: () {
               if (context.canPop()) {
