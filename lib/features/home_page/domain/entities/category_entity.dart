@@ -160,12 +160,12 @@ class Category extends Equatable {
   /// d'écran. [known] est la liste chargée depuis le serveur.
   static String displayNameForSlug(String slug, List<Category> known) {
     if (slug.isEmpty || slug == 'all' || slug == 'other') {
-      return 'Tous les établissements';
+      return 'Tous les commerces';
     }
     for (final c in known) {
       if (c.slug == slug) return c.displayName;
     }
-    return 'Établissements';
+    return 'Commerces';
   }
 
   @override

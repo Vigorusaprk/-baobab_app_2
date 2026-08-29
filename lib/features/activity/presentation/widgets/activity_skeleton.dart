@@ -96,7 +96,7 @@ class OrderCardSkeleton extends StatelessWidget {
                 vertical: AppDimens.small,
               ),
               decoration: BoxDecoration(
-                color: OtherTheme.of(context).success.withOpacity(0.15),
+                color: OtherTheme.of(context).success.withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(AppDimens.radius16),
               ),
               child: Row(

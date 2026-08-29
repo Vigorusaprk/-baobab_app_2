@@ -68,7 +68,9 @@ class OrderDetailPage extends StatelessWidget {
                       if (order.items.isEmpty)
                         const Padding(
                           padding: EdgeInsets.symmetric(vertical: 12),
-                          child: Text('Aucun article de commande disponible.'),
+                          child: Text(
+                            'Le détail des articles est indisponible.',
+                          ),
                         )
                       else
                         ...order.items.map(
@@ -145,29 +147,9 @@ class OrderDetailPage extends StatelessWidget {
                     ),
                   ),
                 ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Fonctionnalité à implémenter'),
-                        ),
-                      );
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Theme.of(context).colorScheme.primary,
-                    ),
-                    child: Text(
-                      'Recommander',
-                      style: TextStyle(
-                        fontFamily: 'Poppins',
-                        color: Theme.of(context).colorScheme.surface,
-                      ),
-                    ),
-                  ),
-                ),
+                // Le bouton « Recommander » a été retiré : il refermait
+                // la page et annonçait « Fonctionnalité à implémenter ». Il
+                // reviendra quand recommander sera possible.
               ],
             ),
           ],

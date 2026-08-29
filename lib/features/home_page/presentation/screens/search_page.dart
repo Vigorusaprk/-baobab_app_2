@@ -10,6 +10,7 @@ import 'package:baobabe_0_2/features/home_page/presentation/widgets/list_skeleto
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:go_router/go_router.dart';
 
 /// Standalone route wrapper for `/search` (pushed on top of another page,
 /// e.g. from Home's "voir tout"). Owns its own Scaffold since it lives
@@ -110,15 +111,24 @@ class _SearchPageBodyState extends State<SearchPageBody> {
                 ),
 
                 SizedBox(width: 5),
-                CustomCard(
-                  color: Theme.of(context).primaryColor,
-                  child: SvgPicture.asset(
-                    'assets/icons/filter.svg',
-                    height: 25,
-                    width: 25,
-                    colorFilter: ColorFilter.mode(
-                      Theme.of(context).colorScheme.surface,
-                      BlendMode.srcIn,
+                // Même destination que l'icône jumelle de l'accueil : c'est la
+                // seule porte d'entrée du filtrage dans l'application. Sans
+                // GestureDetector, elle était ici purement décorative.
+                GestureDetector(
+                  onTap: () => context.pushNamed('budgetFinder'),
+                  child: Tooltip(
+                    message: 'Trouver selon mon budget',
+                    child: CustomCard(
+                      color: Theme.of(context).primaryColor,
+                      child: SvgPicture.asset(
+                        'assets/icons/filter.svg',
+                        height: 25,
+                        width: 25,
+                        colorFilter: ColorFilter.mode(
+                          Theme.of(context).colorScheme.surface,
+                          BlendMode.srcIn,
+                        ),
+                      ),
                     ),
                   ),
                 ),
@@ -153,7 +163,8 @@ class _SearchPageBodyState extends State<SearchPageBody> {
               builder: (context, state) {
                 if (state is SearchInitial) {
                   return _buildEmptyState(
-                    'Rechercher un commerçant ou une offre',
+                    "Cherchez un plat, un soin, un concert, "
+                    "ou le nom d'un commerce.",
                     Icons.search,
                   );
                 } else if (state is SearchLoading) {
@@ -176,7 +187,11 @@ class _SearchPageBodyState extends State<SearchPageBody> {
                   return _buildErrorState(state.message);
                 } else if (state is SearchResultsLoaded) {
                   if (state.results.isEmpty) {
-                    return _buildEmptyState('Aucun résultat', Icons.search_off);
+                    return _buildEmptyState(
+                      'Aucun résultat. '
+                      'Essayez un autre mot, ou retirez un filtre.',
+                      Icons.search_off,
+                    );
                   }
                   return SearchResultsList(
                     state: state,
@@ -220,7 +235,7 @@ class _SearchPageBodyState extends State<SearchPageBody> {
             ),
             const SizedBox(height: 16),
             Text(
-              'Erreur de recherche',
+              'La recherche a échoué',
               style: Theme.of(context).textTheme.bodyLarge!,
             ),
             const SizedBox(height: 8),

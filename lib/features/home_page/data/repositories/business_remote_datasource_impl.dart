@@ -88,9 +88,7 @@ class BusinessRemoteDataSourceImpl implements BusinessRemoteDataSource {
       if (cached != null) {
         return BusinessModel.fromJson(jsonDecode(cached));
       }
-      throw Exception(
-        'Mode hors-ligne : détail non disponible pour cet établissement.',
-      );
+      throw Exception("Hors ligne : ce commerce n'a pas encore été consulté.");
     }
 
     try {

@@ -27,7 +27,9 @@ class ReservationCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(AppDimens.radius20),
           boxShadow: [
             BoxShadow(
-              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.08),
+              color: Theme.of(
+                context,
+              ).colorScheme.onSurface.withValues(alpha: 0.08),
               blurRadius: 12,
               offset: const Offset(0, 4),
             ),
@@ -54,7 +56,7 @@ class ReservationCard extends StatelessWidget {
                         decoration: BoxDecoration(
                           color: reservation
                               .typeColor(context)
-                              .withOpacity(0.2),
+                              .withValues(alpha: 0.2),
                           borderRadius: BorderRadius.circular(
                             AppDimens.radius12,
                           ),
@@ -96,7 +98,7 @@ class ReservationCard extends StatelessWidget {
                                   decoration: BoxDecoration(
                                     color: reservation
                                         .typeColor(context)
-                                        .withOpacity(0.1),
+                                        .withValues(alpha: 0.1),
                                     borderRadius: BorderRadius.circular(
                                       AppDimens.radius8,
                                     ),
@@ -202,7 +204,9 @@ class ReservationCard extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.all(AppDimens.medium),
                     decoration: BoxDecoration(
-                      color: reservation.typeColor(context).withOpacity(0.2),
+                      color: reservation
+                          .typeColor(context)
+                          .withValues(alpha: 0.2),
                       border: Border.all(
                         width: 2,
                         color: Theme.of(context).colorScheme.secondary,
@@ -235,8 +239,8 @@ class ReservationCard extends StatelessWidget {
         ),
       );
     } catch (e, stack) {
-      print('❌ Erreur affichage carte : $e');
-      print(stack);
+      debugPrint('❌ Erreur affichage carte : $e');
+      debugPrint('$stack');
       return Card(
         child: Padding(
           padding: const EdgeInsets.all(16),

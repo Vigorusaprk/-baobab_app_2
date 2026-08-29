@@ -52,7 +52,12 @@ class SettingsCubit extends Cubit<SettingsState> {
 
       emit(SettingsLoaded(userProfile: profile, userAuth: currentUser));
     } catch (e) {
-      emit(SettingsError("Impossible de charger le profil : $e"));
+      debugPrint('Chargement du profil — échec : $e');
+      emit(
+        const SettingsError(
+          "Votre profil n'a pas pu être chargé. Réessayez dans un instant.",
+        ),
+      );
     }
   }
 }

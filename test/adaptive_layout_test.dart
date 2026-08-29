@@ -138,9 +138,7 @@ void main() {
       const Size(560, 900),
       const Size(1400, 900),
     ]) {
-      testWidgets('ne déborde pas en ${size.width.toInt()} px', (
-        tester,
-      ) async {
+      testWidgets('ne déborde pas en ${size.width.toInt()} px', (tester) async {
         await _pumpAt(tester, header(), size: size);
         await tester.pump();
         expect(tester.takeException(), isNull);

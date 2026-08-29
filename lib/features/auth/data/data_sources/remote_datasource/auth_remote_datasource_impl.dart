@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'dart:async';
 import 'dart:convert';
 
@@ -118,14 +119,20 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       );
 
       if (authResponse.user == null) {
-        return Left(AuthFailure(message: 'Google sign-in failed.'));
+        return Left(
+          AuthFailure(
+            message: "La connexion Google n'a pas abouti. Réessayez.",
+          ),
+        );
       }
 
       final supabaseUser = authResponse.user!;
       if (supabaseUser.email == null || supabaseUser.email!.isEmpty) {
         return Left(
           AuthFailure(
-            message: 'Google did not return the email needed for Bicount.',
+            message:
+                'Votre compte Google ne partage pas son adresse e-mail. '
+                'Autorisez-la, ou connectez-vous par e-mail.',
           ),
         );
       }
@@ -135,21 +142,34 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       return Left(AuthFailure(message: e.message));
     } on TimeoutException {
       return Left(
-        AuthFailure(message: 'Google sign-in timed out. Please try again.'),
+        AuthFailure(
+          message:
+              'La connexion Google a mis trop de temps. Vérifiez votre '
+              'réseau et réessayez.',
+        ),
       );
     } catch (e) {
       final errorMessage = e.toString().toLowerCase();
       if (errorMessage.contains('cancel') ||
           errorMessage.contains('user_cancel')) {
-        return Left(AuthFailure(message: 'Google sign-in cancelled.'));
+        return Left(AuthFailure(message: 'Connexion annulée.'));
       }
       if (errorMessage.contains('network')) {
         return Left(
-          AuthFailure(message: 'Network issue. Please check your connection.'),
+          AuthFailure(
+            message: 'Pas de connexion. Vérifiez votre réseau, puis réessayez.',
+          ),
         );
       }
 
-      return Left(AuthFailure(message: e.toString()));
+      // Cas non identifié : on journalise le détail, l'utilisateur lit une
+      // phrase. Une trace de pile ne lui dit pas quoi faire.
+      debugPrint('Connexion Google — échec non identifié : $e');
+      return Left(
+        AuthFailure(
+          message: "La connexion n'a pas abouti. Réessayez dans un instant.",
+        ),
+      );
     }
   }
 

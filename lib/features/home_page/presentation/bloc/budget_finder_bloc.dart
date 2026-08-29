@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../domain/entities/budget_filter.dart';
 import '../../domain/repositories/budget_finder_repository.dart';
@@ -36,7 +37,15 @@ class BudgetFinderBloc extends Bloc<BudgetFinderEvent, BudgetFinderState> {
       final matches = await repository.findMatches(budget);
       emit(BudgetFinderLoaded(matches: matches, budget: budget));
     } catch (e) {
-      emit(BudgetFinderError('Recherche impossible : $e'));
+      // L'exception cite l'Edge Function et le détail HTTP : c'est pour
+      // le journal, pas pour quelqu'un qui cherchait un restaurant.
+      debugPrint('Recherche par budget — échec : $e');
+      emit(
+        const BudgetFinderError(
+          "La recherche n'a pas abouti. Vérifiez votre connexion et "
+          'réessayez.',
+        ),
+      );
     }
   }
 

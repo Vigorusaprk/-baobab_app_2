@@ -38,7 +38,7 @@ class AuthRequiredCard extends StatelessWidget {
           padding: const EdgeInsets.all(AppDimens.medium),
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+            color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
           ),
           child: Icon(
             Icons.lock_outline_rounded,

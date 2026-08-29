@@ -111,13 +111,18 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
               GestureDetector(
                 onTap: () {
-                  // Appeler l'API de mise à jour du profil
+                  // Aucune route serveur ne met encore le profil à jour.
+                  // Annoncer « Profil mis à jour » et refermer la page
+                  // faisait croire à l'utilisateur que sa saisie était
+                  // enregistrée. On dit l'état, et on reste sur la page.
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
-                      content: Text('Profil mis à jour (à implémenter)'),
+                      content: Text(
+                        "La modification du profil n'est pas encore "
+                        'disponible.',
+                      ),
                     ),
                   );
-                  Navigator.pop(context);
                 },
                 child: Container(
                   height: 50,

@@ -65,7 +65,7 @@ class Reservation {
   String get establishmentName =>
       details['establishment_name'] ??
       details['establishmentName'] ??
-      'Établissement inconnu';
+      'Commerce inconnu';
 
   String get customerName =>
       details['customer_name'] ?? details['customerName'] ?? 'Non renseigné';

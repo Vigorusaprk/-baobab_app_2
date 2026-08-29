@@ -45,7 +45,7 @@ class BusinessDetailBloc
       emit(
         state.copyWith(
           detailStatus: BusinessDetailStatus.error,
-          detailErrorMessage: 'Impossible de charger cet établissement.',
+          detailErrorMessage: 'Impossible de charger ce commerce.',
         ),
       );
     }

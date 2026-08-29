@@ -525,6 +525,77 @@ ils ne s'emploient pas sur un contrôle qu'on vise du doigt.
 non-débordement de l'en-tête de 320 px à 1400 px et à 160 % de police, et le
 jeton tactile.
 
+## Résilience : ce que le réel envoie
+
+`test/hardening_test.dart` épingle quatre règles, chacune née d'un défaut
+réel trouvé dans ce code.
+
+- **Les données de locale se chargent au démarrage.** `intl` ne connaît que
+  sa locale par défaut : sans `initializeDateFormatting('fr_FR')` dans
+  `main()`, tout `DateFormat` en français **lève**. Trois écrans en
+  formataient — la fiche d'une offre datée et la boîte de réception du
+  commerçant plantaient au premier affichage.
+- **Une locale que Flutter ne sait pas rendre retombe sur le français.**
+  `ln_CD` n'existe pas dans ses locales : un téléphone réglé sur le lingala
+  affichait une interface française avec un sélecteur de date anglais. Le
+  `localeResolutionCallback` de `main_app.dart` tranche.
+- **Aucune exception brute ne se montre.** `Text('Erreur: $e')` affichait une
+  trace de pile à quelqu'un qui voulait lire un avis. L'erreur part au
+  journal ; l'utilisateur lit une phrase qui nomme ce qui a échoué.
+- **Aucun bouton ne mène nulle part.** `onPressed: () {}` est un contrôle
+  décoratif. Quatre en portaient un — le cœur « favori » de la fiche
+  commerçant et trois entrées de paramètres. Ils ont été retirés, pas
+  câblés à vide : ils reviendront avec ce qu'ils promettent.
+
+Deux règles qui en découlent et que le test ne peut pas voir :
+
+- **Une action en vol ferme son bouton.** `MerchantReady.isWorking` existait
+  mais n'était lu nulle part : deux tapes rapides envoyaient deux changements
+  de statut.
+- **Trois langues, donc aucune largeur figée autour d'un libellé.** Le test
+  refuse `SizedBox(width: …, child: Text(…))`.
+
+**Les traductions n'existent pas.** `supportedLocales` annonce trois langues,
+mais chaque chaîne est écrite en français dans le code : il n'y a ni fichier
+ARB ni délégué applicatif. Livrer l'anglais et le lingala demande une passe
+d'internationalisation complète — c'est du contenu, pas de la technique.
+
+## Le vocabulaire de l'interface
+
+PRODUCT.md fixe un glossaire : **offre**, **commerçant**, **commerce**,
+**activités**. Deux mots pour une même chose obligent l'utilisateur à deviner
+s'il s'agit de la même chose — « établissement » et « commerce » cohabitaient
+sur sept écrans.
+
+`test/copy_test.dart` tient quatre règles, chacune née d'un défaut réel :
+
+- **« commerce », jamais « établissement ».**
+- **Aucun texte n'avoue une fonctionnalité manquante.** « Profil mis à jour
+  (à implémenter) » confirmait un enregistrement qui n'avait pas eu lieu, et
+  refermait la page. Une confirmation ne confirme que ce qui s'est produit.
+- **Aucun texte d'interface en anglais.** Les erreurs de connexion Google
+  l'étaient toutes, et l'une citait **« Bicount »** — le nom d'un autre
+  produit — sur un écran français, dans un SnackBar.
+- **Aucun ternaire de pluriel dont les deux branches sont identiques.**
+
+### Les trois sections de l'accueil nomment leur contenu
+
+Deux montrent des **offres**, une montre des **commerces**. Les libellés le
+disent : « Nouveautés », « Commerces populaires », « Offres les mieux
+notées ». Un titre en verbe (« Découvrir ») au milieu de titres en nom
+rompait le parallélisme, et « nos meilleurs offres » était fautif.
+
+### Ce qu'un état vide doit dire
+
+Nommer l'état, puis l'action suivante. « Rien à afficher pour le moment » ne
+distingue pas la première visite d'un filtre trop étroit ni d'une panne.
+
+### Pas de saut de ligne forcé dans un libellé
+
+`
+` au milieu d'une phrase casse à la traduction et à l'agrandissement de
+police. Le texte s'écoule ; `textAlign` fait le reste.
+
 ## UI And Design System
 
 A dedicated design system pass (colors, typography, spacing, component consistency) is planned but has **not started**. Until a `ui-design-systems` reference file exists in this repo, do not perform a broad visual redesign — only make the minimal visual changes required by the task at hand, using the existing `AppColors`/`AppDimens`/`AppFonts` constants under `lib/core/themes`, and never colors/styles outside of what `AppTheme.silvaTheme` (`lib/core/themes/app_theme.dart`) already defines or composes from those constants (see rule 13 above).

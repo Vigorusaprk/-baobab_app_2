@@ -110,7 +110,9 @@ class BusinessListCubit extends Cubit<BusinessListState> {
       emit(
         BusinessListState(
           isLoading: false,
-          errorMessage: 'Erreur lors du chargement : $e',
+          errorMessage:
+              "La liste n'a pas pu être chargée. Vérifiez votre "
+              'connexion et réessayez.',
           category: category,
         ),
       );

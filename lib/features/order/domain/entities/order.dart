@@ -89,7 +89,7 @@ class Order {
               .map((item) => OrderItem.fromMap(item))
               .toList();
         } else {
-          print('Order.fromMap: items n\'est pas une liste: $itemsValue');
+          debugPrint('Order.fromMap: items n\'est pas une liste: $itemsValue');
         }
       }
 
@@ -140,9 +140,9 @@ class Order {
         paymentMethod: map['payment_method']?.toString(),
       );
     } catch (e, stack) {
-      print('Erreur lors du parsing de la commande: $e');
-      print('Données reçues: $map');
-      print(stack);
+      debugPrint('Erreur lors du parsing de la commande: $e');
+      debugPrint('Données reçues: $map');
+      debugPrint('$stack');
       rethrow;
     }
   }

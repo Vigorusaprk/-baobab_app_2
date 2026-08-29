@@ -120,7 +120,7 @@ class _WriteReviewModalState extends State<WriteReviewModal> {
             border: Border.all(
               color: Theme.of(
                 context,
-              ).colorScheme.surfaceContainerLowest.withOpacity(0.4),
+              ).colorScheme.surfaceContainerLowest.withValues(alpha: 0.4),
               width: 3.5,
             ),
           ),

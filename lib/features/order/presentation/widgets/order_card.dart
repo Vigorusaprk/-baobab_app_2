@@ -73,7 +73,7 @@ class OrderCard extends StatelessWidget {
                                 decoration: BoxDecoration(
                                   color: order
                                       .typeColor(context)
-                                      .withOpacity(0.1),
+                                      .withValues(alpha: 0.1),
                                   borderRadius: BorderRadius.circular(12),
                                 ),
                                 child: Text(
@@ -96,7 +96,9 @@ class OrderCard extends StatelessWidget {
                         vertical: 5,
                       ),
                       decoration: BoxDecoration(
-                        color: order.status.color(context).withOpacity(0.1),
+                        color: order.status
+                            .color(context)
+                            .withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Text(
@@ -150,7 +152,9 @@ class OrderCard extends StatelessWidget {
                     vertical: AppDimens.small,
                   ),
                   decoration: BoxDecoration(
-                    color: OtherTheme.of(context).success.withOpacity(0.3),
+                    color: OtherTheme.of(
+                      context,
+                    ).success.withValues(alpha: 0.3),
                     borderRadius: BorderRadius.circular(AppDimens.radius16),
                   ),
                   child: Row(
@@ -205,8 +209,8 @@ class OrderCard extends StatelessWidget {
         ),
       );
     } catch (e, stack) {
-      print('Erreur lors du rendu de la commande : $e');
-      print(stack);
+      debugPrint('Erreur lors du rendu de la commande : $e');
+      debugPrint('$stack');
       return Card(
         child: Padding(
           padding: const EdgeInsets.all(16),

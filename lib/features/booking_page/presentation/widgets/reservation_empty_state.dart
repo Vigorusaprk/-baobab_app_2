@@ -30,14 +30,14 @@ class ReservationEmptyState extends StatelessWidget {
                 border: Border.all(
                   color: Theme.of(
                     context,
-                  ).colorScheme.surfaceContainerLowest.withOpacity(0.3),
+                  ).colorScheme.surfaceContainerLowest.withValues(alpha: 0.3),
                   width: 2,
                 ),
                 boxShadow: [
                   BoxShadow(
                     color: Theme.of(
                       context,
-                    ).colorScheme.primary.withOpacity(0.1),
+                    ).colorScheme.primary.withValues(alpha: 0.1),
                     blurRadius: 20,
                     offset: const Offset(0, 8),
                   ),
@@ -49,9 +49,10 @@ class ReservationEmptyState extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: Theme.of(
-                        context,
-                      ).colorScheme.surfaceContainerLowest.withOpacity(0.2),
+                      color: Theme.of(context)
+                          .colorScheme
+                          .surfaceContainerLowest
+                          .withValues(alpha: 0.2),
                       borderRadius: BorderRadius.circular(16),
                     ),
                     child: SvgPicture.asset(

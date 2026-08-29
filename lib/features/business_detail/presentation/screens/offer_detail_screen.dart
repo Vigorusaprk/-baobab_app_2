@@ -113,7 +113,10 @@ class _OfferDetailView extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.surface,
         elevation: 0,
-        title: Text('Détail de l\'offre', style: Theme.of(context).textTheme.titleSmall),
+        title: Text(
+          'Détail de l\'offre',
+          style: Theme.of(context).textTheme.titleSmall,
+        ),
       ),
       body: BlocBuilder<OfferDetailCubit, OfferDetailState>(
         builder: (context, state) {

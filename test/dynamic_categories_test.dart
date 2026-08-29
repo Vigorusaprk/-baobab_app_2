@@ -120,9 +120,8 @@ void main() {
 
   test('le libellé d\'écran se résout depuis la liste du serveur', () {
     expect(Category.displayNameForSlug('pharmacie', [inedite]), 'Pharmacies');
-    expect(
-      Category.displayNameForSlug('all', [inedite]),
-      'Tous les établissements',
-    );
+    // Le glossaire du produit dit « commerce » : « établissement » était le
+    // second mot pour la même chose (voir test/copy_test.dart).
+    expect(Category.displayNameForSlug('all', [inedite]), 'Tous les commerces');
   });
 }

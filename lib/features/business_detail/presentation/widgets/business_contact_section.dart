@@ -18,7 +18,7 @@ class BusinessContactSection extends StatelessWidget {
         border: Border.all(
           color: Theme.of(
             context,
-          ).colorScheme.onSurfaceVariant.withOpacity(0.1),
+          ).colorScheme.onSurfaceVariant.withValues(alpha: 0.1),
         ),
       ),
       child: Column(
@@ -64,7 +64,7 @@ class BusinessContactSection extends StatelessWidget {
       leading: Container(
         padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+          color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
           shape: BoxShape.circle,
         ),
         child: SvgPicture.asset(

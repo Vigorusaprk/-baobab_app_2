@@ -110,8 +110,7 @@ class BusinessHeroSection extends StatelessWidget {
                                       _buildBadge(
                                         context,
                                         icon: Icons.comment,
-                                        label:
-                                            "$reviewCount ${reviewCount > 1 ? 'avis' : 'avis'}",
+                                        label: "$reviewCount avis",
                                         isStatus: true,
                                       ),
                                       const SizedBox(width: 12),

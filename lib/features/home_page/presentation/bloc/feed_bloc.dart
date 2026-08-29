@@ -18,7 +18,13 @@ class FeedBloc extends Bloc<FeedEvent, FeedState> {
       final items = await repository.getFeedItems();
       emit(FeedLoaded(allItems: items, activeFilter: FeedFilter.all));
     } catch (e) {
-      emit(FeedError('Impossible de charger le feed : $e'));
+      debugPrint('Chargement de l'accueil — échec : $e');
+      emit(
+        const FeedError(
+          "L'accueil n'a pas pu être chargé. Vérifiez votre connexion "
+          'et réessayez.',
+        ),
+      );
     }
   }
 

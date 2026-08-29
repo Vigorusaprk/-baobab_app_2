@@ -57,7 +57,7 @@ class OfferApiService {
   BusinessPage _parse(Map<String, dynamic> json) {
     final rawBusiness = json['business'];
     if (rawBusiness is! Map) {
-      throw Exception('Établissement introuvable');
+      throw Exception('Commerce introuvable');
     }
 
     final rawOffers = (json['offers'] as List?) ?? const [];

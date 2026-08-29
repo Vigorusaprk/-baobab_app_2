@@ -20,7 +20,7 @@ class ReservationDetailPage extends StatelessWidget {
 
     final establishmentName = reservation.establishmentName.isNotEmpty
         ? reservation.establishmentName
-        : 'Établissement inconnu';
+        : 'Commerce inconnu';
     final total = reservation.totalAmount.toStringAsFixed(2);
 
     return Scaffold(
@@ -69,7 +69,7 @@ class ReservationDetailPage extends StatelessWidget {
                     _buildInfoCard(context, 'Informations générales', [
                       _buildRow(
                         context,
-                        'Établissement',
+                        'Commerce',
                         establishmentName,
                         icon: Icons.store,
                       ),
@@ -280,7 +280,9 @@ class ReservationDetailPage extends StatelessWidget {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3),
+            color: Theme.of(
+              context,
+            ).colorScheme.onSurface.withValues(alpha: 0.3),
             blurRadius: 7,
             offset: const Offset(0, 1),
           ),
@@ -389,7 +391,7 @@ class ReservationDetailPage extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
       decoration: BoxDecoration(
-        color: reservation.typeColor(context).withOpacity(0.1),
+        color: reservation.typeColor(context).withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: reservation.typeColor(context), width: 2.5),
       ),

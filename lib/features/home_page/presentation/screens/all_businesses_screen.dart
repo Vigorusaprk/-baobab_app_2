@@ -215,7 +215,7 @@ class _EmptyView extends StatelessWidget {
           ),
           AppDimens.spacerMedium,
           Text(
-            'Aucun établissement dans cette catégorie',
+            'Aucun commerce dans cette catégorie',
             textAlign: TextAlign.center,
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
               color: Theme.of(context).colorScheme.onSurfaceVariant,

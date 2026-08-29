@@ -17,8 +17,15 @@ class FeedEmptyState extends StatelessWidget {
           ),
           SizedBox(height: 12),
           Text(
-            'Rien à afficher pour le moment',
-            style: TextStyle(
+            'Aucune notification',
+            style: Theme.of(context).textTheme.bodyLarge,
+          ),
+          const SizedBox(height: 6),
+          Text(
+            'Le suivi de vos commandes et les nouvelles de vos commerces '
+            'apparaîtront ici.',
+            textAlign: TextAlign.center,
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
               color: Theme.of(context).colorScheme.onSurfaceVariant,
             ),
           ),

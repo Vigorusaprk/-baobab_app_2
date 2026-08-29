@@ -27,10 +27,10 @@ class FilterChipWidget extends StatelessWidget {
           ),
         ),
         backgroundColor: (color ?? Theme.of(context).colorScheme.secondary)
-            .withOpacity(0.1),
+            .withValues(alpha: 0.1),
         side: BorderSide(
-          color: (color ?? Theme.of(context).colorScheme.secondary).withOpacity(
-            0.3,
+          color: (color ?? Theme.of(context).colorScheme.secondary).withValues(
+            alpha: 0.3,
           ),
           width: 1,
         ),

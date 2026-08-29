@@ -115,7 +115,9 @@ class _ActivityScreenState extends State<ActivityScreen>
           Container(
             margin: const EdgeInsets.symmetric(horizontal: 20),
             decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.primary.withOpacity(0.15),
+              color: Theme.of(
+                context,
+              ).colorScheme.primary.withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(16),
             ),
             child: TabBar(
@@ -156,7 +158,7 @@ class _ActivityScreenState extends State<ActivityScreen>
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext, false),
-            child: const Text('Revenir'),
+            child: const Text('Annuler'),
           ),
           TextButton(
             onPressed: () => Navigator.pop(dialogContext, true),
@@ -192,10 +194,18 @@ class _ActivityScreenState extends State<ActivityScreen>
     }
     try {
       await _orderApi.cancelOrder(order.id);
+      // L'écran a pu être quitté pendant la requête : lire le thème sur un
+      // élément démonté lève.
+      if (!mounted) return;
       _notify('Commande annulée.', OtherTheme.of(context).onSuccessContainer);
       await _loadAll();
     } catch (e) {
-      _notify("$e", Theme.of(context).colorScheme.error);
+      debugPrint('Annulation de commande — échec : $e');
+      if (!mounted) return;
+      _notify(
+        "La commande n'a pas pu être annulée. Réessayez.",
+        Theme.of(context).colorScheme.error,
+      );
     }
   }
 
@@ -209,13 +219,19 @@ class _ActivityScreenState extends State<ActivityScreen>
     }
     try {
       await _resApi.deleteReservation(reservation.id.toString());
+      if (!mounted) return;
       _notify(
         'Réservation supprimée.',
         OtherTheme.of(context).onSuccessContainer,
       );
       await _loadAll();
     } catch (e) {
-      _notify("$e", Theme.of(context).colorScheme.error);
+      debugPrint('Suppression de réservation — échec : $e');
+      if (!mounted) return;
+      _notify(
+        "La réservation n'a pas pu être supprimée. Réessayez.",
+        Theme.of(context).colorScheme.error,
+      );
     }
   }
 

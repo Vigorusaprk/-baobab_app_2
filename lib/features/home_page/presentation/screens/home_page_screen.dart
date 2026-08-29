@@ -165,7 +165,7 @@ class _Sections extends StatelessWidget {
         PopularBusinessesSection(onSeeAllTap: onSeeAllBusinesses),
         AppDimens.spacerMedium,
         OffersCarouselSection(
-          title: 'Découvrir nos meilleurs offres',
+          title: 'Offres les mieux notées',
           offers: loaded.discoverOffers,
           isLoadingMore: loaded.isLoadingMore,
           // Scroll infini : la vue prévient seulement qu'on approche de la
