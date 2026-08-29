@@ -1,8 +1,17 @@
 import 'package:flutter/material.dart';
 
-/// Palette officielle de l'application — à respecter strictement.
-/// Toute nouvelle couleur doit être une de ces valeurs (ou une variante
-/// d'opacité de l'une d'elles), jamais une teinte inventée.
+/// Les **valeurs primitives** de la palette. Rien d'autre.
+///
+/// ⚠️ Ce fichier n'est lu que par `app_theme.dart`. Un écran qui écrit
+/// `AppColors.primary` court-circuite le thème et rend un mode sombre
+/// impossible : il lit alors une constante, pas un rôle. Depuis un widget,
+/// on passe **toujours** par `Theme.of(context).colorScheme` ou
+/// `OtherTheme.of(context)`.
+///
+/// `test/theme_centralisation_test.dart` échoue si cette règle est enfreinte.
+///
+/// Une primitive n'a pas de sens en soi : c'est le thème qui lui donne un
+/// rôle. Ne pas en ajouter ici sans lui en attribuer un là-bas.
 ///
 /// ## Deux rôles par teinte sémantique
 ///
@@ -87,4 +96,21 @@ class AppColors {
   static const Color rating = Color(0xFFFFC107);
   static const Color ratingContent = Color(0xFF8F6B00);
   static const Color ratingSurface = Color(0xFFFFF6DA);
+
+  // === Identité des catégories ===
+  //
+  // Ce ne sont pas des rôles d'interface mais des marqueurs de contenu : elles
+  // distinguent un restaurant d'un hôtel. Elles passent quand même par le
+  // thème (`OtherTheme.categories`), pour qu'un mode sombre puisse les
+  // assourdir d'un bloc plutôt qu'écran par écran.
+  static const Color categoryRestaurant = Color(0xFFFF6B57);
+  static const Color categoryFastFood = Color(0xFFFF9800);
+  static const Color categoryShopping = Color(0xFF00B8D9);
+  static const Color categoryMall = Color(0xFF8B5CF6);
+  static const Color categoryHotel = Color(0xFF536DFE);
+  static const Color categoryCarRental = Color(0xFF3BB273);
+  static const Color categoryTravelAgency = Color(0xFF00C2A8);
+  static const Color categorySpa = Color(0xFF2DD4BF);
+  static const Color categoryCinema = Color(0xFFE64980);
+  static const Color categoryTourism = Color(0xFF7950F2);
 }

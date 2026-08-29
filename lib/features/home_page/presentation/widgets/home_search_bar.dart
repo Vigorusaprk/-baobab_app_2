@@ -1,4 +1,3 @@
-import 'package:baobabe_0_2/core/themes/app_colors.dart';
 import 'package:baobabe_0_2/core/themes/app_diemens.dart';
 import 'package:baobabe_0_2/core/widgets/custom_card.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/bloc/search_bloc.dart';
@@ -46,11 +45,13 @@ class HomeSearchBar extends StatelessWidget {
                   vertical: AppDimens.small,
                 ),
                 decoration: BoxDecoration(
-                  color: AppColors.surface,
+                  color: Theme.of(context).colorScheme.surfaceContainerLowest,
                   borderRadius: BorderRadius.circular(AppDimens.radius12),
                   boxShadow: [
                     BoxShadow(
-                      color: AppColors.textPrimary.withValues(alpha: 0.05),
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.onSurface.withValues(alpha: 0.05),
                       blurRadius: 10,
                       offset: const Offset(0, 4),
                     ),
@@ -62,21 +63,22 @@ class HomeSearchBar extends StatelessWidget {
                       'assets/icons/explore-outline.svg',
                       height: 25,
                       width: 25,
-                      colorFilter: const ColorFilter.mode(
-                        AppColors.primary,
+                      colorFilter: ColorFilter.mode(
+                        Theme.of(context).colorScheme.primary,
                         BlendMode.srcIn,
                       ),
                     ),
                     const SizedBox(width: AppDimens.medium),
-                    const Expanded(
+                    Expanded(
                       child: Text(
                         "Restaurant, concert, cosmétique…",
                         overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          fontFamily: 'Poppins',
-                          color: AppColors.textSecondary,
-                          fontSize: 14,
-                        ),
+                        style: Theme.of(context).textTheme.labelMedium!
+                            .copyWith(
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.onSurfaceVariant,
+                            ),
                       ),
                     ),
                   ],
@@ -97,8 +99,8 @@ class HomeSearchBar extends StatelessWidget {
                 'assets/icons/filter.svg',
                 height: 20,
                 width: 20,
-                colorFilter: const ColorFilter.mode(
-                  AppColors.white,
+                colorFilter: ColorFilter.mode(
+                  Theme.of(context).colorScheme.onPrimary,
                   BlendMode.srcIn,
                 ),
               ),

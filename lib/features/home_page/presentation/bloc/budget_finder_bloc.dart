@@ -8,29 +8,29 @@ class BudgetFinderBloc extends Bloc<BudgetFinderEvent, BudgetFinderState> {
   final BudgetFinderRepository repository;
 
   BudgetFinderBloc({required this.repository})
-      : super(const BudgetFinderInitial()) {
+    : super(const BudgetFinderInitial()) {
     on<LoadBusinesses>(_onLoad);
     on<BudgetChanged>(_onBudgetChanged);
   }
 
   Future<void> _onLoad(
-      LoadBusinesses event,
-      Emitter<BudgetFinderState> emit,
-      ) async {
+    LoadBusinesses event,
+    Emitter<BudgetFinderState> emit,
+  ) async {
     await _search(_currentBudget(), emit);
   }
 
   Future<void> _onBudgetChanged(
-      BudgetChanged event,
-      Emitter<BudgetFinderState> emit,
-      ) async {
+    BudgetChanged event,
+    Emitter<BudgetFinderState> emit,
+  ) async {
     await _search(event.budget, emit);
   }
 
   Future<void> _search(
-      BudgetFilter budget,
-      Emitter<BudgetFinderState> emit,
-      ) async {
+    BudgetFilter budget,
+    Emitter<BudgetFinderState> emit,
+  ) async {
     emit(const BudgetFinderLoading());
     try {
       final matches = await repository.findMatches(budget);

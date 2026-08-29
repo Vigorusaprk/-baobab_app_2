@@ -1,5 +1,4 @@
 import 'dart:ui';
-import 'package:baobabe_0_2/core/themes/app_colors.dart';
 import 'package:baobabe_0_2/features/business_detail/data/review_api_service.dart';
 import 'package:baobabe_0_2/features/business_detail/domain/entities/review.dart';
 import 'package:baobabe_0_2/features/home_page/data/models/ui_business.dart';
@@ -50,7 +49,9 @@ class BusinessHeroSection extends StatelessWidget {
                       borderRadius: BorderRadius.circular(28),
                       boxShadow: [
                         BoxShadow(
-                          color: AppColors.textPrimary.withValues(alpha: 0.1),
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.onSurface.withValues(alpha: 0.1),
                           blurRadius: 16,
                           offset: const Offset(0, 8),
                         ),
@@ -67,10 +68,16 @@ class BusinessHeroSection extends StatelessWidget {
                             ),
                             child: Container(
                               decoration: BoxDecoration(
-                                color: AppColors.white.withValues(alpha: 0.15),
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .surfaceContainerLowest
+                                    .withValues(alpha: 0.15),
                                 borderRadius: BorderRadius.circular(22),
                                 border: Border.all(
-                                  color: AppColors.white.withValues(alpha: 0.3),
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .surfaceContainerLowest
+                                      .withValues(alpha: 0.3),
                                   width: 1,
                                 ),
                               ),
@@ -80,23 +87,28 @@ class BusinessHeroSection extends StatelessWidget {
                                   Text(
                                     uiBusiness.business.name,
                                     textAlign: TextAlign.center,
-                                    style: const TextStyle(
-                                      fontSize: 28,
-                                      fontWeight: FontWeight.bold,
-                                      letterSpacing: -0.5,
-                                      color: AppColors.white,
-                                    ),
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .displayLarge!
+                                        .copyWith(
+                                          letterSpacing: -0.5,
+                                          color: Theme.of(
+                                            context,
+                                          ).colorScheme.onPrimary,
+                                        ),
                                   ),
                                   const SizedBox(height: 16),
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
                                       _buildBadge(
+                                        context,
                                         icon: Icons.star_rounded,
                                         label: "${rating.toStringAsFixed(1)} ",
                                       ),
                                       const SizedBox(width: 1),
                                       _buildBadge(
+                                        context,
                                         icon: Icons.comment,
                                         label:
                                             "$reviewCount ${reviewCount > 1 ? 'avis' : 'avis'}",
@@ -104,6 +116,7 @@ class BusinessHeroSection extends StatelessWidget {
                                       ),
                                       const SizedBox(width: 12),
                                       _buildBadge(
+                                        context,
                                         icon: Icons.circle,
                                         label: uiBusiness.isOpen
                                             ? 'OUVERT'
@@ -130,17 +143,21 @@ class BusinessHeroSection extends StatelessWidget {
                   width: 100,
                   height: 100,
                   decoration: BoxDecoration(
-                    color: AppColors.white,
+                    color: Theme.of(context).colorScheme.surfaceContainerLowest,
                     shape: BoxShape.circle,
                     boxShadow: [
                       BoxShadow(
-                        color: AppColors.textPrimary.withValues(alpha: 0.5),
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.onSurface.withValues(alpha: 0.5),
                         blurRadius: 15,
                         offset: const Offset(0, 1),
                       ),
                     ],
                     border: Border.all(
-                      color: uiBusiness.categoryColor.withValues(alpha: 0.7),
+                      color: uiBusiness
+                          .categoryColor(context)
+                          .withValues(alpha: 0.7),
                       width: 5.5,
                     ),
                   ),
@@ -160,7 +177,7 @@ class BusinessHeroSection extends StatelessWidget {
                         : Icon(
                             uiBusiness.categoryIcon,
                             size: 45,
-                            color: uiBusiness.categoryColor,
+                            color: uiBusiness.categoryColor(context),
                           ),
                   ),
                 ),
@@ -172,7 +189,8 @@ class BusinessHeroSection extends StatelessWidget {
     );
   }
 
-  Widget _buildBadge({
+  Widget _buildBadge(
+    BuildContext context, {
     required IconData icon,
     required String label,
     bool isStatus = false,
@@ -182,14 +200,17 @@ class BusinessHeroSection extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: isStatus ? 15 : 18, color: AppColors.white),
+          Icon(
+            icon,
+            size: isStatus ? 15 : 18,
+            color: Theme.of(context).colorScheme.onPrimary,
+          ),
           const SizedBox(width: 6),
           Text(
             label,
-            style: const TextStyle(
-              color: AppColors.white,
+            style: Theme.of(context).textTheme.labelSmall!.copyWith(
+              color: Theme.of(context).colorScheme.onPrimary,
               fontWeight: FontWeight.w700,
-              fontSize: 13,
             ),
           ),
         ],

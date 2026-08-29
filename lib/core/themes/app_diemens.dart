@@ -20,6 +20,10 @@ class AppDimens {
   }
 
   // *** Spacing générique — 3 tailles seulement, aucune exception *** //
+  /// Le plus petit carré qu'un doigt vise sans effort. Material demande
+  /// 48 dp ; en dessous, la cible se rate.
+  static const double touchTarget = 48.0;
+
   static const double small = 8.0;
   static const double medium = 16.0;
   static const double large = 24.0;

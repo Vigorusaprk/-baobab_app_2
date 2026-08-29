@@ -1,7 +1,6 @@
 import 'package:baobabe_0_2/core/bloc/settings_bloc.dart';
 import 'package:baobabe_0_2/features/settings/presentation/widgets/profile_skeleton.dart';
 import 'package:flutter/material.dart';
-import 'package:baobabe_0_2/core/themes/app_colors.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:skeletonizer/skeletonizer.dart';
@@ -31,7 +30,7 @@ class _ProfilPageState extends State<ProfilPage> {
         ),
         centerTitle: true,
         elevation: 0,
-        backgroundColor: AppColors.transparent,
+        backgroundColor: Colors.transparent,
       ),
       body: BlocBuilder<SettingsCubit, SettingsState>(
         builder: (context, state) {
@@ -46,16 +45,18 @@ class _ProfilPageState extends State<ProfilPage> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Icon(
+                    Icon(
                       Icons.error_outline,
-                      color: AppColors.errorContent,
+                      color: Theme.of(context).colorScheme.error,
                       size: 48,
                     ),
                     const SizedBox(height: 16),
                     Text(
                       state.message,
                       textAlign: TextAlign.center,
-                      style: const TextStyle(color: AppColors.errorContent),
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.error,
+                      ),
                     ),
                     const SizedBox(height: 16),
                     ElevatedButton(
@@ -77,10 +78,16 @@ class _ProfilPageState extends State<ProfilPage> {
               padding: const EdgeInsets.all(24.0),
               child: Column(
                 children: [
-                  const CircleAvatar(
+                  CircleAvatar(
                     radius: 50,
-                    backgroundColor: AppColors.textSecondary,
-                    child: Icon(Icons.person, size: 50, color: AppColors.white),
+                    backgroundColor: Theme.of(
+                      context,
+                    ).colorScheme.onSurfaceVariant,
+                    child: Icon(
+                      Icons.person,
+                      size: 50,
+                      color: Theme.of(context).colorScheme.onPrimary,
+                    ),
                   ),
                   const SizedBox(height: 24),
 
@@ -114,11 +121,10 @@ class _ProfilPageState extends State<ProfilPage> {
                     child: ElevatedButton.icon(
                       onPressed: () => context.push('/edit-profile'),
                       icon: const Icon(Icons.edit),
-                      label: const Text(
+                      label: Text(
                         'Modifier le profil',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
+                        style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                          fontWeight: FontWeight.w700,
                         ),
                       ),
                       style: ElevatedButton.styleFrom(
@@ -147,12 +153,12 @@ class _ProfilPageState extends State<ProfilPage> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColors.background,
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
       ),
       child: Row(
         children: [
-          Icon(icon, color: AppColors.textSecondary),
+          Icon(icon, color: Theme.of(context).colorScheme.onSurfaceVariant),
           const SizedBox(width: 16),
           Expanded(
             child: Column(
@@ -160,18 +166,16 @@ class _ProfilPageState extends State<ProfilPage> {
               children: [
                 Text(
                   label,
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: AppColors.textSecondary,
+                  style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
                   ),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   value,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                  ),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.bodyMedium!.copyWith(fontWeight: FontWeight.w600),
                 ),
               ],
             ),

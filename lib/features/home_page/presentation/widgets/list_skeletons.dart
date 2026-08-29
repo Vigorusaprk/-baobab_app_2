@@ -1,6 +1,4 @@
-import 'package:baobabe_0_2/core/themes/app_colors.dart';
 import 'package:baobabe_0_2/core/themes/app_diemens.dart';
-import 'package:baobabe_0_2/core/themes/app_fonts.dart';
 import 'package:flutter/material.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
@@ -25,7 +23,7 @@ class SearchResultSkeleton extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: AppColors.surface,
+          color: Theme.of(context).colorScheme.surfaceContainerLowest,
           borderRadius: BorderRadius.circular(AppDimens.radius20),
         ),
         child: Row(
@@ -37,11 +35,20 @@ class SearchResultSkeleton extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Bone.text(width: 150, style: AppFonts.titleMedium),
+                  Bone.text(
+                    width: 150,
+                    style: Theme.of(context).textTheme.titleMedium!,
+                  ),
                   const SizedBox(height: 8),
-                  Bone.text(width: 100, style: AppFonts.bodySmall),
+                  Bone.text(
+                    width: 100,
+                    style: Theme.of(context).textTheme.bodySmall!,
+                  ),
                   const SizedBox(height: 6),
-                  Bone.text(width: 70, style: AppFonts.bodySmall),
+                  Bone.text(
+                    width: 70,
+                    style: Theme.of(context).textTheme.bodySmall!,
+                  ),
                 ],
               ),
             ),
@@ -70,9 +77,11 @@ class FeedListSkeleton extends StatelessWidget {
           margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
           padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
-            color: AppColors.white,
+            color: Theme.of(context).colorScheme.surfaceContainerLowest,
             borderRadius: BorderRadius.circular(AppDimens.radius16),
-            border: Border.all(color: AppColors.secondaryLight),
+            border: Border.all(
+              color: Theme.of(context).colorScheme.outlineVariant,
+            ),
           ),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -84,9 +93,15 @@ class FeedListSkeleton extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Bone.text(width: 160, style: AppFonts.bodyLarge),
+                    Bone.text(
+                      width: 160,
+                      style: Theme.of(context).textTheme.bodyLarge!,
+                    ),
                     const SizedBox(height: 6),
-                    Bone.multiText(lines: 2, style: AppFonts.bodySmall),
+                    Bone.multiText(
+                      lines: 2,
+                      style: Theme.of(context).textTheme.bodySmall!,
+                    ),
                   ],
                 ),
               ),

@@ -1,4 +1,4 @@
-import 'package:baobabe_0_2/core/themes/app_colors.dart';
+import 'package:baobabe_0_2/core/widgets/remote_image.dart';
 import 'package:baobabe_0_2/features/business_detail/presentation/widgets/business_hero_section.dart';
 import 'package:baobabe_0_2/features/home_page/data/models/ui_business.dart';
 import 'package:baobabe_0_2/features/home_page/domain/entities/business_entity.dart';
@@ -19,7 +19,7 @@ class BusinessDetailAppBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SliverAppBar(
-      backgroundColor: AppColors.background,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       expandedHeight: 350,
       pinned: true,
       elevation: 0,
@@ -40,7 +40,9 @@ class BusinessDetailAppBar extends StatelessWidget {
               ? Icons.favorite_rounded
               : Icons.favorite_outline_rounded,
           () {},
-          iconColor: business.isFavorite ? AppColors.errorContent : AppColors.primary,
+          iconColor: business.isFavorite
+              ? Theme.of(context).colorScheme.error
+              : Theme.of(context).colorScheme.primary,
         ),
         const SizedBox(width: 7),
       ],
@@ -69,7 +71,7 @@ class BusinessDetailAppBar extends StatelessWidget {
                   opacity: isCollapsed ? 0.0 : 1.0,
                   child: Hero(
                     tag: 'business-image-${business.id}',
-                    child: _buildBackgroundImage(),
+                    child: _buildBackgroundImage(context),
                   ),
                 ),
 
@@ -78,13 +80,17 @@ class BusinessDetailAppBar extends StatelessWidget {
                   duration: const Duration(milliseconds: 200),
                   opacity: isCollapsed ? 1.0 : 0.0,
                   child: Container(
-                    decoration: const BoxDecoration(
+                    decoration: BoxDecoration(
                       gradient: LinearGradient(
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                         colors: [
-                          AppColors.primary, // Couleur unie sans transparence
-                          AppColors.secondary, // Couleur unie sans transparence
+                          Theme.of(context)
+                              .colorScheme
+                              .primary, // Couleur unie sans transparence
+                          Theme.of(context)
+                              .colorScheme
+                              .secondary, // Couleur unie sans transparence
                         ],
                       ),
                     ),
@@ -98,7 +104,7 @@ class BusinessDetailAppBar extends StatelessWidget {
                   right: 0,
                   bottom: 0,
                   child: AnimatedOpacity(
-                    duration: const Duration(milliseconds: 150),
+                    duration: Duration(milliseconds: 150),
                     opacity: isCollapsed ? 0.0 : 1.0,
                     child: BusinessHeroSection(
                       uiBusiness: uiBusiness,
@@ -118,13 +124,14 @@ class BusinessDetailAppBar extends StatelessWidget {
     BuildContext context,
     IconData icon,
     VoidCallback onTap, {
-    Color iconColor = AppColors.primary,
+    Color? iconColor,
   }) {
+    iconColor ??= Theme.of(context).colorScheme.primary;
     return ClipRRect(
       borderRadius: BorderRadius.circular(50),
       child: Container(
         decoration: BoxDecoration(
-          color: AppColors.background,
+          color: Theme.of(context).colorScheme.surface,
           shape: BoxShape.circle,
         ),
         child: IconButton(
@@ -135,32 +142,30 @@ class BusinessDetailAppBar extends StatelessWidget {
     );
   }
 
-  Widget _buildBackgroundImage() {
+  Widget _buildBackgroundImage(BuildContext context) {
     final hasImage = business.bgImg.isNotEmpty;
-    final Color color = uiBusiness.categoryColor;
+    final Color color = uiBusiness.categoryColor(context);
 
     return Container(
       width: double.infinity,
       height: 200,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(28),
-        color: hasImage ? null : uiBusiness.categoryColor,
+        color: hasImage ? null : uiBusiness.categoryColor(context),
       ),
       child: hasImage
           ? ClipRRect(
               borderRadius: BorderRadius.circular(28),
-              child: Image.network(
-                business.bgImg,
-                fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) =>
-                    _buildInitialsContainer(color),
+              child: RemoteImage(
+                url: business.bgImg,
+                fallback: _buildInitialsContainer(context, color),
               ),
             )
-          : _buildInitialsContainer(color),
+          : _buildInitialsContainer(context, color),
     );
   }
 
-  Widget _buildInitialsContainer(Color color) {
+  Widget _buildInitialsContainer(BuildContext context, Color color) {
     return Container(
       decoration: BoxDecoration(
         color: color,

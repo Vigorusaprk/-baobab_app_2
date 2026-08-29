@@ -1,8 +1,8 @@
-import 'package:baobabe_0_2/core/themes/app_colors.dart';
 import 'package:baobabe_0_2/core/themes/app_diemens.dart';
 import 'package:baobabe_0_2/features/merchant/domain/entities/merchant_space.dart';
 import 'package:baobabe_0_2/features/merchant/presentation/cubit/merchant_cubit.dart';
 import 'package:baobabe_0_2/features/merchant/presentation/widgets/merchant_widgets.dart';
+import 'package:baobabe_0_2/core/themes/other_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
@@ -11,34 +11,25 @@ import 'package:intl/intl.dart';
 class ReceivedReservationCard extends StatelessWidget {
   final ReceivedReservation reservation;
 
-  const ReceivedReservationCard({required this.reservation});
+  ReceivedReservationCard({required this.reservation});
 
   /// Même grammaire que le cycle d'une commande : ambre tant qu'on attend
   /// une réponse, vert quand c'est accepté, neutre quand c'est derrière
   /// nous, rouge quand c'est arrêté.
-  static const Map<ReservationStatus, (Color, Color)> _palette = {
-    ReservationStatus.pending: (
-      AppColors.warningContent,
-      AppColors.warningSurface,
-    ),
-    ReservationStatus.confirmed: (
-      AppColors.successContent,
-      AppColors.successSurface,
-    ),
-    ReservationStatus.cancelled: (
-      AppColors.errorContent,
-      AppColors.errorSurface,
-    ),
-    ReservationStatus.completed: (
-      AppColors.textSecondary,
-      AppColors.background,
-    ),
-  };
-
-  static const (Color, Color) _fallback = (
-    AppColors.textSecondary,
-    AppColors.background,
-  );
+  (Color, Color) _palette(BuildContext context, ReservationStatus status) {
+    final other = OtherTheme.of(context);
+    final scheme = Theme.of(context).colorScheme;
+    switch (status) {
+      case ReservationStatus.pending:
+        return (other.onWarningContainer, other.warningContainer);
+      case ReservationStatus.confirmed:
+        return (other.onSuccessContainer, other.successContainer);
+      case ReservationStatus.cancelled:
+        return (scheme.error, scheme.errorContainer);
+      case ReservationStatus.completed:
+        return (scheme.onSurfaceVariant, scheme.surface);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -60,8 +51,8 @@ class ReceivedReservationCard extends StatelessWidget {
               ),
               StatusChip(
                 label: status.label,
-                color: (_palette[status] ?? _fallback).$1,
-                surface: (_palette[status] ?? _fallback).$2,
+                color: _palette(context, status).$1,
+                surface: _palette(context, status).$2,
               ),
             ],
           ),
@@ -76,9 +67,9 @@ class ReceivedReservationCard extends StatelessWidget {
                 'EEEE d MMMM à HH:mm',
                 'fr_FR',
               ).format(reservation.date!.toLocal()),
-              style: Theme.of(
-                context,
-              ).textTheme.bodySmall?.copyWith(color: AppColors.textSecondary),
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
             ),
           AppDimens.spacerSmall,
           Row(
@@ -88,21 +79,23 @@ class ReceivedReservationCard extends StatelessWidget {
                   '${reservation.total.toStringAsFixed(2)} \$',
                   style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                     fontWeight: FontWeight.w800,
-                    color: AppColors.primary,
+                    color: Theme.of(context).colorScheme.primary,
                   ),
                 ),
               const Spacer(),
               if (status == ReservationStatus.pending) ...[
                 TextButton(
                   onPressed: () => _apply(context, ReservationStatus.cancelled),
-                  child: const Text(
+                  child: Text(
                     'Refuser',
-                    style: TextStyle(color: AppColors.errorContent),
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.error,
+                    ),
                   ),
                 ),
                 FilledButton(
                   style: FilledButton.styleFrom(
-                    backgroundColor: AppColors.primary,
+                    backgroundColor: Theme.of(context).colorScheme.primary,
                   ),
                   onPressed: () => _apply(context, ReservationStatus.confirmed),
                   child: const Text('Confirmer'),
@@ -110,7 +103,7 @@ class ReceivedReservationCard extends StatelessWidget {
               ] else if (status == ReservationStatus.confirmed)
                 FilledButton(
                   style: FilledButton.styleFrom(
-                    backgroundColor: AppColors.primary,
+                    backgroundColor: Theme.of(context).colorScheme.primary,
                   ),
                   onPressed: () => _apply(context, ReservationStatus.completed),
                   child: const Text('Honorée'),

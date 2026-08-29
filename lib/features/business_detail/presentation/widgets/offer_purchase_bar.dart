@@ -1,7 +1,7 @@
-import 'package:baobabe_0_2/core/themes/app_colors.dart';
 import 'package:baobabe_0_2/core/themes/app_diemens.dart';
 import 'package:baobabe_0_2/core/widgets/custom_loading.dart';
 import 'package:baobabe_0_2/features/business_detail/presentation/bloc/offer_detail_cubit.dart';
+import 'package:baobabe_0_2/core/themes/other_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -39,10 +39,12 @@ class OfferPurchaseBar extends StatelessWidget {
         12,
       ),
       decoration: BoxDecoration(
-        color: AppColors.white,
+        color: Theme.of(context).colorScheme.surfaceContainerLowest,
         boxShadow: [
           BoxShadow(
-            color: AppColors.textPrimary.withValues(alpha: 0.08),
+            color: Theme.of(
+              context,
+            ).colorScheme.onSurface.withValues(alpha: 0.08),
             blurRadius: 16,
             offset: const Offset(0, -4),
           ),
@@ -97,13 +99,16 @@ class _InStoreNotice extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      color: AppColors.white,
+      color: Theme.of(context).colorScheme.surfaceContainerLowest,
       padding: const EdgeInsets.all(AppDimens.appPaddingValue),
       child: SafeArea(
         top: false,
         child: Row(
           children: [
-            const Icon(Icons.storefront_outlined, color: AppColors.warningContent),
+            Icon(
+              Icons.storefront_outlined,
+              color: OtherTheme.of(context).onWarningContainer,
+            ),
             AppDimens.spacerMediumWidth,
             Expanded(
               child: Text(
@@ -128,7 +133,7 @@ class _QuantityStepper extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.background,
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(AppDimens.radius30),
       ),
       child: Row(
@@ -137,13 +142,21 @@ class _QuantityStepper extends StatelessWidget {
           IconButton(
             onPressed: quantity > 1 ? () => onChanged(quantity - 1) : null,
             icon: const Icon(Icons.remove, size: 18),
-            visualDensity: VisualDensity.compact,
+            constraints: const BoxConstraints(
+              minWidth: AppDimens.touchTarget,
+              minHeight: AppDimens.touchTarget,
+            ),
+            tooltip: 'Un de moins',
           ),
           Text('$quantity', style: Theme.of(context).textTheme.bodyLarge),
           IconButton(
             onPressed: () => onChanged(quantity + 1),
             icon: const Icon(Icons.add, size: 18),
-            visualDensity: VisualDensity.compact,
+            constraints: const BoxConstraints(
+              minWidth: AppDimens.touchTarget,
+              minHeight: AppDimens.touchTarget,
+            ),
+            tooltip: 'Un de plus',
           ),
         ],
       ),
@@ -160,7 +173,7 @@ class _DateRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: AppColors.background,
+      color: Theme.of(context).colorScheme.surface,
       borderRadius: BorderRadius.circular(AppDimens.radius12),
       child: InkWell(
         borderRadius: BorderRadius.circular(AppDimens.radius12),
@@ -169,10 +182,10 @@ class _DateRow extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
           child: Row(
             children: [
-              const Icon(
+              Icon(
                 Icons.calendar_today_outlined,
                 size: 18,
-                color: AppColors.textSecondary,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
               AppDimens.spacerSmallWidth,
               Expanded(
@@ -186,10 +199,10 @@ class _DateRow extends StatelessWidget {
                   style: Theme.of(context).textTheme.bodyMedium,
                 ),
               ),
-              const Icon(
+              Icon(
                 Icons.chevron_right,
                 size: 18,
-                color: AppColors.textSecondary,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
             ],
           ),
@@ -216,8 +229,8 @@ class _SubmitButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return FilledButton(
       style: FilledButton.styleFrom(
-        backgroundColor: AppColors.primary,
-        disabledBackgroundColor: AppColors.secondary,
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        disabledBackgroundColor: Theme.of(context).colorScheme.secondary,
         padding: const EdgeInsets.symmetric(vertical: 16),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppDimens.borderButton),
@@ -225,13 +238,16 @@ class _SubmitButton extends StatelessWidget {
       ),
       onPressed: onPressed,
       child: isLoading
-          ? const CustomLoadingButton(size: 22, color: AppColors.white)
+          ? CustomLoadingButton(
+              size: 22,
+              color: Theme.of(context).colorScheme.onPrimary,
+            )
           : Text(
               total == null
                   ? label
                   : '$label · ${total!.toStringAsFixed(2)} \$',
               style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                color: AppColors.white,
+                color: Theme.of(context).colorScheme.onPrimary,
                 fontWeight: FontWeight.w700,
               ),
             ),

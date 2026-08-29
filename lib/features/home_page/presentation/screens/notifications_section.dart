@@ -1,6 +1,4 @@
-import 'package:baobabe_0_2/core/themes/app_colors.dart';
 import 'package:baobabe_0_2/core/themes/app_diemens.dart';
-import 'package:baobabe_0_2/core/themes/app_fonts.dart';
 import 'package:baobabe_0_2/features/home_page/data/repositories/activity_feed_repository.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/widgets/feed_filter_chips.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/widgets/list_skeletons.dart';
@@ -20,8 +18,9 @@ class NotificationsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => FeedBloc(repository: ActivityFeedRepository())
-        ..add(const LoadFeedItems()),
+      create: (_) =>
+          FeedBloc(repository: ActivityFeedRepository())
+            ..add(const LoadFeedItems()),
       child: const _NotificationsView(),
     );
   }
@@ -33,31 +32,34 @@ class _NotificationsView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: AppBar(
-          title:  Text(
-              'Notifications',
-            style: AppFonts.titleMedium,
-          ),
-          leading: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Container(
-              child: GestureDetector(
-                onTap: () => Navigator.pop(context),
-                child: Container(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: AppDimens.small,
-                    vertical: AppDimens.small,
-                  ),
-                  decoration: BoxDecoration(
-                    color: AppColors.primary,
-                    borderRadius: BorderRadius.circular(AppDimens.radius50),
-                  ),
-                  child: Icon(Icons.arrow_back_ios_new_rounded, color: AppColors.surface,),
+        title: Text(
+          'Notifications',
+          style: Theme.of(context).textTheme.titleMedium!,
+        ),
+        leading: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Container(
+            child: GestureDetector(
+              onTap: () => Navigator.pop(context),
+              child: Container(
+                padding: EdgeInsets.symmetric(
+                  horizontal: AppDimens.small,
+                  vertical: AppDimens.small,
+                ),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.primary,
+                  borderRadius: BorderRadius.circular(AppDimens.radius50),
+                ),
+                child: Icon(
+                  Icons.arrow_back_ios_new_rounded,
+                  color: Theme.of(context).colorScheme.surfaceContainerLowest,
                 ),
               ),
             ),
           ),
+        ),
       ),
       body: BlocBuilder<FeedBloc, FeedState>(
         builder: (context, state) {
@@ -81,20 +83,20 @@ class _NotificationsView extends StatelessWidget {
               const SizedBox(height: 12),
               Expanded(
                 child: items.isEmpty
-                    ? const FeedEmptyState()
+                    ? FeedEmptyState()
                     : ListView.builder(
-                  padding: const EdgeInsets.only(bottom: 16),
-                  itemCount: items.length,
-                  itemBuilder: (context, index) {
-                    final item = items[index];
-                    return FeedItemCard(
-                      item: item,
-                      onTap: () => context
-                          .read<FeedBloc>()
-                          .add(FeedItemTapped(item)),
-                    );
-                  },
-                ),
+                        padding: const EdgeInsets.only(bottom: 16),
+                        itemCount: items.length,
+                        itemBuilder: (context, index) {
+                          final item = items[index];
+                          return FeedItemCard(
+                            item: item,
+                            onTap: () => context.read<FeedBloc>().add(
+                              FeedItemTapped(item),
+                            ),
+                          );
+                        },
+                      ),
               ),
             ],
           );

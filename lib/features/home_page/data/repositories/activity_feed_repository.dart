@@ -74,7 +74,8 @@ class ActivityFeedRepository implements FeedRepository {
       id: 'reservation_${reservation.id}',
       type: FeedItemType.notification,
       title: upcoming ? 'Réservation à venir' : 'Réservation passée',
-      message: '${reservation.establishmentName} — '
+      message:
+          '${reservation.establishmentName} — '
           '${date.day.toString().padLeft(2, '0')}/'
           '${date.month.toString().padLeft(2, '0')}/${date.year}',
       createdAt: date,

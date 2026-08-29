@@ -1,5 +1,3 @@
-import 'package:baobabe_0_2/core/themes/app_colors.dart';
-import 'package:baobabe_0_2/core/themes/app_fonts.dart';
 import 'package:baobabe_0_2/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -12,7 +10,10 @@ void showLogoutConfirmationDialog(BuildContext context) {
   showDialog(
     context: context,
     builder: (context) => AlertDialog(
-      title: Text("Déconnexion", style: AppFonts.titleMedium),
+      title: Text(
+        "Déconnexion",
+        style: Theme.of(context).textTheme.titleMedium!,
+      ),
       content: Text("Êtes-vous sûr de vouloir vous déconnecter ?"),
       actions: [
         TextButton(
@@ -24,7 +25,9 @@ void showLogoutConfirmationDialog(BuildContext context) {
             context.read<AuthBloc>().add(SignOutEvent());
             context.go('/login');
           },
-          style: ElevatedButton.styleFrom(backgroundColor: AppColors.errorContent),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Theme.of(context).colorScheme.error,
+          ),
           child: Text("Se déconnecter"),
         ),
       ],

@@ -46,8 +46,9 @@ class SettingsCubit extends Cubit<SettingsState> {
         'get-me',
         method: HttpMethod.get,
       );
-      final profile = (response.data as Map<String, dynamic>)['data']
-          as Map<String, dynamic>;
+      final profile =
+          (response.data as Map<String, dynamic>)['data']
+              as Map<String, dynamic>;
 
       emit(SettingsLoaded(userProfile: profile, userAuth: currentUser));
     } catch (e) {

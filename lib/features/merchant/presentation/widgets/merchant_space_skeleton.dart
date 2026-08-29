@@ -1,6 +1,4 @@
-import 'package:baobabe_0_2/core/themes/app_colors.dart';
 import 'package:baobabe_0_2/core/themes/app_diemens.dart';
-import 'package:baobabe_0_2/core/themes/app_fonts.dart';
 import 'package:flutter/material.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
@@ -45,18 +43,30 @@ class MerchantSpaceSkeleton extends StatelessWidget {
             children: List.generate(4, (_) => const _StatCardSkeleton()),
           ),
           AppDimens.spacerLarge,
-          Bone.text(width: 120, style: AppFonts.titleMedium),
+          Bone.text(
+            width: 120,
+            style: Theme.of(context).textTheme.titleMedium!,
+          ),
           AppDimens.spacerSmall,
           _CardSkeleton(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
-                Bone.text(width: 160, style: AppFonts.bodyLarge),
+                Bone.text(
+                  width: 160,
+                  style: Theme.of(context).textTheme.bodyLarge!,
+                ),
                 AppDimens.spacerMini,
-                Bone.text(width: 200, style: AppFonts.bodySmall),
+                Bone.text(
+                  width: 200,
+                  style: Theme.of(context).textTheme.bodySmall!,
+                ),
                 AppDimens.spacerSmall,
-                Bone.text(width: 110, style: AppFonts.bodySmall),
+                Bone.text(
+                  width: 110,
+                  style: Theme.of(context).textTheme.bodySmall!,
+                ),
               ],
             ),
           ),
@@ -68,7 +78,10 @@ class MerchantSpaceSkeleton extends StatelessWidget {
                   const Bone.circle(size: 22),
                   AppDimens.spacerMediumWidth,
                   Expanded(
-                    child: Bone.text(width: 150, style: AppFonts.bodyLarge),
+                    child: Bone.text(
+                      width: 150,
+                      style: Theme.of(context).textTheme.bodyLarge!,
+                    ),
                   ),
                 ],
               ),
@@ -92,7 +105,7 @@ class _CardSkeleton extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: AppColors.white,
+        color: Theme.of(context).colorScheme.surfaceContainerLowest,
         borderRadius: BorderRadius.circular(AppDimens.smallCardBorderRadius),
       ),
       child: child,
@@ -109,7 +122,7 @@ class _StatCardSkeleton extends StatelessWidget {
     return Container(
       padding: AppDimens.allPadding12,
       decoration: BoxDecoration(
-        color: AppColors.white,
+        color: Theme.of(context).colorScheme.surfaceContainerLowest,
         borderRadius: BorderRadius.circular(AppDimens.smallCardBorderRadius),
       ),
       child: Column(
@@ -118,9 +131,9 @@ class _StatCardSkeleton extends StatelessWidget {
         children: [
           const Bone.circle(size: 20),
           AppDimens.spacerSmall,
-          Bone.text(width: 60, style: AppFonts.titleMedium),
+          Bone.text(width: 60, style: Theme.of(context).textTheme.titleMedium!),
           AppDimens.spacerMini,
-          Bone.text(width: 90, style: AppFonts.bodySmall),
+          Bone.text(width: 90, style: Theme.of(context).textTheme.bodySmall!),
         ],
       ),
     );

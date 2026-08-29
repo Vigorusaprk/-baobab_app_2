@@ -16,11 +16,13 @@ class BusinessCardPlaceholder extends StatelessWidget {
         height: 140,
         margin: const EdgeInsets.symmetric(horizontal: 6),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: Theme.of(context).colorScheme.surfaceContainerLowest,
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.08),
+              color: Theme.of(
+                context,
+              ).colorScheme.shadow.withValues(alpha: 0.08),
               blurRadius: 10,
               offset: const Offset(0, 4),
             ),

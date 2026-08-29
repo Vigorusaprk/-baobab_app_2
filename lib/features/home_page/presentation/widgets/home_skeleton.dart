@@ -1,5 +1,4 @@
 import 'package:baobabe_0_2/core/themes/app_diemens.dart';
-import 'package:baobabe_0_2/core/themes/app_fonts.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/widgets/business_list_row.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/widgets/offers_carousel_section.dart';
 import 'package:flutter/material.dart';
@@ -52,8 +51,14 @@ class _PopularSectionSkeleton extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Bone.text(width: 110, style: AppFonts.titleMedium),
-              Bone.text(width: 50, style: AppFonts.bodySmall),
+              Bone.text(
+                width: 110,
+                style: Theme.of(context).textTheme.titleMedium!,
+              ),
+              Bone.text(
+                width: 50,
+                style: Theme.of(context).textTheme.bodySmall!,
+              ),
             ],
           ),
           const SizedBox(height: 12),

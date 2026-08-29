@@ -1,5 +1,3 @@
-﻿import 'package:baobabe_0_2/core/themes/app_colors.dart';
-import 'package:baobabe_0_2/core/themes/app_fonts.dart';
 import 'package:baobabe_0_2/features/settings/presentation/bloc/settings_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -12,15 +10,21 @@ void showLanguagePickerDialog(BuildContext context) {
   showDialog(
     context: context,
     builder: (context) => AlertDialog(
-      backgroundColor: AppColors.background,
-      title: Text("Choisir la langue", style: AppFonts.titleMedium),
+      backgroundColor: Theme.of(context).colorScheme.surface,
+      title: Text(
+        "Choisir la langue",
+        style: Theme.of(context).textTheme.titleMedium!,
+      ),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           ListTile(
             title: Text("Français"),
             trailing: cubit.state.locale.languageCode == 'fr'
-                ? Icon(Icons.check, color: AppColors.primary)
+                ? Icon(
+                    Icons.check,
+                    color: Theme.of(context).colorScheme.primary,
+                  )
                 : null,
             onTap: () {
               cubit.setLocale(const Locale('fr', 'FR'));
@@ -30,7 +34,10 @@ void showLanguagePickerDialog(BuildContext context) {
           ListTile(
             title: Text("English"),
             trailing: cubit.state.locale.languageCode == 'en'
-                ? Icon(Icons.check, color: AppColors.primary)
+                ? Icon(
+                    Icons.check,
+                    color: Theme.of(context).colorScheme.primary,
+                  )
                 : null,
             onTap: () {
               cubit.setLocale(const Locale('en', 'US'));
@@ -40,7 +47,10 @@ void showLanguagePickerDialog(BuildContext context) {
           ListTile(
             title: Text("Lingala"),
             trailing: cubit.state.locale.languageCode == 'ln'
-                ? Icon(Icons.check, color: AppColors.primary)
+                ? Icon(
+                    Icons.check,
+                    color: Theme.of(context).colorScheme.primary,
+                  )
                 : null,
             onTap: () {
               cubit.setLocale(const Locale('ln', 'CD'));

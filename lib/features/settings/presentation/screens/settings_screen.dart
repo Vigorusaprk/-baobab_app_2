@@ -13,8 +13,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:baobabe_0_2/core/themes/app_colors.dart';
-import 'package:baobabe_0_2/core/themes/app_fonts.dart';
 
 /// Body-only content for the Settings tab. The Scaffold and AppBar (title
 /// "Paramètres") are owned by MainShell, which is the single Scaffold for
@@ -65,8 +63,8 @@ class SettingsScreen extends StatelessWidget {
                   onTap: () => showLanguagePickerDialog(context),
                   trailing: Text(
                     _getLanguageName(settingsState.locale.languageCode),
-                    style: AppFonts.bodySmall.copyWith(
-                      color: AppColors.textSecondary,
+                    style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
                     ),
                   ),
                 ),

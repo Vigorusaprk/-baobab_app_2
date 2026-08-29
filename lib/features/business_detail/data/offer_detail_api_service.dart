@@ -42,9 +42,7 @@ class OfferDetailApiService {
       if (cached is Map) {
         return _parse(Map<String, dynamic>.from(cached));
       }
-      throw const OfferDetailException(
-        'Cette offre n\'a pas pu être chargée.',
-      );
+      throw const OfferDetailException('Cette offre n\'a pas pu être chargée.');
     }
   }
 

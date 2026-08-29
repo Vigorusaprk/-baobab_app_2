@@ -1,4 +1,3 @@
-import 'package:baobabe_0_2/core/themes/app_colors.dart';
 import 'package:baobabe_0_2/features/home_page/domain/entities/business_entity.dart';
 import 'package:flutter/material.dart';
 
@@ -21,10 +20,8 @@ class BusinessSpecificSection extends StatelessWidget {
           children: [
             Text(
               "Commodités & Services",
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: AppColors.primary,
+              style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                color: Theme.of(context).colorScheme.primary,
               ),
             ),
           ],
@@ -34,7 +31,7 @@ class BusinessSpecificSection extends StatelessWidget {
           spacing: 10,
           runSpacing: 10,
           children: features
-              .map((feature) => _buildFeatureChip(feature))
+              .map((feature) => _buildFeatureChip(context, feature))
               .toList(),
         ),
       ],
@@ -42,27 +39,32 @@ class BusinessSpecificSection extends StatelessWidget {
   }
 
   /// Construit un badge stylisé pour chaque caractéristique
-  Widget _buildFeatureChip(_FeatureData feature) {
+  Widget _buildFeatureChip(BuildContext context, _FeatureData feature) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
       decoration: BoxDecoration(
-        color: AppColors.white,
+        color: Theme.of(context).colorScheme.surfaceContainerLowest,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: AppColors.textSecondary.withValues(alpha: 0.15),
+          color: Theme.of(
+            context,
+          ).colorScheme.onSurfaceVariant.withValues(alpha: 0.15),
         ),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(feature.icon, size: 18, color: AppColors.primary),
+          Icon(
+            feature.icon,
+            size: 18,
+            color: Theme.of(context).colorScheme.primary,
+          ),
           const SizedBox(width: 8),
           Text(
             feature.label,
-            style: const TextStyle(
-              fontSize: 13,
+            style: Theme.of(context).textTheme.labelSmall!.copyWith(
               fontWeight: FontWeight.w600,
-              color: Color(0xFF1A1A1A),
+              color: Theme.of(context).colorScheme.onSurface,
             ),
           ),
         ],

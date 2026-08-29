@@ -1,7 +1,6 @@
 import 'package:baobabe_0_2/features/home_page/presentation/widgets/location_filter.dart';
 import 'package:flutter/material.dart';
 
-
 /// Barre compacte affichant la localisation active.
 /// [onUseGps] relance la géoloc, [onEditManually] ouvre la saisie manuelle
 /// (à toi de brancher un champ de recherche d'adresse, ex: package
@@ -33,9 +32,9 @@ class LocationBar extends StatelessWidget {
               isLocating
                   ? 'Localisation en cours...'
                   : (location?.label ??
-                      (location?.isFromGps == true
-                          ? 'Autour de moi'
-                          : 'Choisir une zone')),
+                        (location?.isFromGps == true
+                            ? 'Autour de moi'
+                            : 'Choisir une zone')),
               overflow: TextOverflow.ellipsis,
               style: const TextStyle(fontWeight: FontWeight.w500),
             ),
@@ -45,10 +44,7 @@ class LocationBar extends StatelessWidget {
             tooltip: 'Utiliser ma position',
             onPressed: isLocating ? null : onUseGps,
           ),
-          TextButton(
-            onPressed: onEditManually,
-            child: const Text('Modifier'),
-          ),
+          TextButton(onPressed: onEditManually, child: const Text('Modifier')),
         ],
       ),
     );

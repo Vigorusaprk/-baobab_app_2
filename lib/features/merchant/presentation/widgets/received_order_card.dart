@@ -1,4 +1,3 @@
-import 'package:baobabe_0_2/core/themes/app_colors.dart';
 import 'package:baobabe_0_2/core/themes/app_diemens.dart';
 import 'package:baobabe_0_2/features/merchant/domain/entities/merchant_space.dart';
 import 'package:baobabe_0_2/features/merchant/presentation/cubit/merchant_cubit.dart';
@@ -47,8 +46,8 @@ class ReceivedOrderCard extends StatelessWidget {
               ),
               StatusChip(
                 label: order.status.displayName,
-                color: order.status.color,
-                surface: order.status.surface,
+                color: order.status.color(context),
+                surface: order.status.surface(context),
               ),
             ],
           ),
@@ -56,9 +55,9 @@ class ReceivedOrderCard extends StatelessWidget {
             AppDimens.spacerMini,
             Text(
               DateFormat('dd/MM à HH:mm').format(order.createdAt!.toLocal()),
-              style: Theme.of(
-                context,
-              ).textTheme.bodySmall?.copyWith(color: AppColors.textSecondary),
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
             ),
           ],
           AppDimens.spacerSmall,
@@ -71,9 +70,9 @@ class ReceivedOrderCard extends StatelessWidget {
             AppDimens.spacerMini,
             Text(
               'Note : ${order.notes}',
-              style: Theme.of(
-                context,
-              ).textTheme.bodySmall?.copyWith(color: AppColors.textSecondary),
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
             ),
           ],
           AppDimens.spacerSmall,
@@ -83,22 +82,24 @@ class ReceivedOrderCard extends StatelessWidget {
                 '${order.total.toStringAsFixed(2)} \$',
                 style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                   fontWeight: FontWeight.w800,
-                  color: AppColors.primary,
+                  color: Theme.of(context).colorScheme.primary,
                 ),
               ),
               const Spacer(),
               if (canRefuse)
                 TextButton(
                   onPressed: () => _apply(context, OrderStatus.cancelled),
-                  child: const Text(
+                  child: Text(
                     'Refuser',
-                    style: TextStyle(color: AppColors.errorContent),
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.error,
+                    ),
                   ),
                 ),
               if (next != null)
                 FilledButton(
                   style: FilledButton.styleFrom(
-                    backgroundColor: AppColors.primary,
+                    backgroundColor: Theme.of(context).colorScheme.primary,
                   ),
                   onPressed: () => _apply(context, next.$1),
                   child: Text(next.$2),
@@ -109,9 +110,9 @@ class ReceivedOrderCard extends StatelessWidget {
             AppDimens.spacerMini,
             Text(
               order.customer!.phone!,
-              style: Theme.of(
-                context,
-              ).textTheme.bodySmall?.copyWith(color: AppColors.textSecondary),
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
             ),
           ],
         ],

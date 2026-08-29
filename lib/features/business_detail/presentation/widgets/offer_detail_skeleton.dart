@@ -1,6 +1,4 @@
-import 'package:baobabe_0_2/core/themes/app_colors.dart';
 import 'package:baobabe_0_2/core/themes/app_diemens.dart';
-import 'package:baobabe_0_2/core/themes/app_fonts.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/widgets/offers_carousel_section.dart';
 import 'package:flutter/material.dart';
 import 'package:skeletonizer/skeletonizer.dart';
@@ -35,11 +33,20 @@ class OfferDetailSkeleton extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Bone.text(words: 3, style: AppFonts.titleMedium),
+              Bone.text(
+                words: 3,
+                style: Theme.of(context).textTheme.titleMedium!,
+              ),
               AppDimens.spacerSmall,
-              Bone.text(width: 80, style: AppFonts.bodyLarge),
+              Bone.text(
+                width: 80,
+                style: Theme.of(context).textTheme.bodyLarge!,
+              ),
               AppDimens.spacerMedium,
-              Bone.multiText(lines: 3, style: AppFonts.bodyMedium),
+              Bone.multiText(
+                lines: 3,
+                style: Theme.of(context).textTheme.bodyMedium!,
+              ),
               AppDimens.spacerMedium,
               for (var i = 0; i < 2; i++)
                 Padding(
@@ -48,12 +55,18 @@ class OfferDetailSkeleton extends StatelessWidget {
                     children: [
                       const Bone.circle(size: 18),
                       AppDimens.spacerSmallWidth,
-                      Bone.text(width: 160, style: AppFonts.bodyMedium),
+                      Bone.text(
+                        width: 160,
+                        style: Theme.of(context).textTheme.bodyMedium!,
+                      ),
                     ],
                   ),
                 ),
               AppDimens.spacerSmall,
-              Bone.text(width: 100, style: AppFonts.titleMedium),
+              Bone.text(
+                width: 100,
+                style: Theme.of(context).textTheme.titleMedium!,
+              ),
               AppDimens.spacerSmall,
               const _MerchantCardSkeleton(),
             ],
@@ -75,8 +88,8 @@ class _MerchantCardSkeleton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(14),
-      decoration: const BoxDecoration(
-        color: AppColors.white,
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surfaceContainerLowest,
         borderRadius: AppDimens.cardBorderRadiusAll,
       ),
       child: Row(
@@ -88,9 +101,15 @@ class _MerchantCardSkeleton extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
-                Bone.text(width: 140, style: AppFonts.bodyLarge),
+                Bone.text(
+                  width: 140,
+                  style: Theme.of(context).textTheme.bodyLarge!,
+                ),
                 AppDimens.spacerMini,
-                Bone.text(width: 90, style: AppFonts.bodySmall),
+                Bone.text(
+                  width: 90,
+                  style: Theme.of(context).textTheme.bodySmall!,
+                ),
               ],
             ),
           ),

@@ -1,4 +1,3 @@
-import 'package:baobabe_0_2/core/themes/app_colors.dart';
 import 'package:baobabe_0_2/core/themes/app_diemens.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -36,7 +35,7 @@ class DateField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: AppColors.white,
+      color: Theme.of(context).colorScheme.surfaceContainerLowest,
       borderRadius: BorderRadius.circular(AppDimens.inputBorderRadius),
       child: InkWell(
         borderRadius: BorderRadius.circular(AppDimens.inputBorderRadius),
@@ -45,10 +44,10 @@ class DateField extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
           child: Row(
             children: [
-              const Icon(
+              Icon(
                 Icons.calendar_today_outlined,
                 size: 18,
-                color: AppColors.textSecondary,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
               AppDimens.spacerMediumWidth,
               Expanded(
@@ -83,9 +82,9 @@ class FieldHint extends StatelessWidget {
   Widget build(BuildContext context) {
     return Text(
       text,
-      style: Theme.of(
-        context,
-      ).textTheme.bodySmall?.copyWith(color: AppColors.textSecondary),
+      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+        color: Theme.of(context).colorScheme.onSurfaceVariant,
+      ),
     );
   }
 }

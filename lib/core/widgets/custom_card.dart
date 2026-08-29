@@ -1,4 +1,3 @@
-import 'package:baobabe_0_2/core/themes/app_colors.dart';
 import 'package:baobabe_0_2/core/themes/app_diemens.dart';
 import 'package:flutter/material.dart';
 
@@ -27,7 +26,9 @@ class CustomCard extends StatelessWidget {
         ),
         boxShadow: [
           BoxShadow(
-            color: AppColors.textPrimary.withValues(alpha: 0.05),
+            color: Theme.of(
+              context,
+            ).colorScheme.onSurface.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),

@@ -1,7 +1,6 @@
-import 'package:baobabe_0_2/core/themes/app_colors.dart';
 import 'package:baobabe_0_2/core/themes/app_diemens.dart';
-import 'package:baobabe_0_2/core/themes/app_fonts.dart';
 import 'package:baobabe_0_2/features/home_page/data/models/ui_business.dart';
+import 'package:baobabe_0_2/core/themes/other_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
@@ -34,7 +33,7 @@ class BusinessListRow extends StatelessWidget {
         AppDimens.cardBorderRadius - AppDimens.allPadding12Number;
 
     return Material(
-      color: AppColors.white,
+      color: Theme.of(context).colorScheme.surfaceContainerLowest,
       borderRadius: AppDimens.cardBorderRadiusAll,
       child: InkWell(
         borderRadius: AppDimens.cardBorderRadiusAll,
@@ -42,11 +41,13 @@ class BusinessListRow extends StatelessWidget {
         child: Container(
           padding: AppDimens.allPadding12,
           decoration: BoxDecoration(
-            color: AppColors.white,
+            color: Theme.of(context).colorScheme.surfaceContainerLowest,
             borderRadius: AppDimens.cardBorderRadiusAll,
             boxShadow: [
               BoxShadow(
-                color: AppColors.textPrimary.withValues(alpha: 0.05),
+                color: Theme.of(
+                  context,
+                ).colorScheme.onSurface.withValues(alpha: 0.05),
                 blurRadius: 10,
                 offset: const Offset(0, 3),
               ),
@@ -60,16 +61,14 @@ class BusinessListRow extends StatelessWidget {
                 height: 45,
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
-                  color: uiBusiness.categoryColor,
+                  color: uiBusiness.categoryColor(context),
                   borderRadius: BorderRadius.circular(interiorPadding),
                 ),
                 child: Text(
                   initial,
-                  style: const TextStyle(
-                    color: AppColors.white,
-                    fontSize: 18,
+                  style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                    color: Theme.of(context).colorScheme.onPrimary,
                     fontWeight: FontWeight.w800,
-                    fontFamily: "Poppins",
                   ),
                 ),
               ),
@@ -83,20 +82,24 @@ class BusinessListRow extends StatelessWidget {
                       business.name,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: AppFonts.titleMedium,
+                      style: Theme.of(context).textTheme.titleMedium!,
                     ),
                     const SizedBox(height: 3),
                     Row(
                       children: [
-                        const Icon(
+                        Icon(
                           Icons.star_rounded,
                           size: 14,
-                          color: AppColors.rating,
+                          color: OtherTheme.of(context).rating,
                         ),
                         Text(
                           business.rating.toStringAsFixed(1),
                           style: Theme.of(context).textTheme.bodySmall
-                              ?.copyWith(color: AppColors.textSecondary),
+                              ?.copyWith(
+                                color: Theme.of(
+                                  context,
+                                ).colorScheme.onSurfaceVariant,
+                              ),
                         ),
                         AppDimens.spacerSmallWidth,
                         Container(
@@ -108,15 +111,15 @@ class BusinessListRow extends StatelessWidget {
                             borderRadius: BorderRadius.circular(
                               interiorPadding,
                             ),
-                            color: uiBusiness.categoryColor.withValues(
-                              alpha: 0.3,
-                            ),
+                            color: uiBusiness
+                                .categoryColor(context)
+                                .withValues(alpha: 0.3),
                           ),
                           child: Text(
                             business.type.name,
                             style: Theme.of(context).textTheme.bodySmall
                                 ?.copyWith(
-                                  color: uiBusiness.categoryColor,
+                                  color: uiBusiness.categoryColor(context),
                                   fontWeight: FontWeight.w600,
                                 ),
                           ),
@@ -149,8 +152,8 @@ class BusinessListRowSkeleton extends StatelessWidget {
 
     return Container(
       padding: AppDimens.allPadding12,
-      decoration: const BoxDecoration(
-        color: AppColors.white,
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surfaceContainerLowest,
         borderRadius: AppDimens.cardBorderRadiusAll,
       ),
       child: Row(
@@ -162,9 +165,15 @@ class BusinessListRowSkeleton extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
-                Bone.text(width: 140, style: AppFonts.titleMedium),
+                Bone.text(
+                  width: 140,
+                  style: Theme.of(context).textTheme.titleMedium!,
+                ),
                 const SizedBox(height: 6),
-                Bone.text(width: 90, style: AppFonts.bodySmall),
+                Bone.text(
+                  width: 90,
+                  style: Theme.of(context).textTheme.bodySmall!,
+                ),
               ],
             ),
           ),

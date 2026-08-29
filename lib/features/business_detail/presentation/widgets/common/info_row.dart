@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:baobabe_0_2/core/themes/app_colors.dart';
 
 class InfoRow extends StatelessWidget {
   final String label;
@@ -27,13 +26,17 @@ class InfoRow extends StatelessWidget {
         child: Row(
           children: [
             if (icon != null) ...[
-              Icon(icon, size: 20, color: AppColors.primary.withOpacity(0.7)),
+              Icon(
+                icon,
+                size: 20,
+                color: Theme.of(context).colorScheme.primary.withOpacity(0.7),
+              ),
               const SizedBox(width: 12),
             ],
             Text(
               label,
               style: TextStyle(
-                color: AppColors.textSecondary,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -41,16 +44,16 @@ class InfoRow extends StatelessWidget {
             Text(
               value,
               style: TextStyle(
-                color: valueColor ?? AppColors.textPrimary,
+                color: valueColor ?? Theme.of(context).colorScheme.onSurface,
                 fontWeight: FontWeight.bold,
               ),
             ),
             if (onTap != null) ...[
               const SizedBox(width: 8),
-              const Icon(
+              Icon(
                 Icons.arrow_forward_ios_rounded,
                 size: 12,
-                color: AppColors.textSecondary,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
             ],
           ],

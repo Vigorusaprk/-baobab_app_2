@@ -28,10 +28,8 @@ class OfferSelection {
   List<Offer> selectedFrom(List<Offer> offers) =>
       offers.where((o) => quantityOf(o) > 0).toList();
 
-  double totalFor(List<Offer> offers) => selectedFrom(offers).fold(
-    0,
-    (sum, o) => sum + o.price * quantityOf(o),
-  );
+  double totalFor(List<Offer> offers) =>
+      selectedFrom(offers).fold(0, (sum, o) => sum + o.price * quantityOf(o));
 
   /// Vrai quand aucune offre sélectionnée n'impose sa date : c'est alors à
   /// l'utilisateur d'en choisir une.

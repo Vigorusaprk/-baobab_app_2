@@ -1,4 +1,3 @@
-import 'package:baobabe_0_2/core/themes/app_colors.dart';
 import 'package:baobabe_0_2/core/themes/app_diemens.dart';
 import 'package:baobabe_0_2/core/widgets/button/custom_button.dart';
 import 'package:baobabe_0_2/core/widgets/custom_text_form_field.dart';
@@ -53,9 +52,9 @@ class _BecomeMerchantPageState extends State<BecomeMerchantPage> {
   Future<void> _submit() async {
     if (!(_formKey.currentState?.validate() ?? false)) return;
     if (_categorySlug == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Choisissez une catégorie')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Choisissez une catégorie')));
       return;
     }
 
@@ -109,9 +108,9 @@ class _BecomeMerchantPageState extends State<BecomeMerchantPage> {
               'Publiez vos produits et vos services sur Baobabe. Vos clients '
               'les commandent ou les réservent depuis l\'application, et vous '
               'les gérez depuis votre espace commerçant.',
-              style: Theme.of(
-                context,
-              ).textTheme.bodyMedium?.copyWith(color: AppColors.textSecondary),
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
             ),
             AppDimens.spacerLarge,
             _Label('Nom du commerce'),
@@ -192,15 +191,17 @@ class _CategoryPicker extends StatelessWidget {
     return BlocBuilder<CategoryBloc, CategoryState>(
       builder: (context, state) {
         final categories = state is CategoriesLoaded
-            ? state.categories.where((c) => c.slug != Category.all.slug).toList()
+            ? state.categories
+                  .where((c) => c.slug != Category.all.slug)
+                  .toList()
             : const <Category>[];
 
         if (categories.isEmpty) {
           return Text(
             'Chargement des catégories…',
-            style: Theme.of(
-              context,
-            ).textTheme.bodySmall?.copyWith(color: AppColors.textSecondary),
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
           );
         }
 
@@ -213,10 +214,14 @@ class _CategoryPicker extends StatelessWidget {
               label: Text(category.displayName),
               selected: isSelected,
               showCheckmark: false,
-              selectedColor: AppColors.primary,
-              backgroundColor: AppColors.white,
+              selectedColor: Theme.of(context).colorScheme.primary,
+              backgroundColor: Theme.of(
+                context,
+              ).colorScheme.surfaceContainerLowest,
               labelStyle: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: isSelected ? AppColors.white : AppColors.textPrimary,
+                color: isSelected
+                    ? Theme.of(context).colorScheme.onPrimary
+                    : Theme.of(context).colorScheme.onSurface,
                 fontWeight: FontWeight.w600,
               ),
               side: BorderSide.none,

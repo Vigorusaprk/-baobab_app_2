@@ -19,7 +19,10 @@ abstract class BusinessRepository {
     String? category,
   });
 
-  Future<BusinessesPage> getBusinessesPage({required int page, String? category});
+  Future<BusinessesPage> getBusinessesPage({
+    required int page,
+    String? category,
+  });
   Future<Business> getBusinessDetail(String businessId);
   Future<List<BusinessReview>> getBusinessReviews(String businessId);
   Future<void> toggleFavorite(String businessId);

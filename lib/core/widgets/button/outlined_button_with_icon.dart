@@ -24,8 +24,8 @@ class OutlinedButtonWithIcon extends StatelessWidget {
           icon: SvgPicture.asset(icon, height: 30, width: 30),
           label: Text(
             label,
-            style: const TextStyle(
-              color: Colors.black87,
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.onSurface,
               fontWeight: FontWeight.w500,
             ),
           ),

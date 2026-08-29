@@ -1,6 +1,5 @@
-import 'package:baobabe_0_2/core/themes/business_category_colors.dart';
+import 'package:baobabe_0_2/core/themes/other_theme.dart';
 import 'package:flutter/material.dart';
-import 'package:baobabe_0_2/core/themes/app_colors.dart';
 
 class Reservation {
   final String id;
@@ -198,24 +197,26 @@ class Reservation {
     }
   }
 
-  Color get typeColor {
+  /// Voir [UIBusiness.categoryColor].
+  Color typeColor(BuildContext context) {
+    final palette = OtherTheme.of(context).categories;
     switch (type) {
       case 'hotel':
-        return BusinessCategoryColors.hotel;
+        return palette.hotel;
       case 'restaurant':
-        return BusinessCategoryColors.restaurant;
+        return palette.restaurant;
       case 'car_rental':
-        return BusinessCategoryColors.carRental;
+        return palette.carRental;
       case 'travel':
-        return BusinessCategoryColors.travelAgency;
+        return palette.travelAgency;
       case 'spa':
-        return BusinessCategoryColors.spa;
+        return palette.spa;
       case 'cinema':
-        return BusinessCategoryColors.cinema;
+        return palette.cinema;
       case 'toursime':
-        return BusinessCategoryColors.tourism;
+        return palette.tourism;
       default:
-        return AppColors.textSecondary;
+        return palette.fallback;
     }
   }
 

@@ -1,4 +1,3 @@
-import 'package:baobabe_0_2/core/themes/app_colors.dart';
 import 'package:baobabe_0_2/core/themes/app_diemens.dart';
 import 'package:baobabe_0_2/core/widgets/auth_required_card.dart';
 import 'package:baobabe_0_2/features/merchant/domain/entities/merchant_space.dart';
@@ -78,7 +77,7 @@ class MerchantSettingsSection extends StatelessWidget {
                   ? Text(
                       application.businessName,
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: AppColors.textSecondary,
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
                       ),
                     )
                   : null,
@@ -104,13 +103,13 @@ class _PendingBadge extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
-        color: AppColors.errorContent,
+        color: Theme.of(context).colorScheme.error,
         borderRadius: BorderRadius.circular(AppDimens.radius20),
       ),
       child: Text(
         '$count',
         style: Theme.of(context).textTheme.bodySmall?.copyWith(
-          color: AppColors.white,
+          color: Theme.of(context).colorScheme.onPrimary,
           fontWeight: FontWeight.w700,
         ),
       ),

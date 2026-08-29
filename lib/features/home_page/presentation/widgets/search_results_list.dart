@@ -1,5 +1,5 @@
+import 'package:baobabe_0_2/core/widgets/remote_image.dart';
 import 'package:baobabe_0_2/core/themes/app_diemens.dart';
-import 'package:baobabe_0_2/core/themes/app_fonts.dart';
 import 'package:baobabe_0_2/features/home_page/domain/entities/business_entity.dart'
     show Business;
 import 'package:baobabe_0_2/features/home_page/domain/entities/search_filter_entity.dart';
@@ -8,8 +8,8 @@ import 'package:baobabe_0_2/features/home_page/presentation/bloc/search_event.da
 import 'package:baobabe_0_2/features/home_page/presentation/bloc/search_bloc.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/widgets/list_skeletons.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/widgets/search_active_filters_bar.dart';
+import 'package:baobabe_0_2/core/themes/other_theme.dart';
 import 'package:flutter/material.dart';
-import 'package:baobabe_0_2/core/themes/app_colors.dart';
 import 'package:baobabe_0_2/features/business_detail/presentation/screens/business_detail_screen.dart';
 import 'package:baobabe_0_2/features/home_page/data/models/ui_business.dart';
 
@@ -41,20 +41,19 @@ class SearchResultsList extends StatelessWidget {
             children: [
               Text(
                 '${state.results.length} résultat(s)',
-                style: TextStyle(
-                  fontSize: 14,
-                  color: AppColors.secondary,
-                  fontWeight: FontWeight.bold,
+                style: Theme.of(context).textTheme.labelMedium!.copyWith(
+                  color: Theme.of(context).colorScheme.secondary,
+                  fontWeight: FontWeight.w700,
                 ),
               ),
               const Spacer(),
               Container(
                 padding: EdgeInsets.symmetric(horizontal: 10),
                 decoration: BoxDecoration(
-                  color: AppColors.secondary,
+                  color: Theme.of(context).colorScheme.secondary,
                   borderRadius: BorderRadius.circular(AppDimens.radius10),
                 ),
-                child: _buildSortDropdown(),
+                child: _buildSortDropdown(context),
               ),
             ],
           ),
@@ -94,11 +93,11 @@ class SearchResultsList extends StatelessWidget {
     );
   }
 
-  Widget _buildSortDropdown() {
+  Widget _buildSortDropdown(BuildContext context) {
     return DropdownButton<SortBy>(
       borderRadius: BorderRadius.circular(AppDimens.radius20),
-      dropdownColor: AppColors.white,
-      style: const TextStyle(color: AppColors.textPrimary),
+      dropdownColor: Theme.of(context).colorScheme.surfaceContainerLowest,
+      style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
       value: state.activeFilters.sortBy,
       underline: const SizedBox(),
       items: SortBy.values.map((sortBy) {
@@ -130,11 +129,11 @@ class SearchResultsList extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: AppColors.surface,
+          color: Theme.of(context).colorScheme.surfaceContainerLowest,
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: AppColors.textPrimary.withOpacity(0.05),
+              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.05),
               blurRadius: 10,
               offset: const Offset(0, 4),
             ),
@@ -144,23 +143,22 @@ class SearchResultsList extends StatelessWidget {
           children: [
             ClipRRect(
               borderRadius: BorderRadius.circular(16),
-              child: Image.network(
-                business.bgImg,
+              child: SizedBox(
                 width: 80,
                 height: 80,
-                fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) {
-                  return Container(
-                    width: 80,
-                    height: 80,
-                    color: uiBusiness.categoryColor.withOpacity(0.2),
+                child: RemoteImage(
+                  url: business.bgImg,
+                  fallback: ColoredBox(
+                    color: uiBusiness
+                        .categoryColor(context)
+                        .withValues(alpha: 0.2),
                     child: Icon(
                       uiBusiness.categoryIcon,
-                      color: uiBusiness.categoryColor,
+                      color: uiBusiness.categoryColor(context),
                       size: 40,
                     ),
-                  );
-                },
+                  ),
+                ),
               ),
             ),
             const SizedBox(width: 16),
@@ -170,18 +168,22 @@ class SearchResultsList extends StatelessWidget {
                 children: [
                   Text(
                     business.name,
-                    style: AppFonts.titleMedium,
+                    style: Theme.of(context).textTheme.titleMedium!,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
                   const SizedBox(height: 4),
                   Row(
                     children: [
-                      const Icon(Icons.star, color: AppColors.rating, size: 16),
+                      Icon(
+                        Icons.star,
+                        color: OtherTheme.of(context).rating,
+                        size: 16,
+                      ),
                       const SizedBox(width: 4),
                       Text(
                         business.rating.toString(),
-                        style: AppFonts.bodySmall,
+                        style: Theme.of(context).textTheme.bodySmall!,
                       ),
                       const SizedBox(width: 8),
                       Container(
@@ -190,18 +192,20 @@ class SearchResultsList extends StatelessWidget {
                           vertical: 2,
                         ),
                         decoration: BoxDecoration(
-                          color: uiBusiness.categoryColor.withOpacity(0.1),
+                          color: uiBusiness
+                              .categoryColor(context)
+                              .withOpacity(0.1),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Text(
                           SearchActiveFiltersBar.categoryDisplayName(
                             business.type,
                           ),
-                          style: TextStyle(
-                            color: uiBusiness.categoryColor,
-                            fontSize: 10,
-                            fontWeight: FontWeight.w600,
-                          ),
+                          style: Theme.of(context).textTheme.bodySmall!
+                              .copyWith(
+                                color: uiBusiness.categoryColor(context),
+                                fontWeight: FontWeight.w600,
+                              ),
                         ),
                       ),
                     ],

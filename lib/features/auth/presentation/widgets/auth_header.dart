@@ -1,7 +1,6 @@
 import 'dart:math' as math;
 
 import 'package:baobabe_0_2/core/constants/icon_link.dart';
-import 'package:baobabe_0_2/core/themes/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
@@ -128,8 +127,8 @@ class _AuthHeaderState extends State<AuthHeader>
                   glyph.asset,
                   width: glyph.size,
                   height: glyph.size,
-                  colorFilter: const ColorFilter.mode(
-                    AppColors.primary,
+                  colorFilter: ColorFilter.mode(
+                    Theme.of(context).colorScheme.primary,
                     BlendMode.srcIn,
                   ),
                 ),
@@ -141,12 +140,12 @@ class _AuthHeaderState extends State<AuthHeader>
 
     final logo = Container(
       padding: const EdgeInsets.all(18),
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         shape: BoxShape.circle,
-        color: AppColors.white,
+        color: Theme.of(context).colorScheme.surfaceContainerLowest,
         boxShadow: [
           BoxShadow(
-            color: Color(0x1A0F2E20),
+            color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
             blurRadius: 20,
             offset: Offset(0, 8),
           ),
@@ -155,8 +154,8 @@ class _AuthHeaderState extends State<AuthHeader>
       child: SvgPicture.asset(
         IconLink.appIcon,
         height: 48,
-        colorFilter: const ColorFilter.mode(
-          AppColors.primary,
+        colorFilter: ColorFilter.mode(
+          Theme.of(context).colorScheme.primary,
           BlendMode.srcIn,
         ),
       ),
@@ -190,16 +189,16 @@ class _AuthHeaderState extends State<AuthHeader>
         const SizedBox(height: 8),
         Text(
           'Bienvenue',
-          style: TextStyle(
-            fontSize: 28,
-            fontWeight: FontWeight.bold,
+          style: Theme.of(context).textTheme.displayLarge!.copyWith(
             letterSpacing: -0.5,
-            color: AppColors.textPrimary,
+            color: Theme.of(context).colorScheme.onSurface,
           ),
         ),
-        const Text(
+        Text(
           'Heureux de vous revoir !',
-          style: TextStyle(fontSize: 16, color: AppColors.secondary),
+          style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+            color: Theme.of(context).colorScheme.secondary,
+          ),
         ),
       ],
     );

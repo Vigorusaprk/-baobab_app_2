@@ -1,5 +1,3 @@
-import 'package:baobabe_0_2/core/themes/app_colors.dart';
-import 'package:baobabe_0_2/core/themes/app_fonts.dart';
 import 'package:flutter/material.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
@@ -39,7 +37,7 @@ class _ProfileFieldSkeleton extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColors.background,
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
       ),
       child: Row(
@@ -51,9 +49,15 @@ class _ProfileFieldSkeleton extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
-                Bone.text(width: 90, style: AppFonts.bodySmall),
+                Bone.text(
+                  width: 90,
+                  style: Theme.of(context).textTheme.bodySmall!,
+                ),
                 const SizedBox(height: 6),
-                Bone.text(width: 150, style: AppFonts.bodyMedium),
+                Bone.text(
+                  width: 150,
+                  style: Theme.of(context).textTheme.bodyMedium!,
+                ),
               ],
             ),
           ),

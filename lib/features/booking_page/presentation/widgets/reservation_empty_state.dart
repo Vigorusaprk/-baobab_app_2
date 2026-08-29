@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
-import 'package:baobabe_0_2/core/themes/app_colors.dart';
-import 'package:baobabe_0_2/core/themes/app_fonts.dart';
 
 /// Full empty state shown when the user has no reservations at all.
 class ReservationEmptyState extends StatelessWidget {
@@ -22,16 +20,24 @@ class ReservationEmptyState extends StatelessWidget {
                 gradient: LinearGradient(
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
-                  colors: [AppColors.white, AppColors.white, AppColors.white],
+                  colors: [
+                    Theme.of(context).colorScheme.surfaceContainerLowest,
+                    Theme.of(context).colorScheme.surfaceContainerLowest,
+                    Theme.of(context).colorScheme.surfaceContainerLowest,
+                  ],
                 ),
                 borderRadius: BorderRadius.circular(24),
                 border: Border.all(
-                  color: AppColors.white.withOpacity(0.3),
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.surfaceContainerLowest.withOpacity(0.3),
                   width: 2,
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: AppColors.primary.withOpacity(0.1),
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.primary.withOpacity(0.1),
                     blurRadius: 20,
                     offset: const Offset(0, 8),
                   ),
@@ -43,14 +49,16 @@ class ReservationEmptyState extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: AppColors.white.withOpacity(0.2),
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.surfaceContainerLowest.withOpacity(0.2),
                       borderRadius: BorderRadius.circular(16),
                     ),
                     child: SvgPicture.asset(
                       'assets/icons/calendar-date-svgrepo-com (1).svg',
                       height: 80,
                       colorFilter: ColorFilter.mode(
-                        AppColors.white,
+                        Theme.of(context).colorScheme.onPrimary,
                         BlendMode.srcIn,
                       ),
                     ),
@@ -58,21 +66,16 @@ class ReservationEmptyState extends StatelessWidget {
                   const SizedBox(height: 28),
                   Text(
                     'Aucune réservation',
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.background,
-                      fontFamily: AppFonts.primaryFontFamily,
+                    style: Theme.of(context).textTheme.displaySmall!.copyWith(
+                      color: Theme.of(context).colorScheme.surface,
                     ),
                   ),
                   const SizedBox(height: 12),
                   Text(
                     'Vous n\'avez pas encore passé de réservation',
                     textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: AppColors.white,
-                      fontFamily: AppFonts.primaryFontFamily,
+                    style: Theme.of(context).textTheme.labelMedium!.copyWith(
+                      color: Theme.of(context).colorScheme.onPrimary,
                       height: 1.5,
                     ),
                   ),
@@ -80,10 +83,8 @@ class ReservationEmptyState extends StatelessWidget {
                   Text(
                     'Table, séance, concert, prestation : réservez en quelques gestes',
                     textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 13,
-                      color: AppColors.white,
-                      fontFamily: AppFonts.primaryFontFamily,
+                    style: Theme.of(context).textTheme.labelSmall!.copyWith(
+                      color: Theme.of(context).colorScheme.onPrimary,
                     ),
                   ),
                   const SizedBox(height: 28),
@@ -92,17 +93,17 @@ class ReservationEmptyState extends StatelessWidget {
                     height: 48,
                     child: ElevatedButton.icon(
                       onPressed: () => context.go('/home'),
-                      label: const Text(
+                      label: Text(
                         'Découvrir les commerces',
-                        style: TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w600,
-                          color: AppColors.white,
+                        style: Theme.of(context).textTheme.titleSmall!.copyWith(
+                          color: Theme.of(context).colorScheme.onPrimary,
                         ),
                       ),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.secondary,
-                        foregroundColor: AppColors.background,
+                        backgroundColor: Theme.of(
+                          context,
+                        ).colorScheme.secondary,
+                        foregroundColor: Theme.of(context).colorScheme.surface,
                         elevation: 0,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),

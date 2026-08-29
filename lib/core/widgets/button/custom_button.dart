@@ -1,5 +1,4 @@
 ﻿import 'package:baobabe_0_2/core/animation/press_effect.dart';
-import 'package:baobabe_0_2/core/themes/app_colors.dart';
 import 'package:baobabe_0_2/core/themes/app_diemens.dart';
 import 'package:baobabe_0_2/core/widgets/custom_loading.dart';
 import 'package:flutter/material.dart';
@@ -28,10 +27,10 @@ class CustomButton extends StatelessWidget {
           curve: Curves.easeInOut,
           decoration: BoxDecoration(
             color: isLoading
-                ? AppColors.secondaryLight
+                ? Theme.of(context).colorScheme.outlineVariant
                 : (isActive
                       ? Theme.of(context).primaryColor
-                      : AppColors.secondaryLight),
+                      : Theme.of(context).colorScheme.outlineVariant),
             borderRadius: BorderRadius.circular(AppDimens.borderButton),
           ),
           child: ElevatedButton(
@@ -40,15 +39,15 @@ class CustomButton extends StatelessWidget {
               shadowColor: Colors.transparent,
               surfaceTintColor: Colors.transparent,
               disabledBackgroundColor: Colors.transparent,
-              disabledForegroundColor: Colors.white,
+              disabledForegroundColor: Theme.of(context).colorScheme.onPrimary,
             ),
             onPressed: isLoading || !isActive ? null : onPressed,
             child: AnimatedSwitcher(
               duration: const Duration(milliseconds: 180),
               child: isLoading
-                  ? const CustomLoadingButton(
+                  ? CustomLoadingButton(
                       key: ValueKey('loading'),
-                      color: Colors.white,
+                      color: Theme.of(context).colorScheme.onPrimary,
                     )
                   : Text(text, key: const ValueKey('label')),
             ),

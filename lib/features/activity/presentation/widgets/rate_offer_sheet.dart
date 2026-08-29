@@ -1,8 +1,8 @@
-import 'package:baobabe_0_2/core/themes/app_colors.dart';
 import 'package:baobabe_0_2/core/themes/app_diemens.dart';
 import 'package:baobabe_0_2/core/widgets/button/custom_button.dart';
 import 'package:baobabe_0_2/core/widgets/custom_text_form_field.dart';
 import 'package:baobabe_0_2/features/business_detail/data/review_api_service.dart';
+import 'package:baobabe_0_2/core/themes/other_theme.dart';
 import 'package:flutter/material.dart';
 
 /// Notation de ce qui a été réellement consommé.
@@ -20,7 +20,7 @@ Future<bool> showRateOfferSheet(
   final rated = await showModalBottomSheet<bool>(
     context: context,
     isScrollControlled: true,
-    backgroundColor: AppColors.transparent,
+    backgroundColor: Colors.transparent,
     builder: (_) => _RateOfferSheet(
       businessId: businessId,
       offerId: offerId,
@@ -80,7 +80,7 @@ class _RateOfferSheetState extends State<_RateOfferSheet> {
       messenger.showSnackBar(
         SnackBar(
           content: const Text('Votre avis n\'a pas pu être envoyé.'),
-          backgroundColor: AppColors.errorContent,
+          backgroundColor: Theme.of(context).colorScheme.error,
         ),
       );
     }
@@ -94,8 +94,8 @@ class _RateOfferSheetState extends State<_RateOfferSheet> {
       ),
       child: Container(
         width: double.infinity,
-        decoration: const BoxDecoration(
-          color: AppColors.background,
+        decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.surface,
           borderRadius: BorderRadius.only(
             topLeft: Radius.circular(AppDimens.bottomSheet),
             topRight: Radius.circular(AppDimens.bottomSheet),
@@ -115,9 +115,9 @@ class _RateOfferSheetState extends State<_RateOfferSheet> {
             Text(
               'Votre note aide les autres clients à choisir.',
               textAlign: TextAlign.center,
-              style: Theme.of(
-                context,
-              ).textTheme.bodySmall?.copyWith(color: AppColors.textSecondary),
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
             ),
             AppDimens.spacerMedium,
             Row(
@@ -130,7 +130,7 @@ class _RateOfferSheetState extends State<_RateOfferSheet> {
                     value <= _rating
                         ? Icons.star_rounded
                         : Icons.star_border_rounded,
-                    color: AppColors.rating,
+                    color: OtherTheme.of(context).rating,
                     size: 34,
                   ),
                 );

@@ -270,10 +270,7 @@ class _OfferFormPageState extends State<OfferFormPage> {
             ],
             AppDimens.spacerMedium,
             FieldLabel('Lien de la photo (facultatif)'),
-            CustomTextFormField(
-              controller: _imageUrl,
-              hintText: 'https://…',
-            ),
+            CustomTextFormField(controller: _imageUrl, hintText: 'https://…'),
             AppDimens.spacerLarge,
             CustomButton(
               text: _isEditing ? 'Enregistrer' : 'Publier l\'offre',

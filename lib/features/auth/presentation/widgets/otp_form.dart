@@ -1,4 +1,3 @@
-import 'package:baobabe_0_2/core/themes/app_colors.dart';
 import 'package:baobabe_0_2/core/themes/app_diemens.dart';
 import 'package:baobabe_0_2/core/widgets/button/custom_button.dart';
 import 'package:flutter/material.dart';
@@ -135,32 +134,32 @@ class _OtpFormState extends State<OtpForm> {
                   maxLength: _length, // allows a full paste into one box
                   style: Theme.of(context).textTheme.titleLarge?.copyWith(
                     fontWeight: FontWeight.bold,
-                    color: AppColors.primary,
+                    color: Theme.of(context).colorScheme.primary,
                   ),
                   decoration: InputDecoration(
                     counterText: '',
                     isDense: true,
                     contentPadding: EdgeInsets.zero,
                     filled: true,
-                    fillColor: AppColors.white,
+                    fillColor: Theme.of(
+                      context,
+                    ).colorScheme.surfaceContainerLowest,
                     border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(
-                        AppDimens.radius12,
+                      borderRadius: BorderRadius.circular(AppDimens.radius12),
+                      borderSide: BorderSide(
+                        color: Theme.of(context).colorScheme.outlineVariant,
                       ),
-                      borderSide: BorderSide(color: AppColors.secondaryLight),
                     ),
                     enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(
-                        AppDimens.radius12,
+                      borderRadius: BorderRadius.circular(AppDimens.radius12),
+                      borderSide: BorderSide(
+                        color: Theme.of(context).colorScheme.outlineVariant,
                       ),
-                      borderSide: BorderSide(color: AppColors.secondaryLight),
                     ),
                     focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(
-                        AppDimens.radius12,
-                      ),
-                      borderSide: const BorderSide(
-                        color: AppColors.primary,
+                      borderRadius: BorderRadius.circular(AppDimens.radius12),
+                      borderSide: BorderSide(
+                        color: Theme.of(context).colorScheme.primary,
                         width: 2,
                       ),
                     ),

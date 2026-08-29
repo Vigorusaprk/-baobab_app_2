@@ -1,4 +1,3 @@
-import 'package:baobabe_0_2/core/themes/app_colors.dart';
 import 'package:flutter/material.dart';
 
 class SeeAll extends StatelessWidget {
@@ -12,10 +11,9 @@ class SeeAll extends StatelessWidget {
       onTap: onTap,
       child: Text(
         'Voir tout',
-        style: Theme.of(context).textTheme.titleMedium!.copyWith(
+        style: Theme.of(context).textTheme.labelSmall!.copyWith(
           fontWeight: FontWeight.w600,
-          color: AppColors.secondary,
-          fontSize: 13,
+          color: Theme.of(context).colorScheme.secondary,
         ),
       ),
     );

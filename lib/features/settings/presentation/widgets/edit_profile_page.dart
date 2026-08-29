@@ -1,7 +1,5 @@
 import 'package:baobabe_0_2/core/services/session_service.dart';
-import 'package:baobabe_0_2/core/themes/app_colors.dart';
 import 'package:baobabe_0_2/core/themes/app_diemens.dart';
-import 'package:baobabe_0_2/core/themes/app_fonts.dart';
 import 'package:flutter/material.dart';
 
 class EditProfilePage extends StatefulWidget {
@@ -33,29 +31,26 @@ class _EditProfilePageState extends State<EditProfilePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.secondary,
+      backgroundColor: Theme.of(context).colorScheme.secondary,
       appBar: AppBar(
-        backgroundColor: AppColors.secondary,
+        backgroundColor: Theme.of(context).colorScheme.secondary,
         leading: IconButton(
-          icon: const Icon(
+          icon: Icon(
             Icons.arrow_back_ios_new_rounded,
-            color: AppColors.background,
+            color: Theme.of(context).colorScheme.surface,
           ),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
           'Modifier le profil',
-          style: TextStyle(
-            fontFamily: AppFonts.primaryFontFamily,
-            fontSize: 24,
-            fontWeight: AppFonts.bold,
-            color: AppColors.background,
+          style: Theme.of(context).textTheme.displaySmall!.copyWith(
+            color: Theme.of(context).colorScheme.surface,
           ),
         ),
       ),
       body: Container(
         decoration: BoxDecoration(
-          color: AppColors.background,
+          color: Theme.of(context).colorScheme.surface,
           borderRadius: const BorderRadius.only(
             topLeft: Radius.circular(AppDimens.radius30),
             topRight: Radius.circular(AppDimens.radius30),
@@ -69,16 +64,21 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 controller: _nameController,
                 decoration: InputDecoration(
                   labelText: 'Nom complet',
-                  fillColor: AppColors.white,
+                  fillColor: Theme.of(
+                    context,
+                  ).colorScheme.surfaceContainerLowest,
 
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(16),
-                    borderSide: BorderSide(color: AppColors.primary, width: 1),
+                    borderSide: BorderSide(
+                      color: Theme.of(context).colorScheme.primary,
+                      width: 1,
+                    ),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(16),
-                    borderSide: const BorderSide(
-                      color: AppColors.primary,
+                    borderSide: BorderSide(
+                      color: Theme.of(context).colorScheme.primary,
                       width: 2.5,
                     ),
                   ),
@@ -91,12 +91,15 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   labelText: 'Email',
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(16),
-                    borderSide: BorderSide(color: AppColors.primary, width: 1),
+                    borderSide: BorderSide(
+                      color: Theme.of(context).colorScheme.primary,
+                      width: 1,
+                    ),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(16),
-                    borderSide: const BorderSide(
-                      color: AppColors.primary,
+                    borderSide: BorderSide(
+                      color: Theme.of(context).colorScheme.primary,
                       width: 2.5,
                     ),
                   ),
@@ -119,7 +122,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   height: 50,
                   width: double.infinity,
                   decoration: BoxDecoration(
-                    color: AppColors.primary,
+                    color: Theme.of(context).colorScheme.primary,
                     borderRadius: BorderRadius.all(Radius.circular(25)),
                   ),
                   child: Padding(
@@ -127,10 +130,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     child: Center(
                       child: Text(
                         'Enregistrer',
-                        style: TextStyle(
-                          color: AppColors.background,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 15,
+                        style: Theme.of(context).textTheme.titleSmall!.copyWith(
+                          color: Theme.of(context).colorScheme.surface,
+                          fontWeight: FontWeight.w700,
                         ),
                       ),
                     ),

@@ -1,7 +1,7 @@
-import 'package:baobabe_0_2/core/themes/app_colors.dart';
+import 'package:baobabe_0_2/core/widgets/remote_image.dart';
 import 'package:baobabe_0_2/core/themes/app_diemens.dart';
-import 'package:baobabe_0_2/core/themes/app_fonts.dart';
 import 'package:baobabe_0_2/features/business_detail/domain/entities/offer.dart';
+import 'package:baobabe_0_2/core/themes/other_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:skeletonizer/skeletonizer.dart';
@@ -17,27 +17,25 @@ class OfferCardWidget extends StatelessWidget {
   final Offer offer;
   final VoidCallback onTap;
 
-  const OfferCardWidget({
-    super.key,
-    required this.offer,
-    required this.onTap,
-  });
+  const OfferCardWidget({super.key, required this.offer, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: AppColors.transparent,
+      color: Colors.transparent,
       borderRadius: AppDimens.cardBorderRadiusAll,
       child: InkWell(
         borderRadius: AppDimens.cardBorderRadiusAll,
         onTap: onTap,
         child: Container(
           decoration: BoxDecoration(
-            color: AppColors.white,
+            color: Theme.of(context).colorScheme.surfaceContainerLowest,
             borderRadius: AppDimens.cardBorderRadiusAll,
             boxShadow: [
               BoxShadow(
-                color: AppColors.textPrimary.withValues(alpha: 0.06),
+                color: Theme.of(
+                  context,
+                ).colorScheme.onSurface.withValues(alpha: 0.06),
                 blurRadius: 12,
                 offset: const Offset(0, 4),
               ),
@@ -59,7 +57,7 @@ class OfferCardWidget extends StatelessWidget {
                         offer.name,
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
-                        style: AppFonts.titleMedium,
+                        style: Theme.of(context).textTheme.titleMedium!,
                       ),
                       if (offer.businessName != null) ...[
                         const SizedBox(height: 2),
@@ -68,7 +66,11 @@ class OfferCardWidget extends StatelessWidget {
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: Theme.of(context).textTheme.bodySmall
-                              ?.copyWith(color: AppColors.textSecondary),
+                              ?.copyWith(
+                                color: Theme.of(
+                                  context,
+                                ).colorScheme.onSurfaceVariant,
+                              ),
                         ),
                       ],
                       const Spacer(),
@@ -84,20 +86,26 @@ class OfferCardWidget extends StatelessWidget {
                               style: Theme.of(context).textTheme.bodyMedium
                                   ?.copyWith(
                                     fontWeight: FontWeight.w800,
-                                    color: AppColors.primary,
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.primary,
                                   ),
                             ),
                           ),
                           if (offer.reviewCount > 0) ...[
-                            const Icon(
+                            Icon(
                               Icons.star_rounded,
                               size: 15,
-                              color: AppColors.rating,
+                              color: OtherTheme.of(context).rating,
                             ),
                             Text(
                               offer.rating.toStringAsFixed(1),
                               style: Theme.of(context).textTheme.bodySmall
-                                  ?.copyWith(color: AppColors.textSecondary),
+                                  ?.copyWith(
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.onSurfaceVariant,
+                                  ),
                             ),
                           ],
                         ],
@@ -122,25 +130,12 @@ class _Visual extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final image = offer.displayImage;
-
     return Stack(
       fit: StackFit.expand,
       children: [
-        if (image != null)
-          Image.network(
-            image,
-            fit: BoxFit.cover,
-            errorBuilder: (_, _, _) => const ColoredBox(
-              color: AppColors.background,
-              child: Icon(Icons.image_outlined, color: AppColors.textSecondary),
-            ),
-          )
-        else
-          const ColoredBox(
-            color: AppColors.background,
-            child: Icon(Icons.image_outlined, color: AppColors.textSecondary),
-          ),
+        // `RemoteImage` gère lui-même l'absence d'image et l'échec de
+        // chargement : plus besoin d'écrire le repli deux fois.
+        RemoteImage(url: offer.displayImage),
         Positioned(
           top: 8,
           left: 8,
@@ -150,10 +145,10 @@ class _Visual extends StatelessWidget {
             // qu'il faut simplement passer en boutique.
             label: offer.fulfilment.badge,
             color: offer.isOrderable
-                ? AppColors.secondary
+                ? Theme.of(context).colorScheme.secondary
                 : offer.isBookable
-                ? AppColors.primary
-                : AppColors.warningContent,
+                ? Theme.of(context).colorScheme.primary
+                : OtherTheme.of(context).onWarningContainer,
           ),
         ),
         if (offer.startsAt != null)
@@ -162,7 +157,7 @@ class _Visual extends StatelessWidget {
             left: 8,
             child: _Badge(
               label: DateFormat('dd/MM').format(offer.startsAt!.toLocal()),
-              color: AppColors.textPrimary,
+              color: Theme.of(context).colorScheme.onSurface,
             ),
           ),
       ],
@@ -187,7 +182,7 @@ class _Badge extends StatelessWidget {
       child: Text(
         label,
         style: Theme.of(context).textTheme.bodySmall?.copyWith(
-          color: AppColors.white,
+          color: Theme.of(context).colorScheme.onPrimary,
           fontWeight: FontWeight.w700,
         ),
       ),
@@ -202,8 +197,8 @@ class OfferCardSkeleton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: const BoxDecoration(
-        color: AppColors.white,
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surfaceContainerLowest,
         borderRadius: AppDimens.cardBorderRadiusAll,
       ),
       clipBehavior: Clip.antiAlias,
@@ -218,11 +213,20 @@ class OfferCardSkeleton extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Bone.text(words: 2, style: AppFonts.titleMedium),
+                  Bone.text(
+                    words: 2,
+                    style: Theme.of(context).textTheme.titleMedium!,
+                  ),
                   const SizedBox(height: 6),
-                  Bone.text(width: 80, style: AppFonts.bodySmall),
+                  Bone.text(
+                    width: 80,
+                    style: Theme.of(context).textTheme.bodySmall!,
+                  ),
                   const Spacer(),
-                  Bone.text(width: 50, style: AppFonts.bodyMedium),
+                  Bone.text(
+                    width: 50,
+                    style: Theme.of(context).textTheme.bodyMedium!,
+                  ),
                 ],
               ),
             ),

@@ -1,7 +1,5 @@
 import 'package:baobabe_0_2/core/animation/press_effect.dart';
-import 'package:baobabe_0_2/core/themes/app_colors.dart';
 import 'package:baobabe_0_2/core/themes/app_diemens.dart';
-import 'package:baobabe_0_2/core/themes/app_fonts.dart';
 import 'package:flutter/material.dart';
 
 /// Petits blocs réutilisables de l'écran des paramètres (badge d'icône,
@@ -10,12 +8,12 @@ import 'package:flutter/material.dart';
 class IconBadge extends StatelessWidget {
   final IconData icon;
   final Color color;
-  const IconBadge({super.key, required this.icon, required this.color});
+  IconBadge({super.key, required this.icon, required this.color});
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(10),
+      padding: EdgeInsets.all(10),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(12),
@@ -28,7 +26,9 @@ class IconBadge extends StatelessWidget {
 class InfoTile extends StatelessWidget {
   final String subtitle;
   final IconData icon;
-  final Color accentColor;
+
+  /// Laissée vide, la puce prend le vert de la marque.
+  final Color? accentColor;
   final VoidCallback? onTap;
   final Widget? trailing;
 
@@ -36,7 +36,7 @@ class InfoTile extends StatelessWidget {
     super.key,
     required this.subtitle,
     required this.icon,
-    this.accentColor = AppColors.primary,
+    this.accentColor,
     this.onTap,
     this.trailing,
   });
@@ -51,12 +51,23 @@ class InfoTile extends StatelessWidget {
           padding: const EdgeInsets.symmetric(vertical: 8.0),
           child: Row(
             children: [
-              IconBadge(icon: icon, color: AppColors.secondary),
+              IconBadge(
+                icon: icon,
+                color: accentColor ?? Theme.of(context).colorScheme.secondary,
+              ),
               const SizedBox(width: 16),
-              Expanded(child: Text(subtitle, style: AppFonts.bodyMedium)),
+              Expanded(
+                child: Text(
+                  subtitle,
+                  style: Theme.of(context).textTheme.bodyMedium!,
+                ),
+              ),
               if (trailing != null) trailing!,
               if (onTap != null && trailing == null)
-                Icon(Icons.chevron_right, color: AppColors.textSecondary),
+                Icon(
+                  Icons.chevron_right,
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
             ],
           ),
         ),
@@ -96,11 +107,13 @@ class ProfileSummaryCard extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: AppColors.white,
+            color: Theme.of(context).colorScheme.surfaceContainerLowest,
             borderRadius: AppDimens.cardBorderRadiusAll,
             boxShadow: [
               BoxShadow(
-                color: AppColors.textPrimary.withValues(alpha: 0.03),
+                color: Theme.of(
+                  context,
+                ).colorScheme.onSurface.withValues(alpha: 0.03),
                 blurRadius: 20,
                 offset: const Offset(0, 8),
               ),
@@ -111,11 +124,15 @@ class ProfileSummaryCard extends StatelessWidget {
               CircleAvatar(
                 radius: 28,
                 backgroundColor: isLoggedIn
-                    ? AppColors.secondary
-                    : AppColors.primary.withValues(alpha: 0.1),
+                    ? Theme.of(context).colorScheme.secondary
+                    : Theme.of(
+                        context,
+                      ).colorScheme.primary.withValues(alpha: 0.1),
                 child: Icon(
                   isLoggedIn ? Icons.person : Icons.login_rounded,
-                  color: isLoggedIn ? AppColors.white : AppColors.primary,
+                  color: isLoggedIn
+                      ? Theme.of(context).colorScheme.onPrimary
+                      : Theme.of(context).colorScheme.primary,
                   size: 28,
                 ),
               ),
@@ -127,16 +144,16 @@ class ProfileSummaryCard extends StatelessWidget {
                   children: [
                     Text(
                       title,
-                      style: AppFonts.bodyLarge,
+                      style: Theme.of(context).textTheme.bodyLarge!,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
                     const SizedBox(height: 2),
                     Text(
                       subtitle,
-                      style: AppFonts.bodySmall.copyWith(
-                        color: AppColors.textSecondary,
-                        fontWeight: AppFonts.regular,
+                      style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        fontWeight: FontWeight.w400,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -144,7 +161,10 @@ class ProfileSummaryCard extends StatelessWidget {
                   ],
                 ),
               ),
-              const Icon(Icons.chevron_right, color: AppColors.textSecondary),
+              Icon(
+                Icons.chevron_right,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
             ],
           ),
         ),
@@ -173,7 +193,9 @@ class SettingsLogoutButton extends StatelessWidget {
           borderRadius: BorderRadius.circular(AppDimens.borderRadiusFull),
           boxShadow: [
             BoxShadow(
-              color: AppColors.textPrimary.withValues(alpha: 0.03),
+              color: Theme.of(
+                context,
+              ).colorScheme.onSurface.withValues(alpha: 0.03),
               blurRadius: 20,
               offset: const Offset(0, 8),
             ),
@@ -182,11 +204,17 @@ class SettingsLogoutButton extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.logout, color: AppColors.errorContent, size: 20),
+            Icon(
+              Icons.logout,
+              color: Theme.of(context).colorScheme.error,
+              size: 20,
+            ),
             const SizedBox(width: 8),
             Text(
               'Déconnexion',
-              style: AppFonts.button.copyWith(color: AppColors.errorContent),
+              style: Theme.of(context).textTheme.labelLarge!.copyWith(
+                color: Theme.of(context).colorScheme.error,
+              ),
             ),
           ],
         ),

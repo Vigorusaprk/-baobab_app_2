@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:baobabe_0_2/core/themes/app_colors.dart';
 
 class FilterChipWidget extends StatelessWidget {
   final String label;
@@ -22,25 +21,31 @@ class FilterChipWidget extends StatelessWidget {
       child: Chip(
         label: Text(
           label,
-          style: TextStyle(
-            fontSize: 12,
-            color: color ?? AppColors.secondary,
+          style: Theme.of(context).textTheme.bodySmall!.copyWith(
+            color: color ?? Theme.of(context).colorScheme.secondary,
             fontWeight: FontWeight.w500,
           ),
         ),
-        backgroundColor: (color ?? AppColors.secondary).withOpacity(0.1),
+        backgroundColor: (color ?? Theme.of(context).colorScheme.secondary)
+            .withOpacity(0.1),
         side: BorderSide(
-          color: (color ?? AppColors.secondary).withOpacity(0.3),
+          color: (color ?? Theme.of(context).colorScheme.secondary).withOpacity(
+            0.3,
+          ),
           width: 1,
         ),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         avatar: icon != null
-            ? Icon(icon, size: 14, color: color ?? AppColors.secondary)
+            ? Icon(
+                icon,
+                size: 14,
+                color: color ?? Theme.of(context).colorScheme.secondary,
+              )
             : null,
         deleteIcon: Icon(
           Icons.close,
           size: 16,
-          color: color ?? AppColors.secondary,
+          color: color ?? Theme.of(context).colorScheme.secondary,
         ),
         onDeleted: onRemoved,
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),

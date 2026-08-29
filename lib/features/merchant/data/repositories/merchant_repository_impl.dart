@@ -58,20 +58,22 @@ class MerchantRepositoryImpl implements MerchantRepository {
       _invoke('update-offer', body: {'offerId': offerId, 'isActive': isActive});
 
   @override
-  Future<void> updateOrderStatus(String orderId, String status) =>
-      _invoke('update-order-status', body: {
-        'orderId': orderId,
-        'status': status,
-      });
+  Future<void> updateOrderStatus(String orderId, String status) => _invoke(
+    'update-order-status',
+    body: {'orderId': orderId, 'status': status},
+  );
 
   @override
   Future<void> updateReservationStatus(String reservationId, String status) =>
-      _invoke('update-reservation-status', body: {
-        // L'identifiant d'une réservation est un entier en base ; le
-        // transmettre en texte le ferait échouer à la comparaison.
-        'reservationId': int.tryParse(reservationId) ?? reservationId,
-        'status': status,
-      });
+      _invoke(
+        'update-reservation-status',
+        body: {
+          // L'identifiant d'une réservation est un entier en base ; le
+          // transmettre en texte le ferait échouer à la comparaison.
+          'reservationId': int.tryParse(reservationId) ?? reservationId,
+          'status': status,
+        },
+      );
 
   /// Appelle une Edge Function et remonte son message d'erreur tel quel.
   ///

@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:baobabe_0_2/core/themes/app_colors.dart';
 import 'package:baobabe_0_2/core/themes/app_diemens.dart';
-import 'package:baobabe_0_2/core/themes/app_fonts.dart';
 
 /// État vide affiché quand l'utilisateur n'a aucune commande.
 class OrderEmptyState extends StatelessWidget {
@@ -24,18 +22,26 @@ class OrderEmptyState extends StatelessWidget {
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                   colors: [
-                    AppColors.primary.withValues(alpha: 0.15),
-                    AppColors.primary.withValues(alpha: 0.05),
+                    Theme.of(
+                      context,
+                    ).colorScheme.primary.withValues(alpha: 0.15),
+                    Theme.of(
+                      context,
+                    ).colorScheme.primary.withValues(alpha: 0.05),
                   ],
                 ),
                 borderRadius: BorderRadius.circular(24),
                 border: Border.all(
-                  color: AppColors.primary.withValues(alpha: 0.3),
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.primary.withValues(alpha: 0.3),
                   width: 2,
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: AppColors.primary.withValues(alpha: 0.1),
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.primary.withValues(alpha: 0.1),
                     blurRadius: 20,
                     offset: const Offset(0, 8),
                   ),
@@ -48,24 +54,23 @@ class OrderEmptyState extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: AppColors.primary.withValues(alpha: 0.1),
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.primary.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(16),
                     ),
                     child: Icon(
                       Icons.shopping_bag_outlined,
                       size: 80,
-                      color: AppColors.primary,
+                      color: Theme.of(context).colorScheme.primary,
                     ),
                   ),
                   const SizedBox(height: 28),
                   // Titre
                   Text(
                     'Aucune commande',
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.background,
-                      fontFamily: AppFonts.primaryFontFamily,
+                    style: Theme.of(context).textTheme.displaySmall!.copyWith(
+                      color: Theme.of(context).colorScheme.surface,
                     ),
                   ),
                   const SizedBox(height: 12),
@@ -73,10 +78,8 @@ class OrderEmptyState extends StatelessWidget {
                   Text(
                     'Vous n\'avez pas encore passé de commande',
                     textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: AppColors.textSecondary,
-                      fontFamily: AppFonts.primaryFontFamily,
+                    style: Theme.of(context).textTheme.labelMedium!.copyWith(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
                       height: 1.5,
                     ),
                   ),
@@ -84,10 +87,8 @@ class OrderEmptyState extends StatelessWidget {
                   Text(
                     'Plats, produits, cosmétiques : commandez ce dont vous avez besoin',
                     textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 13,
-                      color: AppColors.textSecondary,
-                      fontFamily: AppFonts.primaryFontFamily,
+                    style: Theme.of(context).textTheme.labelSmall!.copyWith(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
                     ),
                   ),
                   const SizedBox(height: 28),
@@ -98,16 +99,13 @@ class OrderEmptyState extends StatelessWidget {
                     child: ElevatedButton.icon(
                       onPressed: () => context.go('/home'),
                       icon: const Icon(Icons.storefront_outlined, size: 20),
-                      label: const Text(
+                      label: Text(
                         'Découvrir les commerces',
-                        style: TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w600,
-                        ),
+                        style: Theme.of(context).textTheme.titleSmall!,
                       ),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.primary,
-                        foregroundColor: AppColors.background,
+                        backgroundColor: Theme.of(context).colorScheme.primary,
+                        foregroundColor: Theme.of(context).colorScheme.surface,
                         elevation: 0,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
@@ -143,9 +141,12 @@ class OrderFilteredEmptyState extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
-                color: AppColors.background,
+                color: Theme.of(context).colorScheme.surface,
                 borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: AppColors.textSecondary, width: 2),
+                border: Border.all(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  width: 2,
+                ),
               ),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -153,26 +154,21 @@ class OrderFilteredEmptyState extends StatelessWidget {
                   Icon(
                     Icons.filter_alt_off,
                     size: 64,
-                    color: AppColors.textSecondary,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
                   ),
                   const SizedBox(height: 16),
                   Text(
                     'Aucune commande',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.primary,
-                      fontFamily: AppFonts.primaryFontFamily,
+                    style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                      color: Theme.of(context).colorScheme.primary,
                     ),
                   ),
                   const SizedBox(height: 8),
                   Text(
                     'Aucune commande avec ce statut',
                     textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: AppColors.textSecondary,
-                      fontFamily: AppFonts.primaryFontFamily,
+                    style: Theme.of(context).textTheme.labelMedium!.copyWith(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
                     ),
                   ),
                   const SizedBox(height: 16),
@@ -181,9 +177,11 @@ class OrderFilteredEmptyState extends StatelessWidget {
                     child: OutlinedButton(
                       onPressed: onShowAll,
                       style: OutlinedButton.styleFrom(
-                        foregroundColor: AppColors.secondary,
-                        side: const BorderSide(
-                          color: AppColors.secondary,
+                        foregroundColor: Theme.of(
+                          context,
+                        ).colorScheme.secondary,
+                        side: BorderSide(
+                          color: Theme.of(context).colorScheme.secondary,
                           width: 2,
                         ),
                         shape: RoundedRectangleBorder(
@@ -191,12 +189,10 @@ class OrderFilteredEmptyState extends StatelessWidget {
                         ),
                         padding: const EdgeInsets.symmetric(vertical: 12),
                       ),
-                      child: const Text(
+                      child: Text(
                         'Voir toutes les commandes',
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                        ),
+                        style: Theme.of(context).textTheme.labelMedium!
+                            .copyWith(fontWeight: FontWeight.w600),
                       ),
                     ),
                   ),

@@ -1,4 +1,3 @@
-import 'package:baobabe_0_2/core/themes/app_colors.dart';
 import 'package:baobabe_0_2/core/themes/app_diemens.dart';
 import 'package:baobabe_0_2/features/home_page/data/models/ui_business.dart';
 import 'package:baobabe_0_2/features/home_page/data/repositories/business_remote_datasource_impl.dart';
@@ -67,7 +66,7 @@ class _AllBusinessesScreenState extends State<AllBusinessesScreen> {
       },
       child: Builder(
         builder: (context) => Scaffold(
-          backgroundColor: AppColors.background,
+          backgroundColor: Theme.of(context).colorScheme.surface,
           appBar: AppBar(
             title: BlocBuilder<CategoryBloc, CategoryState>(
               builder: (context, categoryState) => Text(
@@ -80,7 +79,7 @@ class _AllBusinessesScreenState extends State<AllBusinessesScreen> {
               ),
             ),
             centerTitle: true,
-            backgroundColor: AppColors.background,
+            backgroundColor: Theme.of(context).colorScheme.surface,
             elevation: 0,
           ),
           body: Column(
@@ -209,18 +208,18 @@ class _EmptyView extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Icon(
+          Icon(
             Icons.business_outlined,
             size: 60,
-            color: AppColors.textSecondary,
+            color: Theme.of(context).colorScheme.onSurfaceVariant,
           ),
           AppDimens.spacerMedium,
           Text(
             'Aucun établissement dans cette catégorie',
             textAlign: TextAlign.center,
-            style: Theme.of(
-              context,
-            ).textTheme.bodyMedium?.copyWith(color: AppColors.textSecondary),
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
           ),
         ],
       ),
@@ -242,12 +241,16 @@ class _ErrorView extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.error_outline, size: 60, color: AppColors.errorContent),
+            Icon(
+              Icons.error_outline,
+              size: 60,
+              color: Theme.of(context).colorScheme.error,
+            ),
             AppDimens.spacerMedium,
             Text(
               message,
               textAlign: TextAlign.center,
-              style: const TextStyle(color: AppColors.errorContent),
+              style: TextStyle(color: Theme.of(context).colorScheme.error),
             ),
             AppDimens.spacerMedium,
             ElevatedButton(onPressed: onRetry, child: const Text('Réessayer')),

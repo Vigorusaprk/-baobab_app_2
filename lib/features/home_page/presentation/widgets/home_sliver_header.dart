@@ -1,6 +1,5 @@
 import 'dart:ui' show lerpDouble;
 
-import 'package:baobabe_0_2/core/themes/app_colors.dart';
 import 'package:baobabe_0_2/core/themes/app_diemens.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/widgets/Category_Icons.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/widgets/home_search_bar.dart';
@@ -25,10 +24,6 @@ import 'package:go_router/go_router.dart';
 class HomeSliverHeaderMetrics {
   const HomeSliverHeaderMetrics._();
 
-  /// Bloc d'accueil (salutation + proposition) + cloche : c'est lui qui
-  /// disparaît pour laisser la place à la barre épinglée.
-  static const double greetingHeight = 58;
-
   /// Barre de recherche : la hauteur est exposée par le widget lui-même
   /// pour que l'extent réservé ne puisse pas diverger de ce qui est peint.
   static const double searchBarHeight = HomeSearchBar.height;
@@ -36,11 +31,51 @@ class HomeSliverHeaderMetrics {
   static const double gap = AppDimens.small;
   static const double bottomGap = AppDimens.small;
 
+  /// Largeur prise par la cloche de notifications et l'espace qui la sépare
+  /// du texte : autant de moins pour la salutation.
+  static const double _bellWidth = 56;
+
+  /// Hauteur du bloc d'accueil, **mesurée** plutôt que posée.
+  ///
+  /// Elle valait 58 px en dur, et la question tenait donc sur une ligne
+  /// unique — tronquée par une ellipse dès 375 px. Le produit s'engage sur
+  /// trois langues : une traduction plus longue aurait coupé partout.
+  /// On mesure le texte réel, à la largeur réelle et à l'échelle de police
+  /// du système, et l'en-tête réserve ce qu'il faut.
+  static double greetingHeight(BuildContext context) {
+    final theme = Theme.of(context);
+    final media = MediaQuery.of(context);
+    final available =
+        media.size.width - AppDimens.appPaddingValue * 2 - _bellWidth;
+
+    double lineHeight(String text, TextStyle? style, int maxLines) {
+      final painter = TextPainter(
+        text: TextSpan(text: text, style: style),
+        maxLines: maxLines,
+        textScaler: media.textScaler,
+        textDirection: TextDirection.ltr,
+      )..layout(maxWidth: available > 0 ? available : double.infinity);
+      return painter.height;
+    }
+
+    return lineHeight(greeting, theme.textTheme.titleSmall, 1) +
+        lineHeight(
+          question,
+          theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
+          2,
+        );
+  }
+
+  /// Les deux lignes, exposées pour que la mesure porte sur le texte
+  /// réellement peint et non sur une copie qui pourrait diverger.
+  static const String greeting = 'Bonjour,';
+  static const String question = "Qu'allons nous faire aujourd'hui ?";
+
   /// Distance de scroll sur laquelle se joue tout le repliement. La hauteur
-  /// de barre de statut s'annule entre les deux extents, donc cette valeur
-  /// ne dépend pas de l'appareil.
-  static const double collapseRange =
-      greetingHeight +
+  /// de barre de statut s'annule entre les deux extents, donc elle n'entre
+  /// pas dans le calcul.
+  static double collapseRange(BuildContext context) =>
+      greetingHeight(context) +
       gap +
       (CategoryIconsMetrics.expandedHeight -
           CategoryIconsMetrics.collapsedHeight);
@@ -55,6 +90,7 @@ class HomeSliverHeader extends StatelessWidget {
       pinned: true,
       delegate: _HomeSliverHeaderDelegate(
         topPadding: MediaQuery.of(context).padding.top,
+        greetingHeight: HomeSliverHeaderMetrics.greetingHeight(context),
       ),
     );
   }
@@ -65,9 +101,15 @@ class _HomeSliverHeaderDelegate extends SliverPersistentHeaderDelegate {
   /// n'a plus d'AppBar pour le faire.
   final double topPadding;
 
-  const _HomeSliverHeaderDelegate({required this.topPadding});
+  /// Mesurée par [HomeSliverHeaderMetrics.greetingHeight] : elle dépend de
+  /// la langue, de la largeur et de l'échelle de police.
+  final double greetingHeight;
 
-  static const double _greetingHeight = HomeSliverHeaderMetrics.greetingHeight;
+  const _HomeSliverHeaderDelegate({
+    required this.topPadding,
+    required this.greetingHeight,
+  });
+
   static const double _searchBarHeight =
       HomeSliverHeaderMetrics.searchBarHeight;
   static const double _gap = HomeSliverHeaderMetrics.gap;
@@ -76,7 +118,7 @@ class _HomeSliverHeaderDelegate extends SliverPersistentHeaderDelegate {
   @override
   double get maxExtent =>
       topPadding +
-      _greetingHeight +
+      greetingHeight +
       _gap +
       _searchBarHeight +
       _gap +
@@ -105,11 +147,13 @@ class _HomeSliverHeaderDelegate extends SliverPersistentHeaderDelegate {
         : (shrinkOffset / _collapseRange).clamp(0.0, 1.0);
 
     return Material(
-      color: AppColors.background,
+      color: Theme.of(context).colorScheme.surface,
       // L'ombre n'apparaît qu'une fois l'en-tête réellement épinglé, pour
       // détacher la barre du contenu qui défile dessous.
       elevation: lerpDouble(0, 3, t)!,
-      shadowColor: AppColors.textPrimary.withValues(alpha: 0.15),
+      shadowColor: Theme.of(
+        context,
+      ).colorScheme.onSurface.withValues(alpha: 0.15),
       child: Padding(
         padding: EdgeInsets.only(top: topPadding),
         child: Column(
@@ -126,9 +170,9 @@ class _HomeSliverHeaderDelegate extends SliverPersistentHeaderDelegate {
                   // On efface la salutation plus vite que la hauteur ne se
                   // réduit : elle a disparu avant d'être écrasée.
                   opacity: (1 - t * 1.6).clamp(0.0, 1.0),
-                  child: const SizedBox(
-                    height: _greetingHeight,
-                    child: _GreetingRow(),
+                  child: SizedBox(
+                    height: greetingHeight,
+                    child: const _GreetingRow(),
                   ),
                 ),
               ),
@@ -146,7 +190,8 @@ class _HomeSliverHeaderDelegate extends SliverPersistentHeaderDelegate {
 
   @override
   bool shouldRebuild(_HomeSliverHeaderDelegate oldDelegate) =>
-      oldDelegate.topPadding != topPadding;
+      oldDelegate.topPadding != topPadding ||
+      oldDelegate.greetingHeight != greetingHeight;
 }
 
 /// Ancien contenu de `HomeAppBar`, désormais rendu dans l'en-tête pour
@@ -169,17 +214,17 @@ class _GreetingRow extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  "Bonjour,",
-                  style: TextStyle(
-                    fontFamily: 'Poppins',
-                    fontSize: 15,
-                    color: AppColors.primary,
+                Text(
+                  HomeSliverHeaderMetrics.greeting,
+                  style: Theme.of(context).textTheme.titleSmall!.copyWith(
+                    color: Theme.of(context).colorScheme.primary,
                   ),
                 ),
                 Text(
-                  "Qu'allons nous faire aujourd'hui ?",
-                  maxLines: 1,
+                  HomeSliverHeaderMetrics.question,
+                  // Deux lignes : l'en-tête réserve exactement ce que ce
+                  // texte occupe, dans la langue et à l'échelle en cours.
+                  maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.w600,
@@ -195,20 +240,22 @@ class _GreetingRow extends StatelessWidget {
               decoration: BoxDecoration(
                 boxShadow: [
                   BoxShadow(
-                    color: AppColors.textPrimary.withValues(alpha: 0.05),
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.onSurface.withValues(alpha: 0.05),
                     blurRadius: 10,
                     offset: const Offset(0, 4),
                   ),
                 ],
                 borderRadius: BorderRadius.circular(AppDimens.radius10),
-                color: AppColors.surface,
+                color: Theme.of(context).colorScheme.surfaceContainerLowest,
               ),
               child: SvgPicture.asset(
                 'assets/icons/notifications.svg',
                 height: 26,
                 width: 26,
-                colorFilter: const ColorFilter.mode(
-                  AppColors.primary,
+                colorFilter: ColorFilter.mode(
+                  Theme.of(context).colorScheme.primary,
                   BlendMode.srcIn,
                 ),
               ),

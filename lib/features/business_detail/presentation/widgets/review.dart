@@ -1,4 +1,3 @@
-import 'package:baobabe_0_2/core/themes/app_colors.dart';
 import 'package:baobabe_0_2/core/themes/app_diemens.dart';
 import 'package:baobabe_0_2/features/business_detail/data/review_api_service.dart';
 import 'package:baobabe_0_2/features/business_detail/domain/entities/review.dart';
@@ -55,9 +54,9 @@ class _RestaurantReviewState extends State<RestaurantReview> {
             child: Center(
               child: Column(
                 children: [
-                  const Icon(
+                  Icon(
                     Icons.error_outline,
-                    color: AppColors.errorContent,
+                    color: Theme.of(context).colorScheme.error,
                     size: 48,
                   ),
                   const SizedBox(height: 16),
@@ -100,7 +99,7 @@ class _RestaurantReviewState extends State<RestaurantReview> {
                           avgRating.toStringAsFixed(1),
                           style: Theme.of(context).textTheme.headlineMedium,
                         ),
-                        Row(children: buildReviewStars(avgRating, 16)),
+                        Row(children: buildReviewStars(context, avgRating, 16)),
                       ],
                     ),
                     Column(
@@ -117,7 +116,7 @@ class _RestaurantReviewState extends State<RestaurantReview> {
                     ),
                     FilledButton.icon(
                       style: FilledButton.styleFrom(
-                        backgroundColor: AppColors.primary,
+                        backgroundColor: Theme.of(context).colorScheme.primary,
                       ),
                       onPressed: () => showWriteReviewDialog(
                         context,
@@ -126,14 +125,10 @@ class _RestaurantReviewState extends State<RestaurantReview> {
                       ),
                       icon: SvgPicture.asset(
                         "assets/icons/commen.svg",
-                        width: Theme.of(
-                          context,
-                        ).textTheme.bodySmall!.fontSize,
-                        height: Theme.of(
-                          context,
-                        ).textTheme.bodySmall!.fontSize,
+                        width: Theme.of(context).textTheme.bodySmall!.fontSize,
+                        height: Theme.of(context).textTheme.bodySmall!.fontSize,
                         colorFilter: ColorFilter.mode(
-                          AppColors.white,
+                          Theme.of(context).colorScheme.onPrimary,
                           BlendMode.srcIn,
                         ),
                       ),

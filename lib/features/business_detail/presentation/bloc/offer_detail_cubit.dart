@@ -82,11 +82,9 @@ class OfferDetailCubit extends Cubit<OfferDetailState> {
   final OfferDetailApiService _service;
   final String offerId;
 
-  OfferDetailCubit({
-    required this.offerId,
-    OfferDetailApiService? service,
-  }) : _service = service ?? OfferDetailApiService(),
-       super(const OfferDetailLoading());
+  OfferDetailCubit({required this.offerId, OfferDetailApiService? service})
+    : _service = service ?? OfferDetailApiService(),
+      super(const OfferDetailLoading());
 
   Future<void> load() async {
     emit(const OfferDetailLoading());

@@ -1,5 +1,5 @@
+import 'package:baobabe_0_2/core/themes/other_theme.dart';
 import 'package:flutter/material.dart';
-import 'package:baobabe_0_2/core/themes/app_colors.dart';
 
 class RatingWidget extends StatelessWidget {
   final double rating;
@@ -23,23 +23,22 @@ class RatingWidget extends StatelessWidget {
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
           decoration: BoxDecoration(
-            color: AppColors.ratingSurface,
+            color: OtherTheme.of(context).ratingContainer,
             borderRadius: BorderRadius.circular(8),
           ),
           child: Row(
             children: [
               Icon(
                 Icons.star_rounded,
-                color: AppColors.ratingContent,
+                color: OtherTheme.of(context).onRatingContainer,
                 size: iconSize,
               ),
               const SizedBox(width: 4),
               Text(
                 rating.toStringAsFixed(1),
-                style: TextStyle(
+                style: Theme.of(context).textTheme.bodySmall!.copyWith(
                   fontWeight: FontWeight.w900,
-                  color: AppColors.ratingContent,
-                  fontSize: iconSize - 2,
+                  color: OtherTheme.of(context).onRatingContainer,
                 ),
               ),
             ],
@@ -49,9 +48,8 @@ class RatingWidget extends StatelessWidget {
           const SizedBox(width: 8),
           Text(
             "$reviewCount avis",
-            style: TextStyle(
-              color: AppColors.textSecondary,
-              fontSize: 13,
+            style: Theme.of(context).textTheme.labelSmall!.copyWith(
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
               fontWeight: FontWeight.w500,
             ),
           ),

@@ -1,8 +1,8 @@
-import 'package:baobabe_0_2/core/themes/app_colors.dart';
 import 'package:baobabe_0_2/core/themes/app_diemens.dart';
 import 'package:baobabe_0_2/features/merchant/domain/entities/merchant_space.dart';
 import 'package:baobabe_0_2/features/merchant/presentation/cubit/merchant_cubit.dart';
 import 'package:baobabe_0_2/features/merchant/presentation/widgets/merchant_widgets.dart';
+import 'package:baobabe_0_2/core/themes/other_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -54,7 +54,7 @@ class MerchantDashboardScreen extends StatelessWidget {
                 value: '${stats.revenue.toStringAsFixed(0)} \$',
                 label: 'Encaissé',
                 icon: Icons.payments_outlined,
-                color: AppColors.successContent,
+                color: OtherTheme.of(context).onSuccessContainer,
               ),
               MerchantStatCard(
                 value: '${stats.offerCount}',
@@ -65,13 +65,13 @@ class MerchantDashboardScreen extends StatelessWidget {
                 value: '${stats.pendingOrders}',
                 label: 'Commandes à traiter',
                 icon: Icons.receipt_long_outlined,
-                color: AppColors.warningContent,
+                color: OtherTheme.of(context).onWarningContainer,
               ),
               MerchantStatCard(
                 value: '${stats.upcomingReservations}',
                 label: 'Réservations à venir',
                 icon: Icons.event_available_outlined,
-                color: AppColors.secondary,
+                color: Theme.of(context).colorScheme.secondary,
               ),
             ],
           ),
@@ -101,16 +101,16 @@ class MerchantDashboardScreen extends StatelessWidget {
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: AppColors.textSecondary,
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
                         ),
                       ),
                       AppDimens.spacerSmall,
                       Row(
                         children: [
-                          const Icon(
+                          Icon(
                             Icons.star_rounded,
                             size: 16,
-                            color: AppColors.rating,
+                            color: OtherTheme.of(context).rating,
                           ),
                           AppDimens.spacerMiniWidth,
                           Text(
@@ -119,16 +119,20 @@ class MerchantDashboardScreen extends StatelessWidget {
                                 : '${business.rating.toStringAsFixed(1)} '
                                       '(${business.reviewCount} avis)',
                             style: Theme.of(context).textTheme.bodySmall
-                                ?.copyWith(color: AppColors.textSecondary),
+                                ?.copyWith(
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.onSurfaceVariant,
+                                ),
                           ),
                         ],
                       ),
                     ],
                   ),
                 ),
-                const Icon(
+                Icon(
                   Icons.chevron_right,
-                  color: AppColors.textSecondary,
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
                 ),
               ],
             ),
@@ -138,9 +142,9 @@ class MerchantDashboardScreen extends StatelessWidget {
             // La note du commerce n'est pas saisie : elle découle des avis
             // laissés sur ses offres. Le dire évite de la chercher.
             'Votre note est la moyenne des avis laissés sur vos offres.',
-            style: Theme.of(
-              context,
-            ).textTheme.bodySmall?.copyWith(color: AppColors.textSecondary),
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
           ),
           AppDimens.spacerLarge,
           _ActionRow(
@@ -178,8 +182,10 @@ class _ToHandleBanner extends StatelessWidget {
       onTap: onTap,
       child: Row(
         children: [
-          const Icon(Icons.notifications_active_outlined,
-              color: AppColors.warningContent),
+          Icon(
+            Icons.notifications_active_outlined,
+            color: OtherTheme.of(context).onWarningContainer,
+          ),
           AppDimens.spacerMediumWidth,
           Expanded(
             child: Text(
@@ -189,7 +195,10 @@ class _ToHandleBanner extends StatelessWidget {
               style: Theme.of(context).textTheme.bodyLarge,
             ),
           ),
-          const Icon(Icons.chevron_right, color: AppColors.textSecondary),
+          Icon(
+            Icons.chevron_right,
+            color: Theme.of(context).colorScheme.onSurfaceVariant,
+          ),
         ],
       ),
     );
@@ -206,7 +215,10 @@ class _AllClearBanner extends StatelessWidget {
     return MerchantCard(
       child: Row(
         children: [
-          const Icon(Icons.check_circle_outline, color: AppColors.successContent),
+          Icon(
+            Icons.check_circle_outline,
+            color: OtherTheme.of(context).onSuccessContainer,
+          ),
           AppDimens.spacerMediumWidth,
           Expanded(
             child: Text(
@@ -237,12 +249,15 @@ class _ActionRow extends StatelessWidget {
       onTap: onTap,
       child: Row(
         children: [
-          Icon(icon, color: AppColors.primary),
+          Icon(icon, color: Theme.of(context).colorScheme.primary),
           AppDimens.spacerMediumWidth,
           Expanded(
             child: Text(label, style: Theme.of(context).textTheme.bodyLarge),
           ),
-          const Icon(Icons.chevron_right, color: AppColors.textSecondary),
+          Icon(
+            Icons.chevron_right,
+            color: Theme.of(context).colorScheme.onSurfaceVariant,
+          ),
         ],
       ),
     );

@@ -1,6 +1,5 @@
-﻿import 'package:baobabe_0_2/features/home_page/domain/entities/search_filter_entity.dart';
+import 'package:baobabe_0_2/features/home_page/domain/entities/search_filter_entity.dart';
 import 'package:flutter/material.dart';
-import 'package:baobabe_0_2/core/themes/app_colors.dart';
 import 'package:baobabe_0_2/features/home_page/domain/entities/business_entity.dart';
 
 // ... imports inchangés ...
@@ -86,7 +85,7 @@ class _SearchFilterSheetState extends State<SearchFilterSheet> {
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.of(context).size.height;
     return Container(
-      color: AppColors.background,
+      color: Theme.of(context).colorScheme.surface,
       padding: EdgeInsets.only(
         bottom: MediaQuery.of(context).viewInsets.bottom,
       ),
@@ -97,13 +96,17 @@ class _SearchFilterSheetState extends State<SearchFilterSheet> {
           Container(
             padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
             decoration: BoxDecoration(
-              border: Border(bottom: BorderSide(color: AppColors.background)),
+              border: Border(
+                bottom: BorderSide(
+                  color: Theme.of(context).colorScheme.surface,
+                ),
+              ),
             ),
             child: Row(
               children: [
-                const Text(
+                Text(
                   'Filtres de recherche',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  style: Theme.of(context).textTheme.bodyLarge!,
                 ),
                 const Spacer(),
                 TextButton(
@@ -117,7 +120,9 @@ class _SearchFilterSheetState extends State<SearchFilterSheet> {
                   },
                   child: Text(
                     'Réinitialiser',
-                    style: TextStyle(color: AppColors.primary),
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
                   ),
                 ),
               ],
@@ -141,16 +146,18 @@ class _SearchFilterSheetState extends State<SearchFilterSheet> {
                     children: BusinessType.values.map((category) {
                       final isSelected = _categorySelection[category] ?? false;
                       return FilterChip(
-                        backgroundColor: AppColors.background,
+                        backgroundColor: Theme.of(context).colorScheme.surface,
                         label: Text(_getCategoryDisplayName(category)),
                         avatar: Icon(
                           _getCategoryIcon(category),
                           size: 16,
-                          color: AppColors.primary,
+                          color: Theme.of(context).colorScheme.primary,
                         ),
                         selected: isSelected,
-                        selectedColor: AppColors.primary.withValues(alpha: 0.2),
-                        checkmarkColor: AppColors.primary,
+                        selectedColor: Theme.of(
+                          context,
+                        ).colorScheme.primary.withValues(alpha: 0.2),
+                        checkmarkColor: Theme.of(context).colorScheme.primary,
                         onSelected: (selected) {
                           setState(() {
                             for (var cat in BusinessType.values) {
@@ -173,13 +180,17 @@ class _SearchFilterSheetState extends State<SearchFilterSheet> {
                   const SizedBox(height: 12),
                   SliderTheme(
                     data: SliderTheme.of(context).copyWith(
-                      activeTrackColor: AppColors.primary,
-                      inactiveTrackColor: AppColors.primary.withValues(
-                        alpha: 0.3,
-                      ),
-                      thumbColor: AppColors.primary,
-                      overlayColor: AppColors.primary.withValues(alpha: 0.2),
-                      valueIndicatorColor: AppColors.primary,
+                      activeTrackColor: Theme.of(context).colorScheme.primary,
+                      inactiveTrackColor: Theme.of(
+                        context,
+                      ).colorScheme.primary.withValues(alpha: 0.3),
+                      thumbColor: Theme.of(context).colorScheme.primary,
+                      overlayColor: Theme.of(
+                        context,
+                      ).colorScheme.primary.withValues(alpha: 0.2),
+                      valueIndicatorColor: Theme.of(
+                        context,
+                      ).colorScheme.primary,
                     ),
                     child: Column(
                       children: [
@@ -202,18 +213,26 @@ class _SearchFilterSheetState extends State<SearchFilterSheet> {
                           children: [
                             Text(
                               '0.0',
-                              style: TextStyle(color: AppColors.textSecondary),
+                              style: TextStyle(
+                                color: Theme.of(
+                                  context,
+                                ).colorScheme.onSurfaceVariant,
+                              ),
                             ),
                             Text(
                               'Note: ${(_filters.minRating ?? 0.0).toStringAsFixed(1)}',
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
-                                color: AppColors.primary,
+                                color: Theme.of(context).colorScheme.primary,
                               ),
                             ),
                             Text(
                               '5.0',
-                              style: TextStyle(color: AppColors.textSecondary),
+                              style: TextStyle(
+                                color: Theme.of(
+                                  context,
+                                ).colorScheme.onSurfaceVariant,
+                              ),
                             ),
                           ],
                         ),
@@ -231,7 +250,7 @@ class _SearchFilterSheetState extends State<SearchFilterSheet> {
                       hintText: 'Ex: Kinshasa, Lubumbashi...',
                       prefixIcon: Icon(
                         Icons.location_on,
-                        color: AppColors.primary,
+                        color: Theme.of(context).colorScheme.primary,
                       ),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
@@ -263,14 +282,16 @@ class _SearchFilterSheetState extends State<SearchFilterSheet> {
                     children: SortBy.values.map((sortBy) {
                       final isSelected = _filters.sortBy == sortBy;
                       return ChoiceChip(
-                        backgroundColor: AppColors.background,
+                        backgroundColor: Theme.of(context).colorScheme.surface,
                         label: Text(sortBy.displayName),
                         selected: isSelected,
-                        selectedColor: AppColors.primary.withValues(alpha: 0.2),
+                        selectedColor: Theme.of(
+                          context,
+                        ).colorScheme.primary.withValues(alpha: 0.2),
                         labelStyle: TextStyle(
                           color: isSelected
-                              ? AppColors.primary
-                              : AppColors.textSecondary,
+                              ? Theme.of(context).colorScheme.primary
+                              : Theme.of(context).colorScheme.onSurfaceVariant,
                           fontWeight: isSelected
                               ? FontWeight.bold
                               : FontWeight.normal,
@@ -296,11 +317,15 @@ class _SearchFilterSheetState extends State<SearchFilterSheet> {
           Container(
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              color: AppColors.background,
-              border: Border(top: BorderSide(color: AppColors.background)),
+              color: Theme.of(context).colorScheme.surface,
+              border: Border(
+                top: BorderSide(color: Theme.of(context).colorScheme.surface),
+              ),
               boxShadow: [
                 BoxShadow(
-                  color: AppColors.textPrimary.withValues(alpha: 0.1),
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onSurface.withValues(alpha: 0.1),
                   blurRadius: 10,
                   offset: const Offset(0, -5),
                 ),
@@ -313,14 +338,19 @@ class _SearchFilterSheetState extends State<SearchFilterSheet> {
                     onPressed: () => Navigator.pop(context),
                     style: OutlinedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 16),
-                      side: BorderSide(color: AppColors.primary, width: 3),
+                      side: BorderSide(
+                        color: Theme.of(context).colorScheme.primary,
+                        width: 3,
+                      ),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
                     ),
-                    child: const Text(
+                    child: Text(
                       'Annuler',
-                      style: TextStyle(color: AppColors.primary),
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.primary,
+                      ),
                     ),
                   ),
                 ),
@@ -331,15 +361,17 @@ class _SearchFilterSheetState extends State<SearchFilterSheet> {
                       widget.onFiltersChanged(_filters);
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primary,
+                      backgroundColor: Theme.of(context).colorScheme.primary,
                       padding: const EdgeInsets.symmetric(vertical: 16),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
                     ),
-                    child: const Text(
+                    child: Text(
                       'Appliquer',
-                      style: TextStyle(color: AppColors.white),
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.onPrimary,
+                      ),
                     ),
                   ),
                 ),
@@ -354,7 +386,9 @@ class _SearchFilterSheetState extends State<SearchFilterSheet> {
   Widget _buildSectionTitle(String title) {
     return Text(
       title,
-      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+      style: Theme.of(
+        context,
+      ).textTheme.bodyMedium!.copyWith(fontWeight: FontWeight.w700),
     );
   }
 }

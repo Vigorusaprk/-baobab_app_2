@@ -1,4 +1,3 @@
-import 'package:baobabe_0_2/core/themes/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
@@ -34,21 +33,23 @@ class _PasswordFieldState extends State<PasswordField> {
           padding: EdgeInsets.all(8),
           child: SvgPicture.asset(
             "assets/icons/password.svg",
-            colorFilter: const ColorFilter.mode(
-              AppColors.secondary,
+            colorFilter: ColorFilter.mode(
+              Theme.of(context).colorScheme.secondary,
               BlendMode.srcIn,
             ),
           ),
         ),
         labelText: widget.label,
         hintText: widget.hint,
-        labelStyle: TextStyle(color: AppColors.textSecondary, fontSize: 14),
+        labelStyle: Theme.of(context).textTheme.labelMedium!.copyWith(
+          color: Theme.of(context).colorScheme.onSurfaceVariant,
+        ),
         filled: true,
-        fillColor: const Color(0xFFF1F3F4),
+        fillColor: Theme.of(context).colorScheme.surfaceContainerLowest,
         suffixIcon: IconButton(
           icon: Icon(
             _obscureText ? Icons.visibility_off : Icons.visibility,
-            color: AppColors.secondary,
+            color: Theme.of(context).colorScheme.secondary,
           ),
           onPressed: () => setState(() => _obscureText = !_obscureText),
         ),

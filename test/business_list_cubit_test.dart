@@ -47,8 +47,7 @@ class _FakeRepository implements BusinessRepository {
   }
 
   @override
-  dynamic noSuchMethod(Invocation invocation) =>
-      super.noSuchMethod(invocation);
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
 
 BusinessListCubit _cubit(_FakeRepository repo) =>
@@ -57,7 +56,10 @@ BusinessListCubit _cubit(_FakeRepository repo) =>
 void main() {
   test('load() remplit la première page et transmet la catégorie', () async {
     final repo = _FakeRepository([
-      () => BusinessesPage(items: [_business('1'), _business('2')], hasMore: true),
+      () => BusinessesPage(
+        items: [_business('1'), _business('2')],
+        hasMore: true,
+      ),
     ]);
     final cubit = _cubit(repo);
 
@@ -71,22 +73,25 @@ void main() {
     expect(repo.requestedCategories, ['hotel']);
   });
 
-  test('loadMore() ajoute la page suivante sans perdre la précédente', () async {
-    final repo = _FakeRepository([
-      () => BusinessesPage(items: [_business('1')], hasMore: true),
-      () => BusinessesPage(items: [_business('2')], hasMore: false),
-    ]);
-    final cubit = _cubit(repo);
+  test(
+    'loadMore() ajoute la page suivante sans perdre la précédente',
+    () async {
+      final repo = _FakeRepository([
+        () => BusinessesPage(items: [_business('1')], hasMore: true),
+        () => BusinessesPage(items: [_business('2')], hasMore: false),
+      ]);
+      final cubit = _cubit(repo);
 
-    await cubit.load(null);
-    await cubit.loadMore();
+      await cubit.load(null);
+      await cubit.loadMore();
 
-    expect(cubit.state.businesses.map((b) => b.id), ['1', '2']);
-    expect(cubit.state.page, 2);
-    expect(cubit.state.hasMore, isFalse);
-    expect(cubit.state.isLoadingMore, isFalse);
-    expect(repo.requestedPages, [1, 2]);
-  });
+      expect(cubit.state.businesses.map((b) => b.id), ['1', '2']);
+      expect(cubit.state.page, 2);
+      expect(cubit.state.hasMore, isFalse);
+      expect(cubit.state.isLoadingMore, isFalse);
+      expect(repo.requestedPages, [1, 2]);
+    },
+  );
 
   test('loadMore() ne fait rien quand il n\'y a plus rien à charger', () async {
     final repo = _FakeRepository([
@@ -150,21 +155,24 @@ void main() {
     expect(cubit.state.errorMessage, isNotNull);
   });
 
-  test('changer de categorie remplace la liste et refiltre le serveur', () async {
-    final repo = _FakeRepository([
-      () => BusinessesPage(items: [_business('1')], hasMore: true),
-      () => BusinessesPage(items: [_business('9')], hasMore: false),
-    ]);
-    final cubit = _cubit(repo);
+  test(
+    'changer de categorie remplace la liste et refiltre le serveur',
+    () async {
+      final repo = _FakeRepository([
+        () => BusinessesPage(items: [_business('1')], hasMore: true),
+        () => BusinessesPage(items: [_business('9')], hasMore: false),
+      ]);
+      final cubit = _cubit(repo);
 
-    await cubit.load(null);
-    await cubit.load('spa');
+      await cubit.load(null);
+      await cubit.load('spa');
 
-    expect(cubit.state.businesses.map((b) => b.id), ['9']);
-    expect(cubit.state.category, 'spa');
-    expect(cubit.state.page, 1);
-    expect(repo.requestedCategories, [null, 'spa']);
-  });
+      expect(cubit.state.businesses.map((b) => b.id), ['9']);
+      expect(cubit.state.category, 'spa');
+      expect(cubit.state.page, 1);
+      expect(repo.requestedCategories, [null, 'spa']);
+    },
+  );
 
   test('loadMore() reutilise la categorie affichee', () async {
     final repo = _FakeRepository([

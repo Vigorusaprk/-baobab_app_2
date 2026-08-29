@@ -399,45 +399,131 @@ Mandatory checks after any meaningful code change:
     - Never invent a one-off color palette or a screen-specific "look" (e.g. a dark card style copied from a design mockup) that doesn't route through `AppColors`/`AppTheme`. If a design reference (mockup, screenshot) implies colors that don't exist in `AppColors`, restyle the layout using the existing palette instead of introducing new literals — ask the user first if the existing palette genuinely cannot express the design.
     - If a real second theme (e.g. an actual dark mode) is ever needed, it must be added properly: new tokens in `AppColors`, a second `ThemeData` in `AppTheme`, and `darkTheme`/`themeMode` wired into `MaterialApp.router` in `lib/app/main_app.dart` — not a scoped-to-one-screen imitation. Don't half-build this (e.g. a theme picker UI that stores a `ThemeMode` nobody consumes) — a `SettingsCubit.themeMode` + theme-picker dialog like this existed and was removed for being fully decorative; don't reintroduce that pattern.
 
-## Couleur : deux rôles par teinte sémantique
+## Le thème est la source unique de la couleur et de la typographie
+
+**Aucun écran ne nomme une couleur ni une police.** Tout passe par
+`Theme.of(context)`. C'est ce qui rend un thème sombre possible sans toucher
+un seul widget : il se fabriquerait entièrement dans
+`lib/core/themes/app_theme.dart`, en composant un second `ColorScheme` et un
+second `OtherTheme` puis en les passant à `_build`.
+
+| besoin | où le lire |
+|---|---|
+| vert de marque, fonds, texte, erreur | `Theme.of(context).colorScheme` |
+| succès, attention, note, catégories | `OtherTheme.of(context)` |
+| tailles et graisses | `Theme.of(context).textTheme` |
+| espacements, rayons | `AppDimens` (sans rapport avec le thème) |
+
+`AppColors` et `AppFonts` ne sont plus que les **valeurs primitives** lues par
+`app_theme.dart`. Les lire depuis un écran contourne le thème.
+`test/theme_centralisation_test.dart` échoue alors en désignant le fichier et
+la ligne — il refuse aussi `Color(0x…)`, `Colors.xxx` et tout `fontSize:` hors
+du thème.
+
+Ce que cela implique en pratique :
+
+- **Une valeur par défaut de paramètre ne peut pas lire le thème.** Le
+  paramètre devient `Color?` et `build` tranche : `color ?? scheme.primary`.
+- **Un getter de modèle non plus.** `OrderStatus.color`, `UIBusiness.categoryColor`
+  et `Reservation.typeColor` sont devenus des méthodes prenant un
+  `BuildContext`.
+- **`const` disparaît** des widgets qui lisent le thème. C'est le prix normal
+  de la centralisation, pas une régression à corriger.
+
+### Deux rôles par teinte sémantique
 
 Une couleur d'état sert à deux choses qui n'ont pas les mêmes exigences :
-**remplir une surface** et **porter du texte**. `success`, `warning` et
-`error` ont été choisies pour la première ; employées pour la seconde, ou
-surmontées de blanc, elles descendaient à 1,83:1.
+**remplir une surface** et **porter du texte**. Chaque famille suit donc la
+grammaire de Material : `xxx` (l'aplat), `onXxx` (ce qui se pose dessus),
+`xxxContainer` (la pastille), `onXxxContainer` (son texte).
 
-Chacune a donc trois valeurs dans `AppColors` :
-
-| suffixe | emploi |
-|---|---|
-| *(aucun)* — `warning` | aplat large surmonté de texte **foncé**, icône décorative |
-| `...Content` — `warningContent` | **texte, icône signifiante, ou fond plein à texte blanc** |
-| `...Surface` — `warningSurface` | fond de pastille, à marier avec le `...Content` de la même teinte |
-
-Les `...Content` ont été calculées pour satisfaire **trois** contraintes à la
-fois : ≥ 4,5:1 en texte sur blanc, ≥ 4,5:1 sous du blanc, et ≥ 4,5:1 sur leur
-propre `...Surface`. Ne pas les retoucher à l'œil : la valeur est le résultat
-d'un calcul, pas d'un goût.
-
-Deux règles qui en découlent :
+Les valeurs `...Content` de `AppColors` ont été calculées pour satisfaire
+**trois** contraintes à la fois : ≥ 4,5:1 en texte sur blanc, ≥ 4,5:1 sous du
+blanc, et ≥ 4,5:1 sur leur propre surface. Ne pas les retoucher à l'œil.
 
 - **`secondaryLight` n'est jamais une couleur de texte, et rien de blanc ne se
-  pose dessus** (1,83:1). C'est une teinte de bordure et d'aplat décoratif.
+  pose dessus** (1,83:1). Elle ne vit plus que comme `outlineVariant`.
 - **Une pastille reçoit une surface explicite, jamais un `withValues(alpha:)`
-  de sa propre couleur** : le contraste dépendrait alors de ce qu'il y a
-  derrière, donc invérifiable — et il tombait à 3,8:1.
+  de sa propre couleur** : le contraste dépendrait de ce qu'il y a derrière,
+  donc invérifiable — et il tombait à 3,8:1.
 
-La note a un token unique, `AppColors.rating` : elle était déclinée en quatre
-nuances d'ambre selon le fichier, sur le signal même qui porte la confiance
-dans le produit. L'étoile reste vive parce qu'un chiffre l'accompagne
-toujours ; dès qu'un **texte** exprime la note, c'est `ratingContent`.
+La note a un rôle unique, `OtherTheme.rating`, au lieu de quatre nuances
+d'ambre selon le fichier. L'étoile reste vive parce qu'un chiffre l'accompagne
+toujours ; dès qu'un **texte** exprime la note, c'est `onRatingContainer`.
 
-Le cycle de vie d'une commande (`OrderStatus.color` / `.surface`) n'encode pas
-six catégories mais **qui tient la balle** : ambre en attente, vert de la
-marque pendant le traitement, vert de réussite quand c'est prêt, neutre une
-fois terminé, rouge si c'est arrêté. Une commande livrée redevient neutre
-volontairement : elles finissent par former l'essentiel de l'historique, et
-les laisser en vert noierait les rares qui demandent encore quelque chose.
+Le cycle de vie d'une commande (`OrderStatus.color(context)` / `.surface(context)`)
+n'encode pas six catégories mais **qui tient la balle** : ambre en attente,
+vert de la marque pendant le traitement, vert de réussite quand c'est prêt,
+neutre une fois terminé, rouge si c'est arrêté.
+
+### L'échelle typographique
+
+Les quinze cases du `TextTheme` sont remplies et couvrent chaque taille
+employée dans l'application. Un écran n'a plus aucune raison d'écrire un
+`TextStyle` : il prend la case et surcharge la couleur si besoin.
+
+L'échelle compte treize marches distinctes (12 à 28 px) — le signe d'une
+échelle accumulée plutôt que dessinée. La resserrer relève d'une passe
+`/impeccable typeset`, pas d'une retouche au fil de l'eau.
+
+## Réseau et images : le contexte commande
+
+PRODUCT.md pose un réseau irrégulier et des téléphones modestes. Deux règles
+en découlent, et elles ont chacune été enfreintes une fois :
+
+- **Une page = un appel.** L'écran d'un commerçant et sa section catalogue
+  interrogeaient chacun `get-business-detail` pour la même réponse : 1,5 s et
+  20 Ko au lieu de 0,7 s et 10 Ko, à chaque ouverture. Le fetch vit dans
+  `OfferApiService.getPage()`, le bloc distribue. Une section qui a besoin de
+  données va les chercher **auprès de son bloc**, jamais auprès du serveur.
+- **Aucune image distante en direct.** Toutes passent par
+  `core/widgets/remote_image.dart` (`RemoteImage` / `RemoteThumbnail`), qui
+  met en cache sur le disque, montre un squelette pendant l'attente et un
+  repli propre à l'échec. `Image.network` ne garde rien : chaque retour sur
+  l'accueil relançait les téléchargements.
+
+Beaucoup d'URL en base sont des liens de **page** plutôt que de fichier image
+(`https://www.pexels.com/fr-fr/photo/...`). Le repli n'est donc pas un cas
+rare : il fait partie du rendu normal.
+
+## Du téléphone au bureau : une colonne, pas un tableau de bord
+
+PRODUCT.md engage l'application sur trois cibles depuis un seul code, avec
+**un seul langage visuel**. Adapter au bureau ne veut donc pas dire inventer
+des colonnes : cela veut dire donner à l'application sa largeur naturelle et
+laisser le reste de la fenêtre tranquille.
+
+`core/widgets/adaptive_viewport.dart` s'en charge **une fois**, dans le
+`builder` de `MaterialApp` : toutes les routes en héritent, espace commerçant
+compris. Au-delà de 560 px, le contenu tient dans une colonne centrée bordée
+d'un filet.
+
+Le point à ne pas manquer : **le `MediaQuery` est réécrit** pour la
+sous-arborescence. Tout ce qui mesure la largeur voit celle de la colonne, pas
+celle de la fenêtre — sinon l'application se croit sur un écran large tout en
+n'occupant qu'une bande. Ne pas ajouter d'autre règle de largeur ailleurs :
+`ResponsiveContainer` en portait une seconde, appliquée par une seule page.
+
+### Une hauteur figée finit toujours par tronquer
+
+Le bloc d'accueil réservait 58 px en dur, donc la question tenait sur une
+ligne — coupée par une ellipse dès 375 px, et partout une fois traduite en
+lingala. `HomeSliverHeaderMetrics.greetingHeight(context)` **mesure** le texte
+réel, à la largeur réelle et à l'échelle de police du système ; l'en-tête
+réserve ce qu'il faut, et la course d'aimantation suit.
+
+Règle générale : dès qu'un texte traduisible vit dans une boîte de hauteur
+constante, la boîte doit mesurer son contenu. Le produit tient trois langues.
+
+### Cibles tactiles
+
+`AppDimens.touchTarget` vaut 48 dp, le minimum Material. `VisualDensity.compact`
+et `constraints: BoxConstraints()` sur un `IconButton` descendent en dessous —
+ils ne s'emploient pas sur un contrôle qu'on vise du doigt.
+
+`test/adaptive_layout_test.dart` épingle les trois règles : la colonne, le
+non-débordement de l'en-tête de 320 px à 1400 px et à 160 % de police, et le
+jeton tactile.
 
 ## UI And Design System
 

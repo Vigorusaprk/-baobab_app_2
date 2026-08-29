@@ -1,5 +1,5 @@
+import 'package:baobabe_0_2/core/themes/other_theme.dart';
 import 'package:flutter/material.dart';
-import 'package:baobabe_0_2/core/themes/app_colors.dart';
 import 'package:baobabe_0_2/features/business_detail/domain/entities/reservation.dart';
 
 class ReservationFormatUtils {
@@ -23,16 +23,16 @@ class ReservationFormatUtils {
 
   /// La pastille est un aplat surmonté de blanc : la couleur doit donc être
   /// une valeur `...Content`, assez profonde pour porter du texte blanc.
-  static Color getStatusColor(Reservation reservation) {
+  static Color getStatusColor(BuildContext context, Reservation reservation) {
     switch (reservation.status) {
       case 'pending':
-        return AppColors.warningContent;
+        return OtherTheme.of(context).onWarningContainer;
       case 'cancelled':
-        return AppColors.errorContent;
+        return Theme.of(context).colorScheme.error;
       case 'completed':
-        return AppColors.secondary;
+        return Theme.of(context).colorScheme.secondary;
     }
-    return _dateColor(reservation.displayDate);
+    return _dateColor(context, reservation.displayDate);
   }
 
   static String _dateText(DateTime? date) {
@@ -44,13 +44,13 @@ class ReservationFormatUtils {
     return 'À venir';
   }
 
-  static Color _dateColor(DateTime? date) {
-    if (date == null) return AppColors.warningContent;
+  static Color _dateColor(BuildContext context, DateTime? date) {
+    if (date == null) return OtherTheme.of(context).onWarningContainer;
     final diff = date.difference(DateTime.now());
-    if (diff.isNegative) return AppColors.textSecondary;
-    if (diff.inDays == 0) return AppColors.successContent;
-    if (diff.inDays <= 3) return AppColors.warningContent;
-    return AppColors.primary;
+    if (diff.isNegative) return Theme.of(context).colorScheme.onSurfaceVariant;
+    if (diff.inDays == 0) return OtherTheme.of(context).onSuccessContainer;
+    if (diff.inDays <= 3) return OtherTheme.of(context).onWarningContainer;
+    return Theme.of(context).colorScheme.primary;
   }
 
   static String getReservationSubtitle(Reservation reservation) {

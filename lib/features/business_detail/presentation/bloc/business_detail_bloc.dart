@@ -1,23 +1,28 @@
+import 'package:baobabe_0_2/features/business_detail/data/offer_api_service.dart';
+import 'package:baobabe_0_2/features/business_detail/domain/entities/offer.dart';
 import 'package:baobabe_0_2/features/home_page/domain/entities/business_entity.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../domain/usecases/get_business_detail.dart';
 
 part 'business_detail_event.dart';
 part 'business_detail_state.dart';
 
-/// Charge la fiche d'un commerçant.
+/// Charge la fiche d'un commerçant : le commerce **et** son catalogue, en un
+/// seul appel.
 ///
-/// Il ne fait plus que lire : commander et réserver se jouent désormais sur
-/// la fiche d'une offre ([OfferDetailCubit]). Le panier et la réservation
-/// qui vivaient ici pilotaient les tunnels spécialisés, supprimés avec la
-/// section d'actions.
+/// L'écran et sa section catalogue interrogeaient chacun de leur côté la même
+/// Edge Function. Le bloc fait désormais l'appel une fois et distribue — la
+/// section reçoit ses offres, elle ne les cherche plus.
+///
+/// Il ne fait que lire : commander et réserver se jouent sur la fiche d'une
+/// offre ([OfferDetailCubit]).
 class BusinessDetailBloc
     extends Bloc<BusinessDetailEvent, BusinessDetailState> {
-  final GetBusinessDetail getBusinessDetail;
+  final OfferApiService service;
 
-  BusinessDetailBloc({required this.getBusinessDetail})
-    : super(const BusinessDetailState()) {
+  BusinessDetailBloc({OfferApiService? service})
+    : service = service ?? OfferApiService(),
+      super(const BusinessDetailState()) {
     on<LoadBusinessDetail>(_onLoadBusinessDetail);
   }
 
@@ -27,18 +32,20 @@ class BusinessDetailBloc
   ) async {
     emit(state.copyWith(detailStatus: BusinessDetailStatus.loading));
     try {
-      final business = await getBusinessDetail(event.businessId);
+      final page = await service.getPage(event.businessId);
       emit(
         state.copyWith(
           detailStatus: BusinessDetailStatus.loaded,
-          business: business,
+          business: page.business,
+          offers: page.catalogue.offers,
+          capabilities: page.catalogue.capabilities,
         ),
       );
     } catch (e) {
       emit(
         state.copyWith(
           detailStatus: BusinessDetailStatus.error,
-          detailErrorMessage: e.toString(),
+          detailErrorMessage: 'Impossible de charger cet établissement.',
         ),
       );
     }

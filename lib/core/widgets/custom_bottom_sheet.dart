@@ -42,7 +42,9 @@ Future<T?> showCustomBottomSheet<T>({
             //border: Border.all(color: Theme.of(ctx).textTheme.bodyLarge!.color!.withValues(alpha: 0.12)),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withValues(alpha: 0.14),
+                color: Theme.of(
+                  context,
+                ).colorScheme.scrim.withValues(alpha: 0.14),
                 blurRadius: 28,
                 offset: const Offset(0, -8),
               ),

@@ -1,4 +1,3 @@
-import 'package:baobabe_0_2/core/themes/app_colors.dart';
 import 'package:baobabe_0_2/core/themes/app_diemens.dart';
 import 'package:flutter/material.dart';
 
@@ -7,14 +6,16 @@ class MerchantStatCard extends StatelessWidget {
   final String value;
   final String label;
   final IconData icon;
-  final Color color;
+
+  /// Laissée vide, l'icône prend le vert de la marque.
+  final Color? color;
 
   const MerchantStatCard({
     super.key,
     required this.value,
     required this.label,
     required this.icon,
-    this.color = AppColors.primary,
+    this.color,
   });
 
   @override
@@ -22,14 +23,18 @@ class MerchantStatCard extends StatelessWidget {
     return Container(
       padding: AppDimens.allPadding12,
       decoration: BoxDecoration(
-        color: AppColors.white,
+        color: Theme.of(context).colorScheme.surfaceContainerLowest,
         borderRadius: BorderRadius.circular(AppDimens.smallCardBorderRadius),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, color: color, size: 20),
+          Icon(
+            icon,
+            color: color ?? Theme.of(context).colorScheme.primary,
+            size: 20,
+          ),
           AppDimens.spacerSmall,
           Text(
             value,
@@ -43,9 +48,9 @@ class MerchantStatCard extends StatelessWidget {
             label,
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
-            style: Theme.of(
-              context,
-            ).textTheme.bodySmall?.copyWith(color: AppColors.textSecondary),
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
           ),
         ],
       ),
@@ -63,13 +68,15 @@ class MerchantStatCard extends StatelessWidget {
 class StatusChip extends StatelessWidget {
   final String label;
   final Color color;
-  final Color surface;
+
+  /// Laissée vide, la pastille prend le fond neutre de la page.
+  final Color? surface;
 
   const StatusChip({
     super.key,
     required this.label,
     required this.color,
-    this.surface = AppColors.background,
+    this.surface,
   });
 
   @override
@@ -77,7 +84,7 @@ class StatusChip extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
-        color: surface,
+        color: surface ?? Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(AppDimens.radius20),
       ),
       child: Text(
@@ -113,7 +120,11 @@ class MerchantEmptyState extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, size: 44, color: AppColors.secondaryLight),
+            Icon(
+              icon,
+              size: 44,
+              color: Theme.of(context).colorScheme.outlineVariant,
+            ),
             AppDimens.spacerMedium,
             Text(
               title,
@@ -124,9 +135,9 @@ class MerchantEmptyState extends StatelessWidget {
             Text(
               message,
               textAlign: TextAlign.center,
-              style: Theme.of(
-                context,
-              ).textTheme.bodySmall?.copyWith(color: AppColors.textSecondary),
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
             ),
           ],
         ),
@@ -145,7 +156,7 @@ class MerchantCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: AppColors.white,
+      color: Theme.of(context).colorScheme.surfaceContainerLowest,
       borderRadius: BorderRadius.circular(AppDimens.smallCardBorderRadius),
       child: InkWell(
         borderRadius: BorderRadius.circular(AppDimens.smallCardBorderRadius),

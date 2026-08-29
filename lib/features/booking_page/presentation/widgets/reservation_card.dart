@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:baobabe_0_2/core/themes/app_colors.dart';
 import 'package:baobabe_0_2/core/themes/app_diemens.dart';
-import 'package:baobabe_0_2/core/themes/app_fonts.dart';
 import 'package:baobabe_0_2/features/business_detail/domain/entities/reservation.dart';
 import 'package:baobabe_0_2/features/booking_page/presentation/utils/reservation_format_utils.dart';
 import 'reservation_type_details_a.dart';
@@ -25,18 +23,18 @@ class ReservationCard extends StatelessWidget {
       return Container(
         margin: const EdgeInsets.only(bottom: AppDimens.medium),
         decoration: BoxDecoration(
-          color: AppColors.white,
+          color: Theme.of(context).colorScheme.surfaceContainerLowest,
           borderRadius: BorderRadius.circular(AppDimens.radius20),
           boxShadow: [
             BoxShadow(
-              color: AppColors.textPrimary.withOpacity(0.08),
+              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.08),
               blurRadius: 12,
               offset: const Offset(0, 4),
             ),
           ],
         ),
         child: Material(
-          color: AppColors.transparent,
+          color: Colors.transparent,
           child: InkWell(
             onTap: () =>
                 context.pushNamed('reservationDetail', extra: reservation),
@@ -54,18 +52,20 @@ class ReservationCard extends StatelessWidget {
                         width: 50,
                         height: 50,
                         decoration: BoxDecoration(
-                          color: reservation.typeColor.withOpacity(0.2),
+                          color: reservation
+                              .typeColor(context)
+                              .withOpacity(0.2),
                           borderRadius: BorderRadius.circular(
                             AppDimens.radius12,
                           ),
                           border: Border.all(
                             width: 2,
-                            color: reservation.typeColor,
+                            color: reservation.typeColor(context),
                           ),
                         ),
                         child: Icon(
                           reservation.typeIcon,
-                          color: reservation.typeColor,
+                          color: reservation.typeColor(context),
                           size: 24,
                         ),
                       ),
@@ -76,12 +76,12 @@ class ReservationCard extends StatelessWidget {
                           children: [
                             Text(
                               reservation.establishmentName,
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: AppFonts.bold,
-                                fontFamily: AppFonts.primaryFontFamily,
-                                color: AppColors.textPrimary,
-                              ),
+                              style: Theme.of(context).textTheme.bodyLarge!
+                                  .copyWith(
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.onSurface,
+                                  ),
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
                             ),
@@ -94,21 +94,21 @@ class ReservationCard extends StatelessWidget {
                                     vertical: AppDimens.small,
                                   ),
                                   decoration: BoxDecoration(
-                                    color: reservation.typeColor.withOpacity(
-                                      0.1,
-                                    ),
+                                    color: reservation
+                                        .typeColor(context)
+                                        .withOpacity(0.1),
                                     borderRadius: BorderRadius.circular(
                                       AppDimens.radius8,
                                     ),
                                   ),
                                   child: Text(
                                     reservation.typeDisplayName,
-                                    style: TextStyle(
-                                      color: reservation.typeColor,
-                                      fontSize: 12,
-                                      fontWeight: AppFonts.bold,
-                                      fontFamily: AppFonts.primaryFontFamily,
-                                    ),
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodySmall!
+                                        .copyWith(
+                                          color: reservation.typeColor(context),
+                                        ),
                                   ),
                                 ),
                                 const SizedBox(width: AppDimens.small),
@@ -117,11 +117,14 @@ class ReservationCard extends StatelessWidget {
                                     ReservationFormatUtils.getReservationSubtitle(
                                       reservation,
                                     ),
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      color: AppColors.textSecondary,
-                                      fontFamily: AppFonts.primaryFontFamily,
-                                    ),
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .labelMedium!
+                                        .copyWith(
+                                          color: Theme.of(
+                                            context,
+                                          ).colorScheme.onSurfaceVariant,
+                                        ),
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
                                   ),
@@ -140,31 +143,40 @@ class ReservationCard extends StatelessWidget {
                               vertical: AppDimens.small,
                             ),
                             decoration: BoxDecoration(
-                              color: ReservationFormatUtils.getStatusColor(reservation),
+                              color: ReservationFormatUtils.getStatusColor(
+                                context,
+                                reservation,
+                              ),
                               borderRadius: BorderRadius.circular(
                                 AppDimens.radius10,
                               ),
                             ),
                             child: Text(
                               ReservationFormatUtils.getStatusText(reservation),
-                              style: TextStyle(
-                                color: AppColors.white,
-                                fontSize: 12,
-                                fontWeight: AppFonts.bold,
-                                fontFamily: AppFonts.primaryFontFamily,
-                              ),
+                              style: Theme.of(context).textTheme.bodySmall!
+                                  .copyWith(
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.onPrimary,
+                                  ),
                             ),
                           ),
                           const SizedBox(height: AppDimens.small),
                           IconButton(
                             icon: Icon(
                               Icons.delete_outline,
-                              color: AppColors.textSecondary,
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.onSurfaceVariant,
                               size: 20,
                             ),
                             onPressed: onDelete,
                             padding: EdgeInsets.zero,
-                            constraints: const BoxConstraints(),
+                            constraints: const BoxConstraints(
+                              minWidth: AppDimens.touchTarget,
+                              minHeight: AppDimens.touchTarget,
+                            ),
+                            tooltip: 'Supprimer cette réservation',
                           ),
                         ],
                       ),
@@ -190,8 +202,11 @@ class ReservationCard extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.all(AppDimens.medium),
                     decoration: BoxDecoration(
-                      color: reservation.typeColor.withOpacity(0.2),
-                      border: Border.all(width: 2, color: AppColors.secondary),
+                      color: reservation.typeColor(context).withOpacity(0.2),
+                      border: Border.all(
+                        width: 2,
+                        color: Theme.of(context).colorScheme.secondary,
+                      ),
                       borderRadius: BorderRadius.circular(AppDimens.radius12),
                     ),
                     child: Row(
@@ -199,21 +214,16 @@ class ReservationCard extends StatelessWidget {
                       children: [
                         Text(
                           'Total',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: AppFonts.semiBold,
-                            color: reservation.typeColor,
-                            fontFamily: AppFonts.primaryFontFamily,
-                          ),
+                          style: Theme.of(context).textTheme.bodyMedium!
+                              .copyWith(
+                                fontWeight: FontWeight.w600,
+                                color: reservation.typeColor(context),
+                              ),
                         ),
                         Text(
                           '\$${reservation.totalAmount.toStringAsFixed(2)}',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: AppFonts.bold,
-                            color: reservation.typeColor,
-                            fontFamily: AppFonts.primaryFontFamily,
-                          ),
+                          style: Theme.of(context).textTheme.bodyLarge!
+                              .copyWith(color: reservation.typeColor(context)),
                         ),
                       ],
                     ),

@@ -1,4 +1,3 @@
-import 'package:baobabe_0_2/core/themes/app_colors.dart';
 import 'package:baobabe_0_2/core/themes/app_diemens.dart';
 import 'package:baobabe_0_2/core/widgets/auth_required_card.dart';
 import 'package:baobabe_0_2/features/business_detail/presentation/bloc/offer_detail_cubit.dart';
@@ -7,6 +6,7 @@ import 'package:baobabe_0_2/features/business_detail/presentation/widgets/offer_
 import 'package:baobabe_0_2/features/business_detail/presentation/widgets/offer_purchase_bar.dart';
 import 'package:baobabe_0_2/features/business_detail/presentation/widgets/review_list_item.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/widgets/offers_carousel_section.dart';
+import 'package:baobabe_0_2/core/themes/other_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:skeletonizer/skeletonizer.dart';
@@ -99,8 +99,8 @@ class _OfferDetailView extends StatelessWidget {
       SnackBar(
         content: Text(message),
         backgroundColor: isError
-            ? AppColors.errorContent
-            : AppColors.successContent,
+            ? Theme.of(context).colorScheme.error
+            : OtherTheme.of(context).onSuccessContainer,
         behavior: SnackBarBehavior.floating,
       ),
     );
@@ -109,9 +109,9 @@ class _OfferDetailView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: AppBar(
-        backgroundColor: AppColors.background,
+        backgroundColor: Theme.of(context).colorScheme.surface,
         elevation: 0,
         title: const Text('Détail de l\'offre'),
       ),
@@ -179,21 +179,21 @@ class _Content extends StatelessWidget {
                         : '${offer.price.toStringAsFixed(2)} \$',
                     style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                       fontWeight: FontWeight.w800,
-                      color: AppColors.primary,
+                      color: Theme.of(context).colorScheme.primary,
                     ),
                   ),
                   const Spacer(),
                   if (offer.reviewCount > 0) ...[
-                    const Icon(
+                    Icon(
                       Icons.star_rounded,
                       size: 18,
-                      color: AppColors.rating,
+                      color: OtherTheme.of(context).rating,
                     ),
                     Text(
                       '${offer.rating.toStringAsFixed(1)} '
                       '(${offer.reviewCount})',
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: AppColors.textSecondary,
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
                       ),
                     ),
                   ],
@@ -204,7 +204,7 @@ class _Content extends StatelessWidget {
                 Text(
                   offer.description,
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: AppColors.textSecondary,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
                     height: 1.6,
                   ),
                 ),
@@ -259,9 +259,9 @@ class _Failure extends StatelessWidget {
             Text(
               message,
               textAlign: TextAlign.center,
-              style: Theme.of(
-                context,
-              ).textTheme.bodyMedium?.copyWith(color: AppColors.errorContent),
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: Theme.of(context).colorScheme.error,
+              ),
             ),
             AppDimens.spacerMedium,
             ElevatedButton(

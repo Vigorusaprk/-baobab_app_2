@@ -1,37 +1,42 @@
-import 'package:baobabe_0_2/core/themes/business_category_colors.dart';
+import 'package:baobabe_0_2/core/themes/other_theme.dart';
 import 'package:baobabe_0_2/features/home_page/domain/entities/business_entity.dart';
 import 'package:flutter/material.dart';
-import 'package:baobabe_0_2/core/themes/app_colors.dart';
 
 class UIBusiness {
   final Business business;
 
   UIBusiness(this.business);
 
-  Color get categoryColor {
+  /// La couleur d'identité de la catégorie, lue dans le thème.
+  ///
+  /// Prend un contexte plutôt que d'être un getter : la palette
+  /// catégorielle vit dans [OtherTheme], pour qu'un thème sombre puisse
+  /// l'assourdir d'un bloc.
+  Color categoryColor(BuildContext context) {
+    final palette = OtherTheme.of(context).categories;
     switch (business.type) {
       case BusinessType.restaurant:
-        return BusinessCategoryColors.restaurant;
+        return palette.restaurant;
       case BusinessType.fastFood:
-        return BusinessCategoryColors.fastFood;
+        return palette.fastFood;
       case BusinessType.shopping:
-        return BusinessCategoryColors.shopping;
+        return palette.shopping;
       case BusinessType.mall:
-        return BusinessCategoryColors.mall;
+        return palette.mall;
       case BusinessType.hotel:
-        return BusinessCategoryColors.hotel;
+        return palette.hotel;
       case BusinessType.carRental:
-        return BusinessCategoryColors.carRental;
+        return palette.carRental;
       case BusinessType.travelAgency:
-        return BusinessCategoryColors.travelAgency;
+        return palette.travelAgency;
       case BusinessType.spa:
-        return BusinessCategoryColors.spa;
+        return palette.spa;
       case BusinessType.cinema:
-        return BusinessCategoryColors.cinema;
+        return palette.cinema;
       case BusinessType.tourism:
-        return BusinessCategoryColors.tourism;
+        return palette.tourism;
       default:
-        return AppColors.textSecondary;
+        return palette.fallback;
     }
   }
 

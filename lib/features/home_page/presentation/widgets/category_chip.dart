@@ -1,7 +1,6 @@
 import 'dart:math' as math;
 import 'dart:ui' show lerpDouble;
 
-import 'package:baobabe_0_2/core/themes/app_colors.dart';
 import 'package:baobabe_0_2/core/themes/app_diemens.dart';
 import 'package:baobabe_0_2/features/home_page/data/models/ui_category.dart';
 import 'package:flutter/material.dart';
@@ -35,8 +34,6 @@ class CategoryChip extends StatelessWidget {
   /// étriquées à côté des autres.
   static const double _minColumnContentWidth = 65;
 
-  static const Color _inactiveBackground = Color(0xFFF5F7F9);
-
   /// Mesure du libellé mise en cache : la vignette est reconstruite à
   /// chaque frame de scroll, et sa largeur dépend de celle du texte. Le
   /// texte, lui, ne change jamais — inutile de le remesurer.
@@ -53,11 +50,7 @@ class CategoryChip extends StatelessWidget {
   /// applique l'échelle typographique de l'utilisateur. Un [TextPainter]
   /// nourri du style brut sous-estime donc la largeur, et le texte se
   /// retrouve tronqué d'un ou deux pixels.
-  static Size _labelSize(
-    BuildContext context,
-    String label,
-    TextStyle style,
-  ) {
+  static Size _labelSize(BuildContext context, String label, TextStyle style) {
     final effectiveStyle = DefaultTextStyle.of(
       context,
     ).style.merge(style).copyWith(fontWeight: FontWeight.w700);
@@ -82,10 +75,8 @@ class CategoryChip extends StatelessWidget {
     final t = collapseProgress;
     final label = uiCategory.category.displayName;
 
-    final labelStyle = TextStyle(
-      fontSize: 12,
+    final labelStyle = Theme.of(context).textTheme.bodySmall!.copyWith(
       fontWeight: isActive ? FontWeight.w700 : FontWeight.w500,
-      fontFamily: 'Poppins',
     );
     final labelSize = _labelSize(context, label, labelStyle);
 
@@ -116,7 +107,13 @@ class CategoryChip extends StatelessWidget {
       builder: (context, selected, _) => Container(
         width: width,
         decoration: BoxDecoration(
-          color: Color.lerp(_inactiveBackground, AppColors.white, selected),
+          // La puce inactive se fond dans la page ; sélectionnée, elle
+          // remonte au niveau d'une carte.
+          color: Color.lerp(
+            Theme.of(context).colorScheme.surfaceContainer,
+            Theme.of(context).colorScheme.surfaceContainerLowest,
+            selected,
+          ),
           borderRadius: BorderRadius.circular(
             // Le rayon suit la forme : carte arrondie étendue, pastille repliée.
             lerpDouble(
@@ -127,13 +124,15 @@ class CategoryChip extends StatelessWidget {
           ),
           boxShadow: [
             BoxShadow(
-              color: uiCategory.color.withValues(alpha: 0.2 * selected),
+              color: uiCategory
+                  .color(context)
+                  .withValues(alpha: 0.2 * selected),
               blurRadius: 12,
               offset: const Offset(0, 6),
             ),
           ],
           border: Border.all(
-            color: uiCategory.color.withValues(alpha: 0.5 * selected),
+            color: uiCategory.color(context).withValues(alpha: 0.5 * selected),
             width: 1.5,
           ),
         ),
@@ -180,8 +179,8 @@ class CategoryChip extends StatelessWidget {
                     height: iconSize,
                     decoration: BoxDecoration(
                       color: Color.lerp(
-                        uiCategory.color.withValues(alpha: 0.12),
-                        uiCategory.color,
+                        uiCategory.color(context).withValues(alpha: 0.12),
+                        uiCategory.color(context),
                         selected,
                       ),
                       shape: BoxShape.circle,
@@ -189,8 +188,8 @@ class CategoryChip extends StatelessWidget {
                     child: Icon(
                       uiCategory.icon,
                       color: Color.lerp(
-                        uiCategory.color,
-                        AppColors.white,
+                        uiCategory.color(context),
+                        Theme.of(context).colorScheme.onPrimary,
                         selected,
                       ),
                       size: lerpDouble(26, 17, t),
@@ -216,8 +215,8 @@ class CategoryChip extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                       style: labelStyle.copyWith(
                         color: Color.lerp(
-                          AppColors.textSecondary,
-                          AppColors.textPrimary,
+                          Theme.of(context).colorScheme.onSurfaceVariant,
+                          Theme.of(context).colorScheme.onSurface,
                           selected,
                         ),
                       ),

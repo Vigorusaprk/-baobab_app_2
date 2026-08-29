@@ -1,4 +1,4 @@
-import 'package:baobabe_0_2/core/themes/app_colors.dart';
+import 'package:baobabe_0_2/core/themes/other_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import '../../domain/entities/feed_item.dart';
@@ -23,21 +23,29 @@ class FeedItemCard extends StatelessWidget {
         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
-          color: item.isRead ? AppColors.background : AppColors.white,
+          color: item.isRead
+              ? Theme.of(context).colorScheme.surface
+              : Theme.of(context).colorScheme.surfaceContainerLowest,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: _isPromo ? AppColors.rating : AppColors.secondaryLight,
+            color: _isPromo
+                ? OtherTheme.of(context).rating
+                : Theme.of(context).colorScheme.outlineVariant,
           ),
         ),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             SvgPicture.asset(
-              _isPromo ? 'assets/icons/offer.svg' : 'assets/icons/notifications.svg',
+              _isPromo
+                  ? 'assets/icons/offer.svg'
+                  : 'assets/icons/notifications.svg',
               height: 30,
               width: 30,
               colorFilter: ColorFilter.mode(
-                _isPromo ? AppColors.ratingContent : AppColors.textSecondary,
+                _isPromo
+                    ? OtherTheme.of(context).onRatingContainer
+                    : Theme.of(context).colorScheme.onSurfaceVariant,
                 BlendMode.srcIn,
               ),
             ),
@@ -49,17 +57,22 @@ class FeedItemCard extends StatelessWidget {
                   Text(
                     item.title,
                     style: TextStyle(
-                      fontWeight: item.isRead ? FontWeight.normal : FontWeight.bold,
+                      fontWeight: item.isRead
+                          ? FontWeight.normal
+                          : FontWeight.bold,
                     ),
                   ),
                   const SizedBox(height: 4),
-                  Text(item.message, style: const TextStyle(fontSize: 13)),
+                  Text(
+                    item.message,
+                    style: Theme.of(context).textTheme.labelSmall!,
+                  ),
                   if (item.actionLabel != null) ...[
                     const SizedBox(height: 8),
                     Text(
                       item.actionLabel!,
                       style: TextStyle(
-                        color: AppColors.ratingContent,
+                        color: OtherTheme.of(context).onRatingContainer,
                         fontWeight: FontWeight.w600,
                       ),
                     ),

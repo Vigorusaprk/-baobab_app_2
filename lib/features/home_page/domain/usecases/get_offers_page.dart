@@ -23,9 +23,10 @@ class GetOffersPage implements UseCase<OffersPage, GetOffersPageParams> {
   GetOffersPage(this.repository);
 
   @override
-  Future<OffersPage> call(GetOffersPageParams params) => repository.getOffersPage(
-    section: params.section,
-    page: params.page,
-    category: params.category,
-  );
+  Future<OffersPage> call(GetOffersPageParams params) =>
+      repository.getOffersPage(
+        section: params.section,
+        page: params.page,
+        category: params.category,
+      );
 }

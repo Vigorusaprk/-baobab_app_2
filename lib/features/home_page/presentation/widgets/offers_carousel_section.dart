@@ -1,9 +1,7 @@
-import 'package:baobabe_0_2/core/themes/app_colors.dart';
 import 'package:baobabe_0_2/core/themes/app_diemens.dart';
 import 'package:baobabe_0_2/features/business_detail/domain/entities/offer.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/widgets/offer_card_widget.dart';
 import 'package:flutter/material.dart';
-import 'package:baobabe_0_2/core/themes/app_fonts.dart';
 import 'package:go_router/go_router.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
@@ -126,7 +124,7 @@ class _SeeMoreTile extends StatelessWidget {
     return SizedBox(
       width: width,
       child: Material(
-        color: AppColors.white,
+        color: Theme.of(context).colorScheme.surfaceContainerLowest,
         borderRadius: AppDimens.cardBorderRadiusAll,
         child: InkWell(
           borderRadius: AppDimens.cardBorderRadiusAll,
@@ -137,14 +135,14 @@ class _SeeMoreTile extends StatelessWidget {
               children: [
                 Icon(
                   isLoading ? Icons.more_horiz_rounded : Icons.arrow_forward,
-                  color: AppColors.primary,
+                  color: Theme.of(context).colorScheme.primary,
                 ),
                 AppDimens.spacerSmall,
                 Text(
                   isLoading ? 'Chargement…' : 'Voir plus',
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     fontWeight: FontWeight.w700,
-                    color: AppColors.primary,
+                    color: Theme.of(context).colorScheme.primary,
                   ),
                 ),
               ],
@@ -180,7 +178,10 @@ class OffersCarouselSkeleton extends StatelessWidget {
       children: [
         Padding(
           padding: AppDimens.appPadding,
-          child: Bone.text(width: titleWidth, style: AppFonts.titleMedium),
+          child: Bone.text(
+            width: titleWidth,
+            style: Theme.of(context).textTheme.titleMedium!,
+          ),
         ),
         const SizedBox(height: 10),
         SizedBox(

@@ -1,4 +1,3 @@
-import 'package:baobabe_0_2/core/themes/app_colors.dart';
 import 'package:baobabe_0_2/features/home_page/domain/entities/category_entity.dart';
 import 'package:flutter/material.dart';
 
@@ -41,15 +40,18 @@ class UICategory {
 
   IconData get icon => _icons[category.icon] ?? Icons.explore;
 
-  Color get color => _parseColor(category.color);
+  /// La couleur envoyée par le serveur, ou le vert de la marque si elle est
+  /// illisible.
+  Color color(BuildContext context) =>
+      _parseColor(category.color) ?? Theme.of(context).colorScheme.secondary;
 
-  static Color _parseColor(String value) {
-    final normalized = value.trim().replaceFirst('#', '').replaceFirst(
-      '0x',
-      '',
-    );
+  static Color? _parseColor(String value) {
+    final normalized = value
+        .trim()
+        .replaceFirst('#', '')
+        .replaceFirst('0x', '');
     final parsed = int.tryParse(normalized, radix: 16);
-    if (parsed == null) return AppColors.secondary;
+    if (parsed == null) return null;
     // Une valeur sans canal alpha (RRGGBB) est rendue opaque.
     return Color(normalized.length <= 6 ? 0xFF000000 | parsed : parsed);
   }

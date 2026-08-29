@@ -1,4 +1,3 @@
-import 'package:baobabe_0_2/core/themes/app_fonts.dart';
 import 'package:flutter/material.dart';
 
 class CustomTextFormField extends StatelessWidget {
@@ -23,7 +22,7 @@ class CustomTextFormField extends StatelessWidget {
       keyboardType: TextInputType.emailAddress,
       validator: validator,
       enabled: enabled,
-      style: AppFonts.inputTextStyle,
+      style: Theme.of(context).textTheme.bodyMedium,
       decoration: InputDecoration(hintText: hintText),
     );
   }

@@ -41,8 +41,9 @@ void main() {
     return MaterialApp(
       home: Scaffold(
         body: BlocProvider(
-          create: (_) =>
-              CategoryBloc(categoryRepository: _ServerCategories(serverCategories)),
+          create: (_) => CategoryBloc(
+            categoryRepository: _ServerCategories(serverCategories),
+          ),
           child: Align(
             alignment: Alignment.topLeft,
             child: CategoryIcons(
@@ -85,8 +86,22 @@ void main() {
   ) async {
     await tester.pumpWidget(
       harness(const [
-        Category(id: 'a', slug: 'event', displayName: 'Concerts', icon: 'celebration', color: '0xFFF04452', sortOrder: 1),
-        Category(id: 'b', slug: 'cosmetics', displayName: 'Beauté', icon: 'auto_awesome', color: '0xFFEC4899', sortOrder: 2),
+        Category(
+          id: 'a',
+          slug: 'event',
+          displayName: 'Concerts',
+          icon: 'celebration',
+          color: '0xFFF04452',
+          sortOrder: 1,
+        ),
+        Category(
+          id: 'b',
+          slug: 'cosmetics',
+          displayName: 'Beauté',
+          icon: 'auto_awesome',
+          color: '0xFFEC4899',
+          sortOrder: 2,
+        ),
       ]),
     );
     await tester.pumpAndSettle();
@@ -105,6 +120,9 @@ void main() {
 
   test('le libellé d\'écran se résout depuis la liste du serveur', () {
     expect(Category.displayNameForSlug('pharmacie', [inedite]), 'Pharmacies');
-    expect(Category.displayNameForSlug('all', [inedite]), 'Tous les établissements');
+    expect(
+      Category.displayNameForSlug('all', [inedite]),
+      'Tous les établissements',
+    );
   });
 }

@@ -1,4 +1,3 @@
-import 'package:baobabe_0_2/core/themes/app_colors.dart';
 import 'package:baobabe_0_2/core/themes/app_diemens.dart';
 import 'package:baobabe_0_2/features/merchant/presentation/cubit/merchant_cubit.dart';
 import 'package:baobabe_0_2/features/merchant/presentation/screens/merchant_dashboard_screen.dart';
@@ -74,7 +73,8 @@ class _MerchantShellState extends State<MerchantShell> {
           body: MerchantEmptyState(
             icon: Icons.storefront_outlined,
             title: 'Espace commerçant indisponible',
-            message: 'Reconnectez-vous pour retrouver la gestion de votre '
+            message:
+                'Reconnectez-vous pour retrouver la gestion de votre '
                 'commerce.',
           ),
           bottomNavigationBar: SafeArea(
@@ -113,9 +113,9 @@ class _MerchantShellState extends State<MerchantShell> {
             ),
             Text(
               'Espace commerçant',
-              style: Theme.of(
-                context,
-              ).textTheme.bodySmall?.copyWith(color: AppColors.textSecondary),
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
             ),
           ],
         ),
@@ -199,7 +199,7 @@ class _NavBar extends StatelessWidget {
                     curve: Curves.easeInOut,
                     decoration: isSelected
                         ? BoxDecoration(
-                            color: AppColors.primary,
+                            color: Theme.of(context).colorScheme.primary,
                             borderRadius: BorderRadius.circular(
                               AppDimens.radius50,
                             ),
@@ -214,13 +214,12 @@ class _NavBar extends StatelessWidget {
                       children: [
                         Badge(
                           isLabelVisible: showBadge,
-                          backgroundColor: AppColors.errorContent,
                           child: Icon(
                             isSelected ? tab.filled : tab.outlined,
                             size: 20,
                             color: isSelected
-                                ? AppColors.white
-                                : AppColors.primary,
+                                ? Theme.of(context).colorScheme.onPrimary
+                                : Theme.of(context).colorScheme.primary,
                           ),
                         ),
                         if (isSelected) ...[
@@ -229,7 +228,9 @@ class _NavBar extends StatelessWidget {
                             tab.label,
                             style: Theme.of(context).textTheme.bodySmall
                                 ?.copyWith(
-                                  color: AppColors.white,
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.onPrimary,
                                   fontWeight: FontWeight.w600,
                                 ),
                           ),

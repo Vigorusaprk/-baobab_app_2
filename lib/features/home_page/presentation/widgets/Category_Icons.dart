@@ -100,36 +100,36 @@ class CategoryIcons extends StatelessWidget {
   ) {
     final t = collapseProgress.clamp(0.0, 1.0);
     return SizedBox(
-          height: CategoryIconsMetrics.heightFor(t),
-          child: ListView.builder(
-            scrollDirection: Axis.horizontal,
-            physics: const BouncingScrollPhysics(),
-            itemCount: categories.length,
-            itemBuilder: (context, index) {
-              final uiCategory = UICategory(categories[index]);
-              final bool isActive =
-                  selectedCategory.slug == uiCategory.category.slug;
+      height: CategoryIconsMetrics.heightFor(t),
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        physics: const BouncingScrollPhysics(),
+        itemCount: categories.length,
+        itemBuilder: (context, index) {
+          final uiCategory = UICategory(categories[index]);
+          final bool isActive =
+              selectedCategory.slug == uiCategory.category.slug;
 
-              return GestureDetector(
-                onTap: () => _handleTap(context, uiCategory.category),
-                child: Padding(
-                  padding: EdgeInsets.only(
-                    left: index == 0 ? AppDimens.appPaddingValue : 4.0,
-                    right: index == categories.length - 1
-                        ? AppDimens.appPaddingValue
-                        : 4.0,
-                    top: lerpDouble(8.0, 4.0, t)!,
-                    bottom: lerpDouble(8.0, 4.0, t)!,
-                  ),
-                  child: CategoryChip(
-                    uiCategory: uiCategory,
-                    isActive: isActive,
-                    collapseProgress: t,
-                  ),
-                ),
-              );
-            },
-          ),
-        );
+          return GestureDetector(
+            onTap: () => _handleTap(context, uiCategory.category),
+            child: Padding(
+              padding: EdgeInsets.only(
+                left: index == 0 ? AppDimens.appPaddingValue : 4.0,
+                right: index == categories.length - 1
+                    ? AppDimens.appPaddingValue
+                    : 4.0,
+                top: lerpDouble(8.0, 4.0, t)!,
+                bottom: lerpDouble(8.0, 4.0, t)!,
+              ),
+              child: CategoryChip(
+                uiCategory: uiCategory,
+                isActive: isActive,
+                collapseProgress: t,
+              ),
+            ),
+          );
+        },
+      ),
+    );
   }
 }

@@ -1,5 +1,5 @@
+import 'package:baobabe_0_2/core/themes/other_theme.dart';
 import 'package:flutter/material.dart';
-import 'package:baobabe_0_2/core/themes/app_colors.dart';
 
 enum OrderStatus { pending, confirmed, preparing, ready, delivered, cancelled }
 
@@ -39,37 +39,37 @@ extension OrderStatusExtension on OrderStatus {
   /// Une commande livrée redevient neutre volontairement : elles finissent
   /// par former l'essentiel de l'historique, et les laisser en vert
   /// noierait les rares qui demandent encore quelque chose.
-  Color get color {
+  Color color(BuildContext context) {
     switch (this) {
       case OrderStatus.pending:
-        return AppColors.warningContent;
+        return OtherTheme.of(context).onWarningContainer;
       case OrderStatus.confirmed:
-        return AppColors.secondary;
+        return Theme.of(context).colorScheme.secondary;
       case OrderStatus.preparing:
-        return AppColors.primary;
+        return Theme.of(context).colorScheme.primary;
       case OrderStatus.ready:
-        return AppColors.successContent;
+        return OtherTheme.of(context).onSuccessContainer;
       case OrderStatus.delivered:
-        return AppColors.textSecondary;
+        return Theme.of(context).colorScheme.onSurfaceVariant;
       case OrderStatus.cancelled:
-        return AppColors.errorContent;
+        return Theme.of(context).colorScheme.error;
     }
   }
 
   /// Le fond de pastille assorti, explicite plutôt qu'obtenu par opacité.
-  Color get surface {
+  Color surface(BuildContext context) {
     switch (this) {
       case OrderStatus.pending:
-        return AppColors.warningSurface;
+        return OtherTheme.of(context).warningContainer;
       case OrderStatus.confirmed:
       case OrderStatus.preparing:
-        return AppColors.primarySurface;
+        return Theme.of(context).colorScheme.primaryContainer;
       case OrderStatus.ready:
-        return AppColors.successSurface;
+        return OtherTheme.of(context).successContainer;
       case OrderStatus.delivered:
-        return AppColors.background;
+        return Theme.of(context).colorScheme.surface;
       case OrderStatus.cancelled:
-        return AppColors.errorSurface;
+        return Theme.of(context).colorScheme.errorContainer;
     }
   }
 }

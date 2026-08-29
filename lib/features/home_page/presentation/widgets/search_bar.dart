@@ -1,6 +1,5 @@
 import 'package:baobabe_0_2/core/widgets/custom_card.dart';
 import 'package:flutter/material.dart';
-import 'package:baobabe_0_2/core/themes/app_colors.dart';
 
 class SearchAppBar extends StatelessWidget {
   final TextEditingController controller;
@@ -23,7 +22,11 @@ class SearchAppBar extends StatelessWidget {
       child: Row(
         children: [
           const SizedBox(width: 12),
-          Icon(Icons.search, color: AppColors.textSecondary, size: 25),
+          Icon(
+            Icons.search,
+            color: Theme.of(context).colorScheme.onSurfaceVariant,
+            size: 25,
+          ),
           const SizedBox(width: 8),
           Expanded(
             child: TextField(
@@ -32,9 +35,11 @@ class SearchAppBar extends StatelessWidget {
               onSubmitted: onSubmitted,
               decoration: InputDecoration(
                 hintText: hintText,
-                hintStyle: TextStyle(color: AppColors.textSecondary),
+                hintStyle: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
                 border: InputBorder.none,
-                fillColor: AppColors.transparent,
+                fillColor: Colors.transparent,
                 contentPadding: const EdgeInsets.symmetric(vertical: 12),
               ),
             ),

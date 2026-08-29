@@ -48,7 +48,11 @@ class ReviewListItem extends StatelessWidget {
                     ),
                     Row(
                       children: [
-                        ...buildReviewStars(review.rating.toDouble(), 12),
+                        ...buildReviewStars(
+                          context,
+                          review.rating.toDouble(),
+                          12,
+                        ),
                         const SizedBox(width: 8),
                         Text(
                           ' • ${_formatDate(review.createdAt)}',

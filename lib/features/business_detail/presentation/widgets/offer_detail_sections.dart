@@ -1,7 +1,8 @@
-import 'package:baobabe_0_2/core/themes/app_colors.dart';
+import 'package:baobabe_0_2/core/widgets/remote_image.dart';
 import 'package:baobabe_0_2/core/themes/app_diemens.dart';
 import 'package:baobabe_0_2/features/business_detail/domain/entities/offer.dart';
 import 'package:baobabe_0_2/features/business_detail/domain/entities/offer_detail.dart';
+import 'package:baobabe_0_2/core/themes/other_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
@@ -23,11 +24,7 @@ class OfferDetailHeader extends StatelessWidget {
         fit: StackFit.expand,
         children: [
           if (image != null)
-            Image.network(
-              image,
-              fit: BoxFit.cover,
-              errorBuilder: (_, _, _) => const _ImageFallback(),
-            )
+            RemoteImage(url: image, fallback: const _ImageFallback())
           else
             const _ImageFallback(),
           Positioned(
@@ -36,10 +33,10 @@ class OfferDetailHeader extends StatelessWidget {
             child: OfferBadge(
               label: offer.fulfilment.badge,
               color: offer.isOrderable
-                  ? AppColors.secondary
+                  ? Theme.of(context).colorScheme.secondary
                   : offer.isBookable
-                  ? AppColors.primary
-                  : AppColors.warningContent,
+                  ? Theme.of(context).colorScheme.primary
+                  : OtherTheme.of(context).onWarningContainer,
             ),
           ),
         ],
@@ -53,12 +50,12 @@ class _ImageFallback extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const ColoredBox(
-      color: AppColors.background,
+    return ColoredBox(
+      color: Theme.of(context).colorScheme.surface,
       child: Icon(
         Icons.image_outlined,
         size: 40,
-        color: AppColors.textSecondary,
+        color: Theme.of(context).colorScheme.onSurfaceVariant,
       ),
     );
   }
@@ -81,7 +78,7 @@ class OfferBadge extends StatelessWidget {
       child: Text(
         label,
         style: Theme.of(context).textTheme.bodySmall?.copyWith(
-          color: AppColors.white,
+          color: Theme.of(context).colorScheme.onPrimary,
           fontWeight: FontWeight.w700,
         ),
       ),
@@ -135,7 +132,11 @@ class OfferFacts extends StatelessWidget {
             padding: const EdgeInsets.only(bottom: 8),
             child: Row(
               children: [
-                Icon(icon, size: 18, color: AppColors.textSecondary),
+                Icon(
+                  icon,
+                  size: 18,
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
                 AppDimens.spacerSmallWidth,
                 Expanded(
                   child: Text(
@@ -160,7 +161,7 @@ class OfferMerchantCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: AppColors.white,
+      color: Theme.of(context).colorScheme.surfaceContainerLowest,
       borderRadius: AppDimens.cardBorderRadiusAll,
       child: InkWell(
         borderRadius: AppDimens.cardBorderRadiusAll,
@@ -178,10 +179,9 @@ class OfferMerchantCard extends StatelessWidget {
                   width: 48,
                   height: 48,
                   child: merchant.image != null && merchant.image!.isNotEmpty
-                      ? Image.network(
-                          merchant.image!,
-                          fit: BoxFit.cover,
-                          errorBuilder: (_, _, _) => const _ImageFallback(),
+                      ? RemoteImage(
+                          url: merchant.image,
+                          fallback: const _ImageFallback(),
                         )
                       : const _ImageFallback(),
                 ),
@@ -206,13 +206,16 @@ class OfferMerchantCard extends StatelessWidget {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: AppColors.textSecondary,
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
                       ),
                     ),
                   ],
                 ),
               ),
-              const Icon(Icons.chevron_right, color: AppColors.textSecondary),
+              Icon(
+                Icons.chevron_right,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
             ],
           ),
         ),

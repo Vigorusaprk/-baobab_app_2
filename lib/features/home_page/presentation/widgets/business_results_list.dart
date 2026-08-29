@@ -19,9 +19,7 @@ class BusinessResultsList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (matches.isEmpty) {
-      return const Center(
-        child: Text('Aucun établissement pour ce budget.'),
-      );
+      return const Center(child: Text('Aucun établissement pour ce budget.'));
     }
 
     return ListView.builder(

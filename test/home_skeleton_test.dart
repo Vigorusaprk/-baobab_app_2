@@ -9,7 +9,10 @@ import 'package:skeletonizer/skeletonizer.dart';
 
 Widget _wrap(Widget child) => MaterialApp(
   home: Scaffold(
-    body: Skeletonizer(enabled: true, child: SingleChildScrollView(child: child)),
+    body: Skeletonizer(
+      enabled: true,
+      child: SingleChildScrollView(child: child),
+    ),
   ),
 );
 

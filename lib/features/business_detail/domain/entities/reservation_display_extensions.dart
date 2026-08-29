@@ -27,24 +27,26 @@ extension ReservationDisplayExtensions on Reservation {
     }
   }
 
-  Color get typeColor {
+  /// Voir [UIBusiness.categoryColor] : même palette, même raison.
+  Color typeColor(BuildContext context) {
+    final palette = OtherTheme.of(context).categories;
     switch (reservationType) {
       case 'hotel':
-        return BusinessCategoryColors.hotel;
+        return palette.hotel;
       case 'restaurant':
-        return BusinessCategoryColors.restaurant;
+        return palette.restaurant;
       case 'car_rental':
-        return BusinessCategoryColors.carRental;
+        return palette.carRental;
       case 'travel':
-        return BusinessCategoryColors.travelAgency;
+        return palette.travelAgency;
       case 'spa':
-        return BusinessCategoryColors.spa;
+        return palette.spa;
       case 'cinema':
-        return BusinessCategoryColors.cinema;
+        return palette.cinema;
       case 'toursime':
-        return BusinessCategoryColors.tourism;
+        return palette.tourism;
       default:
-        return AppColors.textSecondary;
+        return palette.fallback;
     }
   }
 

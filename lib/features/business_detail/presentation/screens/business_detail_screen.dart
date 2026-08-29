@@ -1,7 +1,3 @@
-import 'package:baobabe_0_2/core/themes/app_colors.dart';
-import 'package:baobabe_0_2/features/home_page/data/repositories/business_remote_datasource_impl.dart';
-import 'package:baobabe_0_2/features/home_page/data/repositories/business_repository_impl.dart';
-import 'package:baobabe_0_2/features/business_detail/domain/usecases/get_business_detail.dart';
 import 'package:baobabe_0_2/features/business_detail/presentation/bloc/business_detail_bloc.dart';
 import 'package:baobabe_0_2/features/business_detail/presentation/widgets/business_contact_section.dart';
 import 'package:baobabe_0_2/features/business_detail/presentation/widgets/business_hours_section.dart';
@@ -39,17 +35,12 @@ class _BusinessDetailScreenState extends State<BusinessDetailScreen> {
   Widget build(BuildContext context) {
     return BlocProvider<BusinessDetailBloc>(
       create: (context) {
-        final repository = BusinessRepositoryImpl(
-          remoteDataSource: BusinessRemoteDataSourceImpl(),
-        );
-        return BusinessDetailBloc(
-          getBusinessDetail: GetBusinessDetail(repository),
-        )..add(LoadBusinessDetail(widget.businessId));
+        return BusinessDetailBloc()..add(LoadBusinessDetail(widget.businessId));
       },
       child: BlocBuilder<BusinessDetailBloc, BusinessDetailState>(
         builder: (context, state) {
           return Scaffold(
-            backgroundColor: AppColors.background,
+            backgroundColor: Theme.of(context).colorScheme.surface,
             body: _buildContent(context, state),
           );
         },
@@ -61,10 +52,7 @@ class _BusinessDetailScreenState extends State<BusinessDetailScreen> {
     // 1. ÉTAT CHARGEMENT INITIAL OU INITIALISATION
     if (state.detailStatus == BusinessDetailStatus.loading ||
         state.detailStatus == BusinessDetailStatus.initial) {
-      return const Skeletonizer(
-        enabled: true,
-        child: BusinessDetailSkeleton(),
-      );
+      return const Skeletonizer(enabled: true, child: BusinessDetailSkeleton());
     }
 
     // 2. ÉTAT ERREUR DE CHARGEMENT DES DÉTAILS
@@ -79,7 +67,9 @@ class _BusinessDetailScreenState extends State<BusinessDetailScreen> {
                 state.detailErrorMessage ??
                     "Impossible de charger les détails.",
                 textAlign: TextAlign.center,
-                style: const TextStyle(color: AppColors.errorContent, fontSize: 16),
+                style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                  color: Theme.of(context).colorScheme.error,
+                ),
               ),
               const SizedBox(height: 16),
               ElevatedButton(
@@ -121,7 +111,7 @@ class _BusinessDetailScreenState extends State<BusinessDetailScreen> {
                   const SizedBox(height: 24),
                   BusinessAboutSection(business: business),
                   const SizedBox(height: 24),
-                  BusinessOffersSection(businessId: business.id),
+                  BusinessOffersSection(offers: state.offers),
                   const BusinessSectionTitle('Contact & Accès'),
                   BusinessContactSection(business: business),
                   const SizedBox(height: 24),

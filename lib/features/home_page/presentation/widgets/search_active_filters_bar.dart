@@ -1,4 +1,3 @@
-import 'package:baobabe_0_2/core/themes/app_colors.dart';
 import 'package:baobabe_0_2/features/home_page/domain/entities/business_entity.dart'
     show BusinessType;
 import 'package:baobabe_0_2/features/home_page/domain/entities/search_filter_entity.dart';
@@ -97,7 +96,9 @@ class SearchActiveFiltersBar extends StatelessWidget {
               },
               child: Text(
                 'Tout effacer',
-                style: TextStyle(color: AppColors.secondary),
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.secondary,
+                ),
               ),
             ),
           ],

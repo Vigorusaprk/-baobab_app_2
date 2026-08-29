@@ -1,5 +1,3 @@
-import 'package:baobabe_0_2/core/themes/app_colors.dart';
-import 'package:baobabe_0_2/core/themes/app_fonts.dart';
 import 'package:baobabe_0_2/features/business_detail/presentation/widgets/common/responsive_container.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/widgets/offers_carousel_section.dart';
 import 'package:flutter/material.dart';
@@ -77,16 +75,19 @@ class _AboutSectionSkeleton extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Bone.text(width: 100, style: AppFonts.titleMedium),
+        Bone.text(width: 100, style: Theme.of(context).textTheme.titleMedium!),
         const SizedBox(height: 12),
         Container(
           width: double.infinity,
           padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
-            color: const Color(0xFFF8F9FA),
+            color: Theme.of(context).colorScheme.surfaceContainerLowest,
             borderRadius: BorderRadius.circular(24),
           ),
-          child: Bone.multiText(lines: 3, style: AppFonts.bodyMedium),
+          child: Bone.multiText(
+            lines: 3,
+            style: Theme.of(context).textTheme.bodyMedium!,
+          ),
         ),
       ],
     );
@@ -105,7 +106,10 @@ class _BlockSkeleton extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Bone.text(width: titleWidth, style: AppFonts.titleMedium),
+        Bone.text(
+          width: titleWidth,
+          style: Theme.of(context).textTheme.titleMedium!,
+        ),
         const SizedBox(height: 12),
         const Bone(width: double.infinity, height: 90, uniRadius: 20),
       ],
@@ -122,7 +126,7 @@ class _SpecificSectionSkeleton extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Bone.text(width: 180, style: AppFonts.titleMedium),
+        Bone.text(width: 180, style: Theme.of(context).textTheme.titleMedium!),
         const SizedBox(height: 12),
         const Wrap(
           spacing: 10,
@@ -152,7 +156,7 @@ class ReviewSectionSkeleton extends StatelessWidget {
         Container(
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(20),
-            color: AppColors.white,
+            color: Theme.of(context).colorScheme.surfaceContainerLowest,
           ),
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
           child: Row(
@@ -161,7 +165,10 @@ class ReviewSectionSkeleton extends StatelessWidget {
               Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Bone.text(width: 30, style: AppFonts.bodyLarge),
+                  Bone.text(
+                    width: 30,
+                    style: Theme.of(context).textTheme.bodyLarge!,
+                  ),
                   const SizedBox(height: 6),
                   const Bone(width: 70, height: 14, uniRadius: 4),
                 ],
@@ -169,9 +176,15 @@ class ReviewSectionSkeleton extends StatelessWidget {
               Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Bone.text(width: 24, style: AppFonts.bodyMedium),
+                  Bone.text(
+                    width: 24,
+                    style: Theme.of(context).textTheme.bodyMedium!,
+                  ),
                   const SizedBox(height: 6),
-                  Bone.text(width: 30, style: AppFonts.bodySmall),
+                  Bone.text(
+                    width: 30,
+                    style: Theme.of(context).textTheme.bodySmall!,
+                  ),
                 ],
               ),
               const Bone.button(width: 120, height: 36, uniRadius: 20),
@@ -183,7 +196,7 @@ class ReviewSectionSkeleton extends StatelessWidget {
           2,
           (_) => Container(
             decoration: BoxDecoration(
-              color: AppColors.white,
+              color: Theme.of(context).colorScheme.surfaceContainerLowest,
               borderRadius: BorderRadius.circular(20),
             ),
             margin: const EdgeInsets.only(bottom: 12),
@@ -200,7 +213,10 @@ class ReviewSectionSkeleton extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Bone.text(width: 100, style: AppFonts.bodyMedium),
+                          Bone.text(
+                            width: 100,
+                            style: Theme.of(context).textTheme.bodyMedium!,
+                          ),
                           const SizedBox(height: 6),
                           const Bone(width: 90, height: 12, uniRadius: 4),
                         ],
@@ -209,7 +225,10 @@ class ReviewSectionSkeleton extends StatelessWidget {
                   ],
                 ),
                 const SizedBox(height: 8),
-                Bone.multiText(lines: 2, style: AppFonts.bodyMedium),
+                Bone.multiText(
+                  lines: 2,
+                  style: Theme.of(context).textTheme.bodyMedium!,
+                ),
               ],
             ),
           ),

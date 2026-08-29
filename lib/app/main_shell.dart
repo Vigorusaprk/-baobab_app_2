@@ -1,5 +1,4 @@
-﻿import 'package:baobabe_0_2/core/themes/app_colors.dart';
-import 'package:baobabe_0_2/core/themes/app_diemens.dart';
+﻿import 'package:baobabe_0_2/core/themes/app_diemens.dart';
 import 'package:baobabe_0_2/features/auth/presentation/bloc/auth_session_cubit.dart';
 import 'package:baobabe_0_2/features/merchant/presentation/cubit/merchant_cubit.dart';
 import 'package:baobabe_0_2/features/settings/presentation/widgets/settings_app_bar.dart';
@@ -162,9 +161,9 @@ class _MainShellState extends State<MainShell> {
     required int index,
     required bool isSelected,
   }) {
-    final Color selectedBgColor = AppColors.primary;
-    final Color selectedIconColor = AppColors.white;
-    final Color unselectedIconColor = AppColors.primary;
+    final Color selectedBgColor = Theme.of(context).colorScheme.primary;
+    final Color selectedIconColor = Theme.of(context).colorScheme.onPrimary;
+    final Color unselectedIconColor = Theme.of(context).colorScheme.primary;
 
     return Semantics(
       label: label,

@@ -3,7 +3,6 @@ import 'package:baobabe_0_2/features/home_page/presentation/widgets/location_fil
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
-
 /// Carte affichant les résultats. Marker vert = dans le budget,
 /// marker orange = hors budget mais dans le rayon (visible quand même,
 /// pour laisser le choix à l'utilisateur plutôt que de le cacher).
@@ -25,34 +24,34 @@ class ResultsMapView extends StatelessWidget {
       Marker(
         markerId: const MarkerId('user'),
         position: LatLng(userLocation.latitude, userLocation.longitude),
-        icon: BitmapDescriptor.defaultMarkerWithHue(
-          BitmapDescriptor.hueBlue,
-        ),
+        icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
         infoWindow: const InfoWindow(title: 'Vous'),
       ),
       ...matches
-      // Sécurité : si jamais un match sans coordonnées arrive ici,
-      // on l'ignore plutôt que de crasher (le repository est censé
-      // déjà filtrer, mais on ne veut pas dépendre de ça pour la carte).
-          .where((match) =>
-      match.business.latitude != null &&
-          match.business.longitude != null)
+          // Sécurité : si jamais un match sans coordonnées arrive ici,
+          // on l'ignore plutôt que de crasher (le repository est censé
+          // déjà filtrer, mais on ne veut pas dépendre de ça pour la carte).
+          .where(
+            (match) =>
+                match.business.latitude != null &&
+                match.business.longitude != null,
+          )
           .map((match) {
-        return Marker(
-          markerId: MarkerId(match.business.id),
-          position: LatLng(
-            match.business.latitude!,
-            match.business.longitude!,
-          ),
-          icon: BitmapDescriptor.defaultMarkerWithHue(
-            match.matchesBudget
-                ? BitmapDescriptor.hueGreen
-                : BitmapDescriptor.hueOrange,
-          ),
-          infoWindow: InfoWindow(title: match.business.name),
-          onTap: () => onMarkerTap(match),
-        );
-      }),
+            return Marker(
+              markerId: MarkerId(match.business.id),
+              position: LatLng(
+                match.business.latitude!,
+                match.business.longitude!,
+              ),
+              icon: BitmapDescriptor.defaultMarkerWithHue(
+                match.matchesBudget
+                    ? BitmapDescriptor.hueGreen
+                    : BitmapDescriptor.hueOrange,
+              ),
+              infoWindow: InfoWindow(title: match.business.name),
+              onTap: () => onMarkerTap(match),
+            );
+          }),
     };
 
     return GoogleMap(

@@ -1,6 +1,5 @@
-import 'package:baobabe_0_2/core/themes/business_category_colors.dart';
+import 'package:baobabe_0_2/core/themes/other_theme.dart';
 import 'package:flutter/material.dart';
-import 'package:baobabe_0_2/core/themes/app_colors.dart';
 import 'package:baobabe_0_2/features/home_page/domain/entities/business_entity.dart';
 import 'package:baobabe_0_2/features/order/domain/entities/order_item.dart';
 import 'package:baobabe_0_2/features/order/domain/entities/order_parsing_utils.dart';
@@ -216,32 +215,33 @@ class Order {
     }
   }
 
-  Color get typeColor {
+  /// Voir [UIBusiness.categoryColor] : la palette catégorielle vit dans le
+  /// thème, donc la couleur se lit avec un contexte.
+  Color typeColor(BuildContext context) {
+    final palette = OtherTheme.of(context).categories;
     switch (establishmentType) {
       case BusinessType.hotel:
-        return BusinessCategoryColors.hotel;
+        return palette.hotel;
       case BusinessType.carRental:
-        return BusinessCategoryColors.carRental;
+        return palette.carRental;
       case BusinessType.travelAgency:
-        return BusinessCategoryColors.travelAgency;
+        return palette.travelAgency;
       case BusinessType.spa:
-        return BusinessCategoryColors.spa;
+        return palette.spa;
       case BusinessType.cinema:
-        return BusinessCategoryColors.cinema;
+        return palette.cinema;
       case BusinessType.tourism:
-        return BusinessCategoryColors.tourism;
+        return palette.tourism;
       case BusinessType.restaurant:
-        return BusinessCategoryColors.restaurant;
+        return palette.restaurant;
       case BusinessType.fastFood:
-        return BusinessCategoryColors.fastFood;
+        return palette.fastFood;
       case BusinessType.shopping:
-        return BusinessCategoryColors.shopping;
+        return palette.shopping;
       case BusinessType.mall:
-        return BusinessCategoryColors.mall;
-      case BusinessType.other:
-        return AppColors.textSecondary;
+        return palette.mall;
       default:
-        return AppColors.textSecondary;
+        return palette.fallback;
     }
   }
 }

@@ -18,8 +18,9 @@ class BudgetFinderPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => BudgetFinderBloc(repository: BudgetFinderRepositoryImpl())
-        ..add(const LoadBusinesses()),
+      create: (_) =>
+          BudgetFinderBloc(repository: BudgetFinderRepositoryImpl())
+            ..add(const LoadBusinesses()),
       child: const _BudgetFinderView(),
     );
   }
@@ -44,8 +45,9 @@ class _BudgetFinderView extends StatelessWidget {
               // Formulaire de filtres budget.
               BudgetFilterPanel(
                 budget: budget,
-                onChanged: (newBudget) =>
-                    context.read<BudgetFinderBloc>().add(BudgetChanged(newBudget)),
+                onChanged: (newBudget) => context.read<BudgetFinderBloc>().add(
+                  BudgetChanged(newBudget),
+                ),
               ),
               const Divider(height: 24),
               Expanded(child: _buildBody(context, state)),

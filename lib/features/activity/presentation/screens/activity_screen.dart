@@ -1,4 +1,3 @@
-﻿import 'package:baobabe_0_2/core/themes/app_colors.dart';
 import 'package:baobabe_0_2/core/services/session_service.dart';
 import 'package:baobabe_0_2/features/activity/presentation/widgets/activity_skeleton.dart';
 import 'package:baobabe_0_2/features/activity/presentation/widgets/rate_offer_sheet.dart';
@@ -10,6 +9,7 @@ import 'package:baobabe_0_2/features/order/presentation/widgets/order_card.dart'
 import 'package:baobabe_0_2/features/order/presentation/widgets/order_empty_states.dart';
 import 'package:baobabe_0_2/features/booking_page/presentation/widgets/reservation_card.dart';
 import 'package:baobabe_0_2/features/booking_page/presentation/widgets/reservation_empty_state.dart';
+import 'package:baobabe_0_2/core/themes/other_theme.dart';
 import 'package:flutter/material.dart';
 
 /// Body-only content for the Orders/Activity tab. The Scaffold is owned by
@@ -72,21 +72,23 @@ class _ActivityScreenState extends State<ActivityScreen>
   @override
   Widget build(BuildContext context) {
     return ColoredBox(
-      color: AppColors.background,
+      color: Theme.of(context).colorScheme.surface,
       child: Column(
         children: [
           Padding(
             padding: const EdgeInsets.fromLTRB(20, 55, 20, 10),
             child: Row(
               children: [
-                Icon(Icons.assignment, color: AppColors.primary, size: 32),
+                Icon(
+                  Icons.assignment,
+                  color: Theme.of(context).colorScheme.primary,
+                  size: 32,
+                ),
                 const SizedBox(width: 12),
                 Text(
                   'Mes activités',
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.primary,
+                  style: Theme.of(context).textTheme.displaySmall!.copyWith(
+                    color: Theme.of(context).colorScheme.primary,
                   ),
                 ),
                 const Spacer(),
@@ -96,15 +98,14 @@ class _ActivityScreenState extends State<ActivityScreen>
                     vertical: 6,
                   ),
                   decoration: BoxDecoration(
-                    color: AppColors.primary,
+                    color: Theme.of(context).colorScheme.primary,
                     borderRadius: BorderRadius.circular(16),
                   ),
                   child: Text(
                     '${_orders.length + _reservations.length}',
-                    style: const TextStyle(
-                      color: AppColors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 14,
+                    style: Theme.of(context).textTheme.labelMedium!.copyWith(
+                      color: Theme.of(context).colorScheme.onPrimary,
+                      fontWeight: FontWeight.w700,
                     ),
                   ),
                 ),
@@ -114,18 +115,18 @@ class _ActivityScreenState extends State<ActivityScreen>
           Container(
             margin: const EdgeInsets.symmetric(horizontal: 20),
             decoration: BoxDecoration(
-              color: AppColors.primary.withOpacity(0.15),
+              color: Theme.of(context).colorScheme.primary.withOpacity(0.15),
               borderRadius: BorderRadius.circular(16),
             ),
             child: TabBar(
               controller: _tabCtrl,
               indicatorPadding: EdgeInsetsGeometry.symmetric(horizontal: -55),
               indicator: BoxDecoration(
-                color: AppColors.primary,
+                color: Theme.of(context).colorScheme.primary,
                 borderRadius: BorderRadius.circular(16),
               ),
-              labelColor: AppColors.white,
-              unselectedLabelColor: AppColors.primary,
+              labelColor: Theme.of(context).colorScheme.onPrimary,
+              unselectedLabelColor: Theme.of(context).colorScheme.primary,
               dividerHeight: 0,
               tabs: const [
                 Tab(text: 'Commandes'),
@@ -159,7 +160,10 @@ class _ActivityScreenState extends State<ActivityScreen>
           ),
           TextButton(
             onPressed: () => Navigator.pop(dialogContext, true),
-            child: Text(action, style: const TextStyle(color: AppColors.errorContent)),
+            child: Text(
+              action,
+              style: TextStyle(color: Theme.of(context).colorScheme.error),
+            ),
           ),
         ],
       ),
@@ -188,10 +192,10 @@ class _ActivityScreenState extends State<ActivityScreen>
     }
     try {
       await _orderApi.cancelOrder(order.id);
-      _notify('Commande annulée.', AppColors.successContent);
+      _notify('Commande annulée.', OtherTheme.of(context).onSuccessContainer);
       await _loadAll();
     } catch (e) {
-      _notify("$e", AppColors.errorContent);
+      _notify("$e", Theme.of(context).colorScheme.error);
     }
   }
 
@@ -205,10 +209,13 @@ class _ActivityScreenState extends State<ActivityScreen>
     }
     try {
       await _resApi.deleteReservation(reservation.id.toString());
-      _notify('Réservation supprimée.', AppColors.successContent);
+      _notify(
+        'Réservation supprimée.',
+        OtherTheme.of(context).onSuccessContainer,
+      );
       await _loadAll();
     } catch (e) {
-      _notify("$e", AppColors.errorContent);
+      _notify("$e", Theme.of(context).colorScheme.error);
     }
   }
 
@@ -221,7 +228,10 @@ class _ActivityScreenState extends State<ActivityScreen>
   Future<void> _rateOrder(Order order) async {
     final rateable = order.items.where((i) => i.offerId != null).toList();
     if (rateable.isEmpty) {
-      _notify('Cette commande ne peut pas être notée.', AppColors.errorContent);
+      _notify(
+        'Cette commande ne peut pas être notée.',
+        Theme.of(context).colorScheme.error,
+      );
       return;
     }
 

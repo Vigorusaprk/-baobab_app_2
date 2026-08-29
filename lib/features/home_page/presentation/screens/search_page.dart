@@ -9,7 +9,6 @@ import 'package:baobabe_0_2/features/home_page/presentation/widgets/search_resul
 import 'package:baobabe_0_2/features/home_page/presentation/widgets/list_skeletons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:baobabe_0_2/core/themes/app_colors.dart';
 import 'package:flutter_svg/svg.dart';
 
 /// Standalone route wrapper for `/search` (pushed on top of another page,
@@ -22,7 +21,7 @@ class SearchPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       body: const SearchPageBody(showBackButton: true),
     );
   }
@@ -93,7 +92,9 @@ class _SearchPageBodyState extends State<SearchPageBody> {
                       color: Theme.of(context).primaryColor,
                       child: Icon(
                         Icons.arrow_back_ios_new_rounded,
-                        color: AppColors.surface,
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.surfaceContainerLowest,
                       ),
                     ),
                   ),
@@ -115,8 +116,8 @@ class _SearchPageBodyState extends State<SearchPageBody> {
                     'assets/icons/filter.svg',
                     height: 25,
                     width: 25,
-                    colorFilter: const ColorFilter.mode(
-                      AppColors.background,
+                    colorFilter: ColorFilter.mode(
+                      Theme.of(context).colorScheme.surface,
                       BlendMode.srcIn,
                     ),
                   ),
@@ -175,10 +176,7 @@ class _SearchPageBodyState extends State<SearchPageBody> {
                   return _buildErrorState(state.message);
                 } else if (state is SearchResultsLoaded) {
                   if (state.results.isEmpty) {
-                    return _buildEmptyState(
-                      'Aucun résultat',
-                      Icons.search_off,
-                    );
+                    return _buildEmptyState('Aucun résultat', Icons.search_off);
                   }
                   return SearchResultsList(
                     state: state,
@@ -215,17 +213,23 @@ class _SearchPageBodyState extends State<SearchPageBody> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.error_outline, size: 64, color: AppColors.errorContent),
+            Icon(
+              Icons.error_outline,
+              size: 64,
+              color: Theme.of(context).colorScheme.error,
+            ),
             const SizedBox(height: 16),
             Text(
               'Erreur de recherche',
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              style: Theme.of(context).textTheme.bodyLarge!,
             ),
             const SizedBox(height: 8),
             Text(
               message,
               textAlign: TextAlign.center,
-              style: TextStyle(color: AppColors.textSecondary),
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
             ),
             const SizedBox(height: 16),
             ElevatedButton(
@@ -247,12 +251,14 @@ class _SearchPageBodyState extends State<SearchPageBody> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, size: 80, color: AppColors.background),
+            Icon(icon, size: 80, color: Theme.of(context).colorScheme.surface),
             const SizedBox(height: 16),
             Text(
               message,
               textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 16, color: AppColors.textSecondary),
+              style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
             ),
           ],
         ),

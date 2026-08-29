@@ -52,7 +52,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
     // propres notifications avec une profondeur supérieure.
     if (notification.depth != 0) return false;
 
-    const range = HomeSliverHeaderMetrics.collapseRange;
+    final range = HomeSliverHeaderMetrics.collapseRange(context);
     final offset = notification.metrics.pixels;
     if (offset <= 0 || offset >= range) return false;
 

@@ -225,7 +225,9 @@ class BusinessRemoteDataSourceImpl implements BusinessRemoteDataSource {
     return HomeFeed(
       newOffers: _decodeOffersPage(json['newOffers']),
       popularBusinesses: ((json['popularBusinesses'] as List?) ?? const [])
-          .map((e) => BusinessModel.fromJson(Map<String, dynamic>.from(e as Map)))
+          .map(
+            (e) => BusinessModel.fromJson(Map<String, dynamic>.from(e as Map)),
+          )
           .map((m) => m.toEntity())
           .toList(),
       discoverOffers: _decodeOffersPage(json['discoverOffers']),

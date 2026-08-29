@@ -1,6 +1,6 @@
-import 'package:baobabe_0_2/core/themes/app_colors.dart';
 import 'package:baobabe_0_2/core/themes/app_diemens.dart';
 import 'package:baobabe_0_2/features/order/domain/entities/order.dart';
+import 'package:baobabe_0_2/core/themes/other_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -14,34 +14,31 @@ class OrderDetailPage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: AppColors.transparent,
+        backgroundColor: Colors.transparent,
         title: Text(
           'Détails de la commande',
-          style: TextStyle(
-            fontSize: 22,
-            fontWeight: FontWeight.bold,
-            color: AppColors.primary,
-            fontFamily: 'Poppins',
+          style: Theme.of(context).textTheme.headlineLarge!.copyWith(
+            color: Theme.of(context).colorScheme.primary,
           ),
         ),
 
         leading: IconButton(
           icon: Container(
             decoration: BoxDecoration(
-              color: AppColors.secondary,
+              color: Theme.of(context).colorScheme.secondary,
               shape: BoxShape.circle,
             ),
             child: Center(
-              child: const Icon(
+              child: Icon(
                 Icons.arrow_back_ios_new_rounded,
-                color: AppColors.background,
+                color: Theme.of(context).colorScheme.surface,
               ),
             ),
           ),
           onPressed: () => Navigator.pop(context),
         ),
       ),
-      backgroundColor: AppColors.primary,
+      backgroundColor: Theme.of(context).colorScheme.primary,
       body: Padding(
         padding: AppDimens.appPadding,
         child: Column(
@@ -55,17 +52,18 @@ class OrderDetailPage extends StatelessWidget {
               child: SingleChildScrollView(
                 child: Column(
                   children: [
-                    _buildDetailSection('Restaurant', [
-                      _buildDetailRow('Nom', order.establishmentName),
-                      _buildDetailRow('Type', order.typeName),
+                    _buildDetailSection(context, 'Restaurant', [
+                      _buildDetailRow(context, 'Nom', order.establishmentName),
+                      _buildDetailRow(context, 'Type', order.typeName),
                     ]),
-                    _buildDetailSection('Date et heure', [
+                    _buildDetailSection(context, 'Date et heure', [
                       _buildDetailRow(
+                        context,
                         'Passée le',
                         dateFormat.format(order.orderDate),
                       ),
                     ]),
-                    _buildDetailSection('Articles', [
+                    _buildDetailSection(context, 'Articles', [
                       if (order.items.isEmpty)
                         const Padding(
                           padding: EdgeInsets.symmetric(vertical: 12),
@@ -89,12 +87,14 @@ class OrderDetailPage extends StatelessWidget {
                           ),
                         ),
                     ]),
-                    _buildDetailSection('Paiement', [
+                    _buildDetailSection(context, 'Paiement', [
                       _buildDetailRow(
+                        context,
                         'Sous-total',
                         '${order.subtotal.toStringAsFixed(2)} \$',
                       ),
                       _buildDetailRow(
+                        context,
                         'Taxes',
                         '${order.tax.toStringAsFixed(2)} \$',
                       ),
@@ -106,12 +106,15 @@ class OrderDetailPage extends StatelessWidget {
                           vertical: AppDimens.small,
                         ),
                         decoration: BoxDecoration(
-                          color: AppColors.success.withValues(alpha: 0.3),
+                          color: OtherTheme.of(
+                            context,
+                          ).success.withValues(alpha: 0.3),
                           borderRadius: BorderRadius.circular(
                             AppDimens.radius16,
                           ),
                         ),
                         child: _buildDetailRow(
+                          context,
                           'Total',
                           '${order.totalAmount.toStringAsFixed(2)} \$',
                           isBold: true,
@@ -119,7 +122,9 @@ class OrderDetailPage extends StatelessWidget {
                       ),
                     ]),
                     if (order.notes != null && order.notes!.isNotEmpty)
-                      _buildDetailSection('Notes', [Text(order.notes!)]),
+                      _buildDetailSection(context, 'Notes', [
+                        Text(order.notes!),
+                      ]),
                   ],
                 ),
               ),
@@ -130,11 +135,11 @@ class OrderDetailPage extends StatelessWidget {
                 Expanded(
                   child: OutlinedButton(
                     onPressed: () => Navigator.pop(context),
-                    child: const Text(
+                    child: Text(
                       'Fermer',
                       style: TextStyle(
                         fontFamily: 'Poppins',
-                        color: AppColors.primary,
+                        color: Theme.of(context).colorScheme.primary,
                       ),
                     ),
                   ),
@@ -151,13 +156,13 @@ class OrderDetailPage extends StatelessWidget {
                       );
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primary,
+                      backgroundColor: Theme.of(context).colorScheme.primary,
                     ),
-                    child: const Text(
+                    child: Text(
                       'Recommander',
                       style: TextStyle(
                         fontFamily: 'Poppins',
-                        color: AppColors.background,
+                        color: Theme.of(context).colorScheme.surface,
                       ),
                     ),
                   ),
@@ -170,26 +175,28 @@ class OrderDetailPage extends StatelessWidget {
     );
   }
 
-  Widget _buildDetailSection(String title, List<Widget> children) {
+  Widget _buildDetailSection(
+    BuildContext context,
+    String title,
+    List<Widget> children,
+  ) {
     return Container(
       width: double.infinity,
       margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: AppColors.background,
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.background),
+        border: Border.all(color: Theme.of(context).colorScheme.surface),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             title,
-            style: const TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 16,
-              fontFamily: 'Poppins',
-            ),
+            style: Theme.of(
+              context,
+            ).textTheme.bodyMedium!.copyWith(fontWeight: FontWeight.w700),
           ),
           const SizedBox(height: 8),
           ...children,
@@ -198,20 +205,30 @@ class OrderDetailPage extends StatelessWidget {
     );
   }
 
-  Widget _buildDetailRow(String label, String value, {bool isBold = false}) {
+  Widget _buildDetailRow(
+    BuildContext context,
+    String label,
+    String value, {
+    bool isBold = false,
+  }) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(label, style: TextStyle(color: AppColors.textSecondary)),
+          Text(
+            label,
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
+          ),
           Text(
             value,
-            style: TextStyle(
-              fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
-              fontSize: isBold ? 16 : 14,
-              fontFamily: 'Poppins',
-            ),
+            style: isBold
+                ? Theme.of(
+                    context,
+                  ).textTheme.bodyMedium!.copyWith(fontWeight: FontWeight.bold)
+                : Theme.of(context).textTheme.labelMedium,
           ),
         ],
       ),

@@ -1,6 +1,7 @@
 import 'package:baobabe_0_2/core/bloc/settings_bloc.dart';
 import 'package:baobabe_0_2/core/constants/supabase_client.dart';
 import 'package:baobabe_0_2/core/routes/app_router.dart';
+import 'package:baobabe_0_2/core/widgets/adaptive_viewport.dart';
 import 'package:baobabe_0_2/core/themes/app_theme.dart';
 import 'package:baobabe_0_2/features/auth/data/data_sources/remote_datasource/auth_remote_datasource_impl.dart';
 import 'package:baobabe_0_2/features/auth/data/repositories/auth_repository_impl.dart';
@@ -90,6 +91,10 @@ class _MainAppState extends State<MainApp> {
         debugShowCheckedModeBanner: false,
         routerConfig: appRouter,
         theme: AppTheme.silvaTheme,
+        // Une seule pose pour toute l'application : chaque route hérite de
+        // la colonne, y compris l'espace commerçant et les pages pleines.
+        builder: (context, child) =>
+            AdaptiveViewport(child: child ?? const SizedBox.shrink()),
         localizationsDelegates: const [
           GlobalMaterialLocalizations.delegate,
           GlobalWidgetsLocalizations.delegate,

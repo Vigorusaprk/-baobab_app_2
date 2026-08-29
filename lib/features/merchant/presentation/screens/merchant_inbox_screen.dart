@@ -1,4 +1,3 @@
-import 'package:baobabe_0_2/core/themes/app_colors.dart';
 import 'package:baobabe_0_2/core/themes/app_diemens.dart';
 import 'package:baobabe_0_2/features/merchant/domain/entities/merchant_space.dart';
 import 'package:baobabe_0_2/features/merchant/presentation/cubit/merchant_cubit.dart';
@@ -23,9 +22,6 @@ class MerchantInboxScreen extends StatelessWidget {
       child: Column(
         children: [
           TabBar(
-            labelColor: AppColors.primary,
-            unselectedLabelColor: AppColors.textSecondary,
-            indicatorColor: AppColors.primary,
             tabs: [
               Tab(text: 'Commandes (${space.orders.length})'),
               Tab(text: 'Réservations (${space.reservations.length})'),
@@ -71,7 +67,8 @@ class _OrdersTab extends StatelessWidget {
         ),
         itemCount: orders.length,
         separatorBuilder: (_, _) => AppDimens.spacerSmall,
-        itemBuilder: (context, index) => ReceivedOrderCard(order: orders[index]),
+        itemBuilder: (context, index) =>
+            ReceivedOrderCard(order: orders[index]),
       ),
     );
   }

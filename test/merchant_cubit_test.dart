@@ -97,8 +97,10 @@ void main() {
       await cubit.refresh();
 
       expect(cubit.state, isA<MerchantReady>());
-      expect((cubit.state as MerchantReady).space.business?.name,
-          'Chez Mama Nzuzi');
+      expect(
+        (cubit.state as MerchantReady).space.business?.name,
+        'Chez Mama Nzuzi',
+      );
       await cubit.close();
     });
 
@@ -118,8 +120,10 @@ void main() {
 
       final state = cubit.state;
       expect(state, isA<NotAMerchant>());
-      expect((state as NotAMerchant).application?.status,
-          ApplicationStatus.pending);
+      expect(
+        (state as NotAMerchant).application?.status,
+        ApplicationStatus.pending,
+      );
       await cubit.close();
     });
 

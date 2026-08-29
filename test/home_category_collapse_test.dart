@@ -27,7 +27,8 @@ void main() {
     return MaterialApp(
       home: Scaffold(
         body: BlocProvider(
-          create: (_) => CategoryBloc(categoryRepository: _FakeCategoryRepository()),
+          create: (_) =>
+              CategoryBloc(categoryRepository: _FakeCategoryRepository()),
           child: Align(
             alignment: Alignment.topLeft,
             child: CategoryIcons(collapseProgress: collapseProgress),
@@ -138,7 +139,9 @@ void main() {
     );
   });
 
-  testWidgets('la transition est continue et ne déborde jamais', (tester) async {
+  testWidgets('la transition est continue et ne déborde jamais', (
+    tester,
+  ) async {
     Offset? previousLabel;
 
     for (final t in [0.0, 0.25, 0.5, 0.75, 1.0]) {

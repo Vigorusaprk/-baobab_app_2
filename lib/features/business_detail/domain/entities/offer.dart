@@ -141,7 +141,8 @@ class Offer extends Equatable {
       name: json['name']?.toString() ?? '',
       description: json['description']?.toString() ?? '',
       imageUrl: json['image_url']?.toString(),
-      price: (json['price'] as num?)?.toDouble() ??
+      price:
+          (json['price'] as num?)?.toDouble() ??
           double.tryParse(json['price']?.toString() ?? '') ??
           0,
       currency: json['currency']?.toString() ?? 'USD',
@@ -153,11 +154,13 @@ class Offer extends Equatable {
       metadata: json['metadata'] is Map
           ? Map<String, dynamic>.from(json['metadata'] as Map)
           : const {},
-      rating: (json['rating'] as num?)?.toDouble() ??
+      rating:
+          (json['rating'] as num?)?.toDouble() ??
           double.tryParse(json['rating']?.toString() ?? '') ??
           0,
       reviewCount: (json['review_count'] as num?)?.toInt() ?? 0,
-      businessId: json['business_id']?.toString() ??
+      businessId:
+          json['business_id']?.toString() ??
           (json['business'] is Map
               ? (json['business'] as Map)['id']?.toString()
               : null),

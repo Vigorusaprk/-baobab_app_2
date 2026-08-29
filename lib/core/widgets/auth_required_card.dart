@@ -1,6 +1,4 @@
-﻿import 'package:baobabe_0_2/core/themes/app_colors.dart';
 import 'package:baobabe_0_2/core/themes/app_diemens.dart';
-import 'package:baobabe_0_2/core/themes/app_fonts.dart';
 import 'package:baobabe_0_2/core/widgets/button/custom_button.dart';
 import 'package:baobabe_0_2/core/widgets/custom_bottom_sheet.dart';
 import 'package:flutter/material.dart';
@@ -40,25 +38,27 @@ class AuthRequiredCard extends StatelessWidget {
           padding: const EdgeInsets.all(AppDimens.medium),
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            color: AppColors.primary.withOpacity(0.1),
+            color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
           ),
-          child: const Icon(
+          child: Icon(
             Icons.lock_outline_rounded,
-            color: AppColors.primary,
+            color: Theme.of(context).colorScheme.primary,
             size: 32,
           ),
         ),
         AppDimens.spacerMedium,
         Text(
           'Connexion requise',
-          style: AppFonts.titleMedium,
+          style: Theme.of(context).textTheme.titleMedium!,
           textAlign: TextAlign.center,
         ),
         AppDimens.spacerSmall,
         Text(
           message,
           textAlign: TextAlign.center,
-          style: AppFonts.bodyMedium.copyWith(color: AppColors.textPrimary),
+          style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+            color: Theme.of(context).colorScheme.onSurface,
+          ),
         ),
         AppDimens.spacerLarge,
         CustomButton(

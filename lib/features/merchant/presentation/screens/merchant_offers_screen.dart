@@ -1,9 +1,9 @@
-import 'package:baobabe_0_2/core/themes/app_colors.dart';
 import 'package:baobabe_0_2/core/themes/app_diemens.dart';
 import 'package:baobabe_0_2/features/business_detail/domain/entities/offer.dart';
 import 'package:baobabe_0_2/features/merchant/domain/entities/merchant_space.dart';
 import 'package:baobabe_0_2/features/merchant/presentation/cubit/merchant_cubit.dart';
 import 'package:baobabe_0_2/features/merchant/presentation/widgets/merchant_widgets.dart';
+import 'package:baobabe_0_2/core/themes/other_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -26,8 +26,6 @@ class MerchantOffersScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       floatingActionButton: FloatingActionButton.extended(
-        backgroundColor: AppColors.primary,
-        foregroundColor: AppColors.white,
         onPressed: () => context.pushNamed('offerForm'),
         icon: const Icon(Icons.add),
         label: const Text('Publier'),
@@ -36,7 +34,8 @@ class MerchantOffersScreen extends StatelessWidget {
           ? const MerchantEmptyState(
               icon: Icons.sell_outlined,
               title: 'Aucune offre publiée',
-              message: 'Publiez ce que vos clients peuvent commander ou '
+              message:
+                  'Publiez ce que vos clients peuvent commander ou '
                   'réserver chez vous.',
             )
           : RefreshIndicator(
@@ -90,13 +89,13 @@ class _OfferTile extends StatelessWidget {
                     StatusChip(
                       label: offer.fulfilment.badge,
                       color: offer.isOrderable
-                          ? AppColors.secondary
+                          ? Theme.of(context).colorScheme.secondary
                           : offer.isBookable
-                          ? AppColors.primary
-                          : AppColors.warningContent,
+                          ? Theme.of(context).colorScheme.primary
+                          : OtherTheme.of(context).onWarningContainer,
                       surface: offer.isInStoreOnly
-                          ? AppColors.warningSurface
-                          : AppColors.primarySurface,
+                          ? OtherTheme.of(context).warningContainer
+                          : Theme.of(context).colorScheme.primaryContainer,
                     ),
                   ],
                 ),
@@ -105,16 +104,16 @@ class _OfferTile extends StatelessWidget {
                   _subtitle(offer),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: Theme.of(
-                    context,
-                  ).textTheme.bodySmall?.copyWith(color: AppColors.textSecondary),
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
                 ),
                 if (!offer.isActive) ...[
                   AppDimens.spacerSmall,
-                  const StatusChip(
+                  StatusChip(
                     label: 'Retirée',
-                    color: AppColors.errorContent,
-                    surface: AppColors.errorSurface,
+                    color: Theme.of(context).colorScheme.error,
+                    surface: Theme.of(context).colorScheme.errorContainer,
                   ),
                 ],
               ],
@@ -149,7 +148,10 @@ class _OfferMenu extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return PopupMenuButton<String>(
-      icon: const Icon(Icons.more_vert, color: AppColors.textSecondary),
+      icon: Icon(
+        Icons.more_vert,
+        color: Theme.of(context).colorScheme.onSurfaceVariant,
+      ),
       onSelected: (value) async {
         if (value == 'edit') {
           context.pushNamed('offerForm', extra: offer);
@@ -173,7 +175,10 @@ class _OfferMenu extends StatelessWidget {
         if (offer.isActive)
           const PopupMenuItem(value: 'retire', child: Text('Retirer'))
         else
-          const PopupMenuItem(value: 'publish', child: Text('Remettre en ligne')),
+          const PopupMenuItem(
+            value: 'publish',
+            child: Text('Remettre en ligne'),
+          ),
       ],
     );
   }

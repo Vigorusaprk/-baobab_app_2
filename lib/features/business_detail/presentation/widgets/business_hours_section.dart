@@ -1,4 +1,3 @@
-import 'package:baobabe_0_2/core/themes/app_colors.dart';
 import 'package:baobabe_0_2/core/themes/app_diemens.dart';
 import 'package:baobabe_0_2/features/home_page/domain/entities/business_entity.dart';
 import 'package:flutter/material.dart';
@@ -53,8 +52,10 @@ class BusinessHoursSection extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
             decoration: BoxDecoration(
               color: isToday
-                  ? AppColors.primary.withValues(alpha: 0.08)
-                  : AppColors.transparent,
+                  ? Theme.of(
+                      context,
+                    ).colorScheme.primary.withValues(alpha: 0.08)
+                  : Colors.transparent,
               borderRadius: BorderRadius.circular(14),
             ),
             child: Row(
@@ -70,29 +71,29 @@ class BusinessHoursSection extends StatelessWidget {
                           width: 28,
                           height: 28,
                           colorFilter: ColorFilter.mode(
-                            AppColors.primary,
+                            Theme.of(context).colorScheme.primary,
                             BlendMode.srcIn,
                           ),
                         ),
                       ),
                     Text(
                       entry.key,
-                      style: TextStyle(
-                        fontSize: 14,
+                      style: Theme.of(context).textTheme.labelMedium!.copyWith(
                         fontWeight: isToday ? FontWeight.w800 : FontWeight.w500,
                         color: isToday
-                            ? AppColors.primary
-                            : AppColors.textSecondary,
+                            ? Theme.of(context).colorScheme.primary
+                            : Theme.of(context).colorScheme.onSurfaceVariant,
                       ),
                     ),
                   ],
                 ),
                 Text(
                   entry.value,
-                  style: TextStyle(
-                    fontSize: 14,
+                  style: Theme.of(context).textTheme.labelMedium!.copyWith(
                     fontWeight: isToday ? FontWeight.bold : FontWeight.w600,
-                    color: isToday ? AppColors.primary : AppColors.textPrimary,
+                    color: isToday
+                        ? Theme.of(context).colorScheme.primary
+                        : Theme.of(context).colorScheme.onSurface,
                   ),
                 ),
               ],
