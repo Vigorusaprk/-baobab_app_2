@@ -49,8 +49,8 @@ class _SearchPageBodyState extends State<SearchPageBody> {
   final ScrollController _scroll = ScrollController();
   late final ExploreCubit _explore;
 
-  /// Deux colonnes, dans les proportions du rail de l'accueil (190 x 250).
-  static const double _cardRatio = 0.76;
+  /// Deux colonnes, dans les proportions du rail de l'accueil (190 x 285).
+  static const double _cardRatio = 0.67;
 
   @override
   void initState() {

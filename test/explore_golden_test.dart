@@ -73,7 +73,7 @@ void main() {
             padding: const EdgeInsets.all(16),
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 2,
-              childAspectRatio: 0.76,
+              childAspectRatio: 0.67,
               mainAxisSpacing: 12,
               crossAxisSpacing: 12,
             ),

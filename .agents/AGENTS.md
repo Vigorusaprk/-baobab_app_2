@@ -753,10 +753,63 @@ travers de la carte. La copie couvre désormais toute la photo et le dégradé
 est seul à décider où le flou apparaît. Sans découpage, il n'y a pas de bord
 possible.
 
-Le voile culmine à 0,88. Ce n'est pas un réglage esthétique : nos visuels sont
-des photos quelconques, et sur une photo entièrement noire — le pire cas — ce
-voile donne encore 5,9:1 à la ligne la plus pâle. Le baisser demande de
-refaire le calcul.
+**La carte est bâtie en deux zones, et c'est la séparation qui fait le
+travail.** En haut la photo, intacte. En bas le texte sur un aplat opaque,
+précédé d'une bande de 28 px où le flou et le voile montent de rien à tout.
+
+La version précédente posait le texte directement sur la photo. Il fallait
+alors doser un voile assez fort pour rester lisible sur n'importe quel visuel,
+et ce voile délavait la photo sur les quatre cinquièmes de sa hauteur : la
+carte ne montrait plus le produit. Le contraste dépendait de la photo, donc il
+se calculait — et le calcul a été fait deux fois à la mauvaise hauteur, le
+titre sortant à 1,79:1 au lieu de 4,5.
+
+Sur fond opaque, le texte hérite des couples du thème : **16,7:1** pour le nom,
+7,9:1 pour « chez X », 14,7:1 pour le prix. Il n'y a plus rien à doser, plus de
+pire cas à envisager. C'est la propriété que `test/offer_card_test.dart`
+protège : *le texte ne repose jamais sur la photo*.
+
+**Le fondu est solidaire du bloc de texte.** Il fait 48 px et se termine
+exactement là où l'aplat opaque commence. C'est la quatrième tentative ; les
+trois précédentes ont chacune produit un défaut visible :
+
+1. **Bande basse masquée par un dégradé calculé sur l'image entière** — le
+   fondu se terminait au-dessus de la bande, et le découpage tranchait une
+   image déjà floutée aux trois quarts. Trait net en travers de la carte.
+2. **`BackdropFilter` sur une bande** — il floute *uniformément* sa région.
+   Le voile se dégradait, le flou non : photo nette au-dessus, pleinement
+   floutée en dessous. Même trait.
+3. **Fondu exprimé en fractions de la carte** (fin à 50 %) alors que le bloc
+   de texte a une hauteur naturelle et commence entre 53 % et 62 % : jusqu'à
+   **36 px de blanc vide** entre les deux.
+
+La leçon commune : *le fondu doit être attaché à ce qu'il rejoint*, pas à la
+carte. Attaché au bloc de texte, l'écart et la marche sont impossibles par
+construction.
+
+**L'alignement de la copie floutée** se règle avec un `OverflowBox` à la
+hauteur de la carte, ancré par le bas : son bas coïncide avec le bas du bloc,
+donc avec le bas de la carte, donc elle se superpose exactement à la photo.
+La hauteur de carte descend d'un `LayoutBuilder` posé sur la carte ; la
+hauteur du bloc vient d'un second `LayoutBuilder` à l'intérieur, et c'est lui
+qui dit quelle fraction du bloc le fondu occupe.
+
+`BackdropFilter` ne peut pas faire ce travail : un flou qui se dégrade demande
+de masquer une couche floutée, donc de la peindre soi-même.
+
+**Ce que la photo occupe réellement**, une fois le texte (119 px) et le fondu
+déduits :
+
+| gabarit | photo nette | photo visible |
+|---|---|---|
+| rail court (190×265) | 45 % | 55 % |
+| rail moyen (190×285) | 48 % | 58 % |
+| rail haut (190×310) | 53 % | 62 % |
+| grille Explorer (171×255) | 42 % | 53 % |
+
+Le bloc de texte est **incompressible** : la photo prend ce qui reste. Monter
+au-delà demande de passer le titre sur une seule ligne, ce qui tronque les noms
+longs — arbitrage volontairement non pris.
 
 Le contenu garde la disposition d'origine : nom, « chez qui », puis une ligne
 qui oppose le prix à la note. Une version intermédiaire y avait mis trois

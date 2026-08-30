@@ -102,7 +102,7 @@ void main() {
           backgroundColor: AppTheme.silvaTheme.colorScheme.surface,
           body: Center(
             child: SizedBox(
-              height: 250,
+              height: 285,
               child: ListView.separated(
                 scrollDirection: Axis.horizontal,
                 padding: const EdgeInsets.symmetric(horizontal: 16),

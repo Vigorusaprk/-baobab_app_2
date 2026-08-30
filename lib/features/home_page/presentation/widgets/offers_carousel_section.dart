@@ -44,7 +44,7 @@ class OffersCarouselSection extends StatelessWidget {
   /// plus haut ou plus court que le contenu réel fait sauter la page au
   /// moment où les données arrivent.
   static double railHeight(BuildContext context) =>
-      AppDimens.horizontalScrollHeight(context, 0.30, min: 220, max: 280);
+      AppDimens.horizontalScrollHeight(context, 0.36, min: 265, max: 310);
 
   @override
   Widget build(BuildContext context) {

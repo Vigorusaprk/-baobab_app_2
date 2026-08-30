@@ -1,7 +1,7 @@
-import 'dart:math' as math;
-
+import 'package:baobabe_0_2/core/themes/app_diemens.dart';
 import 'package:baobabe_0_2/core/themes/app_theme.dart';
 import 'package:baobabe_0_2/core/widgets/offer_card.dart';
+import 'package:baobabe_0_2/core/widgets/remote_image.dart';
 import 'package:baobabe_0_2/features/business_detail/domain/entities/offer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -194,66 +194,129 @@ void main() {
     });
   });
 
-  group('Le voile rend le texte lisible', () {
-    // Le voile est blanc : le pire cas pour du texte foncé est donc une photo
-    // entièrement noire dessous, qui donne le fond le plus sombre.
-    double canal(double c) {
-      final v = c / 255.0;
-      return v <= 0.04045
-          ? v / 12.92
-          : math.pow((v + 0.055) / 1.055, 2.4).toDouble();
-    }
-
-    double luminance(Color c) =>
-        0.2126 * canal(c.r * 255) +
-        0.7152 * canal(c.g * 255) +
-        0.0722 * canal(c.b * 255);
-
-    double contraste(Color texte, double voile) {
-      final fond = luminance(
-        Color.fromARGB(
-          255,
-          (voile * 255).round(),
-          (voile * 255).round(),
-          (voile * 255).round(),
-        ),
+  group('Le texte ne repose jamais sur la photo', () {
+    testWidgets('il est posé sur un fond opaque', (tester) async {
+      // C'est la promesse structurante de la carte. Tant qu'elle tient, le
+      // contraste est celui du thème (16,7:1 pour le nom) et ne dépend plus
+      // du visuel. Une version précédente posait le texte sur la photo : il
+      // fallait alors doser un voile, ce voile délavait la photo sur les
+      // quatre cinquièmes de sa hauteur, et le calcul de contraste avait été
+      // fait à la mauvaise hauteur — le titre sortait à 1,79:1.
+      await tester.pumpWidget(
+        _sized(OfferCard(offer: _offer(), onTap: () {}), _railMin),
       );
-      final t = luminance(texte);
-      final haut = math.max(fond, t);
-      final bas = math.min(fond, t);
-      return (haut + 0.05) / (bas + 0.05);
-    }
 
-    final scheme = AppTheme.silvaTheme.colorScheme;
+      final surface = AppTheme.silvaTheme.colorScheme.surfaceContainerLowest;
 
-    // Hauteur à laquelle chaque ligne se trouve dans la carte.
-    final lignes = <String, (double, Color)>{
-      'le nom': (0.46, scheme.onSurface),
-      '« chez X »': (0.66, scheme.onSurfaceVariant),
-      'le prix': (0.80, scheme.primary),
-    };
+      // Le bloc de texte est enveloppé d'un fond plein de la couleur de la
+      // carte — sans transparence.
+      final fonds = tester
+          .widgetList<ColoredBox>(
+            find.ancestor(
+              of: find.text('Riz au poisson frais'),
+              matching: find.byType(ColoredBox),
+            ),
+          )
+          .map((b) => b.color);
 
-    lignes.forEach((nom, position) {
-      test('$nom atteint 4,5:1 sur une photo noire', () {
-        final (hauteur, couleur) = position;
-        final voile = OfferCard.scrimAlphaAt(hauteur);
-        final ratio = contraste(couleur, voile);
-
-        expect(
-          ratio,
-          greaterThanOrEqualTo(4.5),
-          reason:
-              "à $hauteur de hauteur le voile vaut "
-              "${voile.toStringAsFixed(2)}, ce qui ne donne que "
-              "${ratio.toStringAsFixed(2)}:1.",
-        );
-      });
+      expect(
+        fonds.any((c) => c == surface && c.a == 1.0),
+        isTrue,
+        reason:
+            'le texte doit être adossé à un aplat opaque, pas à un dégradé '
+            'posé sur la photo.',
+      );
     });
 
-    test('le voile ne commence pas avant le haut de la photo', () {
-      // La photo doit rester intacte en haut : c'est elle qu'on regarde.
-      expect(OfferCard.scrimAlphaAt(0.0), 0);
-      expect(OfferCard.scrimAlphaAt(0.15), 0);
+    testWidgets('la photo occupe tout ce qui reste au-dessus', (tester) async {
+      await tester.pumpWidget(
+        _sized(OfferCard(offer: _offer(), onTap: () {}), const Size(190, 280)),
+      );
+
+      final photo = tester.getRect(find.byType(RemoteImage).first);
+      final texte = tester.getRect(find.text('Riz au poisson frais'));
+
+      // La photo est peinte derrière toute la carte ; ce qui compte est
+      // qu'elle soit dégagée au-dessus du texte, sur au moins la moitié.
+      final degage = texte.top - photo.top;
+      expect(
+        degage / photo.height,
+        greaterThan(0.5),
+        reason:
+            'la carte doit montrer le produit : la zone photo dégagée ne fait '
+            'que ${(degage / photo.height * 100).round()} % de la carte.',
+      );
+    });
+  });
+
+  group('Photo en haut, texte en bas', () {
+    // La carte est franchement séparée en deux blocs : aucun fondu, aucun
+    // voile. Quatre versions ont tenté d'adoucir la frontière ; toutes
+    // coûtaient de la hauteur de photo sans rien rendre plus lisible.
+    const gabarits = <String, Size>{
+      'rail court': Size(190, 265),
+      'rail moyen': Size(190, 285),
+      'rail haut': Size(190, 310),
+      'grille Explorer': Size(171, 255),
+    };
+
+    gabarits.forEach((nom, taille) {
+      testWidgets('la photo garde la plus grosse part de la carte — $nom', (
+        tester,
+      ) async {
+        await tester.pumpWidget(
+          _sized(
+            OfferCard(
+              offer: _offer(name: 'Chambre Deluxe Vue Fleuve'),
+              onTap: () {},
+            ),
+            taille,
+          ),
+        );
+
+        final carte = tester.getRect(find.byType(OfferCard));
+        final photo = tester.getRect(find.byType(RemoteImage));
+
+        // Mesurée entre 49 % (grille d'Explorer) et 58 % (rail haut) : le
+        // plancher est posé juste en dessous, pour attraper une régression
+        // sans se casser au premier pixel près.
+        expect(
+          photo.height / carte.height,
+          greaterThan(0.45),
+          reason:
+              'la photo ne fait que '
+              '${(photo.height / carte.height * 100).round()} % de la carte : '
+              "le texte l'a chassée.",
+        );
+      });
+
+      testWidgets("le texte commence là où la photo s'arrête — $nom", (
+        tester,
+      ) async {
+        await tester.pumpWidget(
+          _sized(
+            OfferCard(
+              offer: _offer(name: 'Chambre Deluxe Vue Fleuve'),
+              onTap: () {},
+            ),
+            taille,
+          ),
+        );
+
+        final photo = tester.getRect(find.byType(RemoteImage));
+        final titre = tester.getRect(find.text('Chambre Deluxe Vue Fleuve'));
+
+        // Entre le bas de la photo et le titre, il n'y a que la marge du
+        // bloc de texte — rien d'autre, et surtout aucune bande vide.
+        final ecart = titre.top - photo.bottom;
+        expect(
+          ecart,
+          inInclusiveRange(0, AppDimens.small + 2),
+          reason:
+              'il y a ${ecart.toStringAsFixed(0)} px entre la photo et le '
+              'titre, au lieu de la seule marge du bloc.',
+        );
+      });
     });
   });
 
