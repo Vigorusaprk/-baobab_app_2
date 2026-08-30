@@ -1,3 +1,4 @@
+import 'package:baobabe_0_2/core/widgets/custom_pop_up.dart';
 import 'package:baobabe_0_2/core/services/session_service.dart';
 import 'package:baobabe_0_2/features/activity/presentation/widgets/activity_skeleton.dart';
 import 'package:baobabe_0_2/features/activity/presentation/widgets/rate_offer_sheet.dart';
@@ -149,28 +150,12 @@ class _ActivityScreenState extends State<ActivityScreen>
 
   /// Demande confirmation avant une action irréversible, en nommant ce
   /// qui va être annulé plutôt qu'un « Oui / Non » sans contexte.
-  Future<bool> _confirm(String title, String message, String action) async {
-    final ok = await showDialog<bool>(
+  Future<bool> _confirm(String question, String consequence) {
+    return showCustomPopUp(
       context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: Text(title),
-        content: Text(message),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext, false),
-            child: const Text('Annuler'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext, true),
-            child: Text(
-              action,
-              style: TextStyle(color: Theme.of(context).colorScheme.error),
-            ),
-          ),
-        ],
-      ),
+      title: question,
+      message: consequence,
     );
-    return ok ?? false;
   }
 
   void _notify(String message, Color color) {
@@ -186,9 +171,9 @@ class _ActivityScreenState extends State<ActivityScreen>
 
   Future<void> _cancelOrder(Order order) async {
     if (!await _confirm(
-      'Annuler la commande ?',
-      'La commande chez ${order.establishmentName} sera annulée.',
-      'Annuler la commande',
+      'Voulez-vous vraiment annuler votre commande ?',
+      'Votre commande chez ${order.establishmentName} sera annulée. '
+          'Vous pourrez en passer une nouvelle quand vous voulez.',
     )) {
       return;
     }
@@ -211,9 +196,9 @@ class _ActivityScreenState extends State<ActivityScreen>
 
   Future<void> _deleteReservation(Reservation reservation) async {
     if (!await _confirm(
-      'Supprimer la réservation ?',
-      'Votre réservation chez ${reservation.establishmentName} sera supprimée.',
-      'Supprimer',
+      'Voulez-vous vraiment annuler votre réservation ?',
+      'Votre réservation chez ${reservation.establishmentName} sera '
+          'supprimée. Vous pourrez réserver à nouveau quand vous voulez.',
     )) {
       return;
     }

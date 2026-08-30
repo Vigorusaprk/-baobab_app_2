@@ -654,3 +654,73 @@ dans un état de bloc, un `errorMessage` de cubit — donc surveiller le
 `Text(...)` final ne suffit pas. `test/hardening_test.dart` inspecte toute
 phrase d'interface qui interpole `$e`, en exemptant `throw`, `debugPrint` et
 le journal.
+
+## Une seule fenêtre pour « êtes-vous sûr ? »
+
+`lib/core/widgets/custom_pop_up.dart` est le modèle unique de la confirmation.
+Aucun écran ne construit son propre `AlertDialog` — `test/custom_pop_up_test.dart`
+le vérifie, avec une seule exception nommée dans le test : le sélecteur de
+langue, qui est un choix entre options et non une confirmation.
+
+```dart
+final confirme = await showCustomPopUp(
+  context: context,
+  title: 'Voulez-vous vraiment annuler votre réservation ?',
+  message: 'Votre réservation chez Chez Nadine sera supprimée. '
+      'Vous pourrez réserver à nouveau quand vous voulez.',
+);
+if (!confirme) return;
+```
+
+Ce que le modèle règle une fois pour toutes :
+
+1. **La réponse est un `bool`, jamais un `bool?`.** `showDialog` rend `null`
+   quand on sort sans choisir. Ce `null` se lit « faux » dans un `if`, mais
+   « vrai » dans un `!= false` — soit une suppression que personne n'a
+   demandée. `showCustomPopUp` tranche à la sortie : seul le bouton d'action
+   rend `true`.
+2. **L'intention se nomme, la couleur se déduit.** `PopUpIntent.destructive`
+   prend `colorScheme.error`, `PopUpIntent.neutral` prend `primary`. Aucun
+   écran ne choisit un rouge.
+3. **La question est dans le titre, pas sur les boutons.** Le titre demande
+   « Voulez-vous vraiment annuler votre commande ? », le message dit la
+   conséquence et ce qui reste possible ensuite, et les boutons se contentent
+   de **Retour** et **Confirmer**.
+
+   La première version nommait l'action sur le bouton (« Annuler la
+   commande »). Deux défauts en un : ce bouton se retrouvait face à un bouton
+   « Annuler » qui voulait dire l'inverse, et il était assez long pour que
+   l'`OverflowBar` d'`AlertDialog` empile les deux l'un sous l'autre. Les
+   actions sont donc composées à la main dans un `Row` à parts égales — une
+   seule ligne, quelle que soit la longueur des libellés.
+
+   « Retour » plutôt qu'« Annuler » comme libellé de renoncement : quand
+   l'action confirmée *est* une annulation, « Annuler » ne veut plus rien
+   dire.
+4. **La fenêtre demande, elle n'agit pas.** L'ancienne boîte de déconnexion
+   déclenchait `SignOutEvent` depuis son propre bouton, sans même se refermer.
+   Elle rend maintenant une réponse ; l'appelant décide.
+
+5. **Le message défile.** La zone de contenu d'`AlertDialog` ne le fait pas
+   d'elle-même : un message long, ou un fort agrandissement du texte, en
+   coupait la fin sans rien laisser paraître — et c'est précisément la
+   conséquence de l'action qu'il ne faut pas tronquer.
+
+Les deux gabarits d'avant — bouton texte rouge dans l'activité, bouton plein
+rouge à la déconnexion — sont unifiés sur le bouton plein : c'est l'affordance
+la plus claire pour une action qui ne se reprend pas, et elle existait déjà
+dans l'application.
+
+`test/custom_pop_up_golden_test.dart` en garde une capture (`test/goldens/`),
+utile pour juger le rendu sans lancer l'application. Ces tests portent le tag
+`golden` : le rendu des polices variant d'une machine à l'autre, ils
+s'excluent avec `flutter test --exclude-tags golden`.
+
+### Actions destructrices encore sans confirmation
+
+À traiter quand l'espace commerçant sera repris — elles s'exécutent
+aujourd'hui au premier doigt :
+
+- `merchant_offers_screen.dart` — « Retirer » une offre du catalogue.
+- `received_order_card.dart` — « Refuser » une commande.
+- `received_reservation_card.dart` — « Refuser » une réservation.

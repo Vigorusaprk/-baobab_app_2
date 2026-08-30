@@ -318,7 +318,7 @@ class AppTheme {
       // Corps de texte.
       bodyLarge: style(18, AppFonts.bold),
       bodyMedium: style(16, AppFonts.regular),
-      bodySmall: style(12, AppFonts.bold, color: scheme.onSurfaceVariant),
+      bodySmall: style(12, AppFonts.regular, color: scheme.onSurfaceVariant),
 
       // Libellés : boutons, puces, mentions.
       labelLarge: style(16, AppFonts.semiBold, color: scheme.onPrimary),
