@@ -9,7 +9,7 @@ abstract class Failure extends Equatable {
 
 //for server failure status code is 502
 class ServerFailure extends Failure {
-  ServerFailure();
+  const ServerFailure();
   @override
   List<Object?> get props => [];
 
@@ -20,7 +20,7 @@ class ServerFailure extends Failure {
 //for not found failure status code is 404
 
 class NotFoundFailure extends Failure {
-  NotFoundFailure();
+  const NotFoundFailure();
   @override
   List<Object?> get props => [];
 
@@ -30,7 +30,7 @@ class NotFoundFailure extends Failure {
 
 //for cache failure from device disk
 class CasheFailure extends Failure {
-  CasheFailure();
+  const CasheFailure();
 
   @override
   final message = 'cache failure';
@@ -41,16 +41,17 @@ class CasheFailure extends Failure {
 
 //for connection failure
 class ConnectionFailure extends Failure {
+  @override
   final String message;
 
-  ConnectionFailure({required this.message});
+  const ConnectionFailure({required this.message});
   @override
   List<Object?> get props => [message];
 }
 
 //for error from choosing picture
 class ChoosePictureFailure extends Failure {
-  ChoosePictureFailure();
+  const ChoosePictureFailure();
 
   @override
   final message = 'choose picture failure failure';
@@ -61,7 +62,7 @@ class ChoosePictureFailure extends Failure {
 
 //for otp failure 403
 class Otpfailure extends Failure {
-  Otpfailure();
+  const Otpfailure();
 
   @override
   final message = 'otp failure';
@@ -72,7 +73,7 @@ class Otpfailure extends Failure {
 
 //for auth failure 401
 class AuthorizationFailure extends Failure {
-  AuthorizationFailure();
+  const AuthorizationFailure();
 
   @override
   final message = 'auth failure';
@@ -101,6 +102,7 @@ class InitFailure extends Failure {
 }
 
 class AuthFailure extends Failure {
+  @override
   final String message;
   const AuthFailure({this.message = 'Authentication failure'});
 

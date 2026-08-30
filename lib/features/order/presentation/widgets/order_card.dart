@@ -1,7 +1,8 @@
 import 'package:baobabe_0_2/core/themes/other_theme.dart';
+import 'package:baobabe_0_2/core/widgets/custom_bottom_sheet.dart';
 import 'package:baobabe_0_2/core/widgets/custom_card.dart';
+import 'package:baobabe_0_2/features/order/presentation/screens/order_detail_page.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:baobabe_0_2/core/themes/app_diemens.dart';
 import 'package:baobabe_0_2/features/order/domain/entities/order.dart';
@@ -28,7 +29,10 @@ class OrderCard extends StatelessWidget {
 
       return CustomCard(
         child: InkWell(
-          onTap: () => context.pushNamed('orderDetail', extra: order),
+          onTap: () => showCustomBottomSheet(
+            context: context,
+            child: OrderDetailPage(order: order)
+          ),
           borderRadius: BorderRadius.circular(16),
           child: Padding(
             padding: const EdgeInsets.all(16),

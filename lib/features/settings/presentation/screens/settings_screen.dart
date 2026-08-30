@@ -145,9 +145,13 @@ class SettingsScreen extends StatelessWidget {
   }
 
   Future<void> _shareApp() async {
-    await Share.share(
-      'Découvrez Baobabe, l\'application qui vous connecte aux meilleurs services !\nTéléchargez-la sur : https://baobabe.cd',
-      subject: 'Baobabe App',
+    await SharePlus.instance.share(
+      ShareParams(
+        text:
+            "Découvrez Baobabe, l'application qui vous connecte aux meilleurs "
+            'services !\nTéléchargez-la sur : https://baobabe.cd',
+        subject: 'Baobabe',
+      ),
     );
   }
 }

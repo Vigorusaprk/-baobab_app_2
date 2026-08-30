@@ -30,7 +30,7 @@ class ReviewApiService {
           'businessId': businessId,
           'rating': rating,
           'comment': comment,
-          if (offerId != null) 'offerId': offerId,
+          'offerId': ?offerId,
         },
       );
     } catch (e) {

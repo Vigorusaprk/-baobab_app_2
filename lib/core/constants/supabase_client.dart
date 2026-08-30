@@ -7,12 +7,12 @@ class SupabaseClientWrapper {
     // 1. Utilisez l'URL officielle de votre projet Supabase (sans /rest/v1)
     const String supabaseUrl = 'https://wrutwzbtnquxigxetxfx.supabase.co';
 
-    // 2. Utilisez votre clé publique 'anon'
-    const String anonKey = 'sb_publishable_lCKQ9R0_LzFk6EbRYuDnbQ_WITRinDO';
+    // 2. La clé publiable du projet (l'ancien nom était « anon »).
+    const String publishableKey = 'sb_publishable_lCKQ9R0_LzFk6EbRYuDnbQ_WITRinDO';
 
     final supabase = await Supabase.initialize(
       url: supabaseUrl,
-      anonKey: anonKey,
+      publishableKey: publishableKey,
       authOptions: const FlutterAuthClientOptions(
         authFlowType: AuthFlowType.pkce,
       ),

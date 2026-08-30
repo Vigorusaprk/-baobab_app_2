@@ -13,7 +13,7 @@ import '../widgets/business_results_list.dart';
 /// Recherche par budget : quels commerçants proposent quelque chose dans
 /// la fourchette de prix choisie, tous types d'offres confondus.
 class BudgetFinderPage extends StatelessWidget {
-  const BudgetFinderPage({Key? key}) : super(key: key);
+  const BudgetFinderPage({super.key});
 
   @override
   Widget build(BuildContext context) {

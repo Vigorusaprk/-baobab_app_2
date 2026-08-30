@@ -19,6 +19,7 @@ class CategoryChip extends StatelessWidget {
   final double collapseProgress;
 
   const CategoryChip({
+    super.key,
     required this.uiCategory,
     required this.isActive,
     required this.collapseProgress,
@@ -127,8 +128,8 @@ class CategoryChip extends StatelessWidget {
               color: uiCategory
                   .color(context)
                   .withValues(alpha: 0.2 * selected),
-              blurRadius: 12,
-              offset: const Offset(0, 6),
+              blurRadius: 2,
+              offset: const Offset(0, 5),
             ),
           ],
           border: Border.all(

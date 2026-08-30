@@ -179,8 +179,8 @@ class Order {
   static List<Map<String, dynamic>>? _normalizeToList(dynamic value) {
     if (value is List) {
       return value
-          .where((item) => item is Map)
-          .map((item) => Map<String, dynamic>.from(item as Map))
+          .whereType<Map>()
+          .map((item) => Map<String, dynamic>.from(item))
           .toList();
     }
     return null;

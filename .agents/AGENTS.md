@@ -599,3 +599,58 @@ police. Le texte s'écoule ; `textAlign` fait le reste.
 ## UI And Design System
 
 A dedicated design system pass (colors, typography, spacing, component consistency) is planned but has **not started**. Until a `ui-design-systems` reference file exists in this repo, do not perform a broad visual redesign — only make the minimal visual changes required by the task at hand, using the existing `AppColors`/`AppDimens`/`AppFonts` constants under `lib/core/themes`, and never colors/styles outside of what `AppTheme.silvaTheme` (`lib/core/themes/app_theme.dart`) already defines or composes from those constants (see rule 13 above).
+
+## Un écran fini rend ce qu'il a récupéré
+
+Trois défauts trouvés dans la même passe, tous de la même famille : la donnée
+est demandée au serveur, elle arrive, et personne ne la montre.
+
+- « Trouver selon mon budget » calculait un prix moyen par commerce et
+  décidait s'il tenait dans le budget, puis affichait des rectangles vides —
+  la liste s'appuyait sur un `BusinessCardPlaceholder` resté à l'état
+  d'ébauche, avec son `TODO` intact.
+- L'icône de filtre de la page de recherche était un `CustomCard` **sans**
+  `GestureDetector` : rien ne se passait au doigt. Elle est raccordée à la
+  même destination que sa jumelle de l'accueil.
+- `SearchFilterSheet` — 394 lignes de panneau de filtres — n'était ouvert par
+  rien. Supprimé : il s'appuyait sur l'énumération `BusinessType` figée, que
+  les catégories venues du serveur ont remplacée. Un panneau de filtres se
+  rebâtira sur les slugs du serveur, pas sur cette liste codée en dur.
+
+Les règles qui en découlent :
+
+1. Un widget nommé `*Placeholder` ne survit pas à la revue. S'il rend une
+   boîte vide, il masque un écran non terminé derrière une apparence de
+   travail fait.
+2. Un contrôle visible se teste au doigt, pas à l'œil. Un `Container` décoré
+   qui ressemble à un bouton et n'a pas de `onTap` est un mensonge.
+3. Une valeur portée par une entité (`averagePrice`, `matchesBudget`) et
+   jamais lue par un widget est soit un écran inachevé, soit un champ mort.
+   Les deux se corrigent, aucun ne se garde.
+
+`test/budget_results_test.dart` tient la première ; `test/hardening_test.dart`
+(« aucun bouton ne mène nulle part ») tient la deuxième.
+
+## Le message d'erreur n'est pas le journal
+
+`emit(FeedError('Impossible de charger le feed : $e'))` mettait sous les yeux
+de quelqu'un qui ouvrait l'accueil le texte
+« Erreur Edge Function (get-home) lors du chargement… ». L'exception est pour
+`debugPrint`, la phrase écrite est pour l'écran :
+
+```dart
+} catch (e) {
+  debugPrint("Chargement de l'accueil — échec : $e");
+  emit(
+    const FeedError(
+      "L'accueil n'a pas pu être chargé. Vérifiez votre connexion et réessayez.",
+    ),
+  );
+}
+```
+
+Le piège est que l'exception se colle au message **bien avant** l'affichage —
+dans un état de bloc, un `errorMessage` de cubit — donc surveiller le
+`Text(...)` final ne suffit pas. `test/hardening_test.dart` inspecte toute
+phrase d'interface qui interpole `$e`, en exemptant `throw`, `debugPrint` et
+le journal.

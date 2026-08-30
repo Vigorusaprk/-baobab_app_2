@@ -12,18 +12,6 @@
         "8765"
       ],
       "port": 8765
-    },
-    {
-      "name": "web-release",
-      "runtimeExecutable": "python",
-      "runtimeArgs": [
-        "-m",
-        "http.server",
-        "8766",
-        "--directory",
-        "build/web"
-      ],
-      "port": 8766
     }
   ]
 }

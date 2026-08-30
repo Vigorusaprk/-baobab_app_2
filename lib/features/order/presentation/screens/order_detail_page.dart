@@ -12,149 +12,77 @@ class OrderDetailPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final dateFormat = DateFormat('dd/MM/yyyy HH:mm');
 
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        title: Text(
-          'Détails de la commande',
-          style: Theme.of(context).textTheme.headlineLarge!.copyWith(
-            color: Theme.of(context).colorScheme.primary,
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildDetailSection(context, 'Restaurant', [
+          _buildDetailRow(context, 'Nom', order.establishmentName),
+          _buildDetailRow(context, 'Type', order.typeName),
+        ]),
+        _buildDetailSection(context, 'Date et heure', [
+          _buildDetailRow(
+            context,
+            'Passée le',
+            dateFormat.format(order.orderDate),
           ),
-        ),
-
-        leading: IconButton(
-          tooltip: 'Retour',
-          icon: Container(
-            decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.secondary,
-              shape: BoxShape.circle,
-            ),
-            child: Center(
-              child: Icon(
-                Icons.arrow_back_ios_new_rounded,
-                color: Theme.of(context).colorScheme.surface,
-              ),
-            ),
-          ),
-          onPressed: () => Navigator.pop(context),
-        ),
-      ),
-      backgroundColor: Theme.of(context).colorScheme.primary,
-      body: Padding(
-        padding: AppDimens.appPadding,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(height: 24),
-
-            const SizedBox(height: 16),
-            Expanded(
-              child: SingleChildScrollView(
-                child: Column(
+        ]),
+        _buildDetailSection(context, 'Articles', [
+          if (order.items.isEmpty)
+            const Padding(
+              padding: EdgeInsets.symmetric(vertical: 12),
+              child: Text('Le détail des articles est indisponible.'),
+            )
+          else
+            ...order.items.map(
+              (item) => Padding(
+                padding: const EdgeInsets.symmetric(vertical: 4),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    _buildDetailSection(context, 'Restaurant', [
-                      _buildDetailRow(context, 'Nom', order.establishmentName),
-                      _buildDetailRow(context, 'Type', order.typeName),
-                    ]),
-                    _buildDetailSection(context, 'Date et heure', [
-                      _buildDetailRow(
-                        context,
-                        'Passée le',
-                        dateFormat.format(order.orderDate),
-                      ),
-                    ]),
-                    _buildDetailSection(context, 'Articles', [
-                      if (order.items.isEmpty)
-                        const Padding(
-                          padding: EdgeInsets.symmetric(vertical: 12),
-                          child: Text(
-                            'Le détail des articles est indisponible.',
-                          ),
-                        )
-                      else
-                        ...order.items.map(
-                          (item) => Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 4),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Expanded(
-                                  child: Text('${item.quantity}x ${item.name}'),
-                                ),
-                                Text(
-                                  '${(item.price * item.quantity).toStringAsFixed(2)} \$',
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                    ]),
-                    _buildDetailSection(context, 'Paiement', [
-                      _buildDetailRow(
-                        context,
-                        'Sous-total',
-                        '${order.subtotal.toStringAsFixed(2)} \$',
-                      ),
-                      _buildDetailRow(
-                        context,
-                        'Taxes',
-                        '${order.tax.toStringAsFixed(2)} \$',
-                      ),
-
-                      SizedBox(height: AppDimens.large),
-                      Container(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: AppDimens.small,
-                          vertical: AppDimens.small,
-                        ),
-                        decoration: BoxDecoration(
-                          color: OtherTheme.of(
-                            context,
-                          ).success.withValues(alpha: 0.3),
-                          borderRadius: BorderRadius.circular(
-                            AppDimens.radius16,
-                          ),
-                        ),
-                        child: _buildDetailRow(
-                          context,
-                          'Total',
-                          '${order.totalAmount.toStringAsFixed(2)} \$',
-                          isBold: true,
-                        ),
-                      ),
-                    ]),
-                    if (order.notes != null && order.notes!.isNotEmpty)
-                      _buildDetailSection(context, 'Notes', [
-                        Text(order.notes!),
-                      ]),
+                    Expanded(child: Text('${item.quantity}x ${item.name}')),
+                    Text(
+                      '${(item.price * item.quantity).toStringAsFixed(2)} \$',
+                    ),
                   ],
                 ),
               ),
             ),
-            const SizedBox(height: 16),
-            Row(
-              children: [
-                Expanded(
-                  child: OutlinedButton(
-                    onPressed: () => Navigator.pop(context),
-                    child: Text(
-                      'Fermer',
-                      style: TextStyle(
-                        fontFamily: 'Poppins',
-                        color: Theme.of(context).colorScheme.primary,
-                      ),
-                    ),
-                  ),
-                ),
-                // Le bouton « Recommander » a été retiré : il refermait
-                // la page et annonçait « Fonctionnalité à implémenter ». Il
-                // reviendra quand recommander sera possible.
-              ],
+        ]),
+        _buildDetailSection(context, 'Paiement', [
+          _buildDetailRow(
+            context,
+            'Sous-total',
+            '${order.subtotal.toStringAsFixed(2)} \$',
+          ),
+          _buildDetailRow(
+            context,
+            'Taxes',
+            '${order.tax.toStringAsFixed(2)} \$',
+          ),
+
+          SizedBox(height: AppDimens.large),
+          Container(
+            padding: EdgeInsets.symmetric(
+              horizontal: AppDimens.small,
+              vertical: AppDimens.small,
             ),
-          ],
-        ),
-      ),
+            decoration: BoxDecoration(
+              color: OtherTheme.of(context).success.withValues(alpha: 0.3),
+              borderRadius: BorderRadius.circular(AppDimens.radius16),
+            ),
+            child: _buildDetailRow(
+              context,
+              'Total',
+              '${order.totalAmount.toStringAsFixed(2)} \$',
+              isBold: true,
+            ),
+          ),
+        ]),
+        if (order.notes != null && order.notes!.isNotEmpty)
+          _buildDetailSection(context, 'Notes', [Text(order.notes!)]),
+        const SizedBox(height: 16),
+      ],
     );
   }
 
@@ -166,12 +94,6 @@ class OrderDetailPage extends StatelessWidget {
     return Container(
       width: double.infinity,
       margin: const EdgeInsets.only(bottom: 16),
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surface,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Theme.of(context).colorScheme.surface),
-      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

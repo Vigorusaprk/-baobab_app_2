@@ -61,9 +61,9 @@ class _FakeRepository implements MerchantRepository {
 /// court-circuite ce seul point pour n'exercer que sa logique d'état.
 class _TestableMerchantCubit extends MerchantCubit {
   _TestableMerchantCubit(
-    MerchantRepository repository, {
+    super.repository, {
     required this.loggedIn,
-  }) : super.forTest(repository);
+  }) : super.forTest();
 
   final bool loggedIn;
 

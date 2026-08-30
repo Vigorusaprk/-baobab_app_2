@@ -3,7 +3,7 @@ import 'package:baobabe_0_2/features/home_page/domain/usecases/get_businesses_pa
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-/// État de l'écran "Voir tout" : une seule liste paginée d'établissements.
+/// État de l'écran "Voir tout" : une seule liste paginée de commerces.
 ///
 /// Volontairement distinct de `BusinessBloc`, qui pilote les trois sections
 /// de l'accueil : ici on n'a besoin que de la liste, inutile de demander au

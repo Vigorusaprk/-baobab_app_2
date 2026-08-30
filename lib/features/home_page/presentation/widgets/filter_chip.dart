@@ -7,12 +7,12 @@ class FilterChipWidget extends StatelessWidget {
   final IconData? icon;
 
   const FilterChipWidget({
-    Key? key,
+    super.key,
     required this.label,
     required this.onRemoved,
     this.color,
     this.icon,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

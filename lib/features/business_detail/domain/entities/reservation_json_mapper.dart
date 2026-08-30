@@ -78,18 +78,19 @@ extension ReservationJsonMapper on Reservation {
       },
     };
 
-    final _userId = userId;
-    if (_userId != null && _userId.isNotEmpty) {
-      payload['user_id'] = _userId;
+    // Copie locale : la promotion de type ne s'applique pas à un membre.
+    final owner = userId;
+    if (owner != null && owner.isNotEmpty) {
+      payload['user_id'] = owner;
     }
 
     if (!isNew && id.isNotEmpty) {
       payload['id'] = id;
     }
 
-    final _createdAt = createdAt;
-    if (!isNew && _createdAt != null) {
-      payload['created_at'] = _createdAt.toIso8601String();
+    final created = createdAt;
+    if (!isNew && created != null) {
+      payload['created_at'] = created.toIso8601String();
     }
 
     return payload;

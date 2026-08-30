@@ -1,5 +1,6 @@
 import 'package:baobabe_0_2/core/themes/app_diemens.dart';
 import 'package:baobabe_0_2/core/themes/other_theme.dart';
+import 'package:baobabe_0_2/core/widgets/custom_card.dart';
 import 'package:flutter/material.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
@@ -19,7 +20,7 @@ class ActivityListSkeleton extends StatelessWidget {
       child: ListView.builder(
         padding: const EdgeInsets.all(16),
         itemCount: 4,
-        itemBuilder: (_, __) => itemSkeleton,
+        itemBuilder: (_, _) => itemSkeleton,
       ),
     );
   }
@@ -32,10 +33,7 @@ class OrderCardSkeleton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      color: Theme.of(context).colorScheme.surfaceContainerLowest,
-      margin: const EdgeInsets.only(bottom: 12),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+    return CustomCard(
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(

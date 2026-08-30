@@ -11,7 +11,7 @@ import 'package:intl/intl.dart';
 class ReceivedReservationCard extends StatelessWidget {
   final ReceivedReservation reservation;
 
-  ReceivedReservationCard({required this.reservation});
+  const ReceivedReservationCard({super.key, required this.reservation});
 
   /// Même grammaire que le cycle d'une commande : ambre tant qu'on attend
   /// une réponse, vert quand c'est accepté, neutre quand c'est derrière

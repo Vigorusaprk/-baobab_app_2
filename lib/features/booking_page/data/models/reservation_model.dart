@@ -20,7 +20,7 @@ class Reservation {
     required this.totalAmount,
     required this.details,
     DateTime? createdAt,
-  }) : this.createdAt = createdAt ?? DateTime.now();
+  }) : createdAt = createdAt ?? DateTime.now();
 
   // Correction : factory renommée fromJson pour correspondre à votre service
   factory Reservation.fromJson(Map<String, dynamic> map) {

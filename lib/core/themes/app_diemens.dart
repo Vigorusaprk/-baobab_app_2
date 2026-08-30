@@ -58,7 +58,7 @@ class AppDimens {
   static const double allPadding12Number = 12.0;
   static const allPadding8 = EdgeInsets.all(8);
   static const allPadding12 = EdgeInsets.all(allPadding12Number);
-  static carouselPadding(int index, int length) => EdgeInsets.only(
+  static EdgeInsets carouselPadding(int index, int length) => EdgeInsets.only(
     left: index == 0 ? AppDimens.appPaddingValue : 8.0,
     right: index == length - 1 ? AppDimens.appPaddingValue : 8.0,
     top: 8.0,

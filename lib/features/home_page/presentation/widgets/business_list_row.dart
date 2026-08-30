@@ -17,10 +17,16 @@ class BusinessListRow extends StatelessWidget {
   final UIBusiness uiBusiness;
   final VoidCallback onTap;
 
+  /// Complément affiché en bout de ligne — le prix moyen dans la recherche
+  /// par budget, rien ailleurs. Optionnel pour que les listes existantes
+  /// gardent exactement la même allure.
+  final Widget? trailing;
+
   const BusinessListRow({
     super.key,
     required this.uiBusiness,
     required this.onTap,
+    this.trailing,
   });
 
   @override
@@ -129,6 +135,10 @@ class BusinessListRow extends StatelessWidget {
                   ],
                 ),
               ),
+              if (trailing != null) ...[
+                AppDimens.spacerSmallWidth,
+                trailing!,
+              ],
             ],
           ),
         ),

@@ -9,8 +9,7 @@ class FeedItemCard extends StatelessWidget {
   final FeedItem item;
   final VoidCallback onTap;
 
-  const FeedItemCard({Key? key, required this.item, required this.onTap})
-    : super(key: key);
+  const FeedItemCard({super.key, required this.item, required this.onTap});
 
   bool get _isPromo => item.type == FeedItemType.promotion;
 

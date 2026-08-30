@@ -48,11 +48,11 @@ class WriteReviewModal extends StatefulWidget {
   final VoidCallback onSubmitted;
 
   const WriteReviewModal({
-    Key? key,
+    super.key,
     required this.business,
     required this.userId,
     required this.onSubmitted,
-  }) : super(key: key);
+  });
 
   @override
   State<WriteReviewModal> createState() => _WriteReviewModalState();

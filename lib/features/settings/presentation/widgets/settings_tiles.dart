@@ -8,7 +8,7 @@ import 'package:flutter/material.dart';
 class IconBadge extends StatelessWidget {
   final IconData icon;
   final Color color;
-  IconBadge({super.key, required this.icon, required this.color});
+  const IconBadge({super.key, required this.icon, required this.color});
 
   @override
   Widget build(BuildContext context) {
@@ -62,7 +62,7 @@ class InfoTile extends StatelessWidget {
                   style: Theme.of(context).textTheme.bodyMedium!,
                 ),
               ),
-              if (trailing != null) trailing!,
+              ?trailing,
               if (onTap != null && trailing == null)
                 Icon(
                   Icons.chevron_right,

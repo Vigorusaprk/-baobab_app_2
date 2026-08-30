@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 /// Affiché quand le filtre actif ne renvoie aucun élément.
 class FeedEmptyState extends StatelessWidget {
-  FeedEmptyState({Key? key}) : super(key: key);
+  const FeedEmptyState({super.key});
 
   @override
   Widget build(BuildContext context) {

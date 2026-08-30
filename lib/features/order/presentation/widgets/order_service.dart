@@ -45,10 +45,10 @@ class OrderApiService {
                 },
               )
               .toList(),
-          if (deliveryAddress != null) 'deliveryAddress': deliveryAddress,
-          if (deliveryFee != null) 'deliveryFee': deliveryFee,
-          if (paymentMethod != null) 'paymentMethod': paymentMethod,
-          if (notes != null) 'notes': notes,
+          'deliveryAddress': ?deliveryAddress,
+          'deliveryFee': ?deliveryFee,
+          'paymentMethod': ?paymentMethod,
+          'notes': ?notes,
         },
       );
     } catch (e) {

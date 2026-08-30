@@ -10,11 +10,11 @@ class BudgetFilterPanel extends StatelessWidget {
   final double sliderMax;
 
   const BudgetFilterPanel({
-    Key? key,
+    super.key,
     required this.budget,
     required this.onChanged,
     this.sliderMax = 100000,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

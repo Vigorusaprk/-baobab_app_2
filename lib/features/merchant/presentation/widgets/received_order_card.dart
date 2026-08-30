@@ -11,7 +11,7 @@ import 'package:intl/intl.dart';
 class ReceivedOrderCard extends StatelessWidget {
   final ReceivedOrder order;
 
-  const ReceivedOrderCard({required this.order});
+  const ReceivedOrderCard({super.key, required this.order});
 
   /// L'étape suivante d'une commande. Le commerçant n'a jamais à choisir
   /// dans une liste de six statuts : il confirme, puis prépare, puis

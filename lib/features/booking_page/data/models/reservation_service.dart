@@ -54,8 +54,8 @@ class ReservationApiService {
           'quantity': quantity,
           if (reservationDate != null)
             'reservationDate': reservationDate.toIso8601String(),
-          if (notes != null) 'notes': notes,
-          if (details != null) 'details': details,
+          'notes': ?notes,
+          'details': ?details,
         },
       );
       return (response.data as Map<String, dynamic>)['data']

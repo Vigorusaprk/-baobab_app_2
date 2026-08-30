@@ -9,10 +9,10 @@ class FeedFilterChips extends StatelessWidget {
   final ValueChanged<FeedFilter> onFilterSelected;
 
   const FeedFilterChips({
-    Key? key,
+    super.key,
     required this.activeFilter,
     required this.onFilterSelected,
-  }) : super(key: key);
+  });
 
   static const _labels = {
     FeedFilter.all: 'Tout',

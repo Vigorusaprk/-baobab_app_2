@@ -8,7 +8,7 @@ import 'package:intl/intl.dart';
 class FieldLabel extends StatelessWidget {
   final String text;
 
-  const FieldLabel(this.text);
+  const FieldLabel(this.text, {super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +26,7 @@ class DateField extends StatelessWidget {
   final VoidCallback onPick;
   final VoidCallback onClear;
 
-  const DateField({
+  const DateField({super.key, 
     required this.value,
     required this.onPick,
     required this.onClear,

@@ -13,7 +13,7 @@ import '../widgets/feed_empty_state.dart';
 /// Page racine. Fournit le BLoC et route go_router vers ici.
 /// une fois la table `feed_items` prête.
 class NotificationsPage extends StatelessWidget {
-  const NotificationsPage({Key? key}) : super(key: key);
+  const NotificationsPage({super.key});
 
   @override
   Widget build(BuildContext context) {
