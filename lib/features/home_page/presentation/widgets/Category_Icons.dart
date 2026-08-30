@@ -118,8 +118,8 @@ class CategoryIcons extends StatelessWidget {
                 right: index == categories.length - 1
                     ? AppDimens.appPaddingValue
                     : 4.0,
-                top: lerpDouble(8.0, 4.0, t)!,
-                bottom: lerpDouble(8.0, 4.0, t)!,
+                //top: lerpDouble(8.0, 4.0, t)!,
+                //bottom: lerpDouble(8.0, 4.0, t)!,
               ),
               child: CategoryChip(
                 uiCategory: uiCategory,

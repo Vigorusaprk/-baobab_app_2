@@ -123,15 +123,6 @@ class CategoryChip extends StatelessWidget {
               t,
             )!,
           ),
-          boxShadow: [
-            BoxShadow(
-              color: uiCategory
-                  .color(context)
-                  .withValues(alpha: 0.2 * selected),
-              blurRadius: 2,
-              offset: const Offset(0, 5),
-            ),
-          ],
           border: Border.all(
             color: uiCategory.color(context).withValues(alpha: 0.5 * selected),
             width: 1.5,

@@ -162,7 +162,7 @@ class AppTheme {
           borderSide: BorderSide.none,
         ),
         contentPadding: AppDimens.inputPadding,
-        hintStyle: textTheme.bodyMedium?.copyWith(
+        hintStyle: textTheme.bodySmall?.copyWith(
           color: scheme.onSurfaceVariant,
         ),
         labelStyle: textTheme.labelSmall,

@@ -1,3 +1,4 @@
+import 'package:baobabe_0_2/core/animation/press_effect.dart';
 import 'package:baobabe_0_2/core/themes/app_diemens.dart';
 import 'package:baobabe_0_2/core/themes/other_theme.dart';
 import 'package:baobabe_0_2/core/widgets/remote_image.dart';
@@ -38,32 +39,34 @@ class OfferCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
 
-    return Material(
-      color: scheme.surfaceContainerLowest,
-      borderRadius: AppDimens.cardBorderRadiusAll,
-      clipBehavior: Clip.antiAlias,
-      elevation: AppDimens.elevationDefault,
-      shadowColor: scheme.onSurface.withValues(alpha: 0.10),
-      child: InkWell(
-        onTap: onTap,
-        child: Padding(
-          padding: const EdgeInsets.all(_frame),
-          child: ClipRRect(
-            // Rayon extérieur moins la marge : sans cette soustraction les deux
-            // arrondis ne sont pas concentriques, et le liseré blanc paraît
-            // plus épais dans les coins que sur les côtés.
-            borderRadius: BorderRadius.circular(
-              AppDimens.cardBorderRadius - _frame,
-            ),
-            child: Column(
-              children: [
-                // La photo prend toute la place que le texte ne réclame pas.
-                Expanded(child: _Photo(offer: offer)),
-                ColoredBox(
-                  color: scheme.surfaceContainerLowest,
-                  child: _Content(offer: offer),
-                ),
-              ],
+    return PressEffect(
+      child: Material(
+        color: scheme.surfaceContainerLowest,
+        borderRadius: AppDimens.cardBorderRadiusAll,
+        clipBehavior: Clip.antiAlias,
+        elevation: AppDimens.elevationDefault,
+        shadowColor: scheme.onSurface.withValues(alpha: 0.10),
+        child: InkWell(
+          onTap: onTap,
+          child: Padding(
+            padding: const EdgeInsets.all(_frame),
+            child: ClipRRect(
+              // Rayon extérieur moins la marge : sans cette soustraction les deux
+              // arrondis ne sont pas concentriques, et le liseré blanc paraît
+              // plus épais dans les coins que sur les côtés.
+              borderRadius: BorderRadius.circular(
+                AppDimens.cardBorderRadius - _frame,
+              ),
+              child: Column(
+                children: [
+                  // La photo prend toute la place que le texte ne réclame pas.
+                  Expanded(child: _Photo(offer: offer)),
+                  ColoredBox(
+                    color: scheme.surfaceContainerLowest,
+                    child: _Content(offer: offer),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
