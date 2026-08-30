@@ -1,6 +1,6 @@
 import 'package:baobabe_0_2/core/themes/app_diemens.dart';
 import 'package:baobabe_0_2/features/business_detail/domain/entities/offer.dart';
-import 'package:baobabe_0_2/features/home_page/presentation/widgets/offer_card_widget.dart';
+import 'package:baobabe_0_2/core/widgets/offer_card.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:skeletonizer/skeletonizer.dart';
@@ -87,7 +87,7 @@ class OffersCarouselSection extends StatelessWidget {
               final offer = offers[index];
               return SizedBox(
                 width: cardWidth,
-                child: OfferCardWidget(
+                child: OfferCard(
                   offer: offer,
                   // On ouvre l'offre, pas la boutique : l'utilisateur a
                   // cliqué sur une chose précise, l'envoyer sur le

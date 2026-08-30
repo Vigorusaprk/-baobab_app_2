@@ -156,7 +156,7 @@ class CustomPopUp extends StatelessWidget {
                     ),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(
-                        AppDimens.borderRadiusAuthIconButton,
+                        AppDimens.borderRadiusSmallButton,
                       ),
                     ),
                   ),

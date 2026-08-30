@@ -135,10 +135,7 @@ class BusinessListRow extends StatelessWidget {
                   ],
                 ),
               ),
-              if (trailing != null) ...[
-                AppDimens.spacerSmallWidth,
-                trailing!,
-              ],
+              if (trailing != null) ...[AppDimens.spacerSmallWidth, trailing!],
             ],
           ),
         ),

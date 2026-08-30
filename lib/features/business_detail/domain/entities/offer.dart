@@ -34,6 +34,18 @@ enum Fulfilment {
         return 'En boutique';
     }
   }
+
+  /// La valeur attendue par l'API (`fulfilment` en base et dans get-home).
+  String get apiValue {
+    switch (this) {
+      case Fulfilment.order:
+        return 'order';
+      case Fulfilment.booking:
+        return 'booking';
+      case Fulfilment.inStore:
+        return 'in_store';
+    }
+  }
 }
 
 /// Une offre publiée par un commerçant.

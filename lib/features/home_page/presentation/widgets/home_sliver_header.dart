@@ -3,8 +3,8 @@ import 'dart:ui' show lerpDouble;
 import 'package:baobabe_0_2/core/themes/app_diemens.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/widgets/Category_Icons.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/widgets/home_search_bar.dart';
+import 'package:baobabe_0_2/core/widgets/button/custom_icon_button.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 
 /// En-tête collant de l'accueil : salutation + barre de recherche +
@@ -233,33 +233,11 @@ class _GreetingRow extends StatelessWidget {
               ],
             ),
           ),
-          GestureDetector(
-            onTap: () => context.pushNamed('notifications'),
-            child: Container(
-              padding: const EdgeInsets.all(AppDimens.small),
-              decoration: BoxDecoration(
-                boxShadow: [
-                  BoxShadow(
-                    color: Theme.of(
-                      context,
-                    ).colorScheme.onSurface.withValues(alpha: 0.05),
-                    blurRadius: 10,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
-                borderRadius: BorderRadius.circular(AppDimens.radius10),
-                color: Theme.of(context).colorScheme.surfaceContainerLowest,
-              ),
-              child: SvgPicture.asset(
-                'assets/icons/notifications.svg',
-                height: 26,
-                width: 26,
-                colorFilter: ColorFilter.mode(
-                  Theme.of(context).colorScheme.primary,
-                  BlendMode.srcIn,
-                ),
-              ),
-            ),
+          CustomIconButton(
+            onPressed: () => context.pushNamed('notifications'),
+            tooltip: 'Mes notifications',
+            assetPath: 'assets/icons/notifications.svg',
+            iconSize: 26,
           ),
         ],
       ),

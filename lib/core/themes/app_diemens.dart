@@ -24,6 +24,7 @@ class AppDimens {
   /// 48 dp ; en dessous, la cible se rate.
   static const double touchTarget = 48.0;
 
+  static const double tiny = 4.0;
   static const double small = 8.0;
   static const double medium = 16.0;
   static const double large = 24.0;
@@ -70,7 +71,7 @@ class AppDimens {
 
   // *** Button *** //
   static const double borderButton = 20.0;
-  static const double borderRadiusAuthIconButton = 16.0;
+  static const double borderRadiusSmallButton = 16.0;
   static const buttonPadding = EdgeInsets.symmetric(
     horizontal: 24,
     vertical: 12,

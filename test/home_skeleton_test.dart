@@ -1,7 +1,7 @@
 import 'package:baobabe_0_2/features/business_detail/domain/entities/offer.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/widgets/business_list_row.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/widgets/home_skeleton.dart';
-import 'package:baobabe_0_2/features/home_page/presentation/widgets/offer_card_widget.dart';
+import 'package:baobabe_0_2/core/widgets/offer_card.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/widgets/offers_carousel_section.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';

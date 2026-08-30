@@ -724,3 +724,95 @@ aujourd'hui au premier doigt :
 - `merchant_offers_screen.dart` — « Retirer » une offre du catalogue.
 - `received_order_card.dart` — « Refuser » une commande.
 - `received_reservation_card.dart` — « Refuser » une réservation.
+
+## La carte d'offre vit dans `core/widgets`
+
+`lib/core/widgets/offer_card.dart` est la seule carte d'offre. Les carrousels
+de l'accueil, le catalogue d'un commerçant, le rail « autres offres » et la
+grille d'Explorer montrent tous la même.
+
+Une carte blanche à marge intérieure, dans laquelle la photo est posée avec
+ses propres coins arrondis. Le texte se pose sur le bas de la photo, rendu
+lisible par un flou progressif et un voile clair.
+
+**Le rayon intérieur vaut le rayon extérieur moins la marge.** Avec
+`cardBorderRadius` (20) et une marge de `small` (8), il tombe sur 12. Sans
+cette soustraction les deux arrondis ne sont pas concentriques, et le liseré
+blanc paraît plus épais dans les coins que sur les côtés.
+
+**Le flou ne passe pas par `BackdropFilter`.** Ce qu'il y a derrière le voile,
+c'est la photo de la carte elle-même : on floute donc une **copie** de cette
+photo plutôt que de faire relire la scène au moteur de rendu. Sur le web, où
+ces cartes défilent par paquets, la différence n'est pas théorique.
+
+**Et surtout : aucun découpage.** Une première version ne floutait qu'une
+bande basse, masquée par un dégradé calculé sur l'image entière. Le fondu se
+terminait donc au-dessus de la bande, et le `ClipRect` tranchait net une image
+déjà floutée aux trois quarts : la frontière se voyait comme un trait en
+travers de la carte. La copie couvre désormais toute la photo et le dégradé
+est seul à décider où le flou apparaît. Sans découpage, il n'y a pas de bord
+possible.
+
+Le voile culmine à 0,88. Ce n'est pas un réglage esthétique : nos visuels sont
+des photos quelconques, et sur une photo entièrement noire — le pire cas — ce
+voile donne encore 5,9:1 à la ligne la plus pâle. Le baisser demande de
+refaire le calcul.
+
+Le contenu garde la disposition d'origine : nom, « chez qui », puis une ligne
+qui oppose le prix à la note. Une version intermédiaire y avait mis trois
+colonnes chiffrées (Note · Mode · Prix) : à 173 px de large dans la grille
+d'Explorer, les valeurs longues rétrécissaient et les trois chiffres n'avaient
+plus la même taille. La carte fait 190 px de large — pas la place pour trois
+colonnes.
+
+Les deux badges gardent aussi leurs places d'origine : le mode de retrait en
+haut à gauche de la photo, la date juste au-dessus du nom — là où finissait la
+photo dans la carte d'avant.
+
+`test/offer_card_test.dart` vérifie qu'elle ne déborde ni au plus petit
+gabarit du rail (190×220), ni dans une case de la grille (171×225), ni à 1,5×
+d'agrandissement du texte. Les trois tailles sont réelles.
+
+Pas de bouton dans la carte : la carte entière est le bouton. Un bouton
+créerait une petite cible collée à un geste de défilement, et une offre en
+boutique n'a aucune action à proposer.
+
+## Explorer cherche des offres, et le serveur fait le tri
+
+L'écran présentait des **commerces**, en chargeant les cinquante premiers puis
+en les filtrant en Dart. Deux défauts en un : ce n'était pas le bon objet, et
+au-delà de la première page le filtrage ne portait que sur ce qui était déjà
+reçu.
+
+Il s'appuie désormais sur `get-home?section=discover`, qui accepte `q`,
+`category`, `minPrice`, `maxPrice`, `fulfilment`, `minRating` et `sort` — tous
+appliqués **en base**. La règle : un critère qui coexiste avec du défilement
+infini se filtre au serveur, jamais sur la page déjà chargée.
+
+Deux gardes dans `ExploreCubit` méritent d'être connus :
+
+1. **Une temporisation de 350 ms** sépare la frappe de l'appel, et un numéro
+   de requête écarte les réponses arrivées dans le désordre — sans lui, une
+   requête lente écrase le résultat de la recherche suivante.
+2. **Le numéro de page est suivi dans l'état**, jamais déduit du nombre
+   d'offres reçues. Une page n'est pleine que si le serveur avait de quoi la
+   remplir ; la division redemandait la page déjà lue. Un test le tient.
+
+`copyWith` ne peut pas remettre un critère à zéro — passer `null` veut dire
+« ne change rien ». Les remises à zéro passent donc par des drapeaux
+explicites (`clearPrice`, `clearCategory`…), sans quoi « tous les prix »
+serait inexprimable.
+
+## Un seul bouton icône, un seul champ de recherche
+
+- `lib/core/widgets/button/custom_icon_button.dart` — le bouton carré qui ne
+  porte qu'une icône. Il en existait quatre versions écrites à la main, avec
+  trois rayons différents (10, 20, celui de `CustomCard`) et une cible
+  tactile de 41 px là où `AppDimens.touchTarget` documente 48. Rayon
+  `borderRadiusSmallButton`, carré, jamais sous la cible tactile. Le
+  `tooltip` est **obligatoire** : une icône seule est une devinette, et c'est
+  le seul texte qu'un lecteur d'écran annoncera.
+- `lib/core/widgets/custom_search_field.dart` — le champ de recherche.
+  L'accueil le montre en `readOnly` (il ne sert qu'à emmener sur Explorer),
+  Explorer le montre éditable. Les deux doivent rester indiscernables : c'est
+  le même geste poursuivi d'un écran à l'autre.
