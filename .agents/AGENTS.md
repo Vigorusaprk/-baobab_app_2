@@ -732,84 +732,47 @@ de l'accueil, le catalogue d'un commerçant, le rail « autres offres » et la
 grille d'Explorer montrent tous la même.
 
 Une carte blanche à marge intérieure, dans laquelle la photo est posée avec
-ses propres coins arrondis. Le texte se pose sur le bas de la photo, rendu
-lisible par un flou progressif et un voile clair.
+ses propres coins arrondis, et le texte occupe le bas de la carte.
 
 **Le rayon intérieur vaut le rayon extérieur moins la marge.** Avec
 `cardBorderRadius` (20) et une marge de `small` (8), il tombe sur 12. Sans
 cette soustraction les deux arrondis ne sont pas concentriques, et le liseré
 blanc paraît plus épais dans les coins que sur les côtés.
 
-**Le flou ne passe pas par `BackdropFilter`.** Ce qu'il y a derrière le voile,
-c'est la photo de la carte elle-même : on floute donc une **copie** de cette
-photo plutôt que de faire relire la scène au moteur de rendu. Sur le web, où
-ces cartes défilent par paquets, la différence n'est pas théorique.
+**La carte est bâtie en deux blocs franchement séparés** : la photo en haut,
+le texte en dessous sur l'aplat de la carte. Aucun fondu, aucune
+superposition, aucun voile.
 
-**Et surtout : aucun découpage.** Une première version ne floutait qu'une
-bande basse, masquée par un dégradé calculé sur l'image entière. Le fondu se
-terminait donc au-dessus de la bande, et le `ClipRect` tranchait net une image
-déjà floutée aux trois quarts : la frontière se voyait comme un trait en
-travers de la carte. La copie couvre désormais toute la photo et le dégradé
-est seul à décider où le flou apparaît. Sans découpage, il n'y a pas de bord
-possible.
-
-**La carte est bâtie en deux zones, et c'est la séparation qui fait le
-travail.** En haut la photo, intacte. En bas le texte sur un aplat opaque,
-précédé d'une bande de 28 px où le flou et le voile montent de rien à tout.
-
-La version précédente posait le texte directement sur la photo. Il fallait
-alors doser un voile assez fort pour rester lisible sur n'importe quel visuel,
-et ce voile délavait la photo sur les quatre cinquièmes de sa hauteur : la
-carte ne montrait plus le produit. Le contraste dépendait de la photo, donc il
-se calculait — et le calcul a été fait deux fois à la mauvaise hauteur, le
-titre sortant à 1,79:1 au lieu de 4,5.
-
-Sur fond opaque, le texte hérite des couples du thème : **16,7:1** pour le nom,
-7,9:1 pour « chez X », 14,7:1 pour le prix. Il n'y a plus rien à doser, plus de
-pire cas à envisager. C'est la propriété que `test/offer_card_test.dart`
-protège : *le texte ne repose jamais sur la photo*.
-
-**Le fondu est solidaire du bloc de texte.** Il fait 48 px et se termine
-exactement là où l'aplat opaque commence. C'est la quatrième tentative ; les
-trois précédentes ont chacune produit un défaut visible :
+C'est un choix arrêté après l'avoir essayé **quatre fois**, et chaque tentative
+a produit un défaut visible :
 
 1. **Bande basse masquée par un dégradé calculé sur l'image entière** — le
    fondu se terminait au-dessus de la bande, et le découpage tranchait une
    image déjà floutée aux trois quarts. Trait net en travers de la carte.
-2. **`BackdropFilter` sur une bande** — il floute *uniformément* sa région.
-   Le voile se dégradait, le flou non : photo nette au-dessus, pleinement
-   floutée en dessous. Même trait.
-3. **Fondu exprimé en fractions de la carte** (fin à 50 %) alors que le bloc
-   de texte a une hauteur naturelle et commence entre 53 % et 62 % : jusqu'à
-   **36 px de blanc vide** entre les deux.
+2. **`BackdropFilter` sur une bande** — il floute *uniformément* sa région :
+   le voile se dégradait, le flou non. Même trait.
+3. **Fondu exprimé en fractions de carte** (fin à 50 %) alors que le bloc de
+   texte a une hauteur naturelle et commence entre 53 % et 62 % : jusqu'à
+   36 px de blanc vide entre les deux.
+4. **Fondu solidaire du bloc de texte** — techniquement correct, mesuré
+   progressif au pixel près sur l'émulateur, mais il coûtait 48 px de photo
+   sans rendre la carte plus lisible.
 
-La leçon commune : *le fondu doit être attaché à ce qu'il rejoint*, pas à la
-carte. Attaché au bloc de texte, l'écart et la marche sont impossibles par
-construction.
+La leçon : la photo montre le produit, le texte le nomme. La frontière entre
+les deux n'a pas besoin d'être adoucie, et chaque tentative pour l'adoucir a
+coûté de la hauteur de photo.
 
-**L'alignement de la copie floutée** se règle avec un `OverflowBox` à la
-hauteur de la carte, ancré par le bas : son bas coïncide avec le bas du bloc,
-donc avec le bas de la carte, donc elle se superpose exactement à la photo.
-La hauteur de carte descend d'un `LayoutBuilder` posé sur la carte ; la
-hauteur du bloc vient d'un second `LayoutBuilder` à l'intérieur, et c'est lui
-qui dit quelle fraction du bloc le fondu occupe.
+**Le contraste n'est plus un calcul.** Le texte repose sur un aplat opaque, il
+hérite donc des couples du thème : 16,7:1 pour le nom, 7,9:1 pour « chez X »,
+14,7:1 pour le prix. Ces valeurs ne dépendent pas du visuel — c'est la
+propriété que `test/offer_card_test.dart` protège (« le texte ne repose jamais
+sur la photo »). Les versions à voile la calculaient, et le calcul a été fait
+**deux fois à la mauvaise hauteur** : vérifié en bas de carte où le voile
+culmine, alors que le nom est à mi-hauteur. Le titre sortait à 1,79:1.
 
-`BackdropFilter` ne peut pas faire ce travail : un flou qui se dégrade demande
-de masquer une couche floutée, donc de la peindre soi-même.
-
-**Ce que la photo occupe réellement**, une fois le texte (119 px) et le fondu
-déduits :
-
-| gabarit | photo nette | photo visible |
-|---|---|---|
-| rail court (190×265) | 45 % | 55 % |
-| rail moyen (190×285) | 48 % | 58 % |
-| rail haut (190×310) | 53 % | 62 % |
-| grille Explorer (171×255) | 42 % | 53 % |
-
-Le bloc de texte est **incompressible** : la photo prend ce qui reste. Monter
-au-delà demande de passer le titre sur une seule ligne, ce qui tronque les noms
-longs — arbitrage volontairement non pris.
+**La photo occupe entre 49 % et 58 % de la carte** selon le gabarit — mesuré,
+pas estimé. Le bloc de texte (119 px) est incompressible ; la photo prend ce
+qui reste. Un test pose le plancher à 45 %.
 
 Le contenu garde la disposition d'origine : nom, « chez qui », puis une ligne
 qui oppose le prix à la note. Une version intermédiaire y avait mis trois

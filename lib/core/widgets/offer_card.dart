@@ -145,9 +145,9 @@ class _Content extends StatelessWidget {
         children: [
           Text(
             offer.name,
-            maxLines: 2,
+            maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: Theme.of(context).textTheme.titleMedium,
+            style: Theme.of(context).textTheme.titleSmall,
           ),
           if (offer.businessName != null) ...[
             const SizedBox(height: 2),
@@ -171,7 +171,7 @@ class _Content extends StatelessWidget {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    fontWeight: FontWeight.w800,
+                    fontWeight: FontWeight.w700,
                     color: scheme.primary,
                   ),
                 ),
