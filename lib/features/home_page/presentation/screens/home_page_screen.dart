@@ -97,9 +97,16 @@ class _HomePageScreenState extends State<HomePageScreen> {
           },
         ),
       ],
+      // Pas de `buildWhen` ici. Il y en avait un — « reconstruire seulement
+      // si le type de l'état change » — et il figeait l'accueil sur son
+      // premier état chargé : ajouter des offres produit un `BusinessLoaded`
+      // après un autre `BusinessLoaded`, donc aucun rafraîchissement. Les
+      // deux paginations chargeaient sans jamais rien montrer.
+      //
+      // Filtrer n'est pas nécessaire : `BusinessState` est un Equatable, et
+      // un bloc n'émet pas deux états égaux à la suite. Un état identique ne
+      // reconstruit donc rien de toute façon.
       child: BlocBuilder<BusinessBloc, BusinessState>(
-        buildWhen: (previous, current) =>
-            previous.runtimeType != current.runtimeType,
         builder: (context, state) {
           final isLoading =
               state is BusinessInitial || state is BusinessLoading;

@@ -194,21 +194,70 @@ class _Line extends StatelessWidget {
   }
 }
 
+/// Squelette de la page, calqué sur [_Body].
+///
+/// Il empilait auparavant quatre courtes barres centrées : rien à voir avec
+/// la page réelle, qui aligne une icône puis deux lignes de texte sur toute
+/// la largeur. Le résultat paraissait tassé au milieu, puis sautait
+/// entièrement à l'arrivée des données.
+///
+/// Les largeurs des valeurs sont volontairement inégales — un nom est court,
+/// une adresse est longue. Des barres toutes identiques se lisent comme un
+/// gabarit, pas comme du contenu qui arrive.
 class _Skeleton extends StatelessWidget {
   const _Skeleton();
 
+  /// Longueur approximative de chaque valeur, dans l'ordre de [_Body].
+  static const List<double> _valueWidths = [140, 210, 130, 250];
+
   @override
   Widget build(BuildContext context) {
-    return Padding(
+    final theme = Theme.of(context);
+
+    return SingleChildScrollView(
       padding: const EdgeInsets.all(AppDimens.large),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const Bone.circle(size: 100),
+          const Center(child: Bone.circle(size: 100)),
           AppDimens.spacerLarge,
-          for (var i = 0; i < 4; i++) ...[
-            Bone.text(words: 3, style: Theme.of(context).textTheme.bodySmall!),
-            AppDimens.spacerLarge,
-          ],
+
+          for (final width in _valueWidths)
+            Padding(
+              padding: const EdgeInsets.only(bottom: AppDimens.medium),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Bone.square(size: 20),
+                  const SizedBox(width: AppDimens.medium),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Bone.text(
+                          width: 90,
+                          style: theme.textTheme.labelSmall!,
+                        ),
+                        const SizedBox(height: 2),
+                        Bone.text(
+                          width: width,
+                          style: theme.textTheme.bodySmall!,
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+          AppDimens.spacerLarge,
+          // Le bouton occupe toute la largeur : le squelette aussi, sans quoi
+          // le bas de la page se décale au moment du chargement.
+          Bone(
+            width: double.infinity,
+            height: AppDimens.touchTarget,
+            borderRadius: BorderRadius.circular(AppDimens.radius16),
+          ),
         ],
       ),
     );
