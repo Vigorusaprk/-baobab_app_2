@@ -111,6 +111,55 @@ void main() {
     });
   });
 
+  group("Ce que l'accueil demande en arrivant", () {
+    // Toucher la barre de recherche, c'est vouloir taper : sans ce signal
+    // l'utilisateur arrivait sur Explorer et devait toucher une seconde fois.
+    // Le bouton de filtre, lui, veut le panneau ouvert.
+    //
+    // Une seule intention à la fois, et non deux drapeaux : les deux gestes
+    // s'excluent, et deux booléens auraient laissé exister un état que
+    // personne ne peut produire.
+    test('la barre de recherche demande le focus', () async {
+      final cubit = ExploreCubit(api: _FakeApi());
+
+      cubit.requestSearch();
+      expect(cubit.state.pendingIntent, ExploreIntent.focusSearch);
+
+      await cubit.close();
+    });
+
+    test('le bouton de filtre demande le panneau', () async {
+      final cubit = ExploreCubit(api: _FakeApi());
+
+      cubit.requestFilters();
+      expect(cubit.state.pendingIntent, ExploreIntent.openFilters);
+
+      await cubit.close();
+    });
+
+    test("l'intention est consommée, elle ne se rejoue pas", () async {
+      // Sans cette remise à zéro, revenir sur l'onglet rouvrirait le panneau
+      // ou reprendrait le focus sans qu'on ait rien demandé.
+      final cubit = ExploreCubit(api: _FakeApi());
+
+      cubit.requestFilters();
+      cubit.intentHandled();
+
+      expect(cubit.state.pendingIntent, isNull);
+      await cubit.close();
+    });
+
+    test('la dernière demande remplace la précédente', () async {
+      final cubit = ExploreCubit(api: _FakeApi());
+
+      cubit.requestSearch();
+      cubit.requestFilters();
+
+      expect(cubit.state.pendingIntent, ExploreIntent.openFilters);
+      await cubit.close();
+    });
+  });
+
   group('Le cubit', () {
     test('choisir « Tout » retire la catégorie au lieu de la poser', () async {
       final api = _FakeApi(

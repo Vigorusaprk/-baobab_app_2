@@ -52,12 +52,14 @@ class OfferSelection {
     required String businessId,
     required List<Offer> offers,
     required String userId,
+    String? deliveryAddress,
     OrderApiService? service,
   }) {
     final selected = selectedFrom(offers);
     return (service ?? OrderApiService()).createOrder(
       userId: userId,
       businessId: businessId,
+      deliveryAddress: deliveryAddress,
       items: selected
           .map(
             (o) => OrderItem(
@@ -82,6 +84,7 @@ class OfferSelection {
   /// reste des places et refuse une date passée.
   Future<void> submitBooking({
     required List<Offer> offers,
+    String? contactPhone,
     ReservationApiService? service,
   }) {
     final selected = selectedFrom(offers);
@@ -94,6 +97,9 @@ class OfferSelection {
       offerId: offer.id,
       quantity: quantityOf(offer),
       reservationDate: offer.hasFixedDate ? null : chosenDate,
+      // Le numéro voyage dans `details` : c'est le champ libre de la
+      // réservation, et le client peut refuser de le donner.
+      details: contactPhone == null ? null : {'contactPhone': contactPhone},
     );
   }
 }

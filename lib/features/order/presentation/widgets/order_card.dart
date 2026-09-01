@@ -31,7 +31,7 @@ class OrderCard extends StatelessWidget {
         child: InkWell(
           onTap: () => showCustomBottomSheet(
             context: context,
-            child: OrderDetailPage(order: order)
+            child: OrderDetailPage(order: order),
           ),
           borderRadius: BorderRadius.circular(16),
           child: Padding(

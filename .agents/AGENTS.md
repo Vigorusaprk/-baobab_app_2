@@ -832,3 +832,87 @@ serait inexprimable.
   L'accueil le montre en `readOnly` (il ne sert qu'à emmener sur Explorer),
   Explorer le montre éditable. Les deux doivent rester indiscernables : c'est
   le même geste poursuivi d'un écran à l'autre.
+
+## L'adresse : six colonnes, une ligne
+
+`user_info` porte l'adresse en **paliers** — province, ville, commune,
+quartier, avenue, numéro — une ligne par utilisateur. C'est ainsi qu'une
+adresse se dit à Kinshasa, et c'est ce qui permettra de grouper des livraisons
+par commune sans avoir à deviner ce que contient une chaîne.
+
+`numero` est du **texte** : « 10F » est un numéro de parcelle courant.
+
+Province et ville sont stockées en texte et non en clé étrangère vers
+`provinces`/`cities`. Le référentiel **propose**, il n'impose pas : quelqu'un
+qui habite un lieu absent de la liste doit pouvoir l'écrire. Le référentiel
+lui-même suit le modèle de `categories` — il vit en base, l'application n'en
+connaît pas le contenu à la compilation.
+
+À l'écran, l'adresse se lit sur **une seule ligne**, du précis au large :
+
+> N° 10F, Av. Kasa-Vubu, Q. Lingwala, C. Gombe, Kinshasa
+
+Les paliers absents sont omis — sans quoi une fiche à moitié remplie produit
+des virgules orphelines. La ville n'est pas répétée quand elle porte le nom de
+la province (Kinshasa). `test/profile_test.dart` tient ces règles.
+
+**Le formulaire est apparié, pas empilé.** Six champs l'un sous l'autre se
+lisent comme une corvée ; ils vont donc deux par deux — province avec ville,
+commune avec quartier, avenue avec numéro — le numéro nettement plus étroit
+puisqu'il porte trois caractères. Sous 260 px, chaque paire se remet en
+colonne.
+
+## Le rôle est verrouillé au niveau des colonnes, pas de la politique
+
+`users` n'avait **aucune** politique UPDATE : « Modifier le profil » ne pouvait
+rien enregistrer, quelle que soit l'interface. Elle existe désormais, mais le
+point important est ailleurs :
+
+```sql
+revoke update on public.users from authenticated;
+grant update (name, phone) on public.users to authenticated;
+```
+
+Une politique RLS ne voit pas l'ancienne ligne : elle ne peut donc pas dire
+« `role` ne doit pas changer ». Le privilège de colonne, lui, l'interdit avant
+même que RLS soit consulté. Sans lui, n'importe qui se promeut commerçant d'un
+seul PATCH.
+
+## Commander demande où livrer
+
+Le commerçant recevait des commandes sans adresse : `createOrder` acceptait un
+`deliveryAddress`, la colonne existait, mais `submitOrder` ne le passait
+jamais.
+
+La feuille s'ouvre **toujours**, même quand une adresse est enregistrée —
+pré-remplie. On peut se faire livrer ailleurs qu'à son domicile, et une
+commande partie à la mauvaise adresse sans qu'on ait demandé coûte plus cher
+qu'une confirmation de trop.
+
+Une **réservation** ne se livre pas : sa feuille demande seulement le
+téléphone, et le partage reste un choix — on peut réserver sans le donner. Le
+numéro voyage dans le champ `details` de la réservation.
+
+## Une seule page de recherche
+
+L'accueil renvoyait vers `/search` (doublon de l'onglet Explorer) et son bouton
+filtre vers « Trouver selon mon budget ». Trois écrans pour une même question.
+Il n'en reste qu'un : les deux contrôles de l'accueil mènent à **Explorer**, le
+bouton avec le panneau de filtres ouvert.
+
+Ce que l'accueil demande en chemin passe par **une intention**
+(`ExploreCubit.pendingIntent`), pas par la route : un paramètre d'URL serait
+resté après coup et aurait rejoué l'action à chaque retour sur l'onglet.
+L'écran la consomme (`intentHandled()`) dès qu'il l'a traitée.
+
+Une seule intention à la fois, et non deux drapeaux booléens : les deux gestes
+s'excluent, et deux booléens auraient laissé exister un état que personne ne
+peut produire.
+
+- `focusSearch` — toucher la barre de recherche, c'est **vouloir taper**. Sans
+  ce signal, l'utilisateur arrivait sur Explorer et devait toucher une seconde
+  fois pour ouvrir le clavier.
+- `openFilters` — le bouton ouvre le panneau à l'arrivée.
+
+Le chercheur de budget est supprimé — sa fourchette de prix vit désormais dans
+le panneau de filtres d'Explorer.

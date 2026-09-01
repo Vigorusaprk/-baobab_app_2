@@ -1,186 +1,243 @@
-import 'package:baobabe_0_2/core/bloc/settings_bloc.dart';
-import 'package:baobabe_0_2/features/settings/presentation/widgets/profile_skeleton.dart';
+import 'package:baobabe_0_2/core/themes/app_diemens.dart';
+import 'package:baobabe_0_2/core/widgets/custom_app_bar.dart';
+import 'package:baobabe_0_2/features/settings/presentation/cubit/profile_cubit.dart';
+import 'package:baobabe_0_2/features/settings/presentation/widgets/profile_sheets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:go_router/go_router.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
-class ProfilPage extends StatefulWidget {
+/// Le profil de l'utilisateur.
+///
+/// L'adresse s'y lit **sur une seule ligne**, du précis au large, comme on la
+/// dit à voix haute. Elle est pourtant stockée en six colonnes : ce n'est pas
+/// une contradiction, c'est la différence entre ce qu'on range et ce qu'on
+/// montre.
+///
+/// Tant que les informations manquent, la page propose de les compléter plutôt
+/// que d'aligner des « Non renseigné ». Le formulaire est le même dans les
+/// deux cas — compléter et modifier sont le même geste.
+class ProfilPage extends StatelessWidget {
   const ProfilPage({super.key});
-
-  @override
-  State<ProfilPage> createState() => _ProfilPageState();
-}
-
-class _ProfilPageState extends State<ProfilPage> {
-  @override
-  void initState() {
-    super.initState();
-    // ⚡ On déclenche le chargement dès l'ouverture de l'écran
-    context.read<SettingsCubit>().loadUserProfile();
-  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'Mon Profil',
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
-        centerTitle: true,
-        elevation: 0,
-        backgroundColor: Colors.transparent,
-      ),
-      body: BlocBuilder<SettingsCubit, SettingsState>(
+      backgroundColor: Theme.of(context).colorScheme.surface,
+      appBar: const CustomOtherAppBar(title: 'Mon profil'),
+      body: BlocBuilder<ProfileCubit, ProfileState>(
         builder: (context, state) {
-          if (state is SettingsLoading) {
-            return const Skeletonizer(enabled: true, child: ProfileSkeleton());
-          }
-
-          if (state is SettingsError) {
-            return Center(
-              child: Padding(
-                padding: const EdgeInsets.all(24.0),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      Icons.error_outline,
-                      color: Theme.of(context).colorScheme.error,
-                      size: 48,
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      state.message,
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.error,
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    ElevatedButton(
-                      onPressed: () =>
-                          context.read<SettingsCubit>().loadUserProfile(),
-                      child: const Text('Réessayer'),
-                    ),
-                  ],
-                ),
-              ),
+          if (state.status == ProfileStatus.failure) {
+            return _Failure(
+              message: state.message ?? 'Réessayez dans un instant.',
+              onRetry: () => context.read<ProfileCubit>().load(force: true),
             );
           }
-
-          if (state is SettingsLoaded) {
-            final profile = state.userProfile;
-            final auth = state.userAuth;
-
-            return SingleChildScrollView(
-              padding: const EdgeInsets.all(24.0),
-              child: Column(
-                children: [
-                  CircleAvatar(
-                    radius: 50,
-                    backgroundColor: Theme.of(
-                      context,
-                    ).colorScheme.onSurfaceVariant,
-                    child: Icon(
-                      Icons.person,
-                      size: 50,
-                      color: Theme.of(context).colorScheme.onPrimary,
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-
-                  // --- CHAMP COMPTE (AUTH.USERS) ---
-                  _buildProfileField(
-                    label: 'Adresse Email',
-                    value: auth.email ?? 'Non renseignée',
-                    icon: Icons.email_outlined,
-                  ),
-                  const SizedBox(height: 16),
-
-                  // --- CHAMPS PROFILS (USER_PROFILE) ---
-                  _buildProfileField(
-                    label: 'Nom Complet',
-                    value:
-                        profile['name'] ?? profile['username'] ?? 'Nom inconnu',
-                    icon: Icons.badge_outlined,
-                  ),
-                  const SizedBox(height: 16),
-                  _buildProfileField(
-                    label: 'Téléphone',
-                    value: profile['phone'] ?? 'Aucun numéro enregistré',
-                    icon: Icons.phone_android_outlined,
-                  ),
-                  const SizedBox(height: 32),
-
-                  // Bouton d'édition vers la page de modification
-                  SizedBox(
-                    width: double.infinity,
-                    height: 54,
-                    child: ElevatedButton.icon(
-                      onPressed: () => context.push('/edit-profile'),
-                      icon: const Icon(Icons.edit),
-                      label: Text(
-                        'Modifier le profil',
-                        style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                      style: ElevatedButton.styleFrom(
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            );
+          if (state.status != ProfileStatus.ready) {
+            return const Skeletonizer(enabled: true, child: _Skeleton());
           }
-
-          return const SizedBox.shrink();
+          return _Body(state: state);
         },
       ),
     );
   }
+}
 
-  Widget _buildProfileField({
-    required String label,
-    required String value,
-    required IconData icon,
-  }) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surface,
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Row(
+class _Body extends StatelessWidget {
+  const _Body({required this.state});
+
+  final ProfileState state;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final address = state.address;
+
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(AppDimens.large),
+      child: Column(
         children: [
-          Icon(icon, color: Theme.of(context).colorScheme.onSurfaceVariant),
-          const SizedBox(width: 16),
+          CircleAvatar(
+            radius: 50,
+            backgroundColor: theme.colorScheme.primary,
+            child: Text(
+              _initial(state.profile.name),
+              style: theme.textTheme.displaySmall?.copyWith(
+                color: theme.colorScheme.onPrimary,
+              ),
+            ),
+          ),
+          AppDimens.spacerLarge,
+
+          _Line(
+            label: 'Nom complet',
+            value: state.profile.name,
+            icon: Icons.badge_outlined,
+          ),
+          _Line(
+            label: 'Adresse e-mail',
+            value: state.profile.email,
+            icon: Icons.email_outlined,
+            // L'e-mail vient du compte : il ne se modifie pas ici.
+            editable: false,
+          ),
+          _Line(
+            label: 'Téléphone',
+            value: state.profile.phone,
+            icon: Icons.phone_android_outlined,
+          ),
+          _Line(
+            label: 'Adresse',
+            // Six colonnes, une seule ligne à l'écran.
+            value: (address == null || address.isEmpty)
+                ? null
+                : address.oneLine,
+            icon: Icons.location_on_outlined,
+          ),
+
+          AppDimens.spacerLarge,
+          SizedBox(
+            width: double.infinity,
+            child: FilledButton.icon(
+              onPressed: () async {
+                final saved = await showProfileSheet(context);
+                if (!context.mounted || !saved) return;
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Informations enregistrées.')),
+                );
+              },
+              icon: Icon(
+                state.isIncomplete ? Icons.add_rounded : Icons.edit_outlined,
+              ),
+              label: Text(
+                // Le libellé dit l'état de la fiche : proposer « Modifier »
+                // sur un profil vide n'a pas de sens.
+                state.isIncomplete
+                    ? 'Compléter mon profil'
+                    : 'Modifier mon profil',
+              ),
+              style: FilledButton.styleFrom(
+                backgroundColor: theme.colorScheme.primary,
+                foregroundColor: theme.colorScheme.onPrimary,
+                padding: const EdgeInsets.symmetric(vertical: AppDimens.medium),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(AppDimens.radius16),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  String _initial(String? name) {
+    final trimmed = name?.trim() ?? '';
+    return trimmed.isEmpty ? '?' : trimmed[0].toUpperCase();
+  }
+}
+
+/// Une information du profil. Quand elle manque, elle le dit en clair plutôt
+/// que d'afficher un vide qu'on pourrait prendre pour un bug.
+class _Line extends StatelessWidget {
+  const _Line({
+    required this.label,
+    required this.value,
+    required this.icon,
+    this.editable = true,
+  });
+
+  final String label;
+  final String? value;
+  final IconData icon;
+  final bool editable;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final missing = value == null || value!.isEmpty;
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: AppDimens.medium),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(icon, size: 20, color: theme.colorScheme.onSurfaceVariant),
+          const SizedBox(width: AppDimens.medium),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   label,
-                  style: Theme.of(context).textTheme.bodySmall!.copyWith(
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  style: theme.textTheme.labelSmall?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
                   ),
                 ),
-                const SizedBox(height: 4),
+                const SizedBox(height: 2),
                 Text(
-                  value,
-                  style: Theme.of(
-                    context,
-                  ).textTheme.bodyMedium!.copyWith(fontWeight: FontWeight.w600),
+                  missing
+                      ? (editable ? 'À compléter' : 'Non renseignée')
+                      : value!,
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: missing
+                        ? theme.colorScheme.onSurfaceVariant
+                        : theme.colorScheme.onSurface,
+                    fontStyle: missing ? FontStyle.italic : null,
+                  ),
                 ),
               ],
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _Skeleton extends StatelessWidget {
+  const _Skeleton();
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(AppDimens.large),
+      child: Column(
+        children: [
+          const Bone.circle(size: 100),
+          AppDimens.spacerLarge,
+          for (var i = 0; i < 4; i++) ...[
+            Bone.text(words: 3, style: Theme.of(context).textTheme.bodySmall!),
+            AppDimens.spacerLarge,
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class _Failure extends StatelessWidget {
+  const _Failure({required this.message, required this.onRetry});
+
+  final String message;
+  final VoidCallback onRetry;
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(AppDimens.large),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              message,
+              textAlign: TextAlign.center,
+              style: Theme.of(context).textTheme.bodySmall,
+            ),
+            AppDimens.spacerMedium,
+            FilledButton(onPressed: onRetry, child: const Text('Réessayer')),
+          ],
+        ),
       ),
     );
   }

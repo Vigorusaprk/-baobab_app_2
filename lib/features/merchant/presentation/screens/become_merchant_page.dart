@@ -4,6 +4,7 @@ import 'package:baobabe_0_2/core/widgets/custom_text_form_field.dart';
 import 'package:baobabe_0_2/features/home_page/domain/entities/category_entity.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/bloc/category_bloc.dart';
 import 'package:baobabe_0_2/features/merchant/presentation/cubit/merchant_cubit.dart';
+import 'package:baobabe_0_2/core/widgets/custom_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -89,11 +90,7 @@ class _BecomeMerchantPageState extends State<BecomeMerchantPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-        elevation: 0,
-        title: const Text('Devenir commerçant'),
-      ),
+      appBar: const CustomOtherAppBar(title: 'Devenir commerçant'),
       body: Form(
         key: _formKey,
         child: ListView(

@@ -5,6 +5,7 @@ import 'package:baobabe_0_2/features/merchant/presentation/screens/merchant_inbo
 import 'package:baobabe_0_2/features/merchant/presentation/screens/merchant_offers_screen.dart';
 import 'package:baobabe_0_2/features/merchant/presentation/widgets/merchant_space_skeleton.dart';
 import 'package:baobabe_0_2/features/merchant/presentation/widgets/merchant_widgets.dart';
+import 'package:baobabe_0_2/core/widgets/custom_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -46,11 +47,9 @@ class _MerchantShellState extends State<MerchantShell> {
           // les chiffres arrivent.
           return Scaffold(
             backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-            appBar: AppBar(
-              backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-              elevation: 0,
-              titleSpacing: AppDimens.appPaddingValue,
-              title: const Skeletonizer(
+            appBar: const CustomAppBar(
+              automaticallyImplyLeading: false,
+              widget: Skeletonizer(
                 enabled: true,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -97,11 +96,9 @@ class _MerchantShellState extends State<MerchantShell> {
 
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-        elevation: 0,
-        titleSpacing: AppDimens.appPaddingValue,
-        title: Column(
+      appBar: CustomAppBar(
+        automaticallyImplyLeading: false,
+        widget: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: [

@@ -125,7 +125,16 @@ class OfferDetailCubit extends Cubit<OfferDetailState> {
   ///
   /// Aucun montant n'est transmis : le serveur lit le prix en base, vérifie
   /// la disponibilité et refuse une date passée.
-  Future<String?> submit() async {
+  /// Passe la commande ou la réservation.
+  ///
+  /// [deliveryAddress] vient de la feuille d'adresse ; sans elle le commerçant
+  /// recevait une commande sans savoir où la livrer. [contactPhone] joue le
+  /// même rôle pour une réservation, qui ne se livre pas mais doit pouvoir se
+  /// confirmer par téléphone.
+  Future<String?> submit({
+    String? deliveryAddress,
+    String? contactPhone,
+  }) async {
     final current = state;
     if (current is! OfferDetailLoaded) return null;
 
@@ -147,9 +156,13 @@ class OfferDetailCubit extends Cubit<OfferDetailState> {
           businessId: businessId,
           offers: [offer],
           userId: user.id,
+          deliveryAddress: deliveryAddress,
         );
       } else {
-        await selection.submitBooking(offers: [offer]);
+        await selection.submitBooking(
+          offers: [offer],
+          contactPhone: contactPhone,
+        );
       }
 
       // La jauge de places a bougé : on relit plutôt que de la décrémenter

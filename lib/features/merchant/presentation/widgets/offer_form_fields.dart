@@ -26,7 +26,8 @@ class DateField extends StatelessWidget {
   final VoidCallback onPick;
   final VoidCallback onClear;
 
-  const DateField({super.key, 
+  const DateField({
+    super.key,
     required this.value,
     required this.onPick,
     required this.onClear,

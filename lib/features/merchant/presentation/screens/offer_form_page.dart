@@ -5,6 +5,7 @@ import 'package:baobabe_0_2/features/business_detail/domain/entities/offer.dart'
 import 'package:baobabe_0_2/features/merchant/domain/repositories/merchant_repository.dart';
 import 'package:baobabe_0_2/features/merchant/presentation/cubit/merchant_cubit.dart';
 import 'package:baobabe_0_2/features/merchant/presentation/widgets/offer_form_fields.dart';
+import 'package:baobabe_0_2/core/widgets/custom_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -162,10 +163,8 @@ class _OfferFormPageState extends State<OfferFormPage> {
 
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-        elevation: 0,
-        title: Text(_isEditing ? 'Modifier l\'offre' : 'Nouvelle offre'),
+      appBar: CustomOtherAppBar(
+        title: _isEditing ? "Modifier l'offre" : 'Nouvelle offre',
       ),
       body: Form(
         key: _formKey,

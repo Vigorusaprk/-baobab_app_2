@@ -1,5 +1,6 @@
 import 'package:baobabe_0_2/core/themes/app_diemens.dart';
 import 'package:baobabe_0_2/features/business_detail/domain/entities/reservation.dart';
+import 'package:baobabe_0_2/core/widgets/custom_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -25,37 +26,7 @@ class ReservationDetailPage extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
-      appBar: AppBar(
-        title: Text(
-          'Détails de la réservation',
-          style: Theme.of(context).textTheme.displaySmall!.copyWith(
-            color: Theme.of(context).colorScheme.secondary,
-          ),
-        ),
-        centerTitle: true,
-        elevation: 0,
-        leading: IconButton(
-          tooltip: 'Retour',
-          icon: Container(
-            decoration: BoxDecoration(
-              border: Border.all(
-                color: Theme.of(context).colorScheme.outlineVariant,
-                width: 2.5,
-              ),
-              shape: BoxShape.circle,
-            ),
-            child: Center(
-              child: Icon(
-                Icons.arrow_back_ios_new_rounded,
-                color: Theme.of(context).colorScheme.onPrimary,
-              ),
-            ),
-          ),
-          onPressed: () => Navigator.pop(context),
-        ),
-        backgroundColor: Colors.transparent,
-        foregroundColor: Theme.of(context).colorScheme.onSurface,
-      ),
+      appBar: const CustomOtherAppBar(title: 'Détails de la réservation'),
       body: SingleChildScrollView(
         child: Padding(
           padding: AppDimens.appPadding,

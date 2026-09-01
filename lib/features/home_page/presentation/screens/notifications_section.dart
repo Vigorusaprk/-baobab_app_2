@@ -1,7 +1,7 @@
-import 'package:baobabe_0_2/core/themes/app_diemens.dart';
 import 'package:baobabe_0_2/features/home_page/data/repositories/activity_feed_repository.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/widgets/feed_filter_chips.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/widgets/list_skeletons.dart';
+import 'package:baobabe_0_2/core/widgets/custom_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../bloc/feed_bloc.dart';
@@ -33,34 +33,7 @@ class _NotificationsView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
-      appBar: AppBar(
-        title: Text(
-          'Notifications',
-          style: Theme.of(context).textTheme.titleMedium!,
-        ),
-        leading: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Container(
-            child: GestureDetector(
-              onTap: () => Navigator.pop(context),
-              child: Container(
-                padding: EdgeInsets.symmetric(
-                  horizontal: AppDimens.small,
-                  vertical: AppDimens.small,
-                ),
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.primary,
-                  borderRadius: BorderRadius.circular(AppDimens.radius50),
-                ),
-                child: Icon(
-                  Icons.arrow_back_ios_new_rounded,
-                  color: Theme.of(context).colorScheme.surfaceContainerLowest,
-                ),
-              ),
-            ),
-          ),
-        ),
-      ),
+      appBar: const CustomOtherAppBar(title: 'Notifications'),
       body: BlocBuilder<FeedBloc, FeedState>(
         builder: (context, state) {
           if (state is FeedLoading || state is FeedInitial) {

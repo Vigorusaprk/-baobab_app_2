@@ -17,6 +17,7 @@ class ExploreState extends Equatable {
     this.loadingMore = false,
     this.message,
     this.page = 1,
+    this.pendingIntent,
   });
 
   final OfferSearchFilters filters;
@@ -27,6 +28,13 @@ class ExploreState extends Equatable {
 
   /// Message écrit à montrer en cas d'échec. Jamais une exception.
   final String? message;
+
+  /// Ce que l'écran doit faire dès son affichage, à la demande de l'accueil.
+  ///
+  /// Consommé par l'écran puis remis à `null`. Le passer par la route aurait
+  /// mis un paramètre dans l'URL, qui serait resté après coup et aurait rejoué
+  /// l'action à chaque retour sur l'onglet.
+  final ExploreIntent? pendingIntent;
 
   /// La dernière page reçue du serveur.
   ///
@@ -43,7 +51,9 @@ class ExploreState extends Equatable {
     bool? loadingMore,
     String? message,
     int? page,
+    ExploreIntent? pendingIntent,
     bool clearMessage = false,
+    bool clearIntent = false,
   }) => ExploreState(
     filters: filters ?? this.filters,
     offers: offers ?? this.offers,
@@ -52,6 +62,7 @@ class ExploreState extends Equatable {
     loadingMore: loadingMore ?? this.loadingMore,
     message: clearMessage ? null : (message ?? this.message),
     page: page ?? this.page,
+    pendingIntent: clearIntent ? null : (pendingIntent ?? this.pendingIntent),
   );
 
   @override
@@ -63,10 +74,26 @@ class ExploreState extends Equatable {
     loadingMore,
     message,
     page,
+    pendingIntent,
   ];
 }
 
 enum ExploreStatus { initial, loading, ready, failure }
+
+/// Ce que l'écran d'où l'on vient demande à Explorer de faire en arrivant.
+///
+/// Une seule valeur à la fois, et non deux drapeaux : la barre de recherche et
+/// le bouton de filtre de l'accueil s'excluent, et deux booléens auraient
+/// laissé exister un état que personne ne peut produire.
+enum ExploreIntent {
+  /// Ouvrir le panneau de filtres — le bouton de l'accueil.
+  openFilters,
+
+  /// Donner le focus au champ : l'utilisateur a touché la barre de recherche
+  /// de l'accueil, il veut taper. Sans cela il devait toucher une seconde
+  /// fois, une fois arrivé.
+  focusSearch,
+}
 
 /// Explorer : la recherche d'offres.
 ///
@@ -125,6 +152,17 @@ class ExploreCubit extends Cubit<ExploreState> {
   Future<void> clearFacets() => filtersChanged(state.filters.clearedFacets());
 
   Future<void> retry() => _run(state.filters);
+
+  /// Demande à Explorer d'ouvrir son panneau de filtres dès son affichage.
+  void requestFilters() =>
+      emit(state.copyWith(pendingIntent: ExploreIntent.openFilters));
+
+  /// Demande à Explorer de donner le focus au champ de recherche.
+  void requestSearch() =>
+      emit(state.copyWith(pendingIntent: ExploreIntent.focusSearch));
+
+  /// L'écran a fait ce qu'on lui demandait : la demande est consommée.
+  void intentHandled() => emit(state.copyWith(clearIntent: true));
 
   Future<void> loadMore() async {
     if (!state.hasMore || state.loadingMore) return;

@@ -8,7 +8,8 @@ class SupabaseClientWrapper {
     const String supabaseUrl = 'https://wrutwzbtnquxigxetxfx.supabase.co';
 
     // 2. La clé publiable du projet (l'ancien nom était « anon »).
-    const String publishableKey = 'sb_publishable_lCKQ9R0_LzFk6EbRYuDnbQ_WITRinDO';
+    const String publishableKey =
+        'sb_publishable_lCKQ9R0_LzFk6EbRYuDnbQ_WITRinDO';
 
     final supabase = await Supabase.initialize(
       url: supabaseUrl,

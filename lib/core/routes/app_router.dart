@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:baobabe_0_2/features/home_page/presentation/screens/budget_finder_page.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/screens/notifications_section.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -19,7 +18,6 @@ import 'package:baobabe_0_2/features/activity/presentation/screens/activity_scre
 import 'package:baobabe_0_2/features/order/presentation/screens/order_detail_page.dart';
 import 'package:baobabe_0_2/features/settings/presentation/screens/settings_screen.dart';
 import 'package:baobabe_0_2/features/settings/presentation/widgets/profil_page.dart';
-import 'package:baobabe_0_2/features/settings/presentation/widgets/edit_profile_page.dart';
 import 'package:baobabe_0_2/features/business_detail/presentation/screens/business_detail_screen.dart';
 import 'package:baobabe_0_2/features/business_detail/presentation/screens/offer_detail_screen.dart';
 import 'package:baobabe_0_2/features/merchant/presentation/screens/become_merchant_page.dart';
@@ -186,11 +184,6 @@ final GoRouter appRouter = GoRouter(
       builder: (context, state) => const NotificationsPage(),
     ),
     GoRoute(
-      path: '/budget-finder',
-      name: 'budgetFinder',
-      builder: (context, state) => const BudgetFinderPage(),
-    ),
-    GoRoute(
       path: '/businesses',
       name: 'allBusinesses',
       pageBuilder: (context, state) {
@@ -204,11 +197,6 @@ final GoRouter appRouter = GoRouter(
           ),
         );
       },
-    ),
-    GoRoute(
-      path: '/search',
-      name: 'search',
-      pageBuilder: (context, state) => const MaterialPage(child: SearchPage()),
     ),
     GoRoute(
       path: '/order-detail',
@@ -270,12 +258,6 @@ final GoRouter appRouter = GoRouter(
       path: '/profil-page',
       name: 'profil-page',
       pageBuilder: (context, state) => const MaterialPage(child: ProfilPage()),
-    ),
-    GoRoute(
-      path: '/edit-profile',
-      name: 'edit-profile',
-      pageBuilder: (context, state) =>
-          const MaterialPage(child: EditProfilePage()),
     ),
   ],
 );

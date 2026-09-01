@@ -9,6 +9,7 @@ import 'package:baobabe_0_2/features/home_page/presentation/bloc/business_list_c
 import 'package:baobabe_0_2/features/home_page/presentation/widgets/Category_Icons.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/widgets/business_list_row.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/widgets/home_search_bar.dart';
+import 'package:baobabe_0_2/core/widgets/custom_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -67,8 +68,12 @@ class _AllBusinessesScreenState extends State<AllBusinessesScreen> {
       child: Builder(
         builder: (context) => Scaffold(
           backgroundColor: Theme.of(context).colorScheme.surface,
-          appBar: AppBar(
-            title: BlocBuilder<CategoryBloc, CategoryState>(
+          // Le titre suit la catégorie choisie : il vient d'un BlocBuilder,
+          // pas d'une chaîne. D'où `CustomAppBar`, qui prend un widget, plutôt
+          // que `CustomOtherAppBar`, qui prend un texte.
+          appBar: CustomAppBar(
+            isCenter: true,
+            widget: BlocBuilder<CategoryBloc, CategoryState>(
               builder: (context, categoryState) => Text(
                 Category.displayNameForSlug(
                   _selected,
@@ -76,11 +81,9 @@ class _AllBusinessesScreenState extends State<AllBusinessesScreen> {
                       ? categoryState.categories
                       : Category.fallback,
                 ),
+                style: Theme.of(context).textTheme.titleSmall,
               ),
             ),
-            centerTitle: true,
-            backgroundColor: Theme.of(context).colorScheme.surface,
-            elevation: 0,
           ),
           body: Column(
             children: [

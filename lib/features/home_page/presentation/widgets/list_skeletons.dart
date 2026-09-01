@@ -113,7 +113,7 @@ class FeedListSkeleton extends StatelessWidget {
   }
 }
 
-/// Mirrors [BusinessResultsList] : les cartes du chercheur de budget.
+/// Cartes de commerces en liste verticale.
 class BudgetResultsSkeleton extends StatelessWidget {
   final int itemCount;
 

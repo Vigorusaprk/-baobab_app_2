@@ -10,21 +10,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
-/// Route autonome `/search`, poussée depuis l'accueil. L'onglet Explorer
-/// utilise directement [SearchPageBody], qui vit dans le Scaffold unique de
-/// `MainShell`.
-class SearchPage extends StatelessWidget {
-  const SearchPage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.surface,
-      body: const SearchPageBody(showBackButton: true),
-    );
-  }
-}
-
 /// Explorer : toutes les offres, cherchables et filtrables.
 ///
 /// L'écran présentait auparavant des **commerces**, en chargeant les
@@ -46,6 +31,7 @@ class SearchPageBody extends StatefulWidget {
 
 class _SearchPageBodyState extends State<SearchPageBody> {
   final TextEditingController _controller = TextEditingController();
+  final FocusNode _searchFocus = FocusNode();
   final ScrollController _scroll = ScrollController();
   late final ExploreCubit _explore;
 
@@ -62,6 +48,7 @@ class _SearchPageBodyState extends State<SearchPageBody> {
   @override
   void dispose() {
     _controller.dispose();
+    _searchFocus.dispose();
     _scroll.removeListener(_onScroll);
     _scroll.dispose();
     super.dispose();
@@ -95,6 +82,7 @@ class _SearchPageBodyState extends State<SearchPageBody> {
             AppDimens.spacerSmall,
             _SearchRow(
               controller: _controller,
+              focusNode: _searchFocus,
               showBackButton: widget.showBackButton,
               onChanged: _explore.queryChanged,
               onFilters: _openFilters,
@@ -111,7 +99,27 @@ class _SearchPageBodyState extends State<SearchPageBody> {
             ),
             AppDimens.spacerSmall,
             Expanded(
-              child: BlocBuilder<ExploreCubit, ExploreState>(
+              child: BlocConsumer<ExploreCubit, ExploreState>(
+                listenWhen: (a, b) =>
+                    a.pendingIntent == null && b.pendingIntent != null,
+                listener: (context, state) {
+                  // L'accueil a demandé quelque chose en nous envoyant ici.
+                  // On le consomme aussitôt pour que ça ne se rejoue pas au
+                  // prochain retour sur l'onglet.
+                  final intent = state.pendingIntent;
+                  context.read<ExploreCubit>().intentHandled();
+                  switch (intent) {
+                    case ExploreIntent.openFilters:
+                      _openFilters();
+                    case ExploreIntent.focusSearch:
+                      // Toucher la barre de l'accueil, c'est vouloir taper :
+                      // le clavier doit être là à l'arrivée, sans second
+                      // geste.
+                      _searchFocus.requestFocus();
+                    case null:
+                      break;
+                  }
+                },
                 builder: (context, state) => _Results(
                   state: state,
                   scroll: _scroll,
@@ -131,12 +139,14 @@ class _SearchPageBodyState extends State<SearchPageBody> {
 class _SearchRow extends StatelessWidget {
   const _SearchRow({
     required this.controller,
+    required this.focusNode,
     required this.showBackButton,
     required this.onChanged,
     required this.onFilters,
   });
 
   final TextEditingController controller;
+  final FocusNode focusNode;
   final bool showBackButton;
   final ValueChanged<String> onChanged;
   final VoidCallback onFilters;
@@ -159,6 +169,7 @@ class _SearchRow extends StatelessWidget {
           Expanded(
             child: CustomSearchField(
               controller: controller,
+              focusNode: focusNode,
               onChanged: onChanged,
             ),
           ),

@@ -18,6 +18,7 @@ import 'package:baobabe_0_2/features/merchant/presentation/cubit/merchant_cubit.
 import 'package:baobabe_0_2/features/settings/presentation/bloc/settings_bloc.dart'
     as theme_settings;
 import 'package:baobabe_0_2/features/home_page/presentation/bloc/explore_cubit.dart';
+import 'package:baobabe_0_2/features/settings/presentation/cubit/profile_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -77,6 +78,10 @@ class _MainAppState extends State<MainApp> {
         // commerçant ? » conditionne l'écran d'ouverture et le contenu des
         // paramètres, qui ne peuvent pas chacun refaire l'appel.
         BlocProvider<MerchantCubit>(create: (_) => MerchantCubit()),
+        // Le profil est lu par l'écran Profil, par la feuille d'adresse de
+        // la commande et par celle du téléphone de la réservation. Chacun le
+        // rechargeant de son côté aurait multiplié les appels.
+        BlocProvider<ProfileCubit>(create: (_) => ProfileCubit()..load()),
         BlocProvider<SettingsCubit>(create: (_) => SettingsCubit()),
         BlocProvider<theme_settings.SettingsCubit>(
           create: (_) => theme_settings.SettingsCubit(),

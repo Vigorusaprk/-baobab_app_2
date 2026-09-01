@@ -6,6 +6,7 @@ import 'package:baobabe_0_2/core/widgets/custom_bottom_sheet.dart';
 import 'package:baobabe_0_2/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:baobabe_0_2/features/auth/presentation/widgets/auth_form.dart';
 import 'package:baobabe_0_2/features/auth/presentation/widgets/auth_header.dart';
+import 'package:baobabe_0_2/core/widgets/custom_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -31,8 +32,11 @@ class _LoginPageState extends State<LoginPage> {
         }
       },
       child: Scaffold(
-        appBar: AppBar(
-          elevation: 0,
+        // Barre sans titre : l'écran porte déjà le sien dans [AuthHeader].
+        // Elle passe par `CustomAppBar` comme toutes les autres, pour que le
+        // fond et l'élévation restent définis à un seul endroit.
+        appBar: CustomAppBar(
+          widget: const SizedBox.shrink(),
           leading: IconButton(
             tooltip: 'Retour',
             icon: const Icon(Icons.arrow_back_ios_new_rounded),

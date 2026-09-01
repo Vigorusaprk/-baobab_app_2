@@ -7,6 +7,9 @@ import 'package:baobabe_0_2/features/business_detail/presentation/widgets/offer_
 import 'package:baobabe_0_2/features/business_detail/presentation/widgets/review_list_item.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/widgets/offers_carousel_section.dart';
 import 'package:baobabe_0_2/core/themes/other_theme.dart';
+import 'package:baobabe_0_2/features/settings/presentation/cubit/profile_cubit.dart';
+import 'package:baobabe_0_2/features/settings/presentation/widgets/profile_sheets.dart';
+import 'package:baobabe_0_2/core/widgets/custom_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:skeletonizer/skeletonizer.dart';
@@ -73,7 +76,34 @@ class _OfferDetailView extends StatelessWidget {
       return;
     }
 
-    final error = await cubit.submit();
+    // Ce qui manquait : le commerçant recevait une commande sans savoir où la
+    // livrer. On demande donc l'adresse avant d'envoyer — et pour une
+    // réservation, qui ne se livre pas, un moyen de joindre le client.
+    String? deliveryAddress;
+    String? contactPhone;
+
+    if (state.detail.offer.isOrderable) {
+      final choice = await showDeliverySheet(context);
+      if (choice == null || !context.mounted) return;
+      deliveryAddress = choice.address.oneLine;
+      if (choice.remember) {
+        await context.read<ProfileCubit>().save(address: choice.address);
+        if (!context.mounted) return;
+      }
+    } else {
+      final choice = await showContactSheet(context);
+      if (choice == null || !context.mounted) return;
+      contactPhone = choice.phone;
+      if (choice.remember && choice.phone != null) {
+        await context.read<ProfileCubit>().save(phone: choice.phone);
+        if (!context.mounted) return;
+      }
+    }
+
+    final error = await cubit.submit(
+      deliveryAddress: deliveryAddress,
+      contactPhone: contactPhone,
+    );
     if (!context.mounted) return;
 
     if (error == 'Connectez-vous pour continuer.') {
@@ -110,14 +140,7 @@ class _OfferDetailView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.surface,
-        elevation: 0,
-        title: Text(
-          'Détail de l\'offre',
-          style: Theme.of(context).textTheme.titleSmall,
-        ),
-      ),
+      appBar: const CustomOtherAppBar(title: "Détail de l'offre"),
       body: BlocBuilder<OfferDetailCubit, OfferDetailState>(
         builder: (context, state) {
           if (state is OfferDetailError) {

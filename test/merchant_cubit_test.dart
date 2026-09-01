@@ -60,10 +60,8 @@ class _FakeRepository implements MerchantRepository {
 /// Le cubit lit la session Supabase, indisponible en test : cette variante
 /// court-circuite ce seul point pour n'exercer que sa logique d'état.
 class _TestableMerchantCubit extends MerchantCubit {
-  _TestableMerchantCubit(
-    super.repository, {
-    required this.loggedIn,
-  }) : super.forTest();
+  _TestableMerchantCubit(super.repository, {required this.loggedIn})
+    : super.forTest();
 
   final bool loggedIn;
 

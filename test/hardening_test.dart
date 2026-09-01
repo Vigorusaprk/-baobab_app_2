@@ -65,7 +65,7 @@ void main() {
     test("aucune exception n'est recopiée dans une phrase affichée", () {
       // La règle précédente visait le point d'affichage. Mais l'exception
       // peut être collée au message bien plus tôt — ici dans un état de
-      // bloc : `emit(BudgetFinderError('Recherche impossible : $e'))`.
+      // bloc : `emit(FeedError('Impossible de charger le feed : $e'))`.
       // L'écran montrait alors « Erreur Edge Function (get-home)… » à
       // quelqu'un qui cherchait un restaurant.
       //
@@ -166,6 +166,5 @@ void main() {
             '${found.join('\n')}',
       );
     });
-
   });
 }
