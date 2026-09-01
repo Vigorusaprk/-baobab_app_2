@@ -9,6 +9,11 @@ enum IconButtonTone {
 
   /// Fond de carte, ombre douce : le bouton accompagne sans réclamer.
   surface,
+
+  /// Pas de fond, pas d'ombre : le bouton n'est que son icône. C'est ce
+  /// qu'il faut sur une feuille modale, où un carré blanc en relief poserait
+  /// une carte par-dessus une carte.
+  ghost,
 }
 
 /// Le bouton carré qui ne porte qu'une icône.
@@ -30,6 +35,7 @@ class CustomIconButton extends StatelessWidget {
     this.icon,
     this.tone = IconButtonTone.surface,
     this.iconSize = 24,
+    this.button,
   }) : assert(
          assetPath != null || icon != null,
          'Un bouton icône a besoin de son icône : assetPath ou icon.',
@@ -51,15 +57,19 @@ class CustomIconButton extends StatelessWidget {
 
   final IconButtonTone tone;
   final double iconSize;
+  final double? button;
 
   bool get _isFilled => tone == IconButtonTone.filled;
+  bool get _isGhost => tone == IconButtonTone.ghost;
 
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    final background = _isFilled
-        ? scheme.primary
-        : scheme.surfaceContainerLowest;
+    final background = switch (tone) {
+      IconButtonTone.filled => scheme.primary,
+      IconButtonTone.surface => scheme.surfaceContainerLowest,
+      IconButtonTone.ghost => Colors.transparent,
+    };
     final foreground = _isFilled ? scheme.onPrimary : scheme.primary;
     const radius = BorderRadius.all(
       Radius.circular(AppDimens.borderRadiusSmallButton),
@@ -72,16 +82,16 @@ class CustomIconButton extends StatelessWidget {
         borderRadius: radius,
         // L'ombre n'appartient qu'au ton `surface` : sur un aplat de couleur
         // elle salit le bord sans rien apporter.
-        elevation: _isFilled ? 0 : AppDimens.elevationDefault,
+        elevation: _isFilled || _isGhost ? 0 : AppDimens.elevationDefault,
         shadowColor: scheme.onSurface.withValues(alpha: 0.10),
         child: InkWell(
           onTap: onPressed,
           borderRadius: radius,
           child: ConstrainedBox(
             // Carré, et jamais sous la cible qu'un doigt vise sans effort.
-            constraints: const BoxConstraints(
-              minWidth: AppDimens.touchTarget,
-              minHeight: AppDimens.touchTarget,
+            constraints: BoxConstraints(
+              minWidth: button ?? AppDimens.touchTarget,
+              minHeight: button ?? AppDimens.touchTarget,
             ),
             child: Center(
               widthFactor: 1,

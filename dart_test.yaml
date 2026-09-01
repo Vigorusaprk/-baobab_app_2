@@ -1,6 +1,3 @@
-tags:
-  # Les captures de référence (test/goldens/) dépendent du rendu des polices
-  # de la machine : elles sont fiables en local, pas d'un poste à l'autre.
-  # Pour les exclure : flutter test --exclude-tags golden
-  golden:
-    description: Compare le rendu à une image de référence.
+# Aucune balise particulière : les tests de cette suite ne comparent plus de
+# captures d'écran. Ils vérifient des comportements et des mesures, qui ne
+# dépendent pas du rendu des polices de la machine.

@@ -39,18 +39,26 @@ class SessionService {
 
   SupabaseClient get _client => SupabaseClientWrapper.client;
 
+  /// `null` tant que Supabase n'est pas initialisé — sous test, notamment.
+  /// Demander qui est connecté ne doit jamais faire tomber un écran.
+  SupabaseClient? get _clientOrNull => SupabaseClientWrapper.clientOrNull;
+
   AppSessionUser? get currentUser {
-    final user = _client.auth.currentUser;
+    final user = _clientOrNull?.auth.currentUser;
     return user == null ? null : AppSessionUser.fromSupabase(user);
   }
 
-  bool get isLoggedIn => _client.auth.currentUser != null;
+  bool get isLoggedIn => currentUser != null;
 
   /// Emits the current session user every time Supabase's auth state changes
   /// (sign in, sign out, token refresh).
-  Stream<AppSessionUser?> get userChanges => _client.auth.onAuthStateChange
-      .map((data) => data.session?.user)
-      .map((user) => user == null ? null : AppSessionUser.fromSupabase(user));
+  Stream<AppSessionUser?> get userChanges =>
+      _clientOrNull?.auth.onAuthStateChange
+          .map((data) => data.session?.user)
+          .map(
+            (user) => user == null ? null : AppSessionUser.fromSupabase(user),
+          ) ??
+      const Stream<AppSessionUser?>.empty();
 
   /// Raw auth state change stream, handy for GoRouter's refreshListenable.
   Stream<AuthState> get authStateChanges => _client.auth.onAuthStateChange;

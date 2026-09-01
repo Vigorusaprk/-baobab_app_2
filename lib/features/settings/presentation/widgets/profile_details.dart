@@ -1,5 +1,6 @@
 import 'package:baobabe_0_2/core/animation/fade_swap.dart';
 import 'package:baobabe_0_2/core/themes/app_diemens.dart';
+import 'package:baobabe_0_2/core/widgets/button/custom_button.dart';
 import 'package:baobabe_0_2/features/settings/presentation/cubit/profile_cubit.dart';
 import 'package:baobabe_0_2/features/settings/presentation/widgets/profile_sheets.dart';
 import 'package:flutter/material.dart';
@@ -114,35 +115,20 @@ class _Body extends StatelessWidget {
           ),
 
           AppDimens.spacerLarge,
-          SizedBox(
-            width: double.infinity,
-            child: FilledButton.icon(
-              onPressed: () async {
-                final saved = await showProfileSheet(context);
-                if (!context.mounted || !saved) return;
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Informations enregistrées.')),
-                );
-              },
-              icon: Icon(
-                state.isIncomplete ? Icons.add_rounded : Icons.edit_outlined,
-              ),
-              label: Text(
-                // Le libellé dit l'état de la fiche : proposer « Modifier »
-                // sur un profil vide n'a pas de sens.
-                state.isIncomplete
-                    ? 'Compléter mon profil'
-                    : 'Modifier mon profil',
-              ),
-              style: FilledButton.styleFrom(
-                backgroundColor: theme.colorScheme.primary,
-                foregroundColor: theme.colorScheme.onPrimary,
-                padding: const EdgeInsets.symmetric(vertical: AppDimens.medium),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(AppDimens.radius16),
-                ),
-              ),
-            ),
+          CustomButton(
+            // Le libellé dit l'état de la fiche : proposer « Modifier » sur
+            // un profil vide n'a pas de sens.
+            text: state.isIncomplete
+                ? 'Compléter mon profil'
+                : 'Modifier mon profil',
+            icon: state.isIncomplete ? Icons.add_rounded : Icons.edit_outlined,
+            onPressed: () async {
+              final saved = await showProfileSheet(context);
+              if (!context.mounted || !saved) return;
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Informations enregistrées.')),
+              );
+            },
           ),
         ],
       ),

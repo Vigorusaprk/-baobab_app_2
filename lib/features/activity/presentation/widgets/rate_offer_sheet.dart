@@ -1,8 +1,9 @@
 import 'package:baobabe_0_2/core/themes/app_diemens.dart';
 import 'package:baobabe_0_2/core/widgets/button/custom_button.dart';
+import 'package:baobabe_0_2/core/widgets/custom_bottom_sheet.dart';
+import 'package:baobabe_0_2/core/widgets/rating_stars.dart';
 import 'package:baobabe_0_2/core/widgets/custom_text_form_field.dart';
 import 'package:baobabe_0_2/features/business_detail/data/review_api_service.dart';
-import 'package:baobabe_0_2/core/themes/other_theme.dart';
 import 'package:flutter/material.dart';
 
 /// Notation de ce qui a été réellement consommé.
@@ -17,11 +18,10 @@ Future<bool> showRateOfferSheet(
   required String offerId,
   required String offerName,
 }) async {
-  final rated = await showModalBottomSheet<bool>(
+  final rated = await showCustomBottomSheet<bool>(
     context: context,
-    isScrollControlled: true,
-    backgroundColor: Colors.transparent,
-    builder: (_) => _RateOfferSheet(
+    title: offerName,
+    child: _RateOfferSheet(
       businessId: businessId,
       offerId: offerId,
       offerName: offerName,
@@ -88,70 +88,36 @@ class _RateOfferSheetState extends State<_RateOfferSheet> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.only(
-        bottom: MediaQuery.of(context).viewInsets.bottom,
-      ),
-      child: Container(
-        width: double.infinity,
-        decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.surface,
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(AppDimens.bottomSheet),
-            topRight: Radius.circular(AppDimens.bottomSheet),
+    // Cadre, coins, marges et remontée au-dessus du clavier appartiennent
+    // désormais à la feuille partagée ; le titre aussi.
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Text(
+          'Votre note aide les autres clients à choisir.',
+          textAlign: TextAlign.center,
+          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+            color: Theme.of(context).colorScheme.onSurfaceVariant,
           ),
         ),
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Text(
-              widget.offerName,
-              textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
-            AppDimens.spacerSmall,
-            Text(
-              'Votre note aide les autres clients à choisir.',
-              textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
-              ),
-            ),
-            AppDimens.spacerMedium,
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: List.generate(5, (index) {
-                final value = index + 1;
-                return IconButton(
-                  tooltip: '$value étoile${value > 1 ? 's' : ''}',
-                  onPressed: () => setState(() => _rating = value),
-                  icon: Icon(
-                    value <= _rating
-                        ? Icons.star_rounded
-                        : Icons.star_border_rounded,
-                    color: OtherTheme.of(context).rating,
-                    size: 34,
-                  ),
-                );
-              }),
-            ),
-            AppDimens.spacerMedium,
-            CustomTextFormField(
-              controller: _comment,
-              hintText: 'Un mot sur votre expérience (facultatif)',
-            ),
-            AppDimens.spacerLarge,
-            CustomButton(
-              text: 'Envoyer mon avis',
-              isLoading: _isSending,
-              onPressed: _isSending ? () {} : _submit,
-            ),
-            AppDimens.spacerSmall,
-          ],
+        AppDimens.spacerMedium,
+        RatingStars(
+          rating: _rating,
+          onChanged: (v) => setState(() => _rating = v),
         ),
-      ),
+        AppDimens.spacerMedium,
+        CustomTextFormField(
+          controller: _comment,
+          hintText: 'Un mot sur votre expérience (facultatif)',
+        ),
+        AppDimens.spacerLarge,
+        CustomButton(
+          text: 'Envoyer mon avis',
+          isLoading: _isSending,
+          onPressed: _isSending ? () {} : _submit,
+        ),
+      ],
     );
   }
 }

@@ -6,6 +6,7 @@ import 'package:baobabe_0_2/features/order/domain/entities/order_status.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+import 'package:baobabe_0_2/core/widgets/button/custom_action_button.dart';
 
 /// Une commande reçue, avec le seul geste qui a du sens à cet instant.
 class ReceivedOrderCard extends StatelessWidget {
@@ -90,25 +91,20 @@ class ReceivedOrderCard extends StatelessWidget {
                 ),
               ),
               const Spacer(),
-              if (canRefuse)
-                TextButton(
+              if (canRefuse) ...[
+                CustomActionButton(
+                  label: 'Refuser',
+                  tone: ActionButtonTone.danger,
                   onPressed: busy
                       ? null
                       : () => _apply(context, OrderStatus.cancelled),
-                  child: Text(
-                    'Refuser',
-                    style: TextStyle(
-                      color: Theme.of(context).colorScheme.error,
-                    ),
-                  ),
                 ),
+                AppDimens.spacerSmallWidth,
+              ],
               if (next != null)
-                FilledButton(
-                  style: FilledButton.styleFrom(
-                    backgroundColor: Theme.of(context).colorScheme.primary,
-                  ),
+                CustomActionButton(
+                  label: next.$2,
                   onPressed: busy ? null : () => _apply(context, next.$1),
-                  child: Text(next.$2),
                 ),
             ],
           ),

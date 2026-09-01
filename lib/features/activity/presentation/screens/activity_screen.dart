@@ -13,6 +13,7 @@ import 'package:baobabe_0_2/features/booking_page/presentation/widgets/reservati
 import 'package:baobabe_0_2/features/booking_page/presentation/widgets/reservation_empty_state.dart';
 import 'package:baobabe_0_2/core/themes/other_theme.dart';
 import 'package:flutter/material.dart';
+import 'package:baobabe_0_2/core/widgets/custom_bottom_sheet.dart';
 
 /// Body-only content for the Orders/Activity tab. The Scaffold is owned by
 /// MainShell, which is the single Scaffold for the app's main navigation.
@@ -239,23 +240,20 @@ class _ActivityScreenState extends State<ActivityScreen>
 
     var item = rateable.first;
     if (rateable.length > 1) {
-      final chosen = await showModalBottomSheet<OrderItem>(
+      // La feuille partagée porte le cadre, le titre et la fermeture : cet
+      // écran n'a plus à les redessiner.
+      final chosen = await showCustomBottomSheet<OrderItem>(
         context: context,
-        builder: (_) => SafeArea(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Padding(
-                padding: EdgeInsets.all(16),
-                child: Text('Que souhaitez-vous noter ?'),
+        title: 'Que souhaitez-vous noter ?',
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            for (final line in rateable)
+              ListTile(
+                title: Text(line.name),
+                onTap: () => Navigator.of(context).pop(line),
               ),
-              for (final line in rateable)
-                ListTile(
-                  title: Text(line.name),
-                  onTap: () => Navigator.of(context).pop(line),
-                ),
-            ],
-          ),
+          ],
         ),
       );
       if (chosen == null || !mounted) return;

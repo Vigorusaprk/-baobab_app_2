@@ -7,8 +7,8 @@ import 'package:baobabe_0_2/features/business_detail/presentation/widgets/review
 import 'package:baobabe_0_2/features/business_detail/presentation/widgets/write_review_dialog.dart';
 import 'package:baobabe_0_2/features/home_page/domain/entities/business_entity.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:skeletonizer/skeletonizer.dart';
+import 'package:baobabe_0_2/core/widgets/button/custom_action_button.dart';
 
 class RestaurantReview extends StatefulWidget {
   final Business business;
@@ -119,27 +119,17 @@ class _RestaurantReviewState extends State<RestaurantReview> {
                         ),
                       ],
                     ),
-                    FilledButton.icon(
-                      style: FilledButton.styleFrom(
-                        backgroundColor: Theme.of(context).colorScheme.primary,
-                      ),
+                    // Le libellé était peint avec `textTheme.bodySmall`,
+                    // qui porte la couleur de texte de page : gris foncé sur
+                    // le vert d'action, donc illisible. Le bouton partagé
+                    // déduit sa couleur de texte de son fond.
+                    CustomActionButton(
+                      label: 'Écrire un avis',
+                      assetPath: 'assets/icons/commen.svg',
                       onPressed: () => showWriteReviewDialog(
                         context,
                         widget.business,
                         onSubmitted: _refreshReviews,
-                      ),
-                      icon: SvgPicture.asset(
-                        "assets/icons/commen.svg",
-                        width: Theme.of(context).textTheme.bodySmall!.fontSize,
-                        height: Theme.of(context).textTheme.bodySmall!.fontSize,
-                        colorFilter: ColorFilter.mode(
-                          Theme.of(context).colorScheme.onPrimary,
-                          BlendMode.srcIn,
-                        ),
-                      ),
-                      label: Text(
-                        'Écrire un avis',
-                        style: Theme.of(context).textTheme.bodySmall,
                       ),
                     ),
                   ],

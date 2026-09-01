@@ -64,6 +64,17 @@ void main() {
   });
 
   group('Appear', () {
+    testWidgets('l\'élément ne se déplace pas en apparaissant', (tester) async {
+      // À cet endroit se tenait un squelette de même taille. Faire glisser
+      // la carte par-dessus donnait un déplacement que rien ne justifie :
+      // elle doit devenir nette, pas arriver.
+      await tester.pumpWidget(_app(const Appear(child: Text('bonjour'))));
+      final debut = tester.getTopLeft(find.text('bonjour'));
+
+      await tester.pumpAndSettle();
+      expect(tester.getTopLeft(find.text('bonjour')), debut);
+    });
+
     testWidgets('part invisible et finit visible', (tester) async {
       await tester.pumpWidget(_app(const Appear(child: Text('bonjour'))));
 
@@ -128,6 +139,24 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.text('avant'), findsNothing);
       expect(find.text('après'), findsOneWidget);
+    });
+
+    testWidgets('le nouveau contenu ne glisse pas', (tester) async {
+      // Même raison que pour `Appear` : le contenu remplace un squelette de
+      // même forme, au même endroit.
+      await tester.pumpWidget(
+        _app(const FadeSwap(child: Text('avant', key: ValueKey('a')))),
+      );
+      final place = tester.getTopLeft(find.text('avant'));
+
+      await tester.pumpWidget(
+        _app(const FadeSwap(child: Text('après', key: ValueKey('b')))),
+      );
+      await tester.pump(const Duration(milliseconds: 60));
+      expect(tester.getTopLeft(find.text('après')), place);
+
+      await tester.pumpAndSettle();
+      expect(tester.getTopLeft(find.text('après')), place);
     });
 
     testWidgets('sans clé distincte, rien ne se croise', (tester) async {

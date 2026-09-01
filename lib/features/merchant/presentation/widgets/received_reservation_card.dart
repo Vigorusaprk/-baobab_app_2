@@ -6,6 +6,7 @@ import 'package:baobabe_0_2/core/themes/other_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+import 'package:baobabe_0_2/core/widgets/button/custom_action_button.dart';
 
 /// Une réservation reçue, à confirmer puis à honorer.
 class ReceivedReservationCard extends StatelessWidget {
@@ -87,35 +88,26 @@ class ReceivedReservationCard extends StatelessWidget {
                 ),
               const Spacer(),
               if (status == ReservationStatus.pending) ...[
-                TextButton(
+                CustomActionButton(
+                  label: 'Refuser',
+                  tone: ActionButtonTone.danger,
                   onPressed: busy
                       ? null
                       : () => _apply(context, ReservationStatus.cancelled),
-                  child: Text(
-                    'Refuser',
-                    style: TextStyle(
-                      color: Theme.of(context).colorScheme.error,
-                    ),
-                  ),
                 ),
-                FilledButton(
-                  style: FilledButton.styleFrom(
-                    backgroundColor: Theme.of(context).colorScheme.primary,
-                  ),
+                AppDimens.spacerSmallWidth,
+                CustomActionButton(
+                  label: 'Confirmer',
                   onPressed: busy
                       ? null
                       : () => _apply(context, ReservationStatus.confirmed),
-                  child: const Text('Confirmer'),
                 ),
               ] else if (status == ReservationStatus.confirmed)
-                FilledButton(
-                  style: FilledButton.styleFrom(
-                    backgroundColor: Theme.of(context).colorScheme.primary,
-                  ),
+                CustomActionButton(
+                  label: 'Honorée',
                   onPressed: busy
                       ? null
                       : () => _apply(context, ReservationStatus.completed),
-                  child: const Text('Honorée'),
                 ),
             ],
           ),

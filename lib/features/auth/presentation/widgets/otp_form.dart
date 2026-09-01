@@ -1,181 +1,93 @@
 import 'package:baobabe_0_2/core/themes/app_diemens.dart';
+import 'package:baobabe_0_2/core/themes/other_theme.dart';
 import 'package:baobabe_0_2/core/widgets/button/custom_button.dart';
+import 'package:baobabe_0_2/core/widgets/otp_code_field.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
-class OtpForm extends StatefulWidget {
-  final VoidCallback submit;
-  final TextEditingController otp;
-  final String email;
-  final bool isLoading;
-
+/// Deuxième étape : le code à six chiffres reçu par courriel.
+///
+/// Les trois états du code — en cours de saisie, refusé, vérifié — se lisent
+/// sur les cases elles-mêmes, et sont redits en toutes lettres au-dessus de
+/// l'explication : la couleur seule ne suffit pas à qui la distingue mal.
+class OtpForm extends StatelessWidget {
   const OtpForm({
     super.key,
     required this.submit,
     required this.otp,
     required this.email,
     this.isLoading = false,
+    this.status = OtpStatus.editing,
   });
 
-  @override
-  State<OtpForm> createState() => _OtpFormState();
-}
+  final VoidCallback submit;
+  final TextEditingController otp;
+  final String email;
+  final bool isLoading;
+  final OtpStatus status;
 
-class _OtpFormState extends State<OtpForm> {
   static const int _length = 6;
-
-  late final List<TextEditingController> _digitControllers;
-  late final List<FocusNode> _focusNodes;
-  bool _isComplete = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _digitControllers = List.generate(_length, (_) => TextEditingController());
-    _focusNodes = List.generate(_length, (_) => FocusNode());
-
-    final existing = widget.otp.text;
-    for (var i = 0; i < _length && i < existing.length; i++) {
-      _digitControllers[i].text = existing[i];
-    }
-    _isComplete = _digitControllers.every((c) => c.text.isNotEmpty);
-  }
-
-  @override
-  void dispose() {
-    for (final controller in _digitControllers) {
-      controller.dispose();
-    }
-    for (final node in _focusNodes) {
-      node.dispose();
-    }
-    super.dispose();
-  }
-
-  void _syncOtpController() {
-    widget.otp.text = _digitControllers.map((c) => c.text).join();
-    setState(() {
-      _isComplete = _digitControllers.every((c) => c.text.isNotEmpty);
-    });
-  }
-
-  void _onChanged(int index, String value) {
-    if (value.length > 1) {
-      // A full code was pasted/autofilled into a single box.
-      final digits = value.replaceAll(RegExp(r'\D'), '');
-      for (var i = 0; i < _length; i++) {
-        _digitControllers[i].text = i < digits.length ? digits[i] : '';
-      }
-      final nextEmpty = digits.length.clamp(0, _length - 1);
-      if (digits.length >= _length) {
-        _focusNodes[_length - 1].unfocus();
-      } else {
-        _focusNodes[nextEmpty].requestFocus();
-      }
-      _syncOtpController();
-      return;
-    }
-
-    if (value.isNotEmpty && index < _length - 1) {
-      _focusNodes[index + 1].requestFocus();
-    }
-    _syncOtpController();
-  }
-
-  void _onBackspace(int index) {
-    if (_digitControllers[index].text.isEmpty && index > 0) {
-      _focusNodes[index - 1].requestFocus();
-      _digitControllers[index - 1].clear();
-      _syncOtpController();
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Text(
-          'Entrez le code reçu',
-          style: Theme.of(
-            context,
-          ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
-        ),
-        Text(
-          'Envoyé à ${widget.email}',
-          style: Theme.of(
-            context,
-          ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w500),
+        OtpCodeField(
+          controller: otp,
+          length: _length,
+          status: status,
+          enabled: !isLoading,
         ),
         AppDimens.spacerMedium,
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: List.generate(_length, (index) {
-            return SizedBox(
-              width: 46,
-              height: 56,
-              child: Focus(
-                onKeyEvent: (node, event) {
-                  if (event is KeyDownEvent &&
-                      event.logicalKey == LogicalKeyboardKey.backspace) {
-                    _onBackspace(index);
-                  }
-                  return KeyEventResult.ignored;
-                },
-                child: TextField(
-                  controller: _digitControllers[index],
-                  focusNode: _focusNodes[index],
-                  enabled: !widget.isLoading,
-                  autofocus: index == 0,
-                  textAlign: TextAlign.center,
-                  textAlignVertical: TextAlignVertical.center,
-                  keyboardType: TextInputType.number,
-                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                  maxLength: _length, // allows a full paste into one box
-                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: Theme.of(context).colorScheme.primary,
-                  ),
-                  decoration: InputDecoration(
-                    counterText: '',
-                    isDense: true,
-                    contentPadding: EdgeInsets.zero,
-                    filled: true,
-                    fillColor: Theme.of(
-                      context,
-                    ).colorScheme.surfaceContainerLowest,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(AppDimens.radius12),
-                      borderSide: BorderSide(
-                        color: Theme.of(context).colorScheme.outlineVariant,
-                      ),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(AppDimens.radius12),
-                      borderSide: BorderSide(
-                        color: Theme.of(context).colorScheme.outlineVariant,
-                      ),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(AppDimens.radius12),
-                      borderSide: BorderSide(
-                        color: Theme.of(context).colorScheme.primary,
-                        width: 2,
-                      ),
-                    ),
-                  ),
-                  onChanged: (value) => _onChanged(index, value),
+        if (status != OtpStatus.editing) ...[
+          Text(
+            status == OtpStatus.invalid
+                ? 'Code invalide. Veuillez réessayer.'
+                : 'Code vérifié.',
+            textAlign: TextAlign.center,
+            style: theme.textTheme.bodySmall?.copyWith(
+              fontWeight: FontWeight.w600,
+              color: status == OtpStatus.invalid
+                  ? theme.colorScheme.error
+                  : OtherTheme.of(context).success,
+            ),
+          ),
+          AppDimens.spacerSmall,
+        ],
+        Text.rich(
+          TextSpan(
+            text:
+                'Pour confirmer votre compte, saisissez le code à '
+                '$_length chiffres que nous avons envoyé à ',
+            children: [
+              TextSpan(
+                // L'adresse est mise en avant : c'est ce qu'on relit quand
+                // le code n'arrive pas.
+                text: email,
+                style: TextStyle(
+                  fontWeight: FontWeight.w700,
+                  color: theme.colorScheme.onSurface,
                 ),
               ),
-            );
-          }),
+              const TextSpan(text: '.'),
+            ],
+          ),
+          textAlign: TextAlign.center,
+          style: theme.textTheme.bodySmall?.copyWith(
+            color: theme.colorScheme.onSurfaceVariant,
+          ),
         ),
-        AppDimens.spacerMedium,
-        CustomButton(
-          onPressed: widget.submit,
-          text: 'Vérifier le code',
-          isActive: _isComplete,
-          isLoading: widget.isLoading,
+        AppDimens.spacerLarge,
+        ValueListenableBuilder<TextEditingValue>(
+          valueListenable: otp,
+          builder: (context, value, _) => CustomButton(
+            onPressed: submit,
+            text: 'Suivant',
+            isActive: value.text.length == _length,
+            isLoading: isLoading,
+          ),
         ),
       ],
     );

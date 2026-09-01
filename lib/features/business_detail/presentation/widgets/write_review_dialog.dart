@@ -1,19 +1,20 @@
 import 'package:baobabe_0_2/core/services/session_service.dart';
-import 'package:baobabe_0_2/core/themes/app_theme.dart';
+import 'package:baobabe_0_2/core/themes/app_diemens.dart';
 import 'package:baobabe_0_2/core/widgets/auth_required_card.dart';
-import 'package:baobabe_0_2/core/widgets/custom_loading.dart';
+import 'package:baobabe_0_2/core/widgets/button/custom_action_button.dart';
+import 'package:baobabe_0_2/core/widgets/custom_bottom_sheet.dart';
+import 'package:baobabe_0_2/core/widgets/custom_text_form_field.dart';
+import 'package:baobabe_0_2/core/widgets/rating_stars.dart';
 import 'package:baobabe_0_2/features/business_detail/data/review_api_service.dart';
 import 'package:baobabe_0_2/features/home_page/domain/entities/business_entity.dart';
-import 'package:baobabe_0_2/core/themes/other_theme.dart';
 import 'package:flutter/material.dart';
 
-/// Affiche la boîte de dialogue "Écrire un avis" pour un business donné.
+/// « Écrire un avis » sur un commerce.
 ///
-/// ✅ Mécanique alignée sur `showSpaReservationModal` : un widget dédié
-/// (`WriteReviewModal`) est poussé via `showModalBottomSheet`, ce qui donne
-/// la même transition "surgit du bas" que les autres modales de l'app.
-/// Le design de la carte (radius 24 sur les 4 coins, bordure, largeur 85%)
-/// reste strictement identique à l'original.
+/// La feuille était montée à la main : `showModalBottomSheet` direct, cadre
+/// et coins redessinés, `TextField` brut, deux boutons écrits sur place. Elle
+/// passe maintenant par [showCustomBottomSheet], qui apporte le flou, la
+/// poignée, la croix de fermeture et la remontée au-dessus du clavier.
 Future<void> showWriteReviewDialog(
   BuildContext context,
   Business business, {
@@ -29,12 +30,10 @@ Future<void> showWriteReviewDialog(
     return;
   }
 
-  await showModalBottomSheet(
+  await showCustomBottomSheet<void>(
     context: context,
-    isScrollControlled: true,
-    backgroundColor: Colors.transparent,
-    barrierColor: Theme.of(context).colorScheme.scrim.withValues(alpha: 0.54),
-    builder: (modalContext) => WriteReviewModal(
+    title: 'Donner votre avis sur ${business.name}',
+    child: WriteReviewModal(
       business: business,
       userId: sessionUser.id,
       onSubmitted: onSubmitted,
@@ -102,114 +101,41 @@ class _WriteReviewModalState extends State<WriteReviewModal> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      // Remonte le contenu au-dessus du clavier
-      padding: EdgeInsets.only(
-        bottom: MediaQuery.of(context).viewInsets.bottom,
-      ),
-      child: Align(
-        alignment: Alignment.bottomCenter,
-        child: Container(
-          width: double.infinity,
-          decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.surface,
-            borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(24),
-              topRight: Radius.circular(24),
-            ),
-            border: Border.all(
-              color: Theme.of(
-                context,
-              ).colorScheme.surfaceContainerLowest.withValues(alpha: 0.4),
-              width: 3.5,
-            ),
-          ),
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Text(
-                'Donner votre avis sur ${widget.business.name}',
-                style: Theme.of(context).textTheme.titleMedium!,
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 16),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: List.generate(5, (index) {
-                  return IconButton(
-                    tooltip: '${index + 1} étoile${index > 0 ? 's' : ''}',
-                    icon: Icon(
-                      index < _rating
-                          ? Icons.star_rounded
-                          : Icons.star_border_rounded,
-                      color: OtherTheme.of(context).rating,
-                      size: 32,
-                    ),
-                    onPressed: () => setState(() => _rating = index + 1),
-                  );
-                }),
-              ),
-              const SizedBox(height: 16),
-              TextField(
-                controller: _commentController,
-                maxLines: 3,
-                style: TextStyle(
-                  color: Theme.of(context).colorScheme.onSurface,
-                ),
-                decoration: InputDecoration(
-                  labelText: 'Votre commentaire (optionnel)',
-                  labelStyle: TextStyle(
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
-                  ),
-                  filled: true,
-                  fillColor: Theme.of(
-                    context,
-                  ).colorScheme.surfaceContainerLowest,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide.none,
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(
-                      color: Theme.of(context).colorScheme.secondary,
-                      width: 1.5,
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 24),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  TextButton(
-                    onPressed: _isLoading
-                        ? null
-                        : () => Navigator.of(context).pop(),
-                    child: Text(
-                      'Annuler',
-                      style: Theme.of(context).textTheme.bodyLarge!,
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  ElevatedButton(
-                    style: AppTheme.silvaTheme.elevatedButtonTheme.style,
-                    onPressed: _isLoading ? null : _submit,
-                    child: _isLoading
-                        ? CustomLoadingButton(
-                            size: 22,
-                            color: Theme.of(context).colorScheme.onPrimary,
-                          )
-                        : const Text('Envoyer'),
-                  ),
-                ],
-              ),
-            ],
-          ),
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        AppDimens.spacerSmall,
+        RatingStars(
+          rating: _rating,
+          onChanged: (value) => setState(() => _rating = value),
+          size: 32,
         ),
-      ),
+        AppDimens.spacerMedium,
+        CustomTextFormField(
+          controller: _commentController,
+          hintText: 'Votre commentaire (optionnel)',
+          maxLines: 3,
+          textCapitalization: TextCapitalization.sentences,
+        ),
+        AppDimens.spacerLarge,
+        Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            CustomActionButton(
+              label: 'Annuler',
+              tone: ActionButtonTone.tonal,
+              onPressed: _isLoading ? null : () => Navigator.of(context).pop(),
+            ),
+            AppDimens.spacerSmallWidth,
+            CustomActionButton(
+              label: 'Envoyer',
+              isLoading: _isLoading,
+              onPressed: _submit,
+            ),
+          ],
+        ),
+      ],
     );
   }
 }

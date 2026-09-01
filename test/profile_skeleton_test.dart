@@ -1,8 +1,4 @@
-@Tags(['golden'])
-library;
-
 import 'dart:async';
-import 'dart:io';
 
 import 'package:baobabe_0_2/core/themes/app_theme.dart';
 import 'package:baobabe_0_2/features/settings/data/profile_api_service.dart';
@@ -10,7 +6,6 @@ import 'package:baobabe_0_2/features/settings/domain/entities/user_address.dart'
 import 'package:baobabe_0_2/features/settings/presentation/cubit/profile_cubit.dart';
 import 'package:baobabe_0_2/features/settings/presentation/widgets/profile_details.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -22,6 +17,12 @@ import 'package:flutter_test/flutter_test.dart';
 ///
 /// C'est la règle du projet — un squelette d'une autre taille que son contenu
 /// fait sauter la page — appliquée ici à la largeur autant qu'à la hauteur.
+///
+/// La garantie était tenue par une capture d'écran. Elle l'est maintenant par
+/// une **mesure** : on compare la largeur occupée par le squelette à celle du
+/// contenu réel. Une image dit « ça a changé » sans dire quoi, et diffère
+/// d'une machine à l'autre selon le rendu des polices ; un nombre dit
+/// exactement ce qui casse.
 
 /// Une API qui ne répond jamais : l'écran reste sur son squelette.
 class _NeverAnswers implements ProfileApiService {
@@ -74,51 +75,56 @@ Widget _page(ProfileApiService api) => MaterialApp(
   theme: AppTheme.silvaTheme,
   debugShowCheckedModeBanner: false,
   home: BlocProvider(
+    // La clé porte l'API : sans elle, un second `pumpWidget` réutilise
+    // l'élément existant, `create` ne rejoue pas, et l'écran garde le cubit
+    // du premier appel — le test mesurerait deux fois le squelette.
+    key: ValueKey(api.runtimeType),
     create: (_) => ProfileCubit(api: api)..load(),
     child: const Scaffold(body: ProfileDetails(title: 'Mon profil')),
   ),
 );
 
-Future<void> _loadPoppins() async {
-  final loader = FontLoader('Poppins');
-  loader.addFont(
-    File(
-      'assets/Poppins/Poppins-Regular.ttf',
-    ).readAsBytes().then((b) => ByteData.view(b.buffer)),
+/// Largeur peinte par le bloc de texte, squelette ou contenu.
+double _textBlockWidth(WidgetTester tester) {
+  final column = find.descendant(
+    of: find.byType(ProfileDetails),
+    matching: find.byType(Column),
   );
-  await loader.load();
+  return tester.getSize(column.first).width;
 }
 
 void main() {
-  setUpAll(_loadPoppins);
+  const pageWidth = 400.0;
 
-  testWidgets('le squelette du profil', (tester) async {
-    tester.view.physicalSize = const Size(1080, 1700);
-    tester.view.devicePixelRatio = 2.75;
+  Future<void> pumpAt(WidgetTester tester, ProfileApiService api) async {
+    tester.view.physicalSize = const Size(pageWidth, 800);
+    tester.view.devicePixelRatio = 1.0;
     addTearDown(tester.view.reset);
+    await tester.pumpWidget(_page(api));
+  }
 
-    await tester.pumpWidget(_page(_NeverAnswers()));
+  testWidgets('le squelette occupe la largeur de la page', (tester) async {
+    await pumpAt(tester, _NeverAnswers());
     await tester.pump();
 
-    await expectLater(
-      find.byType(ProfileDetails),
-      matchesGoldenFile('goldens/profil_squelette.png'),
+    // Le défaut d'origine : quatre barres courtes serrées à gauche. Le
+    // squelette doit tenir la même largeur que la page, à ses marges près.
+    final width = _textBlockWidth(tester);
+    expect(
+      width,
+      greaterThan(pageWidth * 0.8),
+      reason: 'le squelette est tassé au lieu de tenir la largeur',
     );
   });
 
-  testWidgets('la page chargée', (tester) async {
-    tester.view.physicalSize = const Size(1080, 1700);
-    tester.view.devicePixelRatio = 2.75;
-    addTearDown(tester.view.reset);
-
-    await tester.pumpWidget(_page(_Answers()));
-    // Quelques trames plutôt que `pumpAndSettle` : le shimmer du squelette ne
-    // s'arrête jamais de lui-même, l'attente tournerait à vide.
-    //
-    // La durée dépasse celle du fondu entre squelette et contenu (voir
-    // `FadeSwap`) : photographier au milieu du croisement donnerait une image
-    // à moitié transparente, différente à chaque exécution.
+  testWidgets('le squelette et le contenu ont la même largeur', (tester) async {
+    await pumpAt(tester, _NeverAnswers());
     await tester.pump();
+    final squelette = _textBlockWidth(tester);
+
+    await pumpAt(tester, _Answers());
+    await tester.pump();
+    // Au-delà du fondu entre squelette et contenu, sinon on mesure les deux.
     await tester.pump(const Duration(milliseconds: 400));
 
     expect(find.text('Louis-kerry Dev'), findsOneWidget);
@@ -128,9 +134,8 @@ void main() {
     );
     expect(tester.takeException(), isNull);
 
-    await expectLater(
-      find.byType(ProfileDetails),
-      matchesGoldenFile('goldens/profil_charge.png'),
-    );
+    // C'est l'écart entre les deux qui faisait sauter la page à l'arrivée
+    // des données.
+    expect(_textBlockWidth(tester), closeTo(squelette, 1.0));
   });
 }

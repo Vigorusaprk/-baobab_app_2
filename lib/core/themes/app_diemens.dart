@@ -40,7 +40,12 @@ class AppDimens {
   static const double borderRadiusFull = 100.0;
 
   // *** Autres tokens spécifiques (ne pas fusionner) *** //
+  /// Rayon des coins hauts d'une feuille modale.
   static const double bottomSheet = 30.0;
+
+  /// La poignée de glissement d'une feuille : la barre grise du haut.
+  static const double bottomSheetHandleWidth = 52.0;
+  static const double bottomSheetHandleHeight = 5.0;
   static const double elevationDefault = 2.0;
   static const double borderWidthThin = 1.0;
 

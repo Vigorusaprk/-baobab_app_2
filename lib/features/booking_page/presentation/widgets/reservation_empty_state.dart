@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
+import 'package:baobabe_0_2/core/widgets/button/custom_action_button.dart';
 
 /// Full empty state shown when the user has no reservations at all.
 class ReservationEmptyState extends StatelessWidget {
@@ -89,28 +90,14 @@ class ReservationEmptyState extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 28),
-                  SizedBox(
-                    width: double.infinity,
-                    height: 48,
-                    child: ElevatedButton.icon(
-                      onPressed: () => context.go('/home'),
-                      label: Text(
-                        'Découvrir les commerces',
-                        style: Theme.of(context).textTheme.titleSmall!.copyWith(
-                          color: Theme.of(context).colorScheme.onPrimary,
-                        ),
-                      ),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Theme.of(
-                          context,
-                        ).colorScheme.secondary,
-                        foregroundColor: Theme.of(context).colorScheme.surface,
-                        elevation: 0,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                    ),
+                  // Même bouton que l'état vide des commandes : il portait
+                  // ici `onPrimary` sur un fond `secondary`, deux rôles qui
+                  // ne vont pas ensemble. Le bouton partagé les accorde.
+                  CustomActionButton(
+                    expand: true,
+                    label: 'Découvrir les commerces',
+                    icon: Icons.storefront_outlined,
+                    onPressed: () => context.go('/home'),
                   ),
                 ],
               ),

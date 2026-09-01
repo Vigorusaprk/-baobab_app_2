@@ -1,4 +1,5 @@
 import 'package:baobabe_0_2/core/themes/app_diemens.dart';
+import 'package:baobabe_0_2/core/widgets/button/custom_button.dart';
 import 'package:baobabe_0_2/core/widgets/custom_bottom_sheet.dart';
 import 'package:baobabe_0_2/features/business_detail/domain/entities/offer.dart';
 import 'package:baobabe_0_2/features/home_page/domain/entities/offer_search_filters.dart';
@@ -175,20 +176,9 @@ class _ExploreFiltersState extends State<_ExploreFilters> {
         ),
 
         AppDimens.spacerMedium,
-        SizedBox(
-          width: double.infinity,
-          child: FilledButton(
-            onPressed: () => Navigator.pop(context, _draft),
-            style: FilledButton.styleFrom(
-              backgroundColor: theme.colorScheme.primary,
-              foregroundColor: theme.colorScheme.onPrimary,
-              padding: const EdgeInsets.symmetric(vertical: AppDimens.medium),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(AppDimens.radius16),
-              ),
-            ),
-            child: const Text('Voir les offres'),
-          ),
+        CustomButton(
+          text: 'Voir les offres',
+          onPressed: () => Navigator.pop(context, _draft),
         ),
       ],
     );

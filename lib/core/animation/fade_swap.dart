@@ -8,9 +8,12 @@ import 'package:flutter/material.dart';
 /// n'était pas animée : chaque écran remplaçait son squelette d'un seul coup,
 /// à la trame près. Le contenu semblait sauter plutôt qu'arriver.
 ///
-/// Le remplacement croise les deux états — l'ancien s'efface pendant que le
-/// nouveau monte de quelques pixels. Le mouvement est court : il doit dire
-/// « ça a changé », pas se faire regarder.
+/// Le remplacement **croise** les deux états, sans les déplacer : l'ancien
+/// s'efface pendant que le nouveau se révèle, au même endroit et à la même
+/// place. Le nouveau contenu montait de quelques pixels ; comme il remplace
+/// presque toujours un squelette de même forme, ce glissement se lisait comme
+/// un décalage de la page. On veut l'inverse : l'impression que l'information
+/// est simplement devenue nette. D'où [rise] à zéro par défaut.
 ///
 /// Chaque état doit porter une **clé distincte**, sinon Flutter considère que
 /// c'est le même widget et ne croise rien :
@@ -27,7 +30,7 @@ class FadeSwap extends StatelessWidget {
     super.key,
     required this.child,
     this.duration,
-    this.rise = 8,
+    this.rise = 0,
     this.alignment = Alignment.topCenter,
   });
 
@@ -36,8 +39,9 @@ class FadeSwap extends StatelessWidget {
   /// Par défaut [AppMotion.base].
   final Duration? duration;
 
-  /// De combien le nouveau contenu monte en apparaissant. Quelques pixels
-  /// suffisent : au-delà, la page paraît glisser.
+  /// De combien le nouveau contenu monte en apparaissant. Zéro par défaut :
+  /// voir l'explication en tête de classe. On ne le lève que pour un contenu
+  /// qui n'a pas de squelette derrière lui.
   final double rise;
 
   /// Où les deux contenus s'alignent pendant le croisement. En haut par
@@ -58,9 +62,10 @@ class FadeSwap extends StatelessWidget {
       switchOutCurve: AppMotion.exit,
       layoutBuilder: (current, previous) =>
           Stack(alignment: alignment, children: [...previous, ?current]),
-      transitionBuilder: (child, animation) => FadeTransition(
-        opacity: animation,
-        child: SlideTransition(
+      transitionBuilder: (child, animation) {
+        final fade = FadeTransition(opacity: animation, child: child);
+        if (rise == 0) return fade;
+        return SlideTransition(
           position: Tween<Offset>(
             // Exprimé en fraction de la hauteur de l'enfant : un contenu haut
             // glisserait beaucoup trop si on donnait des pixels ici. On divise
@@ -68,9 +73,9 @@ class FadeSwap extends StatelessWidget {
             begin: Offset(0, rise / 100),
             end: Offset.zero,
           ).animate(animation),
-          child: child,
-        ),
-      ),
+          child: fade,
+        );
+      },
       child: child,
     );
   }

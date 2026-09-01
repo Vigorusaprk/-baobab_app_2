@@ -1,5 +1,7 @@
+import 'dart:async';
 import 'dart:ui' show lerpDouble;
 
+import 'package:baobabe_0_2/core/services/session_service.dart';
 import 'package:baobabe_0_2/core/themes/app_diemens.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/widgets/Category_Icons.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/widgets/home_search_bar.dart';
@@ -42,7 +44,7 @@ class HomeSliverHeaderMetrics {
   /// trois langues : une traduction plus longue aurait coupé partout.
   /// On mesure le texte réel, à la largeur réelle et à l'échelle de police
   /// du système, et l'en-tête réserve ce qu'il faut.
-  static double greetingHeight(BuildContext context) {
+  static double greetingHeight(BuildContext context, {String? name}) {
     final theme = Theme.of(context);
     final media = MediaQuery.of(context);
     final available =
@@ -58,7 +60,7 @@ class HomeSliverHeaderMetrics {
       return painter.height;
     }
 
-    return lineHeight(greeting, theme.textTheme.titleSmall, 1) +
+    return lineHeight(greeting(name), theme.textTheme.titleSmall, 1) +
         lineHeight(
           question,
           theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
@@ -68,21 +70,79 @@ class HomeSliverHeaderMetrics {
 
   /// Les deux lignes, exposées pour que la mesure porte sur le texte
   /// réellement peint et non sur une copie qui pourrait diverger.
-  static const String greeting = 'Bonjour,';
+  ///
+  /// [name] est le prénom de la personne connectée. Quand il manque — visite
+  /// sans compte —, la formule reste celle d'avant : on ne remplace pas le
+  /// nom par un mot creux du genre « cher client ».
+  static String greeting(String? name) {
+    final hour = DateTime.now().hour;
+    final moment = switch (hour) {
+      < 6 => 'Bonne nuit',
+      < 12 => 'Bonjour',
+      < 18 => 'Bon après-midi',
+      _ => 'Bonsoir',
+    };
+    final first = firstName(name);
+    return first == null ? '$moment,' : '$moment $first,';
+  }
+
+  /// Le prénom seul. Un nom complet déborderait de la ligne, qui n'en a
+  /// qu'une et partage sa largeur avec la cloche de notifications.
+  static String? firstName(String? name) {
+    final trimmed = name?.trim() ?? '';
+    if (trimmed.isEmpty) return null;
+    return trimmed.split(RegExp(r'\s+')).first;
+  }
+
   static const String question = "Qu'allons nous faire aujourd'hui ?";
 
   /// Distance de scroll sur laquelle se joue tout le repliement. La hauteur
   /// de barre de statut s'annule entre les deux extents, donc elle n'entre
   /// pas dans le calcul.
-  static double collapseRange(BuildContext context) =>
-      greetingHeight(context) +
+  static double collapseRange(BuildContext context, {String? name}) =>
+      greetingHeight(context, name: name) +
       gap +
       (CategoryIconsMetrics.expandedHeight -
           CategoryIconsMetrics.collapsedHeight);
 }
 
-class HomeSliverHeader extends StatelessWidget {
+class HomeSliverHeader extends StatefulWidget {
   const HomeSliverHeader({super.key});
+
+  @override
+  State<HomeSliverHeader> createState() => _HomeSliverHeaderState();
+}
+
+class _HomeSliverHeaderState extends State<HomeSliverHeader> {
+  /// Le prénom de la personne connectée, **relu à chaque construction**.
+  ///
+  /// Il était retenu au premier passage. Or Supabase restaure la session
+  /// depuis le stockage local un instant après le démarrage : l'accueil se
+  /// construisait avant, ne trouvait personne, et gardait ce « personne »
+  /// pour toute la session — la salutation restait anonyme alors que les
+  /// réglages, eux, affichaient bien le nom.
+  ///
+  /// La session est donc lue ici, à la source ; le flux ci-dessous ne sert
+  /// qu'à provoquer la reconstruction quand elle change.
+  String? get _name => HomeSliverHeaderMetrics.firstName(
+    SessionService.instance.currentUser?.name,
+  );
+
+  StreamSubscription<AppSessionUser?>? _session;
+
+  @override
+  void initState() {
+    super.initState();
+    _session = SessionService.instance.userChanges.listen((_) {
+      if (mounted) setState(() {});
+    });
+  }
+
+  @override
+  void dispose() {
+    _session?.cancel();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -90,7 +150,11 @@ class HomeSliverHeader extends StatelessWidget {
       pinned: true,
       delegate: _HomeSliverHeaderDelegate(
         topPadding: MediaQuery.of(context).padding.top,
-        greetingHeight: HomeSliverHeaderMetrics.greetingHeight(context),
+        greetingHeight: HomeSliverHeaderMetrics.greetingHeight(
+          context,
+          name: _name,
+        ),
+        name: _name,
       ),
     );
   }
@@ -105,9 +169,13 @@ class _HomeSliverHeaderDelegate extends SliverPersistentHeaderDelegate {
   /// la langue, de la largeur et de l'échelle de police.
   final double greetingHeight;
 
+  /// Prénom de la personne connectée, `null` pour une visite sans compte.
+  final String? name;
+
   const _HomeSliverHeaderDelegate({
     required this.topPadding,
     required this.greetingHeight,
+    required this.name,
   });
 
   static const double _searchBarHeight =
@@ -172,7 +240,7 @@ class _HomeSliverHeaderDelegate extends SliverPersistentHeaderDelegate {
                   opacity: (1 - t * 1.6).clamp(0.0, 1.0),
                   child: SizedBox(
                     height: greetingHeight,
-                    child: const _GreetingRow(),
+                    child: _GreetingRow(name: name),
                   ),
                 ),
               ),
@@ -191,13 +259,16 @@ class _HomeSliverHeaderDelegate extends SliverPersistentHeaderDelegate {
   @override
   bool shouldRebuild(_HomeSliverHeaderDelegate oldDelegate) =>
       oldDelegate.topPadding != topPadding ||
-      oldDelegate.greetingHeight != greetingHeight;
+      oldDelegate.greetingHeight != greetingHeight ||
+      oldDelegate.name != name;
 }
 
 /// Ancien contenu de `HomeAppBar`, désormais rendu dans l'en-tête pour
 /// pouvoir défiler et s'effacer avec lui.
 class _GreetingRow extends StatelessWidget {
-  const _GreetingRow();
+  const _GreetingRow({required this.name});
+
+  final String? name;
 
   @override
   Widget build(BuildContext context) {
@@ -215,9 +286,14 @@ class _GreetingRow extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  HomeSliverHeaderMetrics.greeting,
+                  HomeSliverHeaderMetrics.greeting(name),
+                  // Une seule ligne est réservée pour elle : un prénom long
+                  // s'abrège plutôt que de déborder sur les catégories.
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: Theme.of(context).textTheme.titleSmall!.copyWith(
-                    color: Theme.of(context).colorScheme.primary,
+                    color: Theme.of(context).textTheme.bodyMedium!.color!,
+                    fontWeight: FontWeight.w400,
                   ),
                 ),
                 Text(
@@ -237,7 +313,8 @@ class _GreetingRow extends StatelessWidget {
             onPressed: () => context.pushNamed('notifications'),
             tooltip: 'Mes notifications',
             assetPath: 'assets/icons/notifications.svg',
-            iconSize: 26,
+            iconSize: AppDimens.medium,
+            button: AppDimens.large,
           ),
         ],
       ),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:baobabe_0_2/core/themes/app_diemens.dart';
+import 'package:baobabe_0_2/core/widgets/button/custom_action_button.dart';
 
 /// État vide affiché quand l'utilisateur n'a aucune commande.
 class OrderEmptyState extends StatelessWidget {
@@ -92,26 +93,13 @@ class OrderEmptyState extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 28),
-                  // Bouton d'action
-                  SizedBox(
-                    width: double.infinity,
-                    height: 48,
-                    child: ElevatedButton.icon(
-                      onPressed: () => context.go('/home'),
-                      icon: const Icon(Icons.storefront_outlined, size: 20),
-                      label: Text(
-                        'Découvrir les commerces',
-                        style: Theme.of(context).textTheme.titleSmall!,
-                      ),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Theme.of(context).colorScheme.primary,
-                        foregroundColor: Theme.of(context).colorScheme.surface,
-                        elevation: 0,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                    ),
+                  // Le libellé prenait `textTheme.titleSmall` tel quel :
+                  // couleur de texte de page sur l'aplat vert, illisible.
+                  CustomActionButton(
+                    expand: true,
+                    label: 'Découvrir les commerces',
+                    icon: Icons.storefront_outlined,
+                    onPressed: () => context.go('/home'),
                   ),
                 ],
               ),

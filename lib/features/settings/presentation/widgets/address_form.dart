@@ -1,4 +1,5 @@
 import 'package:baobabe_0_2/core/themes/app_diemens.dart';
+import 'package:baobabe_0_2/core/widgets/custom_text_form_field.dart';
 import 'package:baobabe_0_2/features/settings/domain/entities/user_address.dart';
 import 'package:flutter/material.dart';
 
@@ -217,15 +218,12 @@ class _Plain extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return _Labelled(
+    return CustomTextFormField(
       label: label,
-      child: TextField(
-        controller: controller,
-        onChanged: onChanged,
-        textCapitalization: TextCapitalization.words,
-        style: Theme.of(context).textTheme.bodySmall,
-        decoration: InputDecoration(hintText: hint),
-      ),
+      controller: controller,
+      hintText: hint ?? '',
+      onChanged: onChanged,
+      textCapitalization: TextCapitalization.words,
     );
   }
 }
@@ -246,61 +244,32 @@ class _Suggesting extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return _Labelled(
+    return CustomTextFormField(
       label: label,
-      child: TextField(
-        controller: controller,
-        onChanged: onChanged,
-        textCapitalization: TextCapitalization.words,
-        style: Theme.of(context).textTheme.bodySmall,
-        decoration: InputDecoration(
-          // Le menu n'apparaît que s'il y a quelque chose à proposer : une
-          // flèche qui n'ouvre rien est un contrôle décoratif.
-          suffixIcon: options.isEmpty
-              ? null
-              : PopupMenuButton<String>(
-                  tooltip: 'Choisir $label',
-                  icon: Icon(
-                    Icons.expand_more_rounded,
-                    size: 20,
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
-                  ),
-                  onSelected: (value) {
-                    controller.text = value;
-                    onChanged(value);
-                  },
-                  itemBuilder: (context) => [
-                    for (final option in options)
-                      PopupMenuItem(value: option, child: Text(option)),
-                  ],
-                ),
-        ),
-      ),
-    );
-  }
-}
-
-class _Labelled extends StatelessWidget {
-  const _Labelled({required this.label, required this.child});
-
-  final String label;
-  final Widget child;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Text(
-          label,
-          style: Theme.of(context).textTheme.labelSmall?.copyWith(
-            color: Theme.of(context).colorScheme.onSurfaceVariant,
-          ),
-        ),
-        const SizedBox(height: 4),
-        child,
-      ],
+      controller: controller,
+      hintText: '',
+      onChanged: onChanged,
+      textCapitalization: TextCapitalization.words,
+      // Le menu n'apparaît que s'il y a quelque chose à proposer : une flèche
+      // qui n'ouvre rien est un contrôle décoratif.
+      suffixIcon: options.isEmpty
+          ? null
+          : PopupMenuButton<String>(
+              tooltip: 'Choisir $label',
+              icon: Icon(
+                Icons.expand_more_rounded,
+                size: 20,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
+              onSelected: (value) {
+                controller.text = value;
+                onChanged(value);
+              },
+              itemBuilder: (context) => [
+                for (final option in options)
+                  PopupMenuItem(value: option, child: Text(option)),
+              ],
+            ),
     );
   }
 }

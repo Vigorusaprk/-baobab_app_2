@@ -1,7 +1,18 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class SupabaseClientWrapper {
-  static late final SupabaseClient client;
+  static SupabaseClient? _client;
+
+  /// Le client, une fois [initialize] appelé.
+  static SupabaseClient get client => _client!;
+
+  /// Le client **s'il existe**.
+  ///
+  /// Sous test — et pendant le tout premier instant du démarrage — Supabase
+  /// n'est pas initialisé. Un code qui se contente de demander « qui est
+  /// connecté ? » ne doit pas planter pour autant : la bonne réponse est
+  /// « personne », pas une exception.
+  static SupabaseClient? get clientOrNull => _client;
 
   static Future<void> initialize() async {
     // 1. Utilisez l'URL officielle de votre projet Supabase (sans /rest/v1)
@@ -19,6 +30,6 @@ class SupabaseClientWrapper {
       ),
     );
 
-    client = supabase.client;
+    _client = supabase.client;
   }
 }

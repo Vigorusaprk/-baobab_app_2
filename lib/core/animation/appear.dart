@@ -1,12 +1,19 @@
 import 'package:baobabe_0_2/core/animation/app_motion.dart';
 import 'package:flutter/material.dart';
 
-/// L'entrée en scène d'un élément de liste : il monte de quelques pixels en
-/// apparaissant, un peu après son voisin du dessus.
+/// L'entrée en scène d'un élément de liste : il se révèle un peu après son
+/// voisin du dessus.
 ///
 /// Une grille d'offres surgissait d'un bloc, toutes les cartes au même
 /// instant. Le décalage donne une direction à la lecture — l'œil suit
 /// l'arrivée du haut vers le bas au lieu de tout recevoir d'un coup.
+///
+/// **L'élément ne bouge pas.** Il montait de quelques pixels, et le résultat
+/// était désagréable : à cet endroit précis se tenait déjà un squelette, de
+/// la même taille et à la même place. Faire glisser la carte par-dessus
+/// donnait un déplacement que rien ne justifiait. Une carte qui remplace son
+/// squelette ne doit pas arriver — elle doit devenir nette. D'où [rise] à
+/// zéro par défaut ; on ne le lève que là où rien ne précède l'élément.
 ///
 /// **L'animation ne joue qu'une fois**, à la première apparition. Un élément
 /// qui rejouerait son entrée à chaque reconstruction clignoterait au moindre
@@ -28,7 +35,7 @@ class Appear extends StatefulWidget {
     super.key,
     required this.child,
     this.index = 0,
-    this.rise = 12,
+    this.rise = 0,
     this.duration,
   });
 
@@ -37,7 +44,8 @@ class Appear extends StatefulWidget {
   /// Rang de l'élément dans sa liste. Sert au décalage.
   final int index;
 
-  /// De combien l'élément monte en apparaissant.
+  /// De combien l'élément monte en apparaissant. Zéro par défaut : voir
+  /// l'explication en tête de classe.
   final double rise;
 
   /// Par défaut [AppMotion.base].
@@ -91,6 +99,12 @@ class _AppearState extends State<Appear> with SingleTickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
+    // Sans montée, pas de `Transform` du tout : une transformation identité
+    // coûte une couche à chaque trame pour ne rien déplacer.
+    if (widget.rise == 0) {
+      return FadeTransition(opacity: _curve, child: widget.child);
+    }
+
     return FadeTransition(
       opacity: _curve,
       child: AnimatedBuilder(
