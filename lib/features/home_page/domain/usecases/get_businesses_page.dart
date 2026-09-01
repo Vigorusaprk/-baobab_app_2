@@ -6,7 +6,16 @@ class GetBusinessesPageParams {
   final int page;
   final String? category;
 
-  const GetBusinessesPageParams({required this.page, this.category});
+  /// Ce que l'utilisateur a tapé. Cherché en base, jamais sur la page déjà
+  /// reçue : filtrer côté client ne porterait que sur les vingt premiers
+  /// commerces, ce qui est faux dès qu'on fait défiler.
+  final String? query;
+
+  const GetBusinessesPageParams({
+    required this.page,
+    this.category,
+    this.query,
+  });
 }
 
 class GetBusinessesPage
@@ -20,6 +29,7 @@ class GetBusinessesPage
     return await repository.getBusinessesPage(
       page: params.page,
       category: params.category,
+      query: params.query,
     );
   }
 }

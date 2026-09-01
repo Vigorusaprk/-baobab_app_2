@@ -247,6 +247,7 @@ class BusinessRemoteDataSourceImpl implements BusinessRemoteDataSource {
   Future<({List<BusinessModel> items, bool hasMore})> getBusinessesPage({
     required int page,
     String? category,
+    String? query,
   }) async {
     // Pas de secours hors-ligne ici : la 1ère page (getHomeFeed) a déjà son
     // cache, "charger plus" est un enrichissement progressif, pas le
@@ -261,6 +262,10 @@ class BusinessRemoteDataSourceImpl implements BusinessRemoteDataSource {
         'section': 'businesses',
         'page': '$page',
         if (category != null && category.isNotEmpty) 'category': category,
+        // La recherche est faite **en base**. La filtrer sur la page déjà
+        // reçue ne porterait que sur les vingt premiers commerces, ce qui est
+        // faux dès qu'on fait défiler.
+        if (query != null && query.trim().isNotEmpty) 'q': query.trim(),
       },
     );
     final json = response.data as Map<String, dynamic>;

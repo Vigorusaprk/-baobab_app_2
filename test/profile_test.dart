@@ -23,8 +23,7 @@ class _FakeApi implements ProfileApiService {
   @override
   Future<ProfileBundle> load() async {
     if (fail) throw Exception('réseau indisponible');
-    return bundle ??
-        const ProfileBundle(profile: UserProfile(), address: null);
+    return bundle ?? const ProfileBundle(profile: UserProfile(), address: null);
   }
 
   @override
@@ -77,17 +76,20 @@ void main() {
       expect(address.oneLine.trim(), isNot(endsWith(',')));
     });
 
-    test('la ville ne se répète pas quand elle porte le nom de la province', () {
-      // Kinshasa est à la fois province et ville : l'écrire deux fois se
-      // lirait comme une erreur.
-      const address = UserAddress(
-        province: 'Kinshasa',
-        ville: 'Kinshasa',
-        commune: 'Gombe',
-      );
+    test(
+      'la ville ne se répète pas quand elle porte le nom de la province',
+      () {
+        // Kinshasa est à la fois province et ville : l'écrire deux fois se
+        // lirait comme une erreur.
+        const address = UserAddress(
+          province: 'Kinshasa',
+          ville: 'Kinshasa',
+          commune: 'Gombe',
+        );
 
-      expect(address.oneLine, 'C. Gombe, Kinshasa');
-    });
+        expect(address.oneLine, 'C. Gombe, Kinshasa');
+      },
+    );
 
     test('une ville distincte de la province apparaît', () {
       const address = UserAddress(
@@ -194,10 +196,11 @@ void main() {
       // `custom_app_bar.dart` définit le fond, l'élévation et la teinte une
       // fois. Onze pages les redéfinissaient chacune de leur côté.
       final fautifs = <String>[];
-      for (final file in Directory('lib')
-          .listSync(recursive: true)
-          .whereType<File>()
-          .where((f) => f.path.endsWith('.dart'))) {
+      for (final file
+          in Directory('lib')
+              .listSync(recursive: true)
+              .whereType<File>()
+              .where((f) => f.path.endsWith('.dart'))) {
         final relative = file.path.replaceAll(r'\', '/');
         if (relative.endsWith('core/widgets/custom_app_bar.dart')) continue;
         final lines = file.readAsLinesSync();

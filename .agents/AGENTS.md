@@ -916,3 +916,32 @@ peut produire.
 
 Le chercheur de budget est supprimé — sa fourchette de prix vit désormais dans
 le panneau de filtres d'Explorer.
+
+
+## « Tous les commerces » cherche des commerces
+
+L'écran empruntait `HomeSearchBar`. Le nom disait « accueil », l'usage était
+double : le jour où cette barre est devenue une simple porte vers Explorer,
+taper dedans quittait la page — et le bouton de filtres qui l'accompagnait
+ouvrait des filtres d'**offres** sur une liste de **commerces**.
+
+La leçon vaut au-delà de ce cas : un composant nommé d'après un écran mais
+utilisé par deux se casse en silence dès que l'un des deux évolue. L'écran
+utilise désormais `CustomSearchField` directement, le champ partagé, sans
+bouton à côté.
+
+**La recherche est faite en base**, via `get-home?section=businesses&q=`, avec
+la même temporisation de 350 ms qu'Explorer. Filtrer la page déjà reçue ne
+porterait que sur les vingt premiers commerces — faux dès qu'on fait défiler.
+La page suivante emporte **et** la catégorie **et** la recherche : une page qui
+oublierait l'une des deux collerait des commerces sans rapport à la suite de
+ceux affichés.
+
+Changer de catégorie **conserve** le texte tapé : l'utilisateur affine, il ne
+recommence pas.
+
+Deux détails de mise en page qui traînaient : la bande de catégories était en
+état étendu faute de `collapseProgress: 1`, et la liste avait des marges de 24
+là où tout ce qui la surmontait était à 16 — décalée de 8 px vers l'intérieur.
+Les marges de la liste et de son squelette vivent dans une seule constante,
+pour qu'ils se superposent exactement.

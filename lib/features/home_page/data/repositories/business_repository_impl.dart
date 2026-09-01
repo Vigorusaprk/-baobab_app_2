@@ -54,10 +54,12 @@ class BusinessRepositoryImpl implements BusinessRepository {
   Future<BusinessesPage> getBusinessesPage({
     required int page,
     String? category,
+    String? query,
   }) async {
     final result = await remoteDataSource.getBusinessesPage(
       page: page,
       category: category,
+      query: query,
     );
     return BusinessesPage(
       items: result.items.map((model) => model.toEntity()).toList(),

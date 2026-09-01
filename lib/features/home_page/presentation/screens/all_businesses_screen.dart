@@ -8,7 +8,7 @@ import 'package:baobabe_0_2/features/home_page/domain/usecases/get_businesses_pa
 import 'package:baobabe_0_2/features/home_page/presentation/bloc/business_list_cubit.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/widgets/Category_Icons.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/widgets/business_list_row.dart';
-import 'package:baobabe_0_2/features/home_page/presentation/widgets/home_search_bar.dart';
+import 'package:baobabe_0_2/core/widgets/custom_search_field.dart';
 import 'package:baobabe_0_2/core/widgets/custom_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -41,11 +41,18 @@ class AllBusinessesScreen extends StatefulWidget {
 
 class _AllBusinessesScreenState extends State<AllBusinessesScreen> {
   late String _selected;
+  final TextEditingController _search = TextEditingController();
 
   @override
   void initState() {
     super.initState();
     _selected = widget.categorySlug ?? _allSlug;
+  }
+
+  @override
+  void dispose() {
+    _search.dispose();
+    super.dispose();
   }
 
   static const String _allSlug = 'all';
@@ -88,9 +95,24 @@ class _AllBusinessesScreenState extends State<AllBusinessesScreen> {
           body: Column(
             children: [
               AppDimens.spacerSmall,
-              const HomeSearchBar(),
+              // Le champ partagé, en saisie directe : il cherche **ici**.
+              // L'écran empruntait la barre de l'accueil, devenue une simple
+              // porte vers Explorer — taper dedans quittait donc la page. Et
+              // Explorer cherche des offres, pas des commerces : le bouton de
+              // filtres qui l'accompagnait n'avait rien à faire ici non plus.
+              Padding(
+                padding: AppDimens.appPadding,
+                child: CustomSearchField(
+                  controller: _search,
+                  hint: 'Rechercher un commerce…',
+                  onChanged: context.read<BusinessListCubit>().queryChanged,
+                ),
+              ),
               AppDimens.spacerSmall,
+              // Bande compacte, comme sur Explorer : cet écran défile
+              // longuement, une bande haute mangerait la place de la liste.
               CategoryIcons(
+                collapseProgress: 1,
                 selectedSlug: _selected,
                 onCategorySelected: (slug) {
                   if (slug == _selected) return;
@@ -129,11 +151,20 @@ class _AllBusinessesScreenState extends State<AllBusinessesScreen> {
 
 /// Marges communes à la liste et à son squelette, pour qu'ils se
 /// superposent exactement au moment du basculement.
+///
+/// L'horizontale reprend `appPaddingValue`, comme le champ de recherche et la
+/// bande de catégories au-dessus : elle valait `large` (24), et la liste était
+/// donc décalée de 8 px vers l'intérieur par rapport à tout ce qui la
+/// surmontait.
+///
+/// La marge basse dégage la barre de navigation flottante. Elle vaut la cible
+/// tactile plus deux respirations, au lieu du 100 en dur qui ne correspondait
+/// à la hauteur de rien.
 const EdgeInsets _listPadding = EdgeInsets.fromLTRB(
-  AppDimens.large,
+  AppDimens.appPaddingValue,
   AppDimens.small,
-  AppDimens.large,
-  100,
+  AppDimens.appPaddingValue,
+  AppDimens.touchTarget + AppDimens.large * 2,
 );
 
 class _BusinessList extends StatelessWidget {

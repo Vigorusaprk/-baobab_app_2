@@ -35,14 +35,17 @@ class _FakeRepository implements BusinessRepository {
 
   final List<int> requestedPages = [];
   final List<String?> requestedCategories = [];
+  final List<String?> requestedQueries = [];
 
   @override
   Future<BusinessesPage> getBusinessesPage({
     required int page,
     String? category,
+    String? query,
   }) async {
     requestedPages.add(page);
     requestedCategories.add(category);
+    requestedQueries.add(query);
     return _pages[requestedPages.length - 1]();
   }
 
@@ -186,5 +189,66 @@ void main() {
 
     expect(repo.requestedCategories, ['hotel', 'hotel']);
     expect(repo.requestedPages, [1, 2]);
+  });
+
+  group('La recherche part au serveur', () {
+    test('elle attend une pause dans la frappe', () async {
+      // Sans temporisation, « restaurant » enverrait dix requêtes, et les
+      // réponses pourraient revenir dans le désordre.
+      final repo = _FakeRepository([
+        () => BusinessesPage(items: [_business('1')], hasMore: false),
+      ]);
+      final cubit = _cubit(repo);
+
+      cubit.queryChanged('res');
+      cubit.queryChanged('resta');
+      cubit.queryChanged('restaurant');
+
+      // Rien n'est encore parti.
+      expect(repo.requestedQueries, isEmpty);
+      expect(cubit.state.query, 'restaurant');
+
+      await Future.delayed(const Duration(milliseconds: 500));
+      expect(repo.requestedQueries, ['restaurant']);
+
+      await cubit.close();
+    });
+
+    test('la page suivante répond à la même question', () async {
+      // Une page suivante qui oublierait la recherche renverrait des
+      // commerces sans rapport à la suite de ceux affichés.
+      final repo = _FakeRepository([
+        () => BusinessesPage(items: [_business('1')], hasMore: true),
+        () => BusinessesPage(items: [_business('2')], hasMore: false),
+      ]);
+      final cubit = _cubit(repo);
+
+      await cubit.load('restaurant', query: 'chez');
+      await cubit.loadMore();
+
+      expect(repo.requestedQueries, ['chez', 'chez']);
+      expect(repo.requestedCategories, ['restaurant', 'restaurant']);
+      expect(repo.requestedPages, [1, 2]);
+
+      await cubit.close();
+    });
+
+    test('changer de catégorie garde la recherche tapée', () async {
+      // L'utilisateur affine, il ne recommence pas : effacer son texte au
+      // moment où il touche une catégorie serait une perte de travail.
+      final repo = _FakeRepository([
+        () => BusinessesPage(items: [_business('1')], hasMore: false),
+        () => BusinessesPage(items: [_business('2')], hasMore: false),
+      ]);
+      final cubit = _cubit(repo);
+
+      await cubit.load(null, query: 'chez');
+      await cubit.load('spa');
+
+      expect(cubit.state.query, 'chez');
+      expect(repo.requestedQueries, ['chez', 'chez']);
+
+      await cubit.close();
+    });
   });
 }

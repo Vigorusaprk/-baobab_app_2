@@ -22,6 +22,7 @@ abstract class BusinessRepository {
   Future<BusinessesPage> getBusinessesPage({
     required int page,
     String? category,
+    String? query,
   });
   Future<Business> getBusinessDetail(String businessId);
   Future<List<BusinessReview>> getBusinessReviews(String businessId);
