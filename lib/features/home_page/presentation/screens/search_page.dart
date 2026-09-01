@@ -32,6 +32,7 @@ class SearchPageBody extends StatefulWidget {
 class _SearchPageBodyState extends State<SearchPageBody> {
   final TextEditingController _controller = TextEditingController();
   final FocusNode _searchFocus = FocusNode();
+  final GlobalKey _searchFieldKey = GlobalKey();
   final ScrollController _scroll = ScrollController();
   late final ExploreCubit _explore;
 
@@ -43,6 +44,13 @@ class _SearchPageBodyState extends State<SearchPageBody> {
     super.initState();
     _explore = context.read<ExploreCubit>()..start();
     _scroll.addListener(_onScroll);
+
+    // L'intention est posée par l'accueil **avant** que cet écran existe :
+    // au premier passage, l'`IndexedStack` du shell ne l'a pas encore
+    // construit. Un `BlocListener` ne se déclenche pas pour l'état déjà là
+    // quand il s'abonne — il ne voit que les transitions suivantes. Il faut
+    // donc aussi regarder ce qui est en attente à l'ouverture.
+    _handleIntent(_explore.state.pendingIntent);
   }
 
   @override
@@ -52,6 +60,53 @@ class _SearchPageBodyState extends State<SearchPageBody> {
     _scroll.removeListener(_onScroll);
     _scroll.dispose();
     super.dispose();
+  }
+
+  /// Exécute ce que l'accueil a demandé en nous envoyant ici, puis le
+  /// consomme pour que ça ne se rejoue pas au prochain retour sur l'onglet.
+  void _handleIntent(ExploreIntent? intent) {
+    if (intent == null) return;
+    _explore.intentHandled();
+    switch (intent) {
+      case ExploreIntent.openFilters:
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted) _openFilters();
+        });
+      case ExploreIntent.focusSearch:
+        _focusWhenVisible();
+    }
+  }
+
+  /// Donne le focus au champ dès qu'Explorer est réellement à l'écran.
+  ///
+  /// Toucher la barre de l'accueil, c'est vouloir taper : le clavier doit
+  /// être là à l'arrivée, sans second geste.
+  ///
+  /// La difficulté tient à l'`IndexedStack` du shell : les quatre onglets
+  /// restent montés, et celui qu'on ne voit pas est hors écran. Un champ hors
+  /// écran ne peut pas prendre le focus — la demande est simplement ignorée,
+  /// sans erreur. Et la bascule d'onglet ne prend pas effet dans la trame qui
+  /// suit l'appel de route, mais quelques trames plus tard.
+  ///
+  /// On réessaie donc jusqu'à ce que le champ soit visible, en abandonnant au
+  /// bout de quelques essais plutôt que de boucler : si l'utilisateur a
+  /// changé d'avis entre-temps, lui ouvrir le clavier serait pire que rien.
+  void _focusWhenVisible({int attempts = 0}) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      final visible =
+          _searchFieldKey.currentContext?.findRenderObject()?.attached ?? false;
+      if (visible && ModalRoute.of(context)?.isCurrent != false) {
+        _searchFocus.requestFocus();
+        return;
+      }
+      if (attempts < 10) {
+        Future.delayed(
+          const Duration(milliseconds: 50),
+          () => _focusWhenVisible(attempts: attempts + 1),
+        );
+      }
+    });
   }
 
   void _onScroll() {
@@ -81,6 +136,7 @@ class _SearchPageBodyState extends State<SearchPageBody> {
           children: [
             AppDimens.spacerSmall,
             _SearchRow(
+              key: _searchFieldKey,
               controller: _controller,
               focusNode: _searchFocus,
               showBackButton: widget.showBackButton,
@@ -102,24 +158,10 @@ class _SearchPageBodyState extends State<SearchPageBody> {
               child: BlocConsumer<ExploreCubit, ExploreState>(
                 listenWhen: (a, b) =>
                     a.pendingIntent == null && b.pendingIntent != null,
-                listener: (context, state) {
-                  // L'accueil a demandé quelque chose en nous envoyant ici.
-                  // On le consomme aussitôt pour que ça ne se rejoue pas au
-                  // prochain retour sur l'onglet.
-                  final intent = state.pendingIntent;
-                  context.read<ExploreCubit>().intentHandled();
-                  switch (intent) {
-                    case ExploreIntent.openFilters:
-                      _openFilters();
-                    case ExploreIntent.focusSearch:
-                      // Toucher la barre de l'accueil, c'est vouloir taper :
-                      // le clavier doit être là à l'arrivée, sans second
-                      // geste.
-                      _searchFocus.requestFocus();
-                    case null:
-                      break;
-                  }
-                },
+                // Pour le cas où l'écran est déjà monté : l'utilisateur
+                // revient sur l'accueil et retouche la barre.
+                listener: (context, state) =>
+                    _handleIntent(state.pendingIntent),
                 builder: (context, state) => _Results(
                   state: state,
                   scroll: _scroll,
@@ -138,6 +180,7 @@ class _SearchPageBodyState extends State<SearchPageBody> {
 
 class _SearchRow extends StatelessWidget {
   const _SearchRow({
+    super.key,
     required this.controller,
     required this.focusNode,
     required this.showBackButton,

@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:baobabe_0_2/features/home_page/domain/entities/business_entity.dart';
 import 'package:baobabe_0_2/features/business_detail/domain/entities/offer.dart';
 import 'package:baobabe_0_2/features/home_page/domain/usecases/get_offers_page.dart';
@@ -115,10 +116,13 @@ class BusinessBloc extends Bloc<BusinessEvent, BusinessState> {
           isLoadingMore: false,
         ),
       );
-    } catch (_) {
+    } catch (e) {
+      // Silencieux **pour l'utilisateur**, pas pour le journal : un `catch (_)`
+      // muet a déjà caché une pagination cassée pendant des semaines.
+      debugPrint('Découvrir — page suivante, échec : $e');
       if (requestId != _homeRequestId) return;
-      // Échec silencieux : l'utilisateur redevient libre de scroller pour
-      // réessayer, plutôt que de rester bloqué sur isLoadingMore=true.
+      // L'utilisateur redevient libre de scroller pour réessayer, plutôt que
+      // de rester bloqué sur isLoadingMore=true.
       emit(current.copyWith(isLoadingMore: false));
     }
   }
@@ -157,9 +161,10 @@ class BusinessBloc extends Bloc<BusinessEvent, BusinessState> {
           isLoadingMoreNewOffers: false,
         ),
       );
-    } catch (_) {
+    } catch (e) {
+      debugPrint('Nouveautés — « Voir plus », échec : $e');
       if (requestId != _homeRequestId) return;
-      // Échec silencieux : le bouton reste disponible pour réessayer.
+      // Le bouton reste disponible pour réessayer.
       emit(current.copyWith(isLoadingMoreNewOffers: false));
     }
   }

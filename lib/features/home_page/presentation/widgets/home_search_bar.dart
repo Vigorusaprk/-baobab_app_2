@@ -25,16 +25,23 @@ class HomeSearchBar extends StatelessWidget {
   static const double height = CustomSearchField.height;
 
   void _goToExplore(BuildContext context, {required ExploreIntent intent}) {
+    final cubit = context.read<ExploreCubit>();
+
+    // **On change d'onglet d'abord.** Explorer vit dans un `IndexedStack` et
+    // reste donc monté même caché : demander avant de naviguer faisait
+    // consommer l'intention par un écran encore masqué, et le clavier ne
+    // s'ouvrait pas.
+    context.goNamed('expolre');
+
     // La demande passe par le cubit et non par la route : un paramètre d'URL
     // serait resté après coup, et aurait rejoué l'action à chaque retour sur
     // l'onglet.
     switch (intent) {
       case ExploreIntent.openFilters:
-        context.read<ExploreCubit>().requestFilters();
+        cubit.requestFilters();
       case ExploreIntent.focusSearch:
-        context.read<ExploreCubit>().requestSearch();
+        cubit.requestSearch();
     }
-    context.goNamed('expolre');
   }
 
   @override
