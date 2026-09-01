@@ -1,4 +1,6 @@
 import 'package:baobabe_0_2/core/themes/app_diemens.dart';
+import 'package:baobabe_0_2/core/widgets/button/custom_button.dart';
+import 'package:baobabe_0_2/core/widgets/custom_text_form_field.dart';
 import 'package:baobabe_0_2/core/widgets/custom_bottom_sheet.dart';
 import 'package:baobabe_0_2/features/settings/domain/entities/user_address.dart';
 import 'package:baobabe_0_2/features/settings/presentation/cubit/profile_cubit.dart';
@@ -84,37 +86,26 @@ class _DeliverySheetState extends State<_DeliverySheet> {
           ),
           AppDimens.spacerSmall,
 
-          SizedBox(
-            width: double.infinity,
-            child: FilledButton(
-              onPressed: () {
-                // Une adresse réduite à la province ne mène nulle part : on
-                // ne laisse pas partir une commande qu'on ne saura pas livrer.
-                if (_address.isEmpty) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text(
-                        'Indiquez au moins votre commune et votre avenue.',
-                      ),
+          CustomButton(
+            text: 'Confirmer la commande',
+            onPressed: () {
+              // Une adresse réduite à la province ne mène nulle part : on ne
+              // laisse pas partir une commande qu'on ne saura pas livrer.
+              if (_address.isEmpty) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text(
+                      'Indiquez au moins votre commune et votre avenue.',
                     ),
-                  );
-                  return;
-                }
-                Navigator.pop(
-                  context,
-                  DeliveryChoice(address: _address, remember: _remember),
+                  ),
                 );
-              },
-              style: FilledButton.styleFrom(
-                backgroundColor: theme.colorScheme.primary,
-                foregroundColor: theme.colorScheme.onPrimary,
-                padding: const EdgeInsets.symmetric(vertical: AppDimens.medium),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(AppDimens.radius16),
-                ),
-              ),
-              child: const Text('Confirmer la commande'),
-            ),
+                return;
+              }
+              Navigator.pop(
+                context,
+                DeliveryChoice(address: _address, remember: _remember),
+              );
+            },
           ),
         ],
       ),
@@ -199,11 +190,10 @@ class _ContactSheetState extends State<_ContactSheet> {
 
         if (_share) ...[
           AppDimens.spacerSmall,
-          TextField(
+          CustomTextFormField(
             controller: _phone,
+            hintText: '+243 …',
             keyboardType: TextInputType.phone,
-            style: theme.textTheme.bodySmall,
-            decoration: const InputDecoration(hintText: '+243 …'),
           ),
           CheckboxListTile(
             value: _remember,
@@ -218,37 +208,26 @@ class _ContactSheetState extends State<_ContactSheet> {
         ],
 
         AppDimens.spacerSmall,
-        SizedBox(
-          width: double.infinity,
-          child: FilledButton(
-            onPressed: () {
-              final phone = _phone.text.trim();
-              if (_share && phone.isEmpty) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Indiquez un numéro, ou décochez la case.'),
-                  ),
-                );
-                return;
-              }
-              Navigator.pop(
-                context,
-                ContactChoice(
-                  phone: _share ? phone : null,
-                  remember: _share && _remember,
+        CustomButton(
+          text: 'Réserver',
+          onPressed: () {
+            final phone = _phone.text.trim();
+            if (_share && phone.isEmpty) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Indiquez un numéro, ou décochez la case.'),
                 ),
               );
-            },
-            style: FilledButton.styleFrom(
-              backgroundColor: theme.colorScheme.primary,
-              foregroundColor: theme.colorScheme.onPrimary,
-              padding: const EdgeInsets.symmetric(vertical: AppDimens.medium),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(AppDimens.radius16),
+              return;
+            }
+            Navigator.pop(
+              context,
+              ContactChoice(
+                phone: _share ? phone : null,
+                remember: _share && _remember,
               ),
-            ),
-            child: const Text('Réserver'),
-          ),
+            );
+          },
         ),
       ],
     );
@@ -340,13 +319,18 @@ class _ProfileSheetState extends State<_ProfileSheet> {
           ),
           AppDimens.spacerMedium,
 
-          _Field(label: 'Nom complet', controller: _name),
+          CustomTextFormField(
+            label: 'Nom complet',
+            controller: _name,
+            hintText: 'Votre nom',
+            textCapitalization: TextCapitalization.words,
+          ),
           AppDimens.spacerMedium,
-          _Field(
+          CustomTextFormField(
             label: 'Téléphone',
             controller: _phone,
+            hintText: '+243 …',
             keyboardType: TextInputType.phone,
-            hint: '+243 …',
           ),
           AppDimens.spacerLarge,
 
@@ -368,71 +352,25 @@ class _ProfileSheetState extends State<_ProfileSheet> {
             AppDimens.spacerSmall,
           ],
 
-          SizedBox(
-            width: double.infinity,
-            child: FilledButton(
-              onPressed: state.saving
-                  ? null
-                  : () async {
-                      final cubit = context.read<ProfileCubit>();
-                      final ok = await cubit.save(
-                        name: _name.text.trim(),
-                        phone: _phone.text.trim(),
-                        address: _address,
-                      );
-                      if (!context.mounted || !ok) return;
-                      Navigator.pop(context, true);
-                    },
-              style: FilledButton.styleFrom(
-                backgroundColor: theme.colorScheme.primary,
-                foregroundColor: theme.colorScheme.onPrimary,
-                padding: const EdgeInsets.symmetric(vertical: AppDimens.medium),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(AppDimens.radius16),
-                ),
-              ),
-              child: Text(state.saving ? 'Enregistrement…' : 'Enregistrer'),
-            ),
+          // L'état de chargement vient du bouton partagé : il montre son
+          // indicateur plutôt que de changer son libellé en
+          // « Enregistrement… », qui se lisait comme un autre bouton.
+          CustomButton(
+            text: 'Enregistrer',
+            isLoading: state.saving,
+            onPressed: () async {
+              final cubit = context.read<ProfileCubit>();
+              final ok = await cubit.save(
+                name: _name.text.trim(),
+                phone: _phone.text.trim(),
+                address: _address,
+              );
+              if (!context.mounted || !ok) return;
+              Navigator.pop(context, true);
+            },
           ),
         ],
       ),
-    );
-  }
-}
-
-class _Field extends StatelessWidget {
-  const _Field({
-    required this.label,
-    required this.controller,
-    this.keyboardType,
-    this.hint,
-  });
-
-  final String label;
-  final TextEditingController controller;
-  final TextInputType? keyboardType;
-  final String? hint;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Text(
-          label,
-          style: Theme.of(context).textTheme.labelSmall?.copyWith(
-            color: Theme.of(context).colorScheme.onSurfaceVariant,
-          ),
-        ),
-        const SizedBox(height: 4),
-        TextField(
-          controller: controller,
-          keyboardType: keyboardType,
-          style: Theme.of(context).textTheme.bodySmall,
-          decoration: InputDecoration(hintText: hint),
-        ),
-      ],
     );
   }
 }
