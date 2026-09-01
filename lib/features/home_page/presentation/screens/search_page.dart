@@ -1,3 +1,6 @@
+import 'package:baobabe_0_2/core/animation/animated_count.dart';
+import 'package:baobabe_0_2/core/animation/appear.dart';
+import 'package:baobabe_0_2/core/animation/fade_swap.dart';
 import 'package:baobabe_0_2/core/themes/app_diemens.dart';
 import 'package:baobabe_0_2/core/widgets/button/custom_icon_button.dart';
 import 'package:baobabe_0_2/core/widgets/custom_search_field.dart';
@@ -162,12 +165,14 @@ class _SearchPageBodyState extends State<SearchPageBody> {
                 // revient sur l'accueil et retouche la barre.
                 listener: (context, state) =>
                     _handleIntent(state.pendingIntent),
-                builder: (context, state) => _Results(
-                  state: state,
-                  scroll: _scroll,
-                  ratio: _cardRatio,
-                  onRetry: _explore.retry,
-                  onClearFilters: _explore.clearFacets,
+                builder: (context, state) => FadeSwap(
+                  child: _Results(
+                    state: state,
+                    scroll: _scroll,
+                    ratio: _cardRatio,
+                    onRetry: _explore.retry,
+                    onClearFilters: _explore.clearFacets,
+                  ),
                 ),
               ),
             ),
@@ -223,7 +228,9 @@ class _SearchRow extends StatelessWidget {
               // La pastille dit combien de critères sont posés : sans elle,
               // un filtre actif est invisible une fois le panneau refermé.
               isLabelVisible: state.filters.facetCount > 0,
-              label: Text('${state.filters.facetCount}'),
+              // Le compte défile au lieu de sauter : on voit qu'il a bougé,
+              // et dans quel sens.
+              label: AnimatedCount(value: state.filters.facetCount),
               child: CustomIconButton(
                 onPressed: onFilters,
                 tooltip: 'Filtrer les offres',
@@ -258,6 +265,7 @@ class _Results extends StatelessWidget {
   Widget build(BuildContext context) {
     if (state.status == ExploreStatus.failure) {
       return _Message(
+        key: const ValueKey('echec'),
         title: 'La recherche a échoué',
         body: state.message ?? 'Réessayez dans un instant.',
         actionLabel: 'Réessayer',
@@ -271,6 +279,7 @@ class _Results extends StatelessWidget {
 
     if (loading && state.offers.isEmpty) {
       return Skeletonizer(
+        key: const ValueKey('squelette'),
         enabled: true,
         child: GridView.builder(
           padding: AppDimens.appPadding,
@@ -284,6 +293,7 @@ class _Results extends StatelessWidget {
 
     if (state.offers.isEmpty) {
       return _Message(
+        key: const ValueKey('vide'),
         title: 'Aucune offre ne correspond',
         body: state.filters.hasFacets
             ? 'Essayez d\'élargir vos filtres.'
@@ -294,6 +304,7 @@ class _Results extends StatelessWidget {
     }
 
     return GridView.builder(
+      key: const ValueKey('resultats'),
       controller: scroll,
       padding: AppDimens.appPadding.copyWith(
         top: AppDimens.small,
@@ -306,11 +317,14 @@ class _Results extends StatelessWidget {
           return const Skeletonizer(enabled: true, child: OfferCardSkeleton());
         }
         final offer = state.offers[index];
-        return OfferCard(
-          offer: offer,
-          onTap: () => context.pushNamed(
-            'offerDetail',
-            pathParameters: {'id': offer.id},
+        return Appear(
+          index: index,
+          child: OfferCard(
+            offer: offer,
+            onTap: () => context.pushNamed(
+              'offerDetail',
+              pathParameters: {'id': offer.id},
+            ),
           ),
         );
       },
@@ -328,6 +342,7 @@ class _Results extends StatelessWidget {
 /// Un état vide ou en échec : ce qui s'est passé, et quoi faire ensuite.
 class _Message extends StatelessWidget {
   const _Message({
+    super.key,
     required this.title,
     required this.body,
     this.actionLabel,

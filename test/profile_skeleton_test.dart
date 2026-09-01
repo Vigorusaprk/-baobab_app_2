@@ -8,7 +8,7 @@ import 'package:baobabe_0_2/core/themes/app_theme.dart';
 import 'package:baobabe_0_2/features/settings/data/profile_api_service.dart';
 import 'package:baobabe_0_2/features/settings/domain/entities/user_address.dart';
 import 'package:baobabe_0_2/features/settings/presentation/cubit/profile_cubit.dart';
-import 'package:baobabe_0_2/features/settings/presentation/widgets/profil_page.dart';
+import 'package:baobabe_0_2/features/settings/presentation/widgets/profile_details.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -75,7 +75,7 @@ Widget _page(ProfileApiService api) => MaterialApp(
   debugShowCheckedModeBanner: false,
   home: BlocProvider(
     create: (_) => ProfileCubit(api: api)..load(),
-    child: const ProfilPage(),
+    child: const Scaffold(body: ProfileDetails(title: 'Mon profil')),
   ),
 );
 
@@ -101,7 +101,7 @@ void main() {
     await tester.pump();
 
     await expectLater(
-      find.byType(ProfilPage),
+      find.byType(ProfileDetails),
       matchesGoldenFile('goldens/profil_squelette.png'),
     );
   });
@@ -114,8 +114,12 @@ void main() {
     await tester.pumpWidget(_page(_Answers()));
     // Quelques trames plutôt que `pumpAndSettle` : le shimmer du squelette ne
     // s'arrête jamais de lui-même, l'attente tournerait à vide.
+    //
+    // La durée dépasse celle du fondu entre squelette et contenu (voir
+    // `FadeSwap`) : photographier au milieu du croisement donnerait une image
+    // à moitié transparente, différente à chaque exécution.
     await tester.pump();
-    await tester.pump(const Duration(milliseconds: 100));
+    await tester.pump(const Duration(milliseconds: 400));
 
     expect(find.text('Louis-kerry Dev'), findsOneWidget);
     expect(
@@ -125,7 +129,7 @@ void main() {
     expect(tester.takeException(), isNull);
 
     await expectLater(
-      find.byType(ProfilPage),
+      find.byType(ProfileDetails),
       matchesGoldenFile('goldens/profil_charge.png'),
     );
   });

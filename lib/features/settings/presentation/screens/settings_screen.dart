@@ -8,6 +8,7 @@ import 'package:baobabe_0_2/features/settings/presentation/bloc/settings_bloc.da
 import 'package:baobabe_0_2/features/settings/presentation/widgets/language_picker_dialog.dart';
 import 'package:baobabe_0_2/features/settings/presentation/widgets/logout_confirmation_dialog.dart';
 import 'package:baobabe_0_2/features/settings/presentation/widgets/settings_tiles.dart';
+import 'package:baobabe_0_2/features/settings/presentation/widgets/profile_sheets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -35,7 +36,7 @@ class SettingsScreen extends StatelessWidget {
               name: user?.name ?? '',
               email: user?.email ?? '',
               onTap: () => isLoggedIn
-                  ? context.pushNamed('profil-page')
+                  ? showProfileDetailsSheet(context)
                   : context.push('/login'),
             ),
             AppDimens.spacerMedium,

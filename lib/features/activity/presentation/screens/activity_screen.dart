@@ -1,3 +1,4 @@
+import 'package:baobabe_0_2/core/animation/animated_count.dart';
 import 'package:baobabe_0_2/core/widgets/custom_pop_up.dart';
 import 'package:baobabe_0_2/core/services/session_service.dart';
 import 'package:baobabe_0_2/features/activity/presentation/widgets/activity_skeleton.dart';
@@ -102,8 +103,8 @@ class _ActivityScreenState extends State<ActivityScreen>
                     color: Theme.of(context).colorScheme.primary,
                     borderRadius: BorderRadius.circular(16),
                   ),
-                  child: Text(
-                    '${_orders.length + _reservations.length}',
+                  child: AnimatedCount(
+                    value: _orders.length + _reservations.length,
                     style: Theme.of(context).textTheme.labelMedium!.copyWith(
                       color: Theme.of(context).colorScheme.onPrimary,
                       fontWeight: FontWeight.w700,

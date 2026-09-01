@@ -3,6 +3,7 @@ import 'package:baobabe_0_2/core/widgets/custom_bottom_sheet.dart';
 import 'package:baobabe_0_2/features/settings/domain/entities/user_address.dart';
 import 'package:baobabe_0_2/features/settings/presentation/cubit/profile_cubit.dart';
 import 'package:baobabe_0_2/features/settings/presentation/widgets/address_form.dart';
+import 'package:baobabe_0_2/features/settings/presentation/widgets/profile_details.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -252,6 +253,31 @@ class _ContactSheetState extends State<_ContactSheet> {
       ],
     );
   }
+}
+
+/// Montre le profil dans une feuille.
+///
+/// Le profil était une page à part entière, atteinte depuis les paramètres.
+/// Il rejoint les autres surfaces secondaires de l'application — filtres,
+/// confirmation, adresse de livraison : on y jette un œil, on modifie
+/// éventuellement, on referme. Une page plein écran pour ça obligeait à
+/// naviguer puis à revenir.
+///
+/// Le contenu est **le même widget** que celui de l'ancienne page
+/// ([ProfileDetails]) : les deux surfaces ne peuvent pas diverger.
+Future<void> showProfileDetailsSheet(BuildContext context) {
+  final cubit = context.read<ProfileCubit>()..load();
+
+  return showCustomBottomSheet<void>(
+    context: context,
+    // Assez haute d'emblée pour ne pas grandir d'un coup quand les données
+    // remplacent le squelette.
+    minHeight: 0.72,
+    child: BlocProvider.value(
+      value: cubit,
+      child: const ProfileDetails(title: 'Mon profil'),
+    ),
+  );
 }
 
 /// Le formulaire de profil : identité et adresse, dans une seule feuille.

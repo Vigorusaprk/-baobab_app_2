@@ -1,3 +1,4 @@
+import 'package:baobabe_0_2/core/animation/appear.dart';
 import 'package:baobabe_0_2/core/themes/app_diemens.dart';
 import 'package:baobabe_0_2/features/business_detail/domain/entities/offer.dart';
 import 'package:baobabe_0_2/core/widgets/offer_card.dart';
@@ -87,14 +88,17 @@ class OffersCarouselSection extends StatelessWidget {
               final offer = offers[index];
               return SizedBox(
                 width: cardWidth,
-                child: OfferCard(
-                  offer: offer,
-                  // On ouvre l'offre, pas la boutique : l'utilisateur a
-                  // cliqué sur une chose précise, l'envoyer sur le
-                  // catalogue entier du commerçant lui ferait la chercher.
-                  onTap: () => context.pushNamed(
-                    'offerDetail',
-                    pathParameters: {'id': offer.id},
+                child: Appear(
+                  index: index,
+                  child: OfferCard(
+                    offer: offer,
+                    // On ouvre l'offre, pas la boutique : l'utilisateur a
+                    // cliqué sur une chose précise, l'envoyer sur le
+                    // catalogue entier du commerçant lui ferait la chercher.
+                    onTap: () => context.pushNamed(
+                      'offerDetail',
+                      pathParameters: {'id': offer.id},
+                    ),
                   ),
                 ),
               );

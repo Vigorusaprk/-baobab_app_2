@@ -945,3 +945,69 @@ Deux détails de mise en page qui traînaient : la bande de catégories était e
 là où tout ce qui la surmontait était à 16 — décalée de 8 px vers l'intérieur.
 Les marges de la liste et de son squelette vivent dans une seule constante,
 pour qu'ils se superposent exactement.
+
+
+## Le profil est une feuille, pas une page
+
+Il rejoint les autres surfaces secondaires — filtres, confirmation, adresse de
+livraison : on y jette un œil, on modifie éventuellement, on referme. Une page
+plein écran pour ça obligeait à naviguer puis à revenir.
+
+Le contenu vit dans **`ProfileDetails`**, un widget à part : la feuille
+l'affiche avec un titre en tête, puisqu'elle n'a pas de barre. S'il fallait un
+jour le remontrer en page, il suffit de le réenvelopper — le contenu ne serait
+pas écrit deux fois, et les deux surfaces ne peuvent pas diverger.
+
+`ProfilPage` et la route `/profil-page` sont supprimées : plus rien ne les
+ouvrait.
+
+Le fichier s'appelait `profil_page.dart` alors qu'il ne contient plus de page ;
+il est devenu `profile_details.dart`. Un nom qui ment sur son contenu est
+exactement ce qui a cassé la barre de recherche de « Tous les commerces » —
+`HomeSearchBar` servait deux écrans, son nom n'en annonçait qu'un.
+
+
+## Le mouvement a son vocabulaire, comme la couleur
+
+`lib/core/animation/app_motion.dart` tient les durées et les courbes.
+L'application en comptait **huit** (50, 120, 150, 180, 200, 220, 300, 350 ms)
+et trois courbes, chacune choisie sur le moment : deux transitions voisines
+n'avaient aucune raison de se ressembler. Trois durées suffisent — `quick`
+pour une réaction au doigt, `base` pour le mouvement courant, `calm` pour ce
+qui traverse l'écran.
+
+**Le mouvement se demande au contexte, jamais en dur.** Quand le système est
+réglé sur « réduire les animations », `AppMotion.duration()` rend zéro. Ce
+réglage existe pour les personnes que le mouvement gêne — vertiges, troubles
+vestibulaires — et une animation « juste jolie » ne vaut pas leur inconfort.
+`test/animation_test.dart` le vérifie sur chaque composant.
+
+### Le répertoire des interactions
+
+| moment | composant | où |
+|---|---|---|
+| un contenu en remplace un autre | `FadeSwap` | Explorer, Tous les commerces, profil |
+| un élément de liste arrive | `Appear` | grille d'Explorer, rails d'offres, liste de commerces |
+| un nombre change | `AnimatedCount` | pastille de filtres, compteur d'activités |
+| un texte change au même endroit | `SwappingText` | libellés et valeurs |
+| un appui au doigt | `PressEffect` | boutons, cartes, tuiles |
+| une feuille s'ouvre | `showCustomBottomSheet` | toutes les feuilles |
+
+Trois pièges, appris en les rencontrant :
+
+1. **`FadeSwap` exige une clé distincte par état.** Deux contenus de même type
+   et de même clé sont « le même widget » pour Flutter : rien ne se croise. Un
+   test le montre plutôt que de le laisser deviner.
+2. **`Appear` ne joue qu'une fois.** Un élément qui rejouerait son entrée à
+   chaque reconstruction clignoterait au moindre changement d'état — et sans
+   arrêt pendant le défilement d'une liste recyclée.
+3. **`AnimatedCount` laisse `begin` nul.** `TweenAnimationBuilder` part alors
+   de la valeur courante ; le renseigner ferait aller chaque changement de la
+   nouvelle valeur vers elle-même, soit aucune animation. C'est le défaut
+   qu'avait la première version.
+
+Le décalage d'entrée est **plafonné** à huit éléments : sans plafond, le
+trentième attendrait plus d'une seconde et l'effet deviendrait une attente.
+
+Une capture golden prise pendant un fondu diffère à chaque exécution : les
+tests d'image doivent pomper au-delà de la transition avant de photographier.

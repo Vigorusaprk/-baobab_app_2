@@ -1,51 +1,66 @@
+import 'package:baobabe_0_2/core/animation/fade_swap.dart';
 import 'package:baobabe_0_2/core/themes/app_diemens.dart';
-import 'package:baobabe_0_2/core/widgets/custom_app_bar.dart';
 import 'package:baobabe_0_2/features/settings/presentation/cubit/profile_cubit.dart';
 import 'package:baobabe_0_2/features/settings/presentation/widgets/profile_sheets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
-/// Le profil de l'utilisateur.
+/// Le contenu du profil : ce qu'on sait de l'utilisateur, et de quoi le
+/// compléter.
+///
+/// Extrait de la page pour être montré **aussi** dans une feuille, sans être
+/// écrit deux fois. Les deux surfaces affichent exactement la même chose et
+/// évoluent ensemble.
 ///
 /// L'adresse s'y lit **sur une seule ligne**, du précis au large, comme on la
 /// dit à voix haute. Elle est pourtant stockée en six colonnes : ce n'est pas
 /// une contradiction, c'est la différence entre ce qu'on range et ce qu'on
 /// montre.
 ///
-/// Tant que les informations manquent, la page propose de les compléter plutôt
-/// que d'aligner des « Non renseigné ». Le formulaire est le même dans les
-/// deux cas — compléter et modifier sont le même geste.
-class ProfilPage extends StatelessWidget {
-  const ProfilPage({super.key});
+/// Tant que les informations manquent, il propose de les compléter plutôt que
+/// d'aligner des « Non renseigné ». Le formulaire est le même dans les deux
+/// cas — compléter et modifier sont le même geste.
+class ProfileDetails extends StatelessWidget {
+  const ProfileDetails({super.key, this.title});
+
+  /// Titre affiché au-dessus du contenu. La page le porte dans sa barre ; la
+  /// feuille, qui n'en a pas, le passe ici.
+  final String? title;
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.surface,
-      appBar: const CustomOtherAppBar(title: 'Mon profil'),
-      body: BlocBuilder<ProfileCubit, ProfileState>(
-        builder: (context, state) {
-          if (state.status == ProfileStatus.failure) {
-            return _Failure(
-              message: state.message ?? 'Réessayez dans un instant.',
-              onRetry: () => context.read<ProfileCubit>().load(force: true),
-            );
-          }
-          if (state.status != ProfileStatus.ready) {
-            return const Skeletonizer(enabled: true, child: _Skeleton());
-          }
-          return _Body(state: state);
-        },
-      ),
+    return BlocBuilder<ProfileCubit, ProfileState>(
+      builder: (context, state) => FadeSwap(child: _content(context, state)),
     );
+  }
+
+  /// Chaque état porte sa clé : sans elle, [FadeSwap] croirait qu'il s'agit du
+  /// même contenu et ne croiserait rien.
+  Widget _content(BuildContext context, ProfileState state) {
+    if (state.status == ProfileStatus.failure) {
+      return _Failure(
+        key: const ValueKey('echec'),
+        message: state.message ?? 'Réessayez dans un instant.',
+        onRetry: () => context.read<ProfileCubit>().load(force: true),
+      );
+    }
+    if (state.status != ProfileStatus.ready) {
+      return Skeletonizer(
+        key: const ValueKey('squelette'),
+        enabled: true,
+        child: _Skeleton(title: title),
+      );
+    }
+    return _Body(key: const ValueKey('contenu'), state: state, title: title);
   }
 }
 
 class _Body extends StatelessWidget {
-  const _Body({required this.state});
+  const _Body({super.key, required this.state, this.title});
 
   final ProfileState state;
+  final String? title;
 
   @override
   Widget build(BuildContext context) {
@@ -56,6 +71,10 @@ class _Body extends StatelessWidget {
       padding: const EdgeInsets.all(AppDimens.large),
       child: Column(
         children: [
+          if (title != null) ...[
+            Text(title!, style: theme.textTheme.titleLarge),
+            AppDimens.spacerMedium,
+          ],
           CircleAvatar(
             radius: 50,
             backgroundColor: theme.colorScheme.primary,
@@ -205,7 +224,9 @@ class _Line extends StatelessWidget {
 /// une adresse est longue. Des barres toutes identiques se lisent comme un
 /// gabarit, pas comme du contenu qui arrive.
 class _Skeleton extends StatelessWidget {
-  const _Skeleton();
+  const _Skeleton({this.title});
+
+  final String? title;
 
   /// Longueur approximative de chaque valeur, dans l'ordre de [_Body].
   static const List<double> _valueWidths = [140, 210, 130, 250];
@@ -219,6 +240,12 @@ class _Skeleton extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
+          if (title != null) ...[
+            Center(
+              child: Bone.text(width: 120, style: theme.textTheme.titleLarge!),
+            ),
+            AppDimens.spacerMedium,
+          ],
           const Center(child: Bone.circle(size: 100)),
           AppDimens.spacerLarge,
 
@@ -265,7 +292,7 @@ class _Skeleton extends StatelessWidget {
 }
 
 class _Failure extends StatelessWidget {
-  const _Failure({required this.message, required this.onRetry});
+  const _Failure({super.key, required this.message, required this.onRetry});
 
   final String message;
   final VoidCallback onRetry;

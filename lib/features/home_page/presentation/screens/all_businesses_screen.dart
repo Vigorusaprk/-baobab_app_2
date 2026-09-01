@@ -1,3 +1,5 @@
+import 'package:baobabe_0_2/core/animation/appear.dart';
+import 'package:baobabe_0_2/core/animation/fade_swap.dart';
 import 'package:baobabe_0_2/core/themes/app_diemens.dart';
 import 'package:baobabe_0_2/features/home_page/data/models/ui_business.dart';
 import 'package:baobabe_0_2/features/home_page/data/repositories/business_remote_datasource_impl.dart';
@@ -124,20 +126,10 @@ class _AllBusinessesScreenState extends State<AllBusinessesScreen> {
               Expanded(
                 child: BlocBuilder<BusinessListCubit, BusinessListState>(
                   builder: (context, state) {
-                    if (state.isLoading) return const _LoadingSkeleton();
-
-                    if (state.errorMessage != null) {
-                      return _ErrorView(
-                        message: state.errorMessage!,
-                        onRetry: () => context.read<BusinessListCubit>().load(
-                          _categoryParam(_selected),
-                        ),
-                      );
-                    }
-
-                    if (state.businesses.isEmpty) return const _EmptyView();
-
-                    return _BusinessList(state: state);
+                    // Le contenu se croise au lieu de sauter : c'est le même
+                    // bloc qui change d'état, pas un écran qui en remplace un
+                    // autre.
+                    return FadeSwap(child: _content(context, state));
                   },
                 ),
               ),
@@ -147,6 +139,26 @@ class _AllBusinessesScreenState extends State<AllBusinessesScreen> {
       ),
     );
   }
+}
+
+/// Ce que la zone de liste montre, selon l'état. Chaque cas porte sa propre
+/// clé : sans elle, [FadeSwap] croirait qu'il s'agit du même contenu et ne
+/// croiserait rien.
+Widget _content(BuildContext context, BusinessListState state) {
+  if (state.isLoading)
+    return const _LoadingSkeleton(key: ValueKey('squelette'));
+
+  if (state.errorMessage != null) {
+    return _ErrorView(
+      key: const ValueKey('echec'),
+      message: state.errorMessage!,
+      onRetry: () => context.read<BusinessListCubit>().load(state.category),
+    );
+  }
+
+  if (state.businesses.isEmpty) return const _EmptyView(key: ValueKey('vide'));
+
+  return _BusinessList(key: const ValueKey('liste'), state: state);
 }
 
 /// Marges communes à la liste et à son squelette, pour qu'ils se
@@ -170,7 +182,7 @@ const EdgeInsets _listPadding = EdgeInsets.fromLTRB(
 class _BusinessList extends StatelessWidget {
   final BusinessListState state;
 
-  const _BusinessList({required this.state});
+  const _BusinessList({super.key, required this.state});
 
   @override
   Widget build(BuildContext context) {
@@ -202,11 +214,14 @@ class _BusinessList extends StatelessWidget {
           }
 
           final uiBusiness = UIBusiness(state.businesses[index]);
-          return BusinessListRow(
-            uiBusiness: uiBusiness,
-            onTap: () => context.pushNamed(
-              'businessDetail',
-              pathParameters: {'id': uiBusiness.business.id},
+          return Appear(
+            index: index,
+            child: BusinessListRow(
+              uiBusiness: uiBusiness,
+              onTap: () => context.pushNamed(
+                'businessDetail',
+                pathParameters: {'id': uiBusiness.business.id},
+              ),
             ),
           );
         },
@@ -216,7 +231,7 @@ class _BusinessList extends StatelessWidget {
 }
 
 class _LoadingSkeleton extends StatelessWidget {
-  const _LoadingSkeleton();
+  const _LoadingSkeleton({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -234,7 +249,7 @@ class _LoadingSkeleton extends StatelessWidget {
 }
 
 class _EmptyView extends StatelessWidget {
-  const _EmptyView();
+  const _EmptyView({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -265,7 +280,7 @@ class _ErrorView extends StatelessWidget {
   final String message;
   final VoidCallback onRetry;
 
-  const _ErrorView({required this.message, required this.onRetry});
+  const _ErrorView({super.key, required this.message, required this.onRetry});
 
   @override
   Widget build(BuildContext context) {
