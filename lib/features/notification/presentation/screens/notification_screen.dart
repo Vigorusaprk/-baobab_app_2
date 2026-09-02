@@ -10,9 +10,7 @@ class NotificationScreen extends StatelessWidget {
     return Scaffold(
       body: BlocBuilder<NotificationBloc, NotificationState>(
         builder: (context, state) {
-          return const Center(
-            child: Text('Notification Screen'),
-          );
+          return const Center(child: Text('Notification Screen'));
         },
       ),
     );

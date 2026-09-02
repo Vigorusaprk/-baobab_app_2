@@ -1,5 +1,4 @@
 import 'package:baobabe_0_2/core/animation/animated_count.dart';
-import 'package:baobabe_0_2/core/animation/appear.dart';
 import 'package:baobabe_0_2/core/animation/fade_swap.dart';
 import 'package:baobabe_0_2/core/themes/app_diemens.dart';
 import 'package:baobabe_0_2/core/widgets/button/custom_icon_button.dart';
@@ -318,14 +317,13 @@ class _Results extends StatelessWidget {
           return const Skeletonizer(enabled: true, child: OfferCardSkeleton());
         }
         final offer = state.offers[index];
-        return Appear(
-          index: index,
-          child: OfferCard(
-            offer: offer,
-            onTap: () => context.pushNamed(
-              'offerDetail',
-              pathParameters: {'id': offer.id},
-            ),
+        // Voir le carrousel de l'accueil : la carte remplace un squelette de
+        // même forme, elle n'a donc pas à entrer en scène.
+        return OfferCard(
+          offer: offer,
+          onTap: () => context.pushNamed(
+            'offerDetail',
+            pathParameters: {'id': offer.id},
           ),
         );
       },
