@@ -13,6 +13,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import 'package:baobabe_0_2/core/widgets/button/custom_action_button.dart';
+import 'package:baobabe_0_2/core/widgets/custom_refresh.dart';
 
 class BusinessDetailScreen extends StatefulWidget {
   final String businessId;
@@ -94,43 +95,53 @@ class _BusinessDetailScreenState extends State<BusinessDetailScreen> {
       final business = state.business!;
       final uiBusiness = UIBusiness(business);
 
-      return CustomScrollView(
-        controller: _scrollController,
-        slivers: [
-          BusinessDetailAppBar(
-            business: business,
-            uiBusiness: uiBusiness,
-            scrollController: _scrollController,
-          ),
-          SliverToBoxAdapter(
-            child: ResponsiveContainer(
-              // L'ordre suit les questions de l'utilisateur : qu'est-ce que
-              // c'est, qu'est-ce qu'on y trouve, comment les joindre, quand
-              // ils ouvrent, ce qu'on en dit.
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const SizedBox(height: 24),
-                  BusinessAboutSection(business: business),
-                  const SizedBox(height: 24),
-                  BusinessOffersSection(offers: state.offers),
-                  const BusinessSectionTitle('Contact & Accès'),
-                  BusinessContactSection(business: business),
-                  const SizedBox(height: 24),
-                  if (business.openingHours.isNotEmpty) ...[
-                    const BusinessSectionTitle("Horaires d'ouverture"),
-                    BusinessHoursSection(business: business),
+      return CustomRefresh(
+        onRefresh: () {
+          final bloc = context.read<BusinessDetailBloc>();
+          bloc.add(LoadBusinessDetail(widget.businessId));
+          return awaitSettled<BusinessDetailState>(
+            bloc.stream,
+            (s) => s.detailStatus != BusinessDetailStatus.loading,
+          );
+        },
+        child: CustomScrollView(
+          controller: _scrollController,
+          slivers: [
+            BusinessDetailAppBar(
+              business: business,
+              uiBusiness: uiBusiness,
+              scrollController: _scrollController,
+            ),
+            SliverToBoxAdapter(
+              child: ResponsiveContainer(
+                // L'ordre suit les questions de l'utilisateur : qu'est-ce que
+                // c'est, qu'est-ce qu'on y trouve, comment les joindre, quand
+                // ils ouvrent, ce qu'on en dit.
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
                     const SizedBox(height: 24),
+                    BusinessAboutSection(business: business),
+                    const SizedBox(height: 24),
+                    BusinessOffersSection(offers: state.offers),
+                    const BusinessSectionTitle('Contact & Accès'),
+                    BusinessContactSection(business: business),
+                    const SizedBox(height: 24),
+                    if (business.openingHours.isNotEmpty) ...[
+                      const BusinessSectionTitle("Horaires d'ouverture"),
+                      BusinessHoursSection(business: business),
+                      const SizedBox(height: 24),
+                    ],
+                    BusinessSpecificSection(business: business),
+                    const SizedBox(height: 24),
+                    RestaurantReview(business: business),
+                    const SizedBox(height: 32),
                   ],
-                  BusinessSpecificSection(business: business),
-                  const SizedBox(height: 24),
-                  RestaurantReview(business: business),
-                  const SizedBox(height: 32),
-                ],
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       );
     }
 

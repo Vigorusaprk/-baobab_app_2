@@ -70,13 +70,12 @@ class _Body extends StatelessWidget {
     final address = state.address;
 
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(AppDimens.large),
       child: Column(
         children: [
-          if (title != null) ...[
+          /*if (title != null) ...[
             Text(title!, style: theme.textTheme.titleLarge),
             AppDimens.spacerMedium,
-          ],
+          ],*/
           CircleAvatar(
             radius: 50,
             backgroundColor: theme.colorScheme.primary,
@@ -222,17 +221,20 @@ class _Skeleton extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
+    // Pas de remplissage : le contenu n'en a plus non plus depuis que la
+    // fiche vit dans une feuille, qui apporte le sien. Un squelette d'une
+    // autre largeur que son contenu fait sauter la page quand les données
+    // arrivent — c'est le défaut que `profile_skeleton_test` surveille.
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(AppDimens.large),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          if (title != null) ...[
+          /*if (title != null) ...[
             Center(
               child: Bone.text(width: 120, style: theme.textTheme.titleLarge!),
             ),
             AppDimens.spacerMedium,
-          ],
+          ],*/
           const Center(child: Bone.circle(size: 100)),
           AppDimens.spacerLarge,
 

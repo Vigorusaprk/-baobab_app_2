@@ -12,6 +12,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import 'package:baobabe_0_2/core/widgets/button/custom_action_button.dart';
+import 'package:baobabe_0_2/core/widgets/custom_refresh.dart';
 
 /// Explorer : toutes les offres, cherchables et filtrables.
 ///
@@ -137,7 +138,10 @@ class _SearchPageBodyState extends State<SearchPageBody> {
         bottom: false,
         child: Column(
           children: [
-            AppDimens.spacerSmall,
+            // Le même blanc que l'accueil, au-dessus de la barre de
+            // recherche : `SafeArea` ne réserve que la hauteur de la barre
+            // d'état, et le champ se retrouvait collé au bord.
+            const SizedBox(height: AppDimens.headerTopGap),
             _SearchRow(
               key: _searchFieldKey,
               controller: _controller,
@@ -303,30 +307,36 @@ class _Results extends StatelessWidget {
       );
     }
 
-    return GridView.builder(
+    return CustomRefresh(
       key: const ValueKey('resultats'),
-      controller: scroll,
-      padding: AppDimens.appPadding.copyWith(
-        top: AppDimens.small,
-        bottom: AppDimens.large,
+      onRefresh: context.read<ExploreCubit>().retry,
+      child: GridView.builder(
+        controller: scroll,
+        padding: AppDimens.appPadding.copyWith(
+          top: AppDimens.small,
+          bottom: AppDimens.large,
+        ),
+        gridDelegate: _delegate,
+        itemCount: state.offers.length + (state.loadingMore ? 2 : 0),
+        itemBuilder: (context, index) {
+          if (index >= state.offers.length) {
+            return const Skeletonizer(
+              enabled: true,
+              child: OfferCardSkeleton(),
+            );
+          }
+          final offer = state.offers[index];
+          // Voir le carrousel de l'accueil : la carte remplace un squelette de
+          // même forme, elle n'a donc pas à entrer en scène.
+          return OfferCard(
+            offer: offer,
+            onTap: () => context.pushNamed(
+              'offerDetail',
+              pathParameters: {'id': offer.id},
+            ),
+          );
+        },
       ),
-      gridDelegate: _delegate,
-      itemCount: state.offers.length + (state.loadingMore ? 2 : 0),
-      itemBuilder: (context, index) {
-        if (index >= state.offers.length) {
-          return const Skeletonizer(enabled: true, child: OfferCardSkeleton());
-        }
-        final offer = state.offers[index];
-        // Voir le carrousel de l'accueil : la carte remplace un squelette de
-        // même forme, elle n'a donc pas à entrer en scène.
-        return OfferCard(
-          offer: offer,
-          onTap: () => context.pushNamed(
-            'offerDetail',
-            pathParameters: {'id': offer.id},
-          ),
-        );
-      },
     );
   }
 

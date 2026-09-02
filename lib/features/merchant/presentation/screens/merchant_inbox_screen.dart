@@ -6,6 +6,7 @@ import 'package:baobabe_0_2/features/merchant/presentation/widgets/received_orde
 import 'package:baobabe_0_2/features/merchant/presentation/widgets/received_reservation_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:baobabe_0_2/core/widgets/custom_refresh.dart';
 
 /// Ce que le commerce a reçu : commandes d'un côté, réservations de
 /// l'autre. Les deux se traitent, mais pas avec les mêmes gestes — une
@@ -56,7 +57,7 @@ class _OrdersTab extends StatelessWidget {
       );
     }
 
-    return RefreshIndicator(
+    return CustomRefresh(
       onRefresh: () => context.read<MerchantCubit>().refresh(),
       child: ListView.separated(
         padding: const EdgeInsets.fromLTRB(
@@ -89,7 +90,7 @@ class _ReservationsTab extends StatelessWidget {
       );
     }
 
-    return RefreshIndicator(
+    return CustomRefresh(
       onRefresh: () => context.read<MerchantCubit>().refresh(),
       child: ListView.separated(
         padding: const EdgeInsets.fromLTRB(

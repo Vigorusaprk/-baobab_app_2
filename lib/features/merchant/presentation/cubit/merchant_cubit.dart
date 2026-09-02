@@ -7,6 +7,7 @@ import 'package:baobabe_0_2/features/merchant/domain/repositories/merchant_repos
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:baobabe_0_2/features/settings/domain/entities/user_address.dart';
 
 abstract class MerchantState extends Equatable {
   const MerchantState();
@@ -125,7 +126,7 @@ class MerchantCubit extends Cubit<MerchantState> {
   Future<String?> apply({
     required String businessName,
     required String categorySlug,
-    required String address,
+    required UserAddress address,
     required String phone,
     String? description,
   }) async {

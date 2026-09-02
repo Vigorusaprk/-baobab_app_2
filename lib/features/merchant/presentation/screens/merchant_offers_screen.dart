@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:baobabe_0_2/core/widgets/custom_refresh.dart';
 
 /// Le catalogue du commerçant : ce qu'il propose, en ligne ou retiré.
 ///
@@ -38,7 +39,7 @@ class MerchantOffersScreen extends StatelessWidget {
                   'Publiez ce que vos clients peuvent commander ou '
                   'réserver chez vous.',
             )
-          : RefreshIndicator(
+          : CustomRefresh(
               onRefresh: () => context.read<MerchantCubit>().refresh(),
               child: ListView.separated(
                 padding: const EdgeInsets.fromLTRB(

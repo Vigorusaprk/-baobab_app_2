@@ -176,7 +176,9 @@ class _HomeSliverHeaderState extends State<HomeSliverHeader> {
     return SliverPersistentHeader(
       pinned: true,
       delegate: _HomeSliverHeaderDelegate(
-        topPadding: MediaQuery.of(context).padding.top,
+        // La barre d'état **plus** un blanc : sans lui, la salutation
+        // commence juste sous l'heure du système.
+        topPadding: MediaQuery.of(context).padding.top + AppDimens.headerTopGap,
         greetingHeight: HomeSliverHeaderMetrics.greetingHeight(
           context,
           name: _name,

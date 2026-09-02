@@ -56,6 +56,13 @@ class AppDimens {
 
   static const double appPaddingValue = 16.0;
 
+  /// Le blanc entre la barre d'état et le premier contenu d'un en-tête.
+  ///
+  /// Les en-têtes de l'accueil et d'Explorer se contentaient de réserver la
+  /// hauteur de la barre d'état : le texte commençait donc juste sous
+  /// l'heure, collé au bord haut de l'écran.
+  static const double headerTopGap = 12.0;
+
   // *** Cards *** //
   static const double smallCardBorderRadius = 12.0;
   static const double cardBorderRadius = 20.0;

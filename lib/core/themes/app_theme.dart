@@ -258,6 +258,9 @@ class AppTheme {
       // propre fond, mais celui-ci doit déjà être lisible.
       snackBarTheme: SnackBarThemeData(
         backgroundColor: scheme.inverseSurface,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppDimens.cardBorderRadius),
+        ),
         contentTextStyle: textTheme.bodyMedium?.copyWith(
           color: scheme.onInverseSurface,
         ),

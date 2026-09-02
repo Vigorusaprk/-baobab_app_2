@@ -1,4 +1,3 @@
-import 'package:baobabe_0_2/core/animation/appear.dart';
 import 'package:baobabe_0_2/core/animation/fade_swap.dart';
 import 'package:baobabe_0_2/core/themes/app_diemens.dart';
 import 'package:baobabe_0_2/features/home_page/data/models/ui_business.dart';
@@ -17,6 +16,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import 'package:baobabe_0_2/core/widgets/button/custom_action_button.dart';
+import 'package:baobabe_0_2/core/widgets/custom_refresh.dart';
 
 /// Destination du lien "Voir tout" des sections "Populaires" et
 /// "Découvrir" de l'accueil.
@@ -192,7 +192,7 @@ class _BusinessList extends StatelessWidget {
     // l'accueil, plutôt qu'un indicateur circulaire.
     final itemCount = state.businesses.length + (state.isLoadingMore ? 1 : 0);
 
-    return RefreshIndicator(
+    return CustomRefresh(
       onRefresh: () => context.read<BusinessListCubit>().load(state.category),
       child: ListView.separated(
         padding: _listPadding,
@@ -215,14 +215,14 @@ class _BusinessList extends StatelessWidget {
           }
 
           final uiBusiness = UIBusiness(state.businesses[index]);
-          return Appear(
-            index: index,
-            child: BusinessListRow(
-              uiBusiness: uiBusiness,
-              onTap: () => context.pushNamed(
-                'businessDetail',
-                pathParameters: {'id': uiBusiness.business.id},
-              ),
+          // Pas d'entree en scene : comme pour les cartes d'offres, une ligne
+          // de squelette de meme forme occupait deja la place. La ligne n'a
+          // pas a arriver, elle a a devenir nette.
+          return BusinessListRow(
+            uiBusiness: uiBusiness,
+            onTap: () => context.pushNamed(
+              'businessDetail',
+              pathParameters: {'id': uiBusiness.business.id},
             ),
           );
         },

@@ -1,5 +1,6 @@
 import 'package:baobabe_0_2/features/business_detail/domain/entities/offer.dart';
 import 'package:baobabe_0_2/features/merchant/domain/entities/merchant_space.dart';
+import 'package:baobabe_0_2/features/settings/domain/entities/user_address.dart';
 
 /// Ce que l'application sait faire du côté commerçant.
 ///
@@ -17,7 +18,7 @@ abstract class MerchantRepository {
   Future<MerchantSpace> apply({
     required String businessName,
     required String categorySlug,
-    required String address,
+    required UserAddress address,
     required String phone,
     String? description,
   });

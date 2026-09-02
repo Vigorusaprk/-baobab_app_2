@@ -9,6 +9,7 @@ import '../bloc/feed_event.dart';
 import '../bloc/feed_state.dart';
 import '../widgets/feed_item_card.dart';
 import '../widgets/feed_empty_state.dart';
+import 'package:baobabe_0_2/core/widgets/custom_refresh.dart';
 
 /// Page racine. Fournit le BLoC et route go_router vers ici.
 /// une fois la table `feed_items` prête.
@@ -57,18 +58,28 @@ class _NotificationsView extends StatelessWidget {
               Expanded(
                 child: items.isEmpty
                     ? FeedEmptyState()
-                    : ListView.builder(
-                        padding: const EdgeInsets.only(bottom: 16),
-                        itemCount: items.length,
-                        itemBuilder: (context, index) {
-                          final item = items[index];
-                          return FeedItemCard(
-                            item: item,
-                            onTap: () => context.read<FeedBloc>().add(
-                              FeedItemTapped(item),
-                            ),
+                    : CustomRefresh(
+                        onRefresh: () {
+                          final bloc = context.read<FeedBloc>();
+                          bloc.add(LoadFeedItems());
+                          return awaitSettled<FeedState>(
+                            bloc.stream,
+                            (s) => s is! FeedLoading,
                           );
                         },
+                        child: ListView.builder(
+                          padding: const EdgeInsets.only(bottom: 16),
+                          itemCount: items.length,
+                          itemBuilder: (context, index) {
+                            final item = items[index];
+                            return FeedItemCard(
+                              item: item,
+                              onTap: () => context.read<FeedBloc>().add(
+                                FeedItemTapped(item),
+                              ),
+                            );
+                          },
+                        ),
                       ),
               ),
             ],

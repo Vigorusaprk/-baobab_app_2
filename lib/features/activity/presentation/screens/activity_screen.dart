@@ -14,6 +14,7 @@ import 'package:baobabe_0_2/features/booking_page/presentation/widgets/reservati
 import 'package:baobabe_0_2/core/themes/other_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:baobabe_0_2/core/widgets/custom_bottom_sheet.dart';
+import 'package:baobabe_0_2/core/widgets/custom_refresh.dart';
 
 /// Body-only content for the Orders/Activity tab. The Scaffold is owned by
 /// MainShell, which is the single Scaffold for the app's main navigation.
@@ -274,7 +275,7 @@ class _ActivityScreenState extends State<ActivityScreen>
       return const ActivityListSkeleton(itemSkeleton: OrderCardSkeleton());
     }
     if (_orders.isEmpty) return const OrderEmptyState();
-    return RefreshIndicator(
+    return CustomRefresh(
       onRefresh: _loadAll,
       child: ListView.builder(
         padding: const EdgeInsets.all(16),
@@ -299,7 +300,7 @@ class _ActivityScreenState extends State<ActivityScreen>
       );
     }
     if (_reservations.isEmpty) return const ReservationEmptyState();
-    return RefreshIndicator(
+    return CustomRefresh(
       onRefresh: _loadAll,
       child: ListView.builder(
         padding: const EdgeInsets.all(16),

@@ -12,6 +12,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:skeletonizer/skeletonizer.dart';
+import 'package:baobabe_0_2/core/widgets/custom_refresh.dart';
 
 /// Body-only content for the Home tab. The Scaffold is owned by MainShell.
 ///
@@ -111,29 +112,43 @@ class _HomePageScreenState extends State<HomePageScreen> {
           final isLoading =
               state is BusinessInitial || state is BusinessLoading;
 
-          return NotificationListener<ScrollEndNotification>(
-            onNotification: _snapHeader,
-            child: CustomScrollView(
-              controller: _scrollController,
-              physics: isLoading
-                  ? const NeverScrollableScrollPhysics()
-                  : const AlwaysScrollableScrollPhysics(),
-              slivers: [
-                // Recherche + catégories : toujours montées, y compris
-                // pendant le chargement. Leur contenu ne dépend d'aucune
-                // requête, et changer de catégorie déclenche désormais un
-                // appel réseau — la puce qu'on vient de taper doit rester
-                // visible.
-                const HomeSliverHeader(),
-                SliverToBoxAdapter(
-                  child: isLoading
-                      ? const Skeletonizer(enabled: true, child: HomeSkeleton())
-                      : _Sections(
-                          state: state,
-                          onSeeAllBusinesses: () => _openAllBusinesses(context),
-                        ),
-                ),
-              ],
+          return CustomRefresh(
+            onRefresh: () {
+              final bloc = context.read<BusinessBloc>();
+              bloc.add(LoadBusinesses());
+              return awaitSettled<BusinessState>(
+                bloc.stream,
+                (s) => s is BusinessLoaded || s is BusinessError,
+              );
+            },
+            child: NotificationListener<ScrollEndNotification>(
+              onNotification: _snapHeader,
+              child: CustomScrollView(
+                controller: _scrollController,
+                physics: isLoading
+                    ? const NeverScrollableScrollPhysics()
+                    : const AlwaysScrollableScrollPhysics(),
+                slivers: [
+                  // Recherche + catégories : toujours montées, y compris
+                  // pendant le chargement. Leur contenu ne dépend d'aucune
+                  // requête, et changer de catégorie déclenche désormais un
+                  // appel réseau — la puce qu'on vient de taper doit rester
+                  // visible.
+                  const HomeSliverHeader(),
+                  SliverToBoxAdapter(
+                    child: isLoading
+                        ? const Skeletonizer(
+                            enabled: true,
+                            child: HomeSkeleton(),
+                          )
+                        : _Sections(
+                            state: state,
+                            onSeeAllBusinesses: () =>
+                                _openAllBusinesses(context),
+                          ),
+                  ),
+                ],
+              ),
             ),
           );
         },

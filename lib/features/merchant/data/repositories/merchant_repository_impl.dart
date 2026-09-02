@@ -3,6 +3,7 @@ import 'package:baobabe_0_2/features/home_page/data/models/business_model.dart';
 import 'package:baobabe_0_2/features/merchant/domain/entities/merchant_space.dart';
 import 'package:baobabe_0_2/features/merchant/domain/repositories/merchant_repository.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:baobabe_0_2/features/settings/domain/entities/user_address.dart';
 
 /// Accès à l'espace commerçant, entièrement via Edge Functions.
 ///
@@ -26,7 +27,7 @@ class MerchantRepositoryImpl implements MerchantRepository {
   Future<MerchantSpace> apply({
     required String businessName,
     required String categorySlug,
-    required String address,
+    required UserAddress address,
     required String phone,
     String? description,
   }) async {
@@ -35,7 +36,10 @@ class MerchantRepositoryImpl implements MerchantRepository {
       body: {
         'businessName': businessName,
         'categorySlug': categorySlug,
-        'address': address,
+        // L'adresse part **en pieces** : le serveur la range dans ses six
+        // colonnes et compose lui-meme la ligne d'affichage. Une chaine
+        // unique interdisait de lister les commerces d'une commune.
+        'address': address.toJson(),
         'phone': phone,
         'description': description,
       },

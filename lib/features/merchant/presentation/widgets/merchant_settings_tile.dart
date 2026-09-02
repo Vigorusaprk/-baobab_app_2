@@ -6,6 +6,7 @@ import 'package:baobabe_0_2/features/settings/presentation/widgets/settings_tile
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:baobabe_0_2/features/merchant/presentation/widgets/become_merchant_sheet.dart';
 
 /// La section « Commerce » des paramètres.
 ///
@@ -71,7 +72,9 @@ class MerchantSettingsSection extends StatelessWidget {
                   return;
                 }
                 if (isPending) return;
-                context.pushNamed('becomeMerchant');
+                // Une feuille, plus une page : le formulaire se remplit en
+                // une fois et n'a pas besoin d'une destination a lui.
+                showBecomeMerchantSheet(context);
               },
               trailing: isPending
                   ? Text(

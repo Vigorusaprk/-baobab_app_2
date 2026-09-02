@@ -6,6 +6,7 @@ import 'package:baobabe_0_2/core/themes/other_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:baobabe_0_2/core/widgets/custom_refresh.dart';
 
 /// Ce que le commerçant voit en ouvrant l'application : ce qui l'attend,
 /// puis ce que son commerce a produit.
@@ -27,7 +28,7 @@ class MerchantDashboardScreen extends StatelessWidget {
     final business = space.business;
     final toHandle = stats.pendingOrders + stats.pendingReservations;
 
-    return RefreshIndicator(
+    return CustomRefresh(
       onRefresh: () => context.read<MerchantCubit>().refresh(),
       child: ListView(
         padding: const EdgeInsets.fromLTRB(

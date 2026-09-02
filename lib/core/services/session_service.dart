@@ -61,5 +61,10 @@ class SessionService {
       const Stream<AppSessionUser?>.empty();
 
   /// Raw auth state change stream, handy for GoRouter's refreshListenable.
-  Stream<AuthState> get authStateChanges => _client.auth.onAuthStateChange;
+  ///
+  /// Vide tant que Supabase n'est pas initialise — sous test, notamment.
+  /// Demander a etre prevenu des changements de session ne doit pas faire
+  /// tomber un ecran, pas plus que demander qui est connecte.
+  Stream<AuthState> get authStateChanges =>
+      _clientOrNull?.auth.onAuthStateChange ?? const Stream<AuthState>.empty();
 }

@@ -1,5 +1,5 @@
 import 'package:baobabe_0_2/core/themes/app_diemens.dart';
-import 'package:baobabe_0_2/core/widgets/custom_loading.dart';
+import 'package:baobabe_0_2/core/widgets/button/custom_button.dart';
 import 'package:baobabe_0_2/features/business_detail/presentation/bloc/offer_detail_cubit.dart';
 import 'package:baobabe_0_2/core/themes/other_theme.dart';
 import 'package:flutter/material.dart';
@@ -16,12 +16,17 @@ class OfferPurchaseBar extends StatelessWidget {
   final VoidCallback onPickDate;
   final VoidCallback onSubmit;
 
+  /// Une validation est en cours. Vient du `CheckoutCubit`, et non de l'état
+  /// de la fiche : commander et lire la fiche sont deux choses distinctes.
+  final bool isSubmitting;
+
   const OfferPurchaseBar({
     super.key,
     required this.state,
     required this.onQuantityChanged,
     required this.onPickDate,
     required this.onSubmit,
+    this.isSubmitting = false,
   });
 
   @override
@@ -62,6 +67,15 @@ class OfferPurchaseBar extends StatelessWidget {
               ),
               AppDimens.spacerSmall,
             ],
+            // Le montant se lit **au-dessus** du bouton, plus dedans. Dans
+            // le bouton, il partageait la place avec le libellé — qui
+            // disparaissait sous l'indicateur pendant l'envoi, emportant le
+            // prix avec lui — et il changeait la largeur du texte à chaque
+            // pas de quantité.
+            if (!offer.isFree && !soldOut) ...[
+              _TotalRow(total: state.total),
+              AppDimens.spacerSmall,
+            ],
             Row(
               children: [
                 if (!soldOut)
@@ -71,15 +85,15 @@ class OfferPurchaseBar extends StatelessWidget {
                   ),
                 if (!soldOut) AppDimens.spacerMediumWidth,
                 Expanded(
-                  child: _SubmitButton(
-                    label: soldOut
+                  child: CustomButton(
+                    text: soldOut
                         ? 'Complet'
                         : offer.isOrderable
                         ? 'Commander'
                         : 'Réserver',
-                    total: offer.isFree || soldOut ? null : state.total,
-                    isLoading: state.isSubmitting,
-                    onPressed: soldOut || state.isSubmitting ? null : onSubmit,
+                    isActive: !soldOut,
+                    isLoading: isSubmitting,
+                    onPressed: onSubmit,
                   ),
                 ),
               ],
@@ -212,45 +226,32 @@ class _DateRow extends StatelessWidget {
   }
 }
 
-class _SubmitButton extends StatelessWidget {
-  final String label;
-  final double? total;
-  final bool isLoading;
-  final VoidCallback? onPressed;
+/// Le total, au-dessus du bouton.
+class _TotalRow extends StatelessWidget {
+  const _TotalRow({required this.total});
 
-  const _SubmitButton({
-    required this.label,
-    required this.total,
-    required this.isLoading,
-    required this.onPressed,
-  });
+  final double total;
 
   @override
   Widget build(BuildContext context) {
-    return FilledButton(
-      style: FilledButton.styleFrom(
-        backgroundColor: Theme.of(context).colorScheme.primary,
-        disabledBackgroundColor: Theme.of(context).colorScheme.secondary,
-        padding: const EdgeInsets.symmetric(vertical: 16),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(AppDimens.borderButton),
+    final theme = Theme.of(context);
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          'Total',
+          style: theme.textTheme.bodyMedium?.copyWith(
+            color: theme.colorScheme.onSurfaceVariant,
+          ),
         ),
-      ),
-      onPressed: onPressed,
-      child: isLoading
-          ? CustomLoadingButton(
-              size: 22,
-              color: Theme.of(context).colorScheme.onPrimary,
-            )
-          : Text(
-              total == null
-                  ? label
-                  : '$label · ${total!.toStringAsFixed(2)} \$',
-              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                color: Theme.of(context).colorScheme.onPrimary,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
+        Text(
+          '${total.toStringAsFixed(2)} \$',
+          style: theme.textTheme.titleMedium?.copyWith(
+            fontWeight: FontWeight.w800,
+            color: theme.colorScheme.primary,
+          ),
+        ),
+      ],
     );
   }
 }

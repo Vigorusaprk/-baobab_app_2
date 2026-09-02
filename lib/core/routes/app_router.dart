@@ -19,7 +19,6 @@ import 'package:baobabe_0_2/features/order/presentation/screens/order_detail_pag
 import 'package:baobabe_0_2/features/settings/presentation/screens/settings_screen.dart';
 import 'package:baobabe_0_2/features/business_detail/presentation/screens/business_detail_screen.dart';
 import 'package:baobabe_0_2/features/business_detail/presentation/screens/offer_detail_screen.dart';
-import 'package:baobabe_0_2/features/merchant/presentation/screens/become_merchant_page.dart';
 import 'package:baobabe_0_2/features/merchant/presentation/screens/merchant_shell.dart';
 import 'package:baobabe_0_2/features/merchant/presentation/screens/offer_form_page.dart';
 
@@ -245,12 +244,6 @@ final GoRouter appRouter = GoRouter(
               MaterialPage(child: OfferFormPage(offer: state.extra as Offer?)),
         ),
       ],
-    ),
-    GoRoute(
-      path: '/become-merchant',
-      name: 'becomeMerchant',
-      pageBuilder: (context, state) =>
-          const MaterialPage(child: BecomeMerchantPage()),
     ),
   ],
 );

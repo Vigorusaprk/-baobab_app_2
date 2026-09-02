@@ -719,6 +719,72 @@ tenu par des **mesures** : `profile_skeleton_test.dart` compare la largeur du
 squelette à celle du contenu, `animation_test.dart` compare les positions
 avant et après une entrée. N'en réintroduisez pas.
 
+### Valider n'est pas lire
+
+`CheckoutCubit` (`features/order/presentation/cubit/`) porte la commande et la
+réservation. C'était dans `OfferDetailCubit`, mêlé à la lecture de la fiche,
+avec deux conséquences visibles :
+
+- une validation réussie appelait `load()`, qui repasse par
+  `OfferDetailLoading` : **toute la page redevenait un squelette** alors que
+  l'utilisateur venait d'appuyer sur un bouton — et un squelette veut dire
+  « ça charge », soit l'inverse de ce qui venait de se produire ;
+- « en train de valider » était un champ de l'état de la fiche, donc chaque
+  frappe sur la quantité le traversait.
+
+Après la séparation : `OfferDetailCubit.refresh()` relit **sans** repasser par
+le squelette, et la réussite se dit par `showCheckoutSuccessSheet` — la même
+coche tracée que la fin de la connexion par code, qui se referme d'elle-même.
+
+Le cubit prend sa session en paramètre (`session:`) : un cubit qui lit un
+singleton global ne se teste pas, et c'était le cas avant.
+
+### Un écran qui lit la session doit l'écouter
+
+`AuthSessionCubit` est fourni pour toute l'application depuis `main_app`. Un
+écran qui écrit `SessionService.instance.currentUser` dans son `build` lit un
+instantané : se connecter ne le met pas à jour, et rien ne le montre tant
+qu'un autre événement ne provoque pas de reconstruction. C'était le cas des
+réglages, et de la salutation de l'accueil.
+
+La règle : lire la session **dans** un `BlocBuilder<AuthSessionCubit, …>`, ou
+à défaut la relire à chaque `build` avec un flux qui déclenche la
+reconstruction. Sous test, un bloc livre son état sur une micro-tâche : il
+faut deux `pump()` pour voir le changement.
+
+### Tirer pour rafraîchir : partout, et par le même composant
+
+`core/widgets/custom_refresh.dart`. Cinq écrans avaient un `RefreshIndicator`
+écrit à la main, les dix autres n'avaient rien — or c'est le seul recours
+quand une donnée est en retard, et une application où le geste marche sur une
+page et pas sur la suivante apprend à ne pas l'essayer.
+
+`awaitSettled` accompagne : la roue tourne jusqu'à ce que le futur s'achève,
+or la plupart des rechargements passent par un événement de bloc, qui ne rend
+rien. Elle attend l'état d'arrivée — chargé **ou en erreur**, une erreur étant
+une fin — avec un délai de garde pour que la roue s'arrête même si le bloc
+n'émet jamais.
+
+Restent sans geste, faute d'avoir quoi que ce soit à recharger :
+`notification_screen` (une ébauche), `order_detail_page` et
+`boking_detail_screen` (des vues construites sur des données reçues).
+
+### L'adresse d'un commerce, en colonnes
+
+`business` et `merchant_applications` ont les six paliers de `user_info` :
+province, ville, commune, quartier, avenue, numéro. Ils tenaient sur une
+colonne de texte libre, ce qui interdit tout regroupement — on ne peut pas
+lister les commerces d'une commune sans deviner ce que contient la chaîne.
+
+`address` reste, et devient un **rendu** composé à l'écriture par
+`public.address_one_line`, miroir exact de `UserAddress.oneLine`. Ce n'est pas
+un oubli de normalisation : une dizaine de lectures l'affichent déjà, et leur
+faire recomposer la ligne multiplierait les façons de l'écrire.
+
+Le formulaire vit dans une feuille, réutilise `AddressForm` — celui de la
+livraison — et range son explication derrière un bouton d'information : elle
+rassure la première fois et encombre les suivantes.
+
 ### Notifications : la permission ne se demande pas n'importe quand
 
 La demande **ne suit pas la connexion**. À cet instant elle n'a aucune
