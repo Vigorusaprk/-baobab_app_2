@@ -85,9 +85,15 @@ Future<T?> showCustomBottomSheet<T>({
     enableDrag: true,
     backgroundColor: Colors.transparent,
 
-    // Léger assombrissement derrière la feuille. `scrim` est le rôle du thème
-    // fait pour ça : un noir écrit en dur ne suivrait pas un thème sombre.
-    barrierColor: theme.colorScheme.scrim.withValues(alpha: 0.08),
+    // Assombrissement derrière la feuille. `scrim` est le rôle du thème fait
+    // pour ça : un noir écrit en dur ne suivrait pas un thème sombre.
+    //
+    // Il valait 8 % : la page restait presque aussi claire que la feuille,
+    // qui flottait dessus sans s'en détacher. À 32 %, et vu au travers du
+    // flou, le fond recule vraiment. C'est le seul réglage à toucher pour
+    // cela — le voile est peint **sous** le flou, donc l'assombrissement est
+    // lui aussi flouté, et le fond ne devient pas un rectangle gris net.
+    barrierColor: theme.colorScheme.scrim.withValues(alpha: 0.32),
 
     builder: (ctx) => _SheetFrame(
       color: color,

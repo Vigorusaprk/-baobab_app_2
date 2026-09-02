@@ -746,6 +746,31 @@ Un parcours en plusieurs étapes ne redessine pas sa barre : il pousse son
 titre et son retour dans l'en-tête via `SheetHeaderScope.of(context)?.value`.
 C'est ce que fait la connexion par e-mail et code.
 
+### Le champ de code, et le piège du décorateur
+
+`core/widgets/otp_code_field.dart`. Le contour d'une case est dessiné par la
+case — un `Container` avec `border` — et **jamais** par l'`InputDecorator` du
+champ. Avec `isDense: true` et un remplissage nul, celui-ci calcule une
+hauteur bien inférieure à celle de la case : il dessinait donc son cadre sur
+une fraction de la hauteur, et l'on voyait un contour en pastille posé sur un
+bloc plus haut. Le champ, à l'intérieur, est en `InputBorder.none`.
+
+L'écart entre les cases est porté par `Row(spacing:)`, pas par un
+remplissage dans chaque case — sinon la dernière est plus large que les
+autres de la valeur de l'écart.
+
+### Une réussite ne se confirme pas au bouton
+
+Le code accepté enchaîne seul : les cases restent vertes 700 ms, la
+confirmation arrive, la coche se trace, et la feuille se referme. Aucun
+appui. Il y avait trois gestes pour une réussite — « Suivant », « Suivant »,
+« Continuer » — là où l'utilisateur n'a plus rien à décider.
+
+`core/animation/success_check.dart` trace la coche avec un `PathMetric`
+plutôt que d'afficher une icône, et **prévient quand elle a fini**
+(`onFinished`) : c'est ce qui permet d'enchaîner sans qu'un appelant recopie
+la durée de l'animation — une durée recopiée diverge toujours.
+
 ### Un libellé sur un aplat de couleur
 
 Un style pris dans `textTheme` **porte sa couleur** — celle du texte de page,

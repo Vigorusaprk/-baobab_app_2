@@ -30,6 +30,28 @@ void main() {
     expect(HomeSliverHeaderMetrics.firstName('  Marie   Claire '), 'Marie');
   });
 
+  test('la question suit le moment de la journée', () {
+    // Elle disait « aujourd'hui » à toute heure. À 21 h, proposer un
+    // programme pour la journée sonne faux : ce qui reste, c'est la soirée.
+    String q(int h) =>
+        HomeSliverHeaderMetrics.question(DateTime(2026, 9, 2, h));
+
+    expect(q(9), contains("aujourd'hui"));
+    expect(q(15), contains('cet après-midi'));
+    expect(q(21), contains('ce soir'));
+    expect(q(3), contains('cette nuit'));
+  });
+
+  test('la salutation aussi', () {
+    String g(int h) =>
+        HomeSliverHeaderMetrics.greeting(null, DateTime(2026, 9, 2, h));
+
+    expect(g(9), startsWith('Bonjour'));
+    expect(g(15), startsWith('Bon après-midi'));
+    expect(g(21), startsWith('Bonsoir'));
+    expect(g(3), startsWith('Bonne nuit'));
+  });
+
   test('un nom vide vaut pas de nom', () {
     expect(HomeSliverHeaderMetrics.firstName(''), isNull);
     expect(HomeSliverHeaderMetrics.firstName('   '), isNull);

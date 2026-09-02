@@ -1,59 +1,57 @@
+import 'dart:async';
+
 import 'package:baobabe_0_2/core/animation/app_motion.dart';
+import 'package:baobabe_0_2/core/animation/success_check.dart';
 import 'package:baobabe_0_2/core/themes/app_diemens.dart';
-import 'package:baobabe_0_2/core/widgets/button/custom_button.dart';
 import 'package:flutter/material.dart';
 
 /// Troisième et dernière étape : c'est fait.
 ///
-/// L'écran existait sans exister — la feuille se refermait sur-le-champ et
-/// l'on se retrouvait à sa page d'avant sans savoir si la connexion avait
-/// réussi. Un instant de confirmation coûte peu et répond à la seule question
-/// qu'on se pose à ce moment-là.
-class AuthSuccess extends StatelessWidget {
-  const AuthSuccess({super.key, required this.onContinue});
+/// Rien à appuyer. Le ✓ se trace, le message se lit, et la feuille se referme
+/// d'elle-même — on se retrouve sur la page d'où l'on venait. Il y avait
+/// auparavant un bouton « Continuer » : trois gestes pour une réussite, là où
+/// l'utilisateur n'a plus rien à décider.
+class AuthSuccess extends StatefulWidget {
+  const AuthSuccess({super.key, required this.onDone});
 
-  final VoidCallback onContinue;
+  /// Appelé quand l'animation est finie et le message lu.
+  final VoidCallback onDone;
+
+  @override
+  State<AuthSuccess> createState() => _AuthSuccessState();
+}
+
+class _AuthSuccessState extends State<AuthSuccess> {
+  Timer? _exit;
+
+  /// Le temps de lire le message, après le tracé de la coche. En deçà, la
+  /// feuille se refermerait avant qu'on ait vu ce qu'elle disait.
+  static const Duration _read = Duration(milliseconds: 900);
+
+  /// Déclenché par [SuccessCheck] à la fin de son animation, pour que la
+  /// durée d'attente ne soit pas recopiée ici — elle diverge toujours.
+  void _armExit() {
+    _exit?.cancel();
+    _exit = Timer(AppMotion.duration(context, _read), () {
+      if (mounted) widget.onDone();
+    });
+  }
+
+  @override
+  void dispose() {
+    _exit?.cancel();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final scheme = theme.colorScheme;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
+        Center(child: SuccessCheck(onFinished: _armExit)),
         AppDimens.spacerMedium,
-        Center(
-          child: TweenAnimationBuilder<double>(
-            duration: AppMotion.duration(context, AppMotion.calm),
-            curve: AppMotion.enter,
-            tween: Tween(begin: 0, end: 1),
-            builder: (context, value, child) =>
-                Transform.scale(scale: 0.7 + 0.3 * value, child: child),
-            child: Container(
-              padding: const EdgeInsets.all(AppDimens.medium),
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                // Un halo de la même couleur, très pâle : la pastille se
-                // détache du fond blanc sans qu'on ait à poser une ombre.
-                color: scheme.primary.withValues(alpha: 0.10),
-              ),
-              child: Container(
-                padding: const EdgeInsets.all(AppDimens.medium),
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: scheme.primary,
-                ),
-                child: Icon(
-                  Icons.check_rounded,
-                  size: AppDimens.large,
-                  color: scheme.onPrimary,
-                ),
-              ),
-            ),
-          ),
-        ),
-        AppDimens.spacerLarge,
         Text(
           'Connexion réussie',
           textAlign: TextAlign.center,
@@ -67,11 +65,10 @@ class AuthSuccess extends StatelessWidget {
           'compte.',
           textAlign: TextAlign.center,
           style: theme.textTheme.bodySmall?.copyWith(
-            color: scheme.onSurfaceVariant,
+            color: theme.colorScheme.onSurfaceVariant,
           ),
         ),
         AppDimens.spacerLarge,
-        CustomButton(text: 'Continuer', onPressed: onContinue),
       ],
     );
   }

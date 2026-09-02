@@ -1,3 +1,6 @@
+import 'dart:async';
+
+import 'package:baobabe_0_2/core/animation/app_motion.dart';
 import 'package:baobabe_0_2/core/animation/fade_swap.dart';
 import 'package:baobabe_0_2/core/widgets/custom_bottom_sheet.dart';
 import 'package:baobabe_0_2/core/widgets/otp_code_field.dart';
@@ -34,6 +37,12 @@ class _AuthFormState extends State<AuthForm> {
   OtpStatus _otpStatus = OtpStatus.editing;
   String? _emailError;
 
+  /// Le temps de voir les cases passer au vert avant que l'étape ne change.
+  /// Sans cette pause, le verdict serait remplacé dans la même trame que son
+  /// affichage : on ne verrait jamais que le code a été accepté.
+  Timer? _advance;
+  static const Duration _greenHold = Duration(milliseconds: 700);
+
   @override
   void initState() {
     super.initState();
@@ -53,6 +62,7 @@ class _AuthFormState extends State<AuthForm> {
 
   @override
   void dispose() {
+    _advance?.cancel();
     _otp.removeListener(_clearRejection);
     _email.dispose();
     _otp.dispose();
@@ -80,6 +90,7 @@ class _AuthFormState extends State<AuthForm> {
   }
 
   void _backToEmail() {
+    _advance?.cancel();
     _otp.clear();
     setState(() => _otpStatus = OtpStatus.editing);
     _goTo(_Step.email);
@@ -94,10 +105,11 @@ class _AuthFormState extends State<AuthForm> {
   }
 
   void _submitOtp() {
-    // Une fois le code accepté, le même bouton fait passer à la
-    // confirmation : c'est l'enchaînement des maquettes, code vert puis
-    // « Suivant ». Le revérifier le brûlerait pour rien.
+    // Un code déjà accepté passe à la confirmation sans repartir au serveur :
+    // le revérifier le brûlerait pour rien. Normalement la pause ci-dessous
+    // y mène d'elle-même — ceci ne sert qu'à celui qui appuie plus vite.
     if (_otpStatus == OtpStatus.verified) {
+      _advance?.cancel();
       _goTo(_Step.done);
       return;
     }
@@ -107,12 +119,21 @@ class _AuthFormState extends State<AuthForm> {
   }
 
   /// Referme la feuille, puis rend la main à l'écran d'où l'on venait.
+  ///
+  /// Le routeur est retenu **avant** de fermer : après le `pop`, ce contexte
+  /// n'est plus dans l'arbre, et le lire donnerait un routeur au mieux
+  /// périmé. `maybeOf` parce que ce formulaire tourne aussi hors routeur —
+  /// sous test, ou dans un aperçu — et n'a alors nulle part où revenir.
   void _finish() {
+    if (!mounted) return;
+    final router = GoRouter.maybeOf(context);
     Navigator.of(context).pop();
-    if (context.canPop()) {
-      context.pop();
+
+    if (router == null) return;
+    if (router.canPop()) {
+      router.pop();
     } else {
-      context.go('/home');
+      router.go('/home');
     }
   }
 
@@ -130,9 +151,15 @@ class _AuthFormState extends State<AuthForm> {
           case VerifyEmailOtpFailure():
             setState(() => _otpStatus = OtpStatus.invalid);
           case VerifyEmailOtpSuccess():
-            // On reste sur l'étape du code, en vert : la confirmation
-            // vient à l'appui suivant.
+            // Les cases passent au vert, puis la confirmation arrive seule.
+            // L'utilisateur n'a plus rien à décider : il n'a donc rien à
+            // appuyer.
             setState(() => _otpStatus = OtpStatus.verified);
+            _advance?.cancel();
+            _advance = Timer(
+              AppMotion.duration(context, _greenHold),
+              () => mounted ? _goTo(_Step.done) : null,
+            );
           default:
             break;
         }
@@ -162,6 +189,6 @@ class _AuthFormState extends State<AuthForm> {
       isLoading: state is VerifyEmailOtpLoading,
       status: _otpStatus,
     ),
-    _Step.done => AuthSuccess(key: const ValueKey('done'), onContinue: _finish),
+    _Step.done => AuthSuccess(key: const ValueKey('done'), onDone: _finish),
   };
 }

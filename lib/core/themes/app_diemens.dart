@@ -43,6 +43,11 @@ class AppDimens {
   /// Rayon des coins hauts d'une feuille modale.
   static const double bottomSheet = 30.0;
 
+  /// Hauteur d'une case de code à usage unique. Fixe, et non déduite d'un
+  /// rapport : six cases dans une largeur d'écran étroite donnaient des
+  /// cases écrasées.
+  static const double otpBoxHeight = 56.0;
+
   /// La poignée de glissement d'une feuille : la barre grise du haut.
   static const double bottomSheetHandleWidth = 52.0;
   static const double bottomSheetHandleHeight = 5.0;

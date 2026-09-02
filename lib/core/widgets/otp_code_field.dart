@@ -12,7 +12,7 @@ enum OtpStatus {
   /// Le serveur a refusé le code. Les cases passent au rouge.
   invalid,
 
-  /// Le code est bon. Les cases passent au vert, le temps de la bascule.
+  /// Le code est bon. Les cases passent au vert.
   verified,
 }
 
@@ -120,14 +120,16 @@ class _OtpCodeFieldState extends State<OtpCodeField> {
   @override
   Widget build(BuildContext context) {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: List.generate(
-        widget.length,
-        (index) => Flexible(
-          child: Padding(
-            padding: EdgeInsets.only(
-              right: index == widget.length - 1 ? 0 : AppDimens.small,
-            ),
+      // L'écart est porté par la rangée, et non par un remplissage à
+      // l'intérieur de chaque case : ainsi les six cases font exactement la
+      // même largeur. Avec le remplissage, la dernière était plus large que
+      // les cinq autres de la valeur de l'écart.
+      spacing: AppDimens.small,
+      children: [
+        for (var index = 0; index < widget.length; index++)
+          // `Expanded` plutôt qu'une largeur fixe : six largeurs en dur
+          // débordent sur un écran de 360 px.
+          Expanded(
             child: _DigitBox(
               controller: _digits[index],
               node: _nodes[index],
@@ -139,13 +141,20 @@ class _OtpCodeFieldState extends State<OtpCodeField> {
               onBackspace: () => _onBackspace(index),
             ),
           ),
-        ),
-      ),
+      ],
     );
   }
 }
 
-class _DigitBox extends StatelessWidget {
+/// Une case.
+///
+/// Le contour est dessiné par la case elle-même, et non par le décorateur du
+/// champ. C'est le point qui avait tout faussé : avec `isDense` et un
+/// remplissage nul, l'`InputDecorator` calcule une hauteur bien inférieure à
+/// celle de la case, et dessinait donc son cadre sur une fraction de la
+/// hauteur — d'où le contour en pastille posé sur un bloc blanc plus haut.
+/// Le champ, ici, n'a plus aucune bordure : il ne fait que porter le chiffre.
+class _DigitBox extends StatefulWidget {
   const _DigitBox({
     required this.controller,
     required this.node,
@@ -167,15 +176,37 @@ class _DigitBox extends StatelessWidget {
   final VoidCallback onBackspace;
 
   @override
+  State<_DigitBox> createState() => _DigitBoxState();
+}
+
+class _DigitBoxState extends State<_DigitBox> {
+  @override
+  void initState() {
+    super.initState();
+    // Le cadre s'épaissit sur la case qui reçoit la frappe : c'est le seul
+    // repère qui dit où l'on en est dans le code.
+    widget.node.addListener(_onFocusChange);
+  }
+
+  @override
+  void dispose() {
+    widget.node.removeListener(_onFocusChange);
+    super.dispose();
+  }
+
+  void _onFocusChange() {
+    if (mounted) setState(() {});
+  }
+
+  @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final scheme = theme.colorScheme;
     final other = OtherTheme.of(context);
 
-    // Le fond dit l'état du code, la bordure dit lequel des chiffres reçoit
-    // la frappe. Les deux ensemble : on voit d'un coup d'œil où l'on en est
-    // et ce que le serveur a répondu.
-    final (fill, border, ink) = switch (status) {
+    // Le fond dit l'état du code, l'épaisseur du cadre dit lequel des
+    // chiffres reçoit la frappe.
+    final (fill, edge, ink) = switch (widget.status) {
       OtpStatus.invalid => (
         scheme.errorContainer,
         scheme.error,
@@ -193,61 +224,58 @@ class _DigitBox extends StatelessWidget {
       ),
     };
 
-    OutlineInputBorder side(Color color, double width) => OutlineInputBorder(
-      borderRadius: BorderRadius.circular(AppDimens.radius12),
-      borderSide: BorderSide(color: color, width: width),
-    );
+    final focused = widget.node.hasFocus;
+    final borderColor = focused && widget.status == OtpStatus.editing
+        ? scheme.primary
+        : edge;
 
-    return AspectRatio(
-      // Des cases carrées-ish qui se partagent la largeur : six largeurs
-      // fixes débordent sur un petit téléphone.
-      aspectRatio: 0.82,
-      child: AnimatedContainer(
-        duration: AppMotion.duration(context, AppMotion.quick),
-        curve: AppMotion.standard,
-        decoration: BoxDecoration(
-          color: fill,
-          borderRadius: BorderRadius.circular(AppDimens.radius12),
+    return AnimatedContainer(
+      duration: AppMotion.duration(context, AppMotion.quick),
+      curve: AppMotion.standard,
+      height: AppDimens.otpBoxHeight,
+      alignment: Alignment.center,
+      decoration: BoxDecoration(
+        color: fill,
+        borderRadius: BorderRadius.circular(AppDimens.radius16),
+        border: Border.all(
+          color: borderColor,
+          width: focused ? 2 : AppDimens.borderWidthThin,
         ),
-        child: Focus(
-          onKeyEvent: (_, event) {
-            if (event is KeyDownEvent &&
-                event.logicalKey == LogicalKeyboardKey.backspace) {
-              onBackspace();
-            }
-            return KeyEventResult.ignored;
-          },
-          child: TextField(
-            controller: controller,
-            focusNode: node,
-            enabled: enabled,
-            autofocus: autofocus,
-            textAlign: TextAlign.center,
-            textAlignVertical: TextAlignVertical.center,
-            keyboardType: TextInputType.number,
-            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-            // Autorise le collage d'un code entier dans une seule case.
-            maxLength: length,
-            cursorColor: scheme.primary,
-            style: theme.textTheme.titleLarge?.copyWith(
-              fontWeight: FontWeight.w700,
-              color: ink,
-            ),
-            decoration: InputDecoration(
-              counterText: '',
-              isDense: true,
-              contentPadding: EdgeInsets.zero,
-              filled: false,
-              border: side(border, AppDimens.borderWidthThin),
-              enabledBorder: side(border, AppDimens.borderWidthThin),
-              disabledBorder: side(border, AppDimens.borderWidthThin),
-              focusedBorder: side(
-                status == OtpStatus.editing ? scheme.primary : border,
-                2,
-              ),
-            ),
-            onChanged: onChanged,
+      ),
+      child: Focus(
+        onKeyEvent: (_, event) {
+          if (event is KeyDownEvent &&
+              event.logicalKey == LogicalKeyboardKey.backspace) {
+            widget.onBackspace();
+          }
+          return KeyEventResult.ignored;
+        },
+        child: TextField(
+          controller: widget.controller,
+          focusNode: widget.node,
+          enabled: widget.enabled,
+          autofocus: widget.autofocus,
+          textAlign: TextAlign.center,
+          keyboardType: TextInputType.number,
+          inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+          // Autorise le collage d'un code entier dans une seule case.
+          maxLength: widget.length,
+          cursorColor: scheme.primary,
+          style: theme.textTheme.titleLarge?.copyWith(
+            fontWeight: FontWeight.w700,
+            color: ink,
           ),
+          decoration: const InputDecoration(
+            counterText: '',
+            isDense: true,
+            contentPadding: EdgeInsets.zero,
+            filled: false,
+            border: InputBorder.none,
+            enabledBorder: InputBorder.none,
+            focusedBorder: InputBorder.none,
+            disabledBorder: InputBorder.none,
+          ),
+          onChanged: widget.onChanged,
         ),
       ),
     );

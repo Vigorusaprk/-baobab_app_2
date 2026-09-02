@@ -21,6 +21,9 @@ import 'package:go_router/go_router.dart';
 /// ajouter un élément à l'en-tête se fait en touchant uniquement ces
 /// constantes et [_buildContent], sans risque de désaccord entre la taille
 /// réservée par le sliver et la taille réellement peinte.
+/// Le moment de la journée. Il commande la salutation **et** la question.
+enum DayMoment { night, morning, afternoon, evening }
+
 /// Métriques de l'en-tête, publiques pour que l'écran puisse aimanter le
 /// scroll sur l'un des deux états stables (voir [HomePageScreen]).
 class HomeSliverHeaderMetrics {
@@ -62,10 +65,23 @@ class HomeSliverHeaderMetrics {
 
     return lineHeight(greeting(name), theme.textTheme.titleSmall, 1) +
         lineHeight(
-          question,
+          question(),
           theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
           2,
         );
+  }
+
+  /// Le moment de la journée, seule source des deux lignes.
+  ///
+  /// Il est calculé **à chaque appel** : l'application reste ouverte des
+  /// heures, et une salutation figée au lancement souhaiterait le bonsoir à
+  /// midi.
+  static DayMoment moment([DateTime? now]) {
+    final hour = (now ?? DateTime.now()).hour;
+    if (hour < 6) return DayMoment.night;
+    if (hour < 12) return DayMoment.morning;
+    if (hour < 18) return DayMoment.afternoon;
+    return DayMoment.evening;
   }
 
   /// Les deux lignes, exposées pour que la mesure porte sur le texte
@@ -74,16 +90,29 @@ class HomeSliverHeaderMetrics {
   /// [name] est le prénom de la personne connectée. Quand il manque — visite
   /// sans compte —, la formule reste celle d'avant : on ne remplace pas le
   /// nom par un mot creux du genre « cher client ».
-  static String greeting(String? name) {
-    final hour = DateTime.now().hour;
-    final moment = switch (hour) {
-      < 6 => 'Bonne nuit',
-      < 12 => 'Bonjour',
-      < 18 => 'Bon après-midi',
-      _ => 'Bonsoir',
+  static String greeting(String? name, [DateTime? now]) {
+    final hello = switch (moment(now)) {
+      DayMoment.night => 'Bonne nuit',
+      DayMoment.morning => 'Bonjour',
+      DayMoment.afternoon => 'Bon après-midi',
+      DayMoment.evening => 'Bonsoir',
     };
     final first = firstName(name);
-    return first == null ? '$moment,' : '$moment $first,';
+    return first == null ? '$hello,' : '$hello $first,';
+  }
+
+  /// La question, accordée au moment.
+  ///
+  /// Elle disait « aujourd'hui » à toute heure. À 21 h, proposer un programme
+  /// pour la journée sonne faux : ce qui reste, c'est la soirée.
+  static String question([DateTime? now]) {
+    final quand = switch (moment(now)) {
+      DayMoment.night => 'cette nuit',
+      DayMoment.morning => "aujourd'hui",
+      DayMoment.afternoon => 'cet après-midi',
+      DayMoment.evening => 'ce soir',
+    };
+    return "Qu'allons nous faire $quand ?";
   }
 
   /// Le prénom seul. Un nom complet déborderait de la ligne, qui n'en a
@@ -93,8 +122,6 @@ class HomeSliverHeaderMetrics {
     if (trimmed.isEmpty) return null;
     return trimmed.split(RegExp(r'\s+')).first;
   }
-
-  static const String question = "Qu'allons nous faire aujourd'hui ?";
 
   /// Distance de scroll sur laquelle se joue tout le repliement. La hauteur
   /// de barre de statut s'annule entre les deux extents, donc elle n'entre
@@ -297,7 +324,7 @@ class _GreetingRow extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  HomeSliverHeaderMetrics.question,
+                  HomeSliverHeaderMetrics.question(),
                   // Deux lignes : l'en-tête réserve exactement ce que ce
                   // texte occupe, dans la langue et à l'échelle en cours.
                   maxLines: 2,

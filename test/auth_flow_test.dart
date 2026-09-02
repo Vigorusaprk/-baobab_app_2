@@ -159,21 +159,34 @@ void main() {
     await tester.pumpAndSettle();
     expect(_status(tester), OtpStatus.editing);
 
-    // Le bon code.
+    // Le bon code. Les cases passent au vert et **y restent un instant** :
+    // sans cette pause, le verdict serait remplacé dans la trame qui
+    // l'affiche, et on ne verrait jamais que le code a été accepté.
     await _typeCode(tester, '123456');
     await tester.tap(find.text('Suivant'));
-    await tester.pumpAndSettle();
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 100));
     expect(_status(tester), OtpStatus.verified);
     expect(find.text('Code vérifié.'), findsOneWidget);
 
-    // --- Étape 3 : la confirmation --------------------------------------
-    await tester.tap(find.text('Suivant'));
-    await tester.pumpAndSettle();
+    // --- Étape 3 : la confirmation, sans qu'on appuie sur rien ----------
+    await tester.pump(const Duration(milliseconds: 700));
+    await tester.pump(const Duration(milliseconds: 400));
 
     expect(find.text('Terminé'), findsOneWidget);
     expect(find.text('Connexion réussie'), findsOneWidget);
     // On ne revient pas en arrière depuis une connexion faite.
     expect(find.byTooltip('Étape précédente'), findsNothing);
+
+    // Puis la feuille se referme d'elle-même, et l'on retrouve la page d'où
+    // l'on venait. Trois temps, parce que `pumpAndSettle` fait tourner les
+    // animations mais n'avance pas la pause de lecture, qui est un `Timer`.
+    await tester.pumpAndSettle();
+    await tester.pump(const Duration(milliseconds: 900));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Connexion réussie'), findsNothing);
+    expect(find.text('se connecter'), findsOneWidget);
   });
 
   testWidgets('le retour ramène à l\'adresse et vide le code', (tester) async {
