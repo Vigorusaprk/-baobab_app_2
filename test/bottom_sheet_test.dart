@@ -99,6 +99,24 @@ void main() {
     );
   });
 
+  testWidgets('la feuille ne passe pas sous la barre du système', (
+    tester,
+  ) async {
+    // Depuis que le bord a bord est imposé (cible API 35), le contenu passe
+    // sous la barre de geste. La feuille s'y posait dessous.
+    const barreGeste = 48.0;
+    tester.view.physicalSize = const Size(400, 800);
+    tester.view.devicePixelRatio = 1.0;
+    tester.view.viewPadding = const FakeViewPadding(bottom: barreGeste);
+    tester.view.padding = const FakeViewPadding(bottom: barreGeste);
+    addTearDown(tester.view.reset);
+
+    await _open(tester, _host());
+
+    final basDeLaFeuille = tester.getRect(find.byType(Material).last).bottom;
+    expect(basDeLaFeuille, lessThanOrEqualTo(800 - barreGeste));
+  });
+
   testWidgets('la feuille ne passe pas sous la barre d\'état', (tester) async {
     // Poussée par le clavier, elle remontait jusqu'à glisser sa poignée et
     // sa croix sous l'heure et les icônes du système.

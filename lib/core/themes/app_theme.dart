@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'app_colors.dart';
 import 'app_fonts.dart';
 import 'app_diemens.dart';
@@ -25,6 +26,21 @@ import 'other_theme.dart';
 /// mode sombre impossible ; `test/theme_centralisation_test.dart` échoue si
 /// cela se reproduit.
 class AppTheme {
+  /// La teinte des barres systeme.
+  ///
+  /// L'application n'a qu'un theme clair : les icones du systeme doivent donc
+  /// etre sombres, sur des barres transparentes. `contrastEnforced` a `false`
+  /// retire le voile que le systeme poserait de lui-meme derriere la barre de
+  /// navigation, et qui trancherait avec notre fond.
+  static const SystemUiOverlayStyle systemOverlay = SystemUiOverlayStyle(
+    statusBarColor: Colors.transparent,
+    statusBarIconBrightness: Brightness.dark,
+    statusBarBrightness: Brightness.light,
+    systemNavigationBarColor: Colors.transparent,
+    systemNavigationBarIconBrightness: Brightness.dark,
+    systemNavigationBarContrastEnforced: false,
+  );
+
   AppTheme._();
 
   /// Le thème clair — le seul livré aujourd'hui.
@@ -152,6 +168,11 @@ class AppTheme {
         elevation: AppDimens.elevationDefault,
         centerTitle: true,
         titleTextStyle: textTheme.titleLarge,
+        // Depuis la cible API 35, Android impose le bord a bord : la barre
+        // d'etat est transparente et le contenu passe dessous. Sans cette
+        // consigne, la teinte des icones systeme n'est pilotee par personne,
+        // et l'heure peut se retrouver en blanc sur notre fond clair.
+        systemOverlayStyle: AppTheme.systemOverlay,
       ),
 
       inputDecorationTheme: InputDecorationTheme(

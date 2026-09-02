@@ -60,7 +60,7 @@ Widget _app(AuthRepository repository) {
       ),
       GoRoute(
         path: '/login',
-        builder: (_, __) =>
+        builder: (_, _) =>
             const Scaffold(body: Center(child: Text('Accueil connexion'))),
       ),
     ],

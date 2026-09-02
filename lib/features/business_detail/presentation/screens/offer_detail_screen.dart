@@ -14,6 +14,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import 'package:baobabe_0_2/core/widgets/button/custom_action_button.dart';
+import 'package:baobabe_0_2/features/notification/domain/notification_reason.dart';
+import 'package:baobabe_0_2/features/notification/presentation/notification_prompt.dart';
 
 /// La fiche d'une offre.
 ///
@@ -122,6 +124,17 @@ class _OfferDetailView extends StatelessWidget {
               ? 'Commande envoyée. Suivez-la dans Mes activités.'
               : 'Demande envoyée. Le commerçant doit la confirmer.'),
       isError: error != null,
+    );
+    if (error != null || !context.mounted) return;
+
+    // C'est **ici** qu'on demande les notifications, et nulle part ailleurs :
+    // l'acte vient d'aboutir, il appelle une suite, et la demande a donc une
+    // raison à donner. À la connexion, elle n'en aurait aucune.
+    await NotificationPrompt.maybeAsk(
+      context,
+      state.detail.offer.isOrderable
+          ? NotificationReason.orderPlaced
+          : NotificationReason.reservationPlaced,
     );
   }
 

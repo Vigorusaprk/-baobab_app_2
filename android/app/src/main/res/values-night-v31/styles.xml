@@ -1,10 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- Pas de `windowDrawsSystemBarBackgrounds` ni de
+         `statusBarColor` / `navigationBarColor` ici : depuis la cible
+         API 35, Android impose le bord a bord et ces attributs sont
+         sans effet. Les encarts sont geres cote Flutter. -->
     <!-- Theme applied to the Android Window while the process is starting when the OS's Dark Mode setting is on -->
     <style name="LaunchTheme" parent="@android:style/Theme.Black.NoTitleBar">
         <item name="android:forceDarkAllowed">false</item>
         <item name="android:windowFullscreen">false</item>
-        <item name="android:windowDrawsSystemBarBackgrounds">false</item>
         <item name="android:windowLayoutInDisplayCutoutMode">shortEdges</item>
         <item name="android:windowSplashScreenBackground">#0F2E20</item>
         <item name="android:windowSplashScreenAnimatedIcon">@drawable/android12splash</item>

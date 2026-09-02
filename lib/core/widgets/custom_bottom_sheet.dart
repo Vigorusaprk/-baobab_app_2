@@ -155,9 +155,6 @@ class _SheetFrameState extends State<_SheetFrame> {
     // feuille suit alors la fenêtre. C'est vérifié, pas supposé.
     final keyboard = MediaQuery.viewInsetsOf(context).bottom;
     final screenHeight = MediaQuery.sizeOf(context).height;
-    // Ce qui reste au-dessus du clavier. Sans cette soustraction, la feuille
-    // remonte mais garde sa hauteur : elle déborde par le haut.
-    final available = screenHeight - keyboard;
 
     // La hauteur de la barre d'état, lue sur la **vue** et non sur un
     // `MediaQuery`. Ceux-ci se manipulent en chemin : `showModalBottomSheet`
@@ -166,6 +163,20 @@ class _SheetFrameState extends State<_SheetFrame> {
     // mon profil » — trouvait zéro et remontait sous l'heure du système.
     final view = View.of(context);
     final topInset = view.viewPadding.top / view.devicePixelRatio;
+
+    // Même lecture pour le bas : la zone que le système se réserve, barre de
+    // geste ou barre à trois boutons. Depuis que le bord à bord est imposé
+    // (cible API 35), la feuille s'y posait dessous.
+    //
+    // `max` et non une somme : clavier ouvert, la barre de geste est **dans**
+    // la zone du clavier, et additionner les deux ferait flotter la feuille
+    // au-dessus de rien.
+    final systemBottom = view.viewPadding.bottom / view.devicePixelRatio;
+    final bottomInset = math.max(keyboard, systemBottom);
+
+    // Ce qui reste au-dessus de tout cela. Sans cette soustraction, la
+    // feuille remonte mais garde sa hauteur : elle déborde par le haut.
+    final available = screenHeight - bottomInset;
 
     // Deux plafonds, et c'est le plus bas qui gagne :
     //
@@ -217,7 +228,7 @@ class _SheetFrameState extends State<_SheetFrame> {
               left: AppDimens.appPaddingValue,
               right: AppDimens.appPaddingValue,
               // Le clavier pousse la feuille au lieu de la recouvrir.
-              bottom: AppDimens.appPaddingValue + keyboard,
+              bottom: AppDimens.appPaddingValue + bottomInset,
             ),
             child: _Entrance(
               child: Material(

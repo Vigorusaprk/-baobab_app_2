@@ -14,6 +14,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:baobabe_0_2/features/notification/presentation/widgets/notification_setting_tile.dart';
 
 /// Body-only content for the Settings tab. The Scaffold and AppBar (title
 /// "Paramètres") are owned by MainShell, which is the single Scaffold for
@@ -44,17 +45,18 @@ class SettingsScreen extends StatelessWidget {
             DetailSection(
               sectionTitle: "Générale",
               children: [
-                InfoTile(
-                  subtitle: "Notifications",
-                  icon: Icons.notifications_none_outlined,
-                  onTap: () {
-                    if (!isLoggedIn) _requireLogin(context);
-                  },
-                  trailing: Switch(
-                    value: isLoggedIn,
-                    onChanged: (value) {
-                      if (!isLoggedIn) _requireLogin(context);
-                    },
+                // Le commutateur était décoratif : sa valeur suivait
+                // « suis-je connecté ? » et son `onChanged` ne faisait rien.
+                // Il dit maintenant l'état réel de la permission, et sert de
+                // porte de sortie à qui l'a refusée.
+                NotificationSettingTile(
+                  isLoggedIn: isLoggedIn,
+                  onRequireLogin: () => _requireLogin(context),
+                  builder: (context, trailing, onTap) => InfoTile(
+                    subtitle: "Notifications",
+                    icon: Icons.notifications_none_outlined,
+                    onTap: onTap,
+                    trailing: trailing,
                   ),
                 ),
                 const CustomDivider(),

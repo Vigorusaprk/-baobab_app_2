@@ -719,6 +719,116 @@ tenu par des **mesures** : `profile_skeleton_test.dart` compare la largeur du
 squelette à celle du contenu, `animation_test.dart` compare les positions
 avant et après une entrée. N'en réintroduisez pas.
 
+### Notifications : la permission ne se demande pas n'importe quand
+
+La demande **ne suit pas la connexion**. À cet instant elle n'a aucune
+justification, et une demande sans raison se refuse — une fois pour toutes,
+puisque Android ne remontre plus sa boîte après deux refus. Elle suit une
+**action accomplie** qui appelle une suite : une commande passée, une
+réservation posée, un commerce créé. Chacune porte sa raison propre
+(`NotificationReason`), et la feuille l'expose avant de passer la main.
+
+Notre feuille n'accorde rien : c'est un pré-consentement. Le bouton déclenche
+la boîte du système, seule à autoriser.
+
+La règle vit **entière** dans `NotificationPreferences`, qui ne touche ni à
+Firebase ni à un widget et se teste donc sans émulateur :
+
+- accepté une fois → plus jamais demandé, pour aucune action ;
+- refusé → on n'insiste pas sur le même prétexte ;
+- une action d'une autre nature peut reposer la question, une fois ;
+- au-delà de deux refus → plus jamais. Il reste le réglage des paramètres,
+  qui remet le compteur à zéro : quelqu'un qui active lui-même revient sur
+  son refus.
+
+### Le jeton d'appareil : trois mouvements, pas un
+
+Un jeton ne se pose pas une fois pour toutes, et deux des trois mouvements
+sont invisibles depuis l'application :
+
+1. on l'obtient à l'accord ;
+2. **Firebase le remplace de lui-même**, sans rien demander — d'où l'écoute
+   de `onTokenRefresh` ; sans elle les notifications s'arrêtent un jour, en
+   silence ;
+3. **le compte change** : téléphone neuf, prêté, revendu, ou simple
+   déconnexion.
+
+Le troisième est tenu en base : `device_tokens.token` est **unique**, et non
+la paire (utilisateur, jeton). Se connecter sur un appareil déjà connu le
+rattache au nouveau compte et détache l'ancien. Sans cela, revendre son
+téléphone laisserait fuiter ses notifications.
+
+C'est aussi pourquoi les écritures passent par `register-push-token` avec le
+rôle de service : rattacher suppose de toucher la ligne d'un *autre*
+utilisateur, ce qu'aucune politique RLS honnête ne peut autoriser. L'identité
+vient du JWT vérifié, jamais du corps de la requête. Le client, lui, n'a que
+`SELECT` sur ses propres lignes.
+
+`unregister-push-token` est appelé **avant** `signOut()` (crochet
+`SessionHooks`) : après, il n'y a plus d'identité à présenter et la ligne
+resterait — la personne suivante à se connecter recevrait les notifications
+de la précédente.
+
+Le jeton est enregistré **dès la connexion, même sans permission accordée** :
+sur Android le jeton identifie l'appareil, la permission ne gouverne que
+l'affichage. L'accord devient donc effectif sans aller-retour.
+
+### L'envoi : une seule fonction parle à Firebase
+
+`send-push`, et elle seule. Les autres passent par `_shared/notify.ts`, qui
+fait un appel interne authentifié par la clé de service — laquelle est un JWT,
+donc `verify_jwt` reste actif et la fonction n'est pas une porte ouverte ;
+elle vérifie en plus que le rôle du porteur est `service_role`.
+
+Sans cette centralisation, les trois cents lignes de signature OAuth2 (l'API
+à « clé serveur » a été retirée en 2024 ; la v1 exige un JWT RS256 signé avec
+la clé d'un compte de service) seraient recopiées dans les six fonctions qui
+notifient.
+
+**Un envoi ne fait jamais échouer l'action qui le déclenche.** C'est la raison
+des `catch` vides autour des appels de notification — les seuls du dossier.
+
+**À poser une fois** : le secret `FCM_SERVICE_ACCOUNT` sur le projet Supabase
+(le JSON de la clé du compte de service, tel quel). Sans lui tout fonctionne,
+mais rien ne part : `send-push` répond `no_service_account` au lieu d'échouer.
+
+### Bord à bord : déjà en vigueur, pas à préparer
+
+Flutter fixe `targetSdk` à 36. Le bord à bord est imposé dès la cible 35 :
+l'application y est soumise **aujourd'hui**. En conséquence,
+`windowDrawsSystemBarBackgrounds`, `statusBarColor` et `navigationBarColor`
+n'ont plus aucun effet — ils ont été retirés des quatre `styles.xml`.
+
+Ce qui les remplace :
+
+- `AppTheme.systemOverlay` fixe la teinte des icônes système ;
+- la barre de navigation basse ajoute `viewPadding.bottom` à sa marge — elle
+  valait 16 en dur, et la barre de geste se posait par-dessus les onglets ;
+- la feuille modale borne sa hauteur par le haut **et** par le bas.
+
+Les encarts de la feuille se lisent sur `View.of(context)` et non sur le
+`MediaQuery` : celui-ci est consommé en chemin — `showModalBottomSheet` retire
+l'encart du haut de celui qu'il passe à son contenu, si bien qu'une feuille
+ouverte depuis une autre feuille trouvait zéro et remontait sous l'heure.
+
+Pour comparer avant/après sans recompiler :
+`adb shell am compat disable OVERRIDE_ENABLE_EDGE_TO_EDGE com.app.baobab02`.
+
+### Déconnexion : deux pièges enchaînés
+
+Elle en demandait deux pour une, et il y avait deux causes :
+
+1. `add(SignOutEvent())` ne fait qu'**empiler** l'événement. La navigation qui
+   suivait partait alors que la session était encore ouverte, et la garde du
+   routeur — « connecté sur une route d'authentification ? alors `/home` » —
+   la renvoyait à l'accueil. On attend désormais `SignOutSuccess` ou
+   `SignOutFailure` avant de bouger ;
+2. `AuthRepositoryImpl.signOut` renvoyait `localFailure!.message` sur une
+   variable **toujours nulle**. Au premier échec réseau, cette ligne levait au
+   lieu de renvoyer une erreur ; l'exception traversait le bloc, qui
+   n'émettait alors aucun état — et l'attente du point 1 serait restée
+   suspendue pour de bon.
+
 ### La feuille modale : deux pièges qui ne se devinent pas
 
 `lib/core/widgets/custom_bottom_sheet.dart` porte tout ce qui monte du bas.

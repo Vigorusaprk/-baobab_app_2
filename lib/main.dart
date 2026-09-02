@@ -1,3 +1,7 @@
+import 'package:baobabe_0_2/features/notification/data/push_token_service.dart';
+import 'package:baobabe_0_2/core/services/session_service.dart';
+import 'package:baobabe_0_2/core/services/session_hooks.dart';
+import 'dart:async';
 import 'package:baobabe_0_2/app/main_app.dart';
 import 'package:baobabe_0_2/core/constants/supabase_client.dart';
 import 'package:baobabe_0_2/core/database/local_cache.dart';
@@ -40,6 +44,21 @@ void main() async {
     SyncService(reservationApiService),
     reservationApiService,
   );
+
+  // Notifications. Le service ne **demande** rien ici : la permission se
+  // demande après une action qui la justifie (voir `NotificationPrompt`).
+  // Il se contente d'écouter le remplacement du jeton par Firebase — qui
+  // arrive sans qu'on ait rien demandé — et de rattacher l'appareil au
+  // compte connecté.
+  SessionHooks.beforeSignOut = PushTokenService.instance.detachCurrentDevice;
+  unawaited(PushTokenService.instance.start());
+
+  // Se connecter sur un appareil déjà connu doit le rattacher au nouveau
+  // compte : c'est le cas du téléphone prêté, revendu, ou simplement d'un
+  // second compte. Le serveur détache l'ancien propriétaire au passage.
+  SessionService.instance.userChanges.listen((user) {
+    if (user != null) PushTokenService.instance.registerCurrentDevice();
+  });
 
   runApp(const MainApp());
 }

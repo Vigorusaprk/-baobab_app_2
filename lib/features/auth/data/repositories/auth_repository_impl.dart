@@ -3,6 +3,7 @@ import 'package:baobabe_0_2/features/auth/data/data_sources/remote_datasource/au
 import 'package:dartz/dartz.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../domain/repositories/auth_repository.dart';
+import 'package:baobabe_0_2/core/services/session_hooks.dart';
 
 class AuthRepositoryImpl implements AuthRepository {
   AuthRepositoryImpl(this.remoteDataSource);
@@ -67,13 +68,22 @@ class AuthRepositoryImpl implements AuthRepository {
 
   @override
   Future<Either<Failure, void>> signOut() async {
-    Failure? localFailure;
-
     try {
+      // Avant de fermer la session, et non après : passé `signOut`, il n'y a
+      // plus de jeton à présenter au serveur, et l'appareil resterait
+      // rattaché à ce compte. La personne suivante à se connecter sur ce
+      // téléphone recevrait alors ses notifications.
+      await SessionHooks.runBeforeSignOut();
+
       await remoteDataSource.signOut();
       return const Right(null);
     } catch (e) {
-      return Left(AuthFailure(message: localFailure!.message));
+      // Il y avait ici `localFailure!.message`, sur une variable toujours
+      // nulle : au premier échec réseau, cette ligne levait au lieu de
+      // renvoyer une erreur. L'exception traversait le bloc, qui n'émettait
+      // alors **aucun** état — et l'écran qui attend l'issue de la
+      // déconnexion restait suspendu pour de bon.
+      return Left(AuthFailure(message: e.toString()));
     }
   }
 }

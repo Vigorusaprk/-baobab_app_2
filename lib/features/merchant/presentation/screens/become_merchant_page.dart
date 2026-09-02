@@ -8,6 +8,8 @@ import 'package:baobabe_0_2/core/widgets/custom_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:baobabe_0_2/features/notification/domain/notification_reason.dart';
+import 'package:baobabe_0_2/features/notification/presentation/notification_prompt.dart';
 
 /// Demande d'ouverture d'un commerce sur Baobabe.
 ///
@@ -80,6 +82,15 @@ class _BecomeMerchantPageState extends State<BecomeMerchantPage> {
       messenger.showSnackBar(SnackBar(content: Text(error)));
       return;
     }
+
+    // Un commerçant qui n'est pas prévenu doit garder l'application ouverte
+    // pour ne pas manquer une commande. C'est la raison la plus forte de
+    // toutes, et le bon moment pour la donner : le commerce vient d'exister.
+    await NotificationPrompt.maybeAsk(
+      context,
+      NotificationReason.merchantJoined,
+    );
+    if (!mounted) return;
 
     // Le commerce existe : on bascule directement dans l'espace commerçant
     // en remplaçant cet écran, il n'y a plus de raison d'y revenir.
