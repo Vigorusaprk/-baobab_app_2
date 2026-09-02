@@ -711,10 +711,52 @@ rouge à la déconnexion — sont unifiés sur le bouton plein : c'est l'afforda
 la plus claire pour une action qui ne se reprend pas, et elle existait déjà
 dans l'application.
 
-`test/custom_pop_up_golden_test.dart` en garde une capture (`test/goldens/`),
-utile pour juger le rendu sans lancer l'application. Ces tests portent le tag
-`golden` : le rendu des polices variant d'une machine à l'autre, ils
-s'excluent avec `flutter test --exclude-tags golden`.
+**La suite ne compare plus d'images.** Elle l'a fait — `test/goldens/` —, et
+c'était un mauvais marché : une capture dit « ça a changé » sans dire quoi,
+elle diffère d'une machine à l'autre selon le rendu des polices, et il faut
+la régénérer à chaque retouche légitime. Ce qu'elles gardaient est désormais
+tenu par des **mesures** : `profile_skeleton_test.dart` compare la largeur du
+squelette à celle du contenu, `animation_test.dart` compare les positions
+avant et après une entrée. N'en réintroduisez pas.
+
+### La feuille modale : deux pièges qui ne se devinent pas
+
+`lib/core/widgets/custom_bottom_sheet.dart` porte tout ce qui monte du bas.
+Deux défauts y ont vécu longtemps, et leurs causes ne sont pas celles qu'on
+suppose :
+
+1. **Le clic à l'extérieur ne fermait pas.** `BottomSheet` enveloppe son
+   contenu dans un `Material` dont `absorbHitTest` vaut `true`. Comme notre
+   voile flouté est plein écran, ce `Material` l'est aussi : il avale toutes
+   les touches, et la barrière de la route — celle qui aurait fermé la
+   feuille — n'en reçoit aucune. `isDismissible: true` n'y change rien. La
+   fermeture est donc portée par le voile lui-même.
+
+2. **La feuille restait sous le clavier.** Les métriques étaient lues sur le
+   contexte *appelant*, avant l'ouverture de la route, où `viewInsets` vaut
+   toujours zéro. Elles se lisent maintenant dans le `builder`, et **par
+   aspect** (`viewInsetsOf`, `sizeOf`, `paddingOf`) : `MediaQuery.of`
+   abonnait l'écran appelant à toutes les métriques, et le reconstruisait en
+   entier à chaque trame d'ouverture du clavier.
+
+Le flou vit dans un `RepaintBoundary`, le contenu dans un autre : sans cela,
+chaque caractère tapé refloutait tout l'écran.
+
+Un parcours en plusieurs étapes ne redessine pas sa barre : il pousse son
+titre et son retour dans l'en-tête via `SheetHeaderScope.of(context)?.value`.
+C'est ce que fait la connexion par e-mail et code.
+
+### Un libellé sur un aplat de couleur
+
+Un style pris dans `textTheme` **porte sa couleur** — celle du texte de page,
+sombre — et un style posé sur un `Text` l'emporte sur le `foregroundColor` du
+bouton. Écrire `Text('Écrire un avis', style: textTheme.bodySmall)` dans un
+`FilledButton` vert donnait donc un libellé gris foncé sur vert : illisible.
+Deux boutons étaient dans ce cas.
+
+D'où `CustomActionButton` (`core/widgets/button/`) : le bouton compact déduit
+la couleur de son texte de son fond, et l'appelant ne la choisit pas.
+`CustomButton` reste le bouton pleine largeur qui conclut un formulaire.
 
 ### Actions destructrices encore sans confirmation
 
@@ -1009,5 +1051,5 @@ Trois pièges, appris en les rencontrant :
 Le décalage d'entrée est **plafonné** à huit éléments : sans plafond, le
 trentième attendrait plus d'une seconde et l'effet deviendrait une attente.
 
-Une capture golden prise pendant un fondu diffère à chaque exécution : les
-tests d'image doivent pomper au-delà de la transition avant de photographier.
+Une assertion posée pendant un fondu voit les deux contenus à la fois : il
+faut pomper au-delà de la transition avant de mesurer.

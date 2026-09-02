@@ -12,6 +12,7 @@ import 'package:baobabe_0_2/features/home_page/data/models/ui_business.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:skeletonizer/skeletonizer.dart';
+import 'package:baobabe_0_2/core/widgets/button/custom_action_button.dart';
 
 class BusinessDetailScreen extends StatefulWidget {
   final String businessId;
@@ -72,13 +73,14 @@ class _BusinessDetailScreenState extends State<BusinessDetailScreen> {
                 ),
               ),
               const SizedBox(height: 16),
-              ElevatedButton(
+              CustomActionButton(
+                label: 'Réessayer',
+                icon: Icons.refresh_rounded,
                 onPressed: () {
                   context.read<BusinessDetailBloc>().add(
                     LoadBusinessDetail(widget.businessId),
                   );
                 },
-                child: const Text('Réessayer'),
               ),
             ],
           ),

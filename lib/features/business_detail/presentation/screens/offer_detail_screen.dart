@@ -13,6 +13,7 @@ import 'package:baobabe_0_2/core/widgets/custom_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:skeletonizer/skeletonizer.dart';
+import 'package:baobabe_0_2/core/widgets/button/custom_action_button.dart';
 
 /// La fiche d'une offre.
 ///
@@ -290,9 +291,10 @@ class _Failure extends StatelessWidget {
               ),
             ),
             AppDimens.spacerMedium,
-            ElevatedButton(
+            CustomActionButton(
+              label: 'Réessayer',
+              icon: Icons.refresh_rounded,
               onPressed: () => context.read<OfferDetailCubit>().load(),
-              child: const Text('Réessayer'),
             ),
           ],
         ),

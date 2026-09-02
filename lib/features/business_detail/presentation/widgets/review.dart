@@ -67,9 +67,10 @@ class _RestaurantReviewState extends State<RestaurantReview> {
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 16),
-                  ElevatedButton(
+                  CustomActionButton(
+                    label: 'Réessayer',
+                    icon: Icons.refresh_rounded,
                     onPressed: _refreshReviews,
-                    child: const Text('Réessayer'),
                   ),
                 ],
               ),

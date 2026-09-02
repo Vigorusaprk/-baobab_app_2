@@ -99,6 +99,24 @@ void main() {
     );
   });
 
+  testWidgets('la feuille ne passe pas sous la barre d\'état', (tester) async {
+    // Poussée par le clavier, elle remontait jusqu'à glisser sa poignée et
+    // sa croix sous l'heure et les icônes du système.
+    const clavier = 400.0;
+    const barreEtat = 40.0;
+    tester.view.physicalSize = const Size(400, 800);
+    tester.view.devicePixelRatio = 1.0;
+    tester.view.viewInsets = const FakeViewPadding(bottom: clavier);
+    tester.view.viewPadding = const FakeViewPadding(top: barreEtat);
+    tester.view.padding = const FakeViewPadding(top: barreEtat);
+    addTearDown(tester.view.reset);
+
+    await _open(tester, _host());
+
+    final haut = tester.getRect(find.byTooltip('Fermer')).top;
+    expect(haut, greaterThanOrEqualTo(barreEtat));
+  });
+
   testWidgets('l\'en-tête porte le titre et le retour', (tester) async {
     var revenu = false;
     await _open(

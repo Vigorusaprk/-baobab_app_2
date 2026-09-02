@@ -1,3 +1,4 @@
+import 'dart:math' as math;
 import 'dart:ui';
 
 import 'package:baobabe_0_2/core/animation/app_motion.dart';
@@ -140,12 +141,37 @@ class _SheetFrameState extends State<_SheetFrame> {
     // toujours zéro, et la feuille restait sous le clavier. Au passage,
     // `MediaQuery.of` abonnait l'écran appelant à *toutes* les métriques —
     // chaque trame d'ouverture du clavier le reconstruisait en entier.
+    //
+    // Réserve : tout ceci suppose que le système **annonce** son clavier. Sur
+    // un émulateur Android 16 en mode bord-à-bord, il ne le fait pas — il fait
+    // glisser la fenêtre entière, `viewInsets` reste à zéro et aucune trame
+    // n'est reconstruite. Rien, au niveau du widget, ne rattrape ce cas : la
+    // feuille suit alors la fenêtre. C'est vérifié, pas supposé.
     final keyboard = MediaQuery.viewInsetsOf(context).bottom;
     final screenHeight = MediaQuery.sizeOf(context).height;
-
     // Ce qui reste au-dessus du clavier. Sans cette soustraction, la feuille
     // remonte mais garde sa hauteur : elle déborde par le haut.
     final available = screenHeight - keyboard;
+
+    // La hauteur de la barre d'état, lue sur la **vue** et non sur un
+    // `MediaQuery`. Ceux-ci se manipulent en chemin : `showModalBottomSheet`
+    // retire l'encart du haut de celui qu'il donne à son contenu, si bien
+    // qu'une feuille ouverte depuis une autre feuille — ce que fait « Modifier
+    // mon profil » — trouvait zéro et remontait sous l'heure du système.
+    final view = View.of(context);
+    final topInset = view.viewPadding.top / view.devicePixelRatio;
+
+    // Deux plafonds, et c'est le plus bas qui gagne :
+    //
+    // - une proportion de l'espace libre, pour qu'une feuille courte garde
+    //   l'air d'une feuille et non d'une page ;
+    // - la place réelle sous la barre d'état. Sans ce second plafond, un
+    //   formulaire ouvert au-dessus du clavier remontait jusqu'à glisser sa
+    //   poignée et sa croix sous l'heure et les icônes du système.
+    final maxSheetHeight = math.min(
+      available * 0.88,
+      available - topInset - AppDimens.appPaddingValue * 2,
+    );
 
     return Stack(
       children: [
@@ -201,7 +227,7 @@ class _SheetFrameState extends State<_SheetFrame> {
                     minHeight: widget.minHeight != null
                         ? available * widget.minHeight!
                         : 0,
-                    maxHeight: available * 0.88,
+                    maxHeight: maxSheetHeight,
                   ),
                   child: Padding(
                     padding: const EdgeInsets.fromLTRB(

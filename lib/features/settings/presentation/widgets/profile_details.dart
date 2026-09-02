@@ -6,6 +6,7 @@ import 'package:baobabe_0_2/features/settings/presentation/widgets/profile_sheet
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:skeletonizer/skeletonizer.dart';
+import 'package:baobabe_0_2/core/widgets/button/custom_action_button.dart';
 
 /// Le contenu du profil : ce qu'on sait de l'utilisateur, et de quoi le
 /// compléter.
@@ -297,7 +298,11 @@ class _Failure extends StatelessWidget {
               style: Theme.of(context).textTheme.bodySmall,
             ),
             AppDimens.spacerMedium,
-            FilledButton(onPressed: onRetry, child: const Text('Réessayer')),
+            CustomActionButton(
+              label: 'Réessayer',
+              icon: Icons.refresh_rounded,
+              onPressed: onRetry,
+            ),
           ],
         ),
       ),

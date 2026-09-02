@@ -16,6 +16,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:skeletonizer/skeletonizer.dart';
+import 'package:baobabe_0_2/core/widgets/button/custom_action_button.dart';
 
 /// Destination du lien "Voir tout" des sections "Populaires" et
 /// "Découvrir" de l'accueil.
@@ -302,7 +303,11 @@ class _ErrorView extends StatelessWidget {
               style: TextStyle(color: Theme.of(context).colorScheme.error),
             ),
             AppDimens.spacerMedium,
-            ElevatedButton(onPressed: onRetry, child: const Text('Réessayer')),
+            CustomActionButton(
+              label: 'Réessayer',
+              icon: Icons.refresh_rounded,
+              onPressed: onRetry,
+            ),
           ],
         ),
       ),

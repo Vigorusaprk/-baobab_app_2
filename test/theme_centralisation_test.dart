@@ -40,6 +40,58 @@ Iterable<String> _offenders(bool Function(String line) isOffending) sync* {
 }
 
 void main() {
+  group('Lisibilité sur un aplat de couleur', () {
+    test('aucun libellé de bouton ne prend son style tel quel', () {
+      // Un style pris dans `textTheme` porte sa couleur — celle du texte de
+      // page, sombre — et un style posé sur un `Text` l'emporte sur le
+      // `foregroundColor` du bouton. Écrire
+      //
+      //   Text('Écrire un avis', style: textTheme.bodySmall)
+      //
+      // dans un `FilledButton` vert donnait donc un libellé gris foncé sur
+      // vert : illisible. C'était le cas de deux boutons.
+      //
+      // La règle : un bouton coloré passe par `CustomActionButton` ou
+      // `CustomButton`, qui déduisent la couleur du texte de leur fond.
+      final found = <String>[];
+      for (final file in _sourceFiles()) {
+        final relative = file.path.replaceAll(r'\\', '/');
+        if (relative.contains('core/widgets/button/')) continue;
+        final lines = file.readAsLinesSync();
+        for (var i = 0; i < lines.length; i++) {
+          if (!RegExp(
+            r'(FilledButton|ElevatedButton)(\.icon)?\(',
+          ).hasMatch(lines[i])) {
+            continue;
+          }
+          final window = lines
+              .skip(i)
+              .take(24)
+              .where((l) => !l.trimLeft().startsWith('//'))
+              .join('\n');
+          // Un style repris du thème sans y reposer une couleur explicite.
+          for (final m in RegExp(
+            r'style:[^,]*textTheme\.\w+[^,]*',
+          ).allMatches(window)) {
+            if (m.group(0)!.contains('color:')) continue;
+            found.add('$relative:${i + 1}  ${m.group(0)}');
+            break;
+          }
+        }
+      }
+
+      expect(
+        found,
+        isEmpty,
+        reason:
+            'Libellé illisible sur un aplat de couleur. Utilisez '
+                'CustomActionButton (compact) ou CustomButton (pleine '
+                'largeur) :\n\n' +
+            found.join('\n'),
+      );
+    });
+  });
+
   group('Centralisation du thème', () {
     test('aucun écran ne lit AppColors ou AppFonts', () {
       final found = _offenders(

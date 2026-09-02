@@ -12,6 +12,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:skeletonizer/skeletonizer.dart';
+import 'package:baobabe_0_2/core/widgets/button/custom_action_button.dart';
 
 /// Explorer : toutes les offres, cherchables et filtrables.
 ///
@@ -378,17 +379,7 @@ class _Message extends StatelessWidget {
             ),
             if (actionLabel != null && onAction != null) ...[
               AppDimens.spacerMedium,
-              FilledButton(
-                onPressed: onAction,
-                style: FilledButton.styleFrom(
-                  backgroundColor: theme.colorScheme.primary,
-                  foregroundColor: theme.colorScheme.onPrimary,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(AppDimens.radius16),
-                  ),
-                ),
-                child: Text(actionLabel!),
-              ),
+              CustomActionButton(label: actionLabel!, onPressed: onAction),
             ],
           ],
         ),
