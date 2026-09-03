@@ -333,6 +333,80 @@ Deux pièges vus à l'écran, à ne pas réintroduire :
   zéro barre par arrondi : le compteur bougeait sans que la jauge réagisse.
   Une place prise vaut donc au moins une barre.
 
+### Un lien qui ne s'ouvre pas : le piège de la visibilité des paquets
+
+`canLaunchUrl` répondait **faux** pour `tel:`, `mailto:` et `https:` sans
+qu'aucune erreur n'apparaisse : « Appeler », « Itinéraire » et les lignes de
+la carte de contact ne faisaient donc rien du tout. Depuis Android 11, une
+application ne voit que les applications qu'elle déclare ; iOS impose la même
+déclaration. Les deux sont désormais en place :
+
+- `android/app/src/main/AndroidManifest.xml` → `<queries>` avec `DIAL/tel`,
+  `SENDTO/mailto`, `VIEW/https`, `VIEW/geo` ;
+- `ios/Runner/Info.plist` → `LSApplicationQueriesSchemes`.
+
+**Toute nouvelle ouverture de lien doit ajouter son schéma aux deux fichiers**,
+sans quoi elle échouera en silence. Et `canLaunchUrl` sert d'indice, pas de
+verdict : `_launch` tente l'ouverture même quand il répond faux.
+
+« Appeler » n'apparaît que si `dialablePhone()` rend un numéro : le champ
+`phone` est du texte libre, et un « N/A » donnait un bouton qui ouvrait un
+composeur vide. Six chiffres au minimum.
+
+### Le mode d'une offre voyage avec son identifiant
+
+`/offer/:id` reçoit le `Fulfilment` connu de l'appelant dans `extra`
+(`OfferDetailScreen.expected`). Il ne sert **qu'au squelette** — le serveur
+reste seul juge de ce que l'offre est. Sans lui, le squelette d'une commande
+s'affichait devant une réservation, dont la photo est en tête et pleine
+largeur : la page sautait entièrement à l'arrivée des données.
+
+### La photo d'une fiche ne bouge pas
+
+`FlexibleSpaceBar(collapseMode: CollapseMode.none)`, sur la fiche commerce
+comme sur la fiche d'une réservation : la photo reste où elle est et le
+contenu passe par-dessus. Les deux gestes — retour, partage — vivent dans le
+`leading` et les `actions` de la barre épinglée, donc ils ne partent pas avec
+l'image ; ils partaient avec elle, si bien qu'on ne pouvait plus revenir sans
+remonter toute la page.
+
+Une barre **étire** ce qu'on lui donne en `leading` : sans une contrainte
+carrée (`_Round`), le disque du retour s'affichait en ovale.
+
+### Un avis se lit sur deux lignes
+
+`CustomReviewItem` (`core/widgets/`) est le **seul** gabarit d'avis de
+l'application, avec `ReadOnlyStars` (`core/widgets/rating_stars.dart`) pour
+la note. Il en existait deux, et une fonction `buildReviewStars` qui rendait
+une liste de widgets — donc un appelant qui oubliait la `Row` cassait sa mise
+en page. Le composant ne connaît **aucune entité** : un avis de commerce et
+un avis d'offre ne sont pas la même classe en base, et c'était la raison de
+la duplication.
+
+- le propos tient sur **deux lignes**, et « Voir plus » n'apparaît que s'il y
+  a vraiment quelque chose de coupé — la mesure se fait avec la largeur
+  réelle (`TextPainter.didExceedMaxLines`), pas devinée à un nombre de
+  caractères. La suite s'ouvre dans un `custom_bottom_sheet` ;
+- le rail est une **bordure gauche**, pas une colonne voisine étirée : un
+  frère en `stretch` réclame un `IntrinsicHeight`, et un `IntrinsicHeight`
+  au-dessus d'un `LayoutBuilder` lève « does not support returning intrinsic
+  dimensions » ;
+- sur la fiche d'une réservation, les avis se **feuillettent par deux**
+  (`ReviewPager`) avec des points : la page y porte déjà la date, la jauge,
+  le compteur et l'avertissement, et dix avis empilés repoussaient la
+  validation à plusieurs écrans du bas. La hauteur du feuilleteur est
+  **mesurée** (la page la plus haute), pas décidée : une valeur fixe laissait
+  un grand blanc sous des avis d'une ligne.
+
+### Le code du reçu est un nombre
+
+Huit chiffres, groupés par quatre (« 4978 3872 »). Il mêlait lettres et
+chiffres, ce qui obligeait à l'épeler au comptoir et à distinguer un O d'un
+zéro. La nature de la demande entre dans le calcul : une commande et une
+réservation portant le même identifiant ne peuvent pas tomber sur le même
+code. Et une demande **annulée** ne présente plus de talon du tout — il
+restait affiché, code lisible et QR actif, au bas de son reçu.
+
 Le mode **en boutique n'existe pas encore dans les données** (`select count(*)
 from offers where fulfilment = 'in_store'` renvoie 0) : `OfferInStoreView`
 n'est donc couvert que par ses tests, pas par une vérification à l'écran.

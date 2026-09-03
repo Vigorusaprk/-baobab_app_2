@@ -84,26 +84,38 @@ class ActivityReceipt extends StatelessWidget {
                 _TotalRow(total: entry.total),
                 AppDimens.spacerLarge,
 
-                ReceiptTicket(
-                  payload: entry.qrPayload,
-                  code: entry.code,
-                  locked: _isLocked,
-                  note: _isLocked
-                      ? 'Actif dès que la réservation est confirmée.'
-                      : 'Le commerçant scanne le code, ou saisit les 8 '
-                            'chiffres.',
-                ),
-                AppDimens.spacerMedium,
-
-                Text(
-                  'Paiement sur place, à la livraison. Baobabe ne vend pas et '
-                  'n\'encaisse rien : le montant est celui fixé par le '
-                  'commerce.',
-                  style: theme.textTheme.labelSmall?.copyWith(
-                    color: scheme.onSurfaceVariant,
-                    height: 1.5,
+                // Rien à présenter pour une demande annulée : le talon
+                // disparaît. Il restait affiché, code lisible et QR actif,
+                // au bas du reçu d\'une commande annulée.
+                if (!entry.isCancelled) ...[
+                  ReceiptTicket(
+                    payload: entry.qrPayload,
+                    code: entry.code,
+                    locked: _isLocked,
+                    note: _isLocked
+                        ? 'Actif dès que la réservation est confirmée.'
+                        : 'Le commerçant scanne le code, ou saisit les 8 '
+                              'chiffres.',
                   ),
-                ),
+                  AppDimens.spacerMedium,
+                  Text(
+                    'Paiement sur place, à la livraison. Baobabe ne vend pas '
+                    'et n\'encaisse rien : le montant est celui fixé par le '
+                    'commerce.',
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      color: scheme.onSurfaceVariant,
+                      height: 1.5,
+                    ),
+                  ),
+                ] else
+                  Text(
+                    'Cette demande est annulée : il n\'y a plus rien à '
+                    'présenter au commerce.',
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      color: scheme.onSurfaceVariant,
+                      height: 1.5,
+                    ),
+                  ),
                 AppDimens.spacerLarge,
 
                 _Actions(entry: entry, onCancel: onCancel, onRate: onRate),

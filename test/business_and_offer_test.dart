@@ -8,6 +8,7 @@ import 'package:baobabe_0_2/features/business_detail/presentation/widgets/busine
 import 'package:baobabe_0_2/features/business_detail/presentation/widgets/offer_detail_views.dart';
 import 'package:baobabe_0_2/features/business_detail/presentation/widgets/offer_purchase_bar.dart';
 import 'package:baobabe_0_2/core/widgets/custom_review_item.dart';
+import 'package:baobabe_0_2/core/widgets/review_pager.dart';
 import 'package:baobabe_0_2/features/home_page/data/models/ui_business.dart';
 import 'package:baobabe_0_2/features/home_page/domain/entities/business_entity.dart';
 import 'package:flutter/material.dart';
@@ -459,6 +460,41 @@ void main() {
       );
 
       expect(find.text('Complet'), findsOneWidget);
+    });
+  });
+
+  group('Les avis feuilletés', () {
+    Widget _item(String name) => CustomReviewItem(
+      author: name,
+      rating: 5,
+      createdAt: DateTime.now(),
+      comment: 'Très bien.',
+    );
+
+    testWidgets('deux par page, et un point par page', (tester) async {
+      await tester.pumpWidget(
+        _host(ReviewPager(reviews: [_item('A'), _item('B'), _item('C')])),
+      );
+      await tester.pumpAndSettle();
+
+      // Dix avis empilés repoussaient la validation hors de l écran.
+      expect(find.text('A'), findsOneWidget);
+      expect(find.text('B'), findsOneWidget);
+      expect(find.text('C'), findsNothing);
+
+      await tester.drag(find.byType(PageView), const Offset(-400, 0));
+      await tester.pumpAndSettle();
+
+      expect(find.text('C'), findsOneWidget);
+    });
+
+    testWidgets('un seul avis ne montre pas de points', (tester) async {
+      await tester.pumpWidget(_host(ReviewPager(reviews: [_item('A')])));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(PageView), findsOneWidget);
+      // Un point unique n invite à rien.
+      expect(tester.getSize(find.byType(PageView)).height, greaterThan(0));
     });
   });
 

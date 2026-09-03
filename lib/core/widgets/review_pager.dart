@@ -5,9 +5,14 @@ import 'package:flutter/material.dart';
 ///
 /// Empilés verticalement, dix avis repoussent tout ce qui suit hors de
 /// l'écran : sur une fiche de réservation, la barre de validation se
-/// retrouvait à dix écrans du bas de page. Ici la section garde une hauteur
-/// fixe, on feuillette pour lire la suite, et les points disent combien il en
-/// reste.
+/// retrouvait à plusieurs écrans du bas de page. Ici la section garde une
+/// hauteur stable, on feuillette pour lire la suite, et les points disent
+/// combien il en reste.
+///
+/// La hauteur est **mesurée**, pas décidée. Une valeur fixe laissait un grand
+/// blanc entre le dernier avis et les points quand les propos tenaient sur
+/// une ligne, et coupait ceux qui débordaient. Elle prend la hauteur de la
+/// page la plus haute, de façon que feuilleter ne déplace pas ce qui suit.
 ///
 /// Les avis lui sont **donnés déjà construits** : ce composant ne connaît ni
 /// entité ni mise en forme d'un avis, seulement la pagination.
@@ -26,11 +31,13 @@ class ReviewPager extends StatefulWidget {
 
 class _ReviewPagerState extends State<ReviewPager> {
   final _controller = PageController();
+  final _keys = <int, GlobalKey>{};
+  final _heights = <int, double>{};
   int _page = 0;
 
-  /// La hauteur d'un avis : le nom, deux lignes de propos, et le bouton
-  /// « Voir plus » quand il apparaît.
-  static const double _itemHeight = 104;
+  /// La hauteur du premier rendu, le temps que la mesure arrive : un avis
+  /// d'une ligne, fois le nombre par page.
+  static const double _estimate = 76;
 
   @override
   void dispose() {
@@ -51,34 +58,63 @@ class _ReviewPagerState extends State<ReviewPager> {
     return pages;
   }
 
+  /// Relève la hauteur réelle d'une page après son rendu.
+  void _measure(int index) {
+    final box = _keys[index]?.currentContext?.findRenderObject() as RenderBox?;
+    if (box == null || !box.hasSize) return;
+    final height = box.size.height;
+    if ((_heights[index] ?? 0) == height) return;
+    if (!mounted) return;
+    setState(() => _heights[index] = height);
+  }
+
   @override
   Widget build(BuildContext context) {
     final pages = _pages;
     if (pages.isEmpty) return const SizedBox.shrink();
 
-    // La hauteur suit la taille de texte du système : figée en pixels, elle
-    // coupait le propos de qui lit en grand.
+    final measured = _heights.values.isEmpty
+        ? null
+        : _heights.values.reduce((a, b) => a > b ? a : b);
+    // La mesure sert de plancher, jamais de plafond : la taille de texte du
+    // système peut grandir entre deux rendus.
     final height =
-        MediaQuery.textScalerOf(context).scale(_itemHeight) * widget.perPage;
+        measured ??
+        MediaQuery.textScalerOf(context).scale(_estimate) * widget.perPage;
 
     return Column(
       children: [
-        SizedBox(
-          height: height,
-          child: PageView.builder(
-            controller: _controller,
-            itemCount: pages.length,
-            onPageChanged: (index) => setState(() => _page = index),
-            itemBuilder: (context, index) => Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: pages[index],
+        AnimatedSize(
+          duration: const Duration(milliseconds: 160),
+          curve: Curves.easeOut,
+          child: SizedBox(
+            height: height,
+            child: PageView.builder(
+              controller: _controller,
+              itemCount: pages.length,
+              onPageChanged: (index) => setState(() => _page = index),
+              itemBuilder: (context, index) {
+                final key = _keys.putIfAbsent(index, GlobalKey.new);
+                WidgetsBinding.instance.addPostFrameCallback(
+                  (_) => _measure(index),
+                );
+                // `Align` donne au contenu des contraintes lâches : sans lui,
+                // la page l'étire à la hauteur du cadre et la mesure rend
+                // toujours cette même hauteur.
+                return Align(
+                  alignment: Alignment.topCenter,
+                  child: Column(
+                    key: key,
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: pages[index],
+                  ),
+                );
+              },
             ),
           ),
         ),
-        if (pages.length > 1) ...[
-          AppDimens.spacerSmall,
-          _Dots(count: pages.length, current: _page),
-        ],
+        if (pages.length > 1) _Dots(count: pages.length, current: _page),
       ],
     );
   }
@@ -104,8 +140,8 @@ class _Dots extends StatelessWidget {
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 180),
               curve: Curves.easeOut,
-              // Le point courant s'allonge au lieu de changer de taille :
-              // une pastille qui grossit fait sauter la rangée entière.
+              // Le point courant s'allonge au lieu de grossir : une pastille
+              // qui change de taille fait sauter la rangée entière.
               width: i == current ? 16 : 6,
               height: 6,
               decoration: BoxDecoration(

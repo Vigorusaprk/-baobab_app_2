@@ -81,7 +81,10 @@ class BusinessCover extends StatelessWidget {
             Hero(
               tag: 'business-image-${business.id}',
               child: business.bgImg.isNotEmpty
-                  ? RemoteImage(url: business.bgImg, fallback: _Fallback(uiBusiness))
+                  ? RemoteImage(
+                      url: business.bgImg,
+                      fallback: _Fallback(uiBusiness),
+                    )
                   : _Fallback(uiBusiness),
             ),
             // Le bord à bord fait passer la photo **sous** la barre d'état.
@@ -141,10 +144,7 @@ class _Round extends StatelessWidget {
     return Padding(
       padding: padding,
       child: Center(
-        child: SizedBox.square(
-          dimension: AppDimens.touchTarget,
-          child: child,
-        ),
+        child: SizedBox.square(dimension: AppDimens.touchTarget, child: child),
       ),
     );
   }

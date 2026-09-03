@@ -238,6 +238,26 @@ void main() {
       expect(find.textContaining('dès que la réservation'), findsNothing);
     });
 
+    testWidgets('une demande annulée ne présente plus de code', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        _host(
+          ActivityReceipt(
+            entry: ActivityEntry.fromOrder(
+              _order(status: OrderStatus.cancelled),
+            ),
+            onBack: () {},
+          ),
+        ),
+      );
+
+      // Le talon restait affiché, code lisible et QR actif, au bas du reçu
+      // d\'une commande annulée.
+      expect(find.text('À PRÉSENTER AU COMMERCE'), findsNothing);
+      expect(find.textContaining('plus rien à présenter'), findsOneWidget);
+    });
+
     testWidgets('l\'annulation est un bouton tracé, pleine largeur', (
       tester,
     ) async {
