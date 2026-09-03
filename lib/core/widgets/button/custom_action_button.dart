@@ -108,40 +108,40 @@ class CustomActionButton extends StatelessWidget {
     const minimumSize = Size(0, AppDimens.touchTarget);
 
     final content = AnimatedSwitcher(
-        duration: AppMotion.duration(context, AppMotion.base),
-        child: isLoading
-            ? CustomLoadingButton(
-                key: const ValueKey('loading'),
-                size: 18,
-                color: foreground,
-              )
-            : Row(
-                key: ValueKey(label),
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  if (icon != null || assetPath != null) ...[
-                    _Glyph(
-                      icon: icon,
-                      assetPath: assetPath,
+      duration: AppMotion.duration(context, AppMotion.base),
+      child: isLoading
+          ? CustomLoadingButton(
+              key: const ValueKey('loading'),
+              size: 18,
+              color: foreground,
+            )
+          : Row(
+              key: ValueKey(label),
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (icon != null || assetPath != null) ...[
+                  _Glyph(
+                    icon: icon,
+                    assetPath: assetPath,
+                    color: foreground,
+                    size: theme.textTheme.labelLarge?.fontSize ?? 14,
+                  ),
+                  const SizedBox(width: AppDimens.small),
+                ],
+                Flexible(
+                  child: Text(
+                    label,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    // La couleur vient du fond, pas de l'appelant : c'est
+                    // toute la raison d'être de ce widget.
+                    style: theme.textTheme.labelLarge?.copyWith(
                       color: foreground,
-                      size: theme.textTheme.labelLarge?.fontSize ?? 14,
-                    ),
-                    const SizedBox(width: AppDimens.small),
-                  ],
-                  Flexible(
-                    child: Text(
-                      label,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      // La couleur vient du fond, pas de l'appelant : c'est
-                      // toute la raison d'être de ce widget.
-                      style: theme.textTheme.labelLarge?.copyWith(
-                        color: foreground,
-                      ),
                     ),
                   ),
-                ],
-              ),
+                ),
+              ],
+            ),
     );
 
     final button = border == null

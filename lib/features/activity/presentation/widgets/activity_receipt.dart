@@ -1,5 +1,6 @@
 import 'package:baobabe_0_2/core/themes/app_diemens.dart';
 import 'package:baobabe_0_2/core/widgets/button/custom_action_button.dart';
+import 'package:baobabe_0_2/core/widgets/dashed_rule.dart';
 import 'package:baobabe_0_2/core/widgets/button/custom_icon_button.dart';
 import 'package:baobabe_0_2/features/activity/domain/activity_entry.dart';
 import 'package:baobabe_0_2/features/activity/presentation/widgets/receipt_ticket.dart';

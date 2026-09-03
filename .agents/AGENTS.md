@@ -225,11 +225,117 @@ commerce : l'utilisateur a cliqué sur une chose précise, l'envoyer sur le
 catalogue entier le forcerait à la rechercher. C'est sur cette fiche qu'on
 commande ou qu'on réserve.
 
-La fiche du commerçant **ne porte plus aucun bouton d'action**. Elle se lit
-dans l'ordre des questions qu'on se pose : à propos → son catalogue en
-carrousels → contact → horaires → commodités → avis. Le catalogue est la
-seule porte vers l'achat, et chaque offre y parle pour elle-même — un bouton
-« Commander » générique obligeait à deviner ce qu'on allait trouver derrière.
+La fiche du commerçant **ne porte aucun bouton d'action**. Le catalogue est
+la seule porte vers l'achat, et chaque offre y parle pour elle-même — un
+bouton « Commander » générique obligeait à deviner ce qu'on allait trouver
+derrière.
+
+### La fiche commerce : la photo, qui c'est, ce qu'on peut en faire
+
+Refonte à partir d'une maquette Claude Design (« Commerce et offre v2 »),
+posée sur le thème et `AppDimens` de l'application — la maquette porte déjà
+la palette Baobabe dans son bloc `.bb`, et son propre système (Nocturne :
+fond sombre, accent violet) n'a donc pas été suivi.
+
+- la **photo ne change plus d'apparence**. C'était une barre pliante de
+  350 px qui, en se pliant, remplaçait la photo par un dégradé de deux
+  couleurs de marque et ramenait le nom au centre : trois états pour une
+  seule information. Elle fait 210 px, elle défile, et le nom vit dans la
+  feuille qui la recouvre de 14 px — donc à sa place définitive dès le
+  premier pixel de défilement (`BusinessCover`, `BusinessIdentity`) ;
+- elle **reste une barre épinglée**, pour une raison qui n'a rien à voir avec
+  la photo : la page est bord à bord, et sans bandeau opaque en haut,
+  « Horaires d'ouverture » se peignait par-dessus l'heure du système en
+  défilant. Repliée, il ne reste que ce bandeau et les deux gestes ;
+- le voile du haut de la photo est **clair**, pas sombre. Les icônes du
+  système sont sombres dans toute l'application : les inverser pour un seul
+  écran (`AnnotatedRegion`) obligeait à les réinverser au repliage, alors
+  qu'un voile clair les tient lisibles sur n'importe quelle photo, dans les
+  deux états ;
+- **le catalogue arrive en deuxième**, plus en troisième. Il était derrière
+  « À propos », en carrousels par rayon déclaré par le commerçant (Entrées,
+  Chambres). Or le rayon est un classement de commerçant : la question du
+  client est **ce qu'il peut en faire**. `BusinessOfferBoard` groupe donc par
+  `Fulfilment` — à commander / à réserver / en boutique — en rangées de 74 px
+  qui ne cachent rien, sous un filtre **épinglé** ;
+- le filtre n'apparaît **que s'il trie quelque chose** : un seul mode, pas de
+  filtre. `BusinessOfferBoard` rend un sliver (`SliverMainAxisGroup` +
+  `SliverPersistentHeader`), ce qui épingle son filtre sans sortir l'état du
+  filtre de son propre widget. Son en-tête réserve la barre d'état **en
+  permanence** : épinglé, « Tout · 10 » se peignait sur l'heure, et une
+  réserve qui n'apparaîtrait qu'à l'épinglage ferait sauter la liste ;
+- « Appeler » et « Itinéraire » remontent dans l'identité, et la carte
+  « Contact » ne garde que le courriel et le site (`showPhone: false`) : elle
+  proposait le téléphone une seconde fois ;
+- l'étiquette d'horaire dit « Ouvert · jusqu'à 23:00 » **seulement** quand
+  deux heures se lisent dans la ligne du jour. Le commerçant saisit du texte
+  libre : « Sur rendez-vous » est repris tel quel, sans jugement ;
+- un commerce **sans offre publiée** le dit. La section disparaissait, et la
+  fiche s'arrêtait sur les horaires sans qu'on sache si le commerce n'a rien
+  à vendre ou si la lecture avait échoué.
+
+Supprimés comme orphelins de cette refonte : `BusinessDetailAppBar`,
+`BusinessHeroSection`, `BusinessOffersSection`.
+
+### La fiche d'offre : trois mises en page, une par mode
+
+Une offre qu'on commande, une qu'on réserve et une qu'on prend en boutique ne
+posent pas les mêmes questions. Elles partageaient une seule page avec des
+`if` : une offre en boutique héritait d'une barre d'achat vide, et une
+réservation cachait sa date dans une ligne de pied de page.
+
+- **commander** (`OfferOrderView`) : nom et prix en grand, photo de 172 px,
+  description, bloc de faits perforé (le mode, le paiement), puis la
+  quantité ;
+- **réserver** (`OfferBookingView`) : photo de tête de 226 px, étiquette
+  « Sur réservation », **la date d'abord** — trois pastilles de jours plus le
+  calendrier pour le reste, au lieu de deux écrans de calendrier pour réserver
+  ce soir —, la jauge de places, le compteur, puis l'avertissement
+  d'attente ;
+- **en boutique** (`OfferInStoreView`) : ni compteur ni date. Un bandeau dit
+  ce qui n'aura pas lieu dans l'application, et le bas de page propose
+  « Voir le commerce » et l'appel.
+
+La **barre du bas** ne porte plus que ce qui conclut : ce que ça coûte, et le
+geste. La date et la quantité sont remontées dans la page, là où on les
+décide. Pour une réservation, le libellé du montant est la **date retenue** —
+« DATE À CHOISIR » tant qu'il n'y en a pas : un montant seul ne dit pas pour
+quand.
+
+Une pastille de jour touchée ouvre **aussitôt** le sélecteur d'heure : une
+table sans heure n'est pas une réservation.
+
+`OfferMerchant` porte désormais `openingHours`. `get-offer-detail` les
+rapportait déjà — la fiche les jetait, alors qu'une offre qu'on ne peut que
+venir chercher a besoin de dire **quand**.
+
+Les **avis suivent un rail** partout (`ReviewListItem`) : filet vertical,
+nom + note + repère de temps sur une ligne, propos dessous ; le premier en
+couleur d'action, les suivants en teinte douce. L'avatar a disparu — souvent
+absent, il occupait la place du texte pour n'afficher qu'une silhouette
+grise. La fiche n'en montre que deux, le reste s'ouvre dans une feuille
+(`get-offer-detail` n'en renvoie que dix : la feuille le dit quand le compte
+total est plus grand).
+
+`DashedRule` a quitté `features/activity` pour `core/widgets` : deux
+fonctionnalités s'en servent. `CustomIconButton` accepte `circle: true` — un
+carré blanc posé sur une photo y découpe un morceau d'image.
+
+Deux pièges vus à l'écran, à ne pas réintroduire :
+
+- **le visuel d'une offre.** `Offer.displayImage` se replie sur
+  `businessImage`, un champ que `get-offer-detail` ne renseigne pas (il
+  renvoie le commerce à part). Une offre sans photo propre affichait donc un
+  rectangle gris vide, là où l'accueil montrait la photo du commerce.
+  `offerImage(offer, merchant)` recolle les deux, et `OfferPhotoFallback`
+  porte une icône plutôt qu'un aplat muet ;
+- **la jauge de places.** Une place demandée dans une salle de 80 tombait à
+  zéro barre par arrondi : le compteur bougeait sans que la jauge réagisse.
+  Une place prise vaut donc au moins une barre.
+
+Le mode **en boutique n'existe pas encore dans les données** (`select count(*)
+from offers where fulfilment = 'in_store'` renvoie 0) : `OfferInStoreView`
+n'est donc couvert que par ses tests, pas par une vérification à l'écran.
 
 Les anciens tunnels spécialisés (menu de restaurant, chambres d'hôtel,
 flotte de location, panier — `online_order/`, `offer_catalogue_page`,

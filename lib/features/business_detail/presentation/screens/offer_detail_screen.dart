@@ -1,31 +1,33 @@
 import 'package:baobabe_0_2/core/themes/app_diemens.dart';
-import 'package:baobabe_0_2/core/widgets/auth_required_card.dart';
-import 'package:baobabe_0_2/features/business_detail/presentation/bloc/offer_detail_cubit.dart';
-import 'package:baobabe_0_2/features/business_detail/presentation/widgets/offer_detail_sections.dart';
-import 'package:baobabe_0_2/features/business_detail/presentation/widgets/offer_detail_skeleton.dart';
-import 'package:baobabe_0_2/features/business_detail/presentation/widgets/offer_purchase_bar.dart';
-import 'package:baobabe_0_2/features/business_detail/presentation/widgets/review_list_item.dart';
-import 'package:baobabe_0_2/features/home_page/presentation/widgets/offers_carousel_section.dart';
 import 'package:baobabe_0_2/core/themes/other_theme.dart';
-import 'package:baobabe_0_2/features/settings/presentation/cubit/profile_cubit.dart';
-import 'package:baobabe_0_2/features/settings/presentation/widgets/profile_sheets.dart';
-import 'package:baobabe_0_2/core/widgets/custom_app_bar.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:skeletonizer/skeletonizer.dart';
+import 'package:baobabe_0_2/core/widgets/auth_required_card.dart';
 import 'package:baobabe_0_2/core/widgets/button/custom_action_button.dart';
+import 'package:baobabe_0_2/core/widgets/custom_refresh.dart';
+import 'package:baobabe_0_2/features/business_detail/presentation/bloc/offer_detail_cubit.dart';
+import 'package:baobabe_0_2/features/business_detail/presentation/widgets/offer_detail_skeleton.dart';
+import 'package:baobabe_0_2/features/business_detail/presentation/widgets/offer_detail_views.dart';
+import 'package:baobabe_0_2/features/business_detail/presentation/widgets/offer_purchase_bar.dart';
 import 'package:baobabe_0_2/features/notification/domain/notification_reason.dart';
 import 'package:baobabe_0_2/features/notification/presentation/notification_prompt.dart';
 import 'package:baobabe_0_2/features/order/presentation/cubit/checkout_cubit.dart';
 import 'package:baobabe_0_2/features/order/presentation/widgets/checkout_success_sheet.dart';
-import 'package:baobabe_0_2/core/widgets/custom_refresh.dart';
+import 'package:baobabe_0_2/features/settings/presentation/cubit/profile_cubit.dart';
+import 'package:baobabe_0_2/features/settings/presentation/widgets/profile_sheets.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 
 /// La fiche d'une offre.
 ///
-/// C'est désormais la destination d'un clic sur une offre, où qu'elle
-/// apparaisse : sur l'accueil, dans la recherche, ou dans le catalogue d'un
-/// commerçant. On y décide, et on y commande ou réserve — la fiche du
-/// commerçant, elle, ne porte plus de bouton d'action.
+/// C'est la destination d'un clic sur une offre, où qu'elle apparaisse :
+/// l'accueil, la recherche, ou le catalogue d'un commerçant. On y décide, et
+/// on y commande ou réserve — la fiche du commerçant, elle, ne porte pas de
+/// bouton d'achat.
+///
+/// **Trois mises en page, une par mode.** Une offre qu'on commande, une
+/// qu'on réserve et une qu'on prend en boutique ne posent pas les mêmes
+/// questions ; elles partageaient pourtant une seule page, avec des `if`
+/// pour éteindre ce qui ne servait pas. Voir `offer_detail_views.dart`.
 class OfferDetailScreen extends StatelessWidget {
   final String offerId;
 
@@ -49,7 +51,22 @@ class OfferDetailScreen extends StatelessWidget {
 class _OfferDetailView extends StatelessWidget {
   const _OfferDetailView();
 
-  Future<void> _pickDate(BuildContext context) async {
+  /// Le jour touché dans les pastilles. L'heure est demandée aussitôt : une
+  /// table sans heure n'est pas une réservation.
+  Future<void> _pickDay(BuildContext context, DateTime day) async {
+    final cubit = context.read<OfferDetailCubit>();
+    final time = await showTimePicker(
+      context: context,
+      initialTime: const TimeOfDay(hour: 12, minute: 0),
+    );
+    if (time == null || !context.mounted) return;
+    cubit.setDate(
+      DateTime(day.year, day.month, day.day, time.hour, time.minute),
+    );
+  }
+
+  /// Le calendrier complet, pour une date au-delà des trois jours proposés.
+  Future<void> _openCalendar(BuildContext context) async {
     final cubit = context.read<OfferDetailCubit>();
     final now = DateTime.now();
 
@@ -176,8 +193,9 @@ class _OfferDetailView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.surface,
-      appBar: const CustomOtherAppBar(title: "Détail de l'offre"),
+      // Pas d'`AppBar` : chaque mise en page porte sa propre barre, et celle
+      // d'une réservation se pose **sur** la photo.
+      backgroundColor: Theme.of(context).colorScheme.surfaceContainerLowest,
       body: BlocBuilder<OfferDetailCubit, OfferDetailState>(
         builder: (context, state) {
           if (state is OfferDetailError) {
@@ -189,7 +207,13 @@ class _OfferDetailView extends StatelessWidget {
               child: OfferDetailSkeleton(),
             );
           }
-          return _Content(state: state);
+          // Le rafraîchissement relit la fiche **sans** repasser par le
+          // squelette : la jauge de places se met à jour, la page ne saute
+          // pas.
+          return CustomRefresh(
+            onRefresh: context.read<OfferDetailCubit>().refresh,
+            child: _layout(context, state),
+          );
         },
       ),
       bottomNavigationBar: BlocBuilder<OfferDetailCubit, OfferDetailState>(
@@ -200,8 +224,6 @@ class _OfferDetailView extends StatelessWidget {
             builder: (context, checkout) => OfferPurchaseBar(
               state: state,
               isSubmitting: checkout is CheckoutSubmitting,
-              onQuantityChanged: context.read<OfferDetailCubit>().setQuantity,
-              onPickDate: () => _pickDate(context),
               onSubmit: () => _submit(context),
             ),
           );
@@ -209,111 +231,20 @@ class _OfferDetailView extends StatelessWidget {
       ),
     );
   }
-}
 
-class _Content extends StatelessWidget {
-  final OfferDetailLoaded state;
+  Widget _layout(BuildContext context, OfferDetailLoaded state) {
+    final setQuantity = context.read<OfferDetailCubit>().setQuantity;
+    final offer = state.detail.offer;
 
-  const _Content({required this.state});
-
-  @override
-  Widget build(BuildContext context) {
-    final detail = state.detail;
-    final offer = detail.offer;
-    final merchant = detail.merchant;
-
-    // Le rafraichissement relit la fiche **sans** repasser par le squelette :
-    // la jauge de places se met a jour, la page ne saute pas.
-    return CustomRefresh(
-      onRefresh: context.read<OfferDetailCubit>().refresh,
-      child: ListView(
-        padding: EdgeInsets.zero,
-        children: [
-          OfferDetailHeader(offer: offer),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(
-              AppDimens.appPaddingValue,
-              AppDimens.appPaddingValue,
-              AppDimens.appPaddingValue,
-              0,
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  offer.name,
-                  style: Theme.of(context).textTheme.titleMedium,
-                ),
-                AppDimens.spacerSmall,
-                Row(
-                  children: [
-                    Text(
-                      offer.isFree
-                          ? 'Sur demande'
-                          : '${offer.price.toStringAsFixed(2)} \$',
-                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                        fontWeight: FontWeight.w800,
-                        color: Theme.of(context).colorScheme.primary,
-                      ),
-                    ),
-                    const Spacer(),
-                    if (offer.reviewCount > 0) ...[
-                      Icon(
-                        Icons.star_rounded,
-                        size: 18,
-                        color: OtherTheme.of(context).rating,
-                      ),
-                      Text(
-                        '${offer.rating.toStringAsFixed(1)} '
-                        '(${offer.reviewCount})',
-                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: Theme.of(context).colorScheme.onSurfaceVariant,
-                        ),
-                      ),
-                    ],
-                  ],
-                ),
-                if (offer.description.isNotEmpty) ...[
-                  AppDimens.spacerMedium,
-                  Text(
-                    offer.description,
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: Theme.of(context).colorScheme.onSurfaceVariant,
-                      height: 1.6,
-                    ),
-                  ),
-                ],
-                AppDimens.spacerMedium,
-                OfferFacts(detail: detail),
-                if (merchant != null) ...[
-                  AppDimens.spacerSmall,
-                  Text(
-                    'Proposé par',
-                    style: Theme.of(context).textTheme.titleMedium,
-                  ),
-                  AppDimens.spacerSmall,
-                  OfferMerchantCard(merchant: merchant),
-                ],
-                if (detail.reviews.isNotEmpty) ...[
-                  AppDimens.spacerLarge,
-                  Text('Avis', style: Theme.of(context).textTheme.titleMedium),
-                  AppDimens.spacerSmall,
-                  for (final review in detail.reviews)
-                    ReviewListItem(review: review),
-                ],
-              ],
-            ),
-          ),
-          if (detail.otherOffers.isNotEmpty) ...[
-            AppDimens.spacerLarge,
-            OffersCarouselSection(
-              title: 'Chez le même commerçant',
-              offers: detail.otherOffers,
-            ),
-          ],
-          const SizedBox(height: 24),
-        ],
-      ),
+    if (offer.isInStoreOnly) return OfferInStoreView(state: state);
+    if (offer.isOrderable) {
+      return OfferOrderView(state: state, onQuantityChanged: setQuantity);
+    }
+    return OfferBookingView(
+      state: state,
+      onQuantityChanged: setQuantity,
+      onPickDay: (day) => _pickDay(context, day),
+      onOpenCalendar: () => _openCalendar(context),
     );
   }
 }
@@ -327,7 +258,7 @@ class _Failure extends StatelessWidget {
   Widget build(BuildContext context) {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(24),
+        padding: const EdgeInsets.all(AppDimens.large),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [

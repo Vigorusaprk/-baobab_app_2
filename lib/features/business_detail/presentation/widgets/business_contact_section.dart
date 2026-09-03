@@ -6,7 +6,16 @@ import 'package:url_launcher/url_launcher.dart';
 class BusinessContactSection extends StatelessWidget {
   final Business business;
 
-  const BusinessContactSection({super.key, required this.business});
+  /// Le téléphone est devenu un bouton dans l'identité du commerce : la
+  /// fiche le proposait donc deux fois. Cette carte ne porte plus que ce que
+  /// le bouton ne couvre pas.
+  final bool showPhone;
+
+  const BusinessContactSection({
+    super.key,
+    required this.business,
+    this.showPhone = true,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -23,13 +32,14 @@ class BusinessContactSection extends StatelessWidget {
       ),
       child: Column(
         children: [
-          _buildContactTile(
-            context,
-            "assets/icons/phone.svg",
-            "Téléphone",
-            business.phone,
-            () => _launch('tel:${business.phone}'),
-          ),
+          if (showPhone)
+            _buildContactTile(
+              context,
+              "assets/icons/phone.svg",
+              "Téléphone",
+              business.phone,
+              () => _launch('tel:${business.phone}'),
+            ),
           if (business.email != null)
             _buildContactTile(
               context,

@@ -17,6 +17,12 @@ class OfferMerchant extends Equatable {
   final double rating;
   final int reviewCount;
 
+  /// Les horaires, tels que le commerçant les a saisis.
+  ///
+  /// `get-offer-detail` les rapportait déjà — la fiche les jetait. Une offre
+  /// qu'on ne peut que venir chercher a pourtant besoin de dire **quand**.
+  final Map<String, String> openingHours;
+
   const OfferMerchant({
     required this.id,
     required this.name,
@@ -25,6 +31,7 @@ class OfferMerchant extends Equatable {
     this.phone,
     this.rating = 0,
     this.reviewCount = 0,
+    this.openingHours = const {},
   });
 
   factory OfferMerchant.fromJson(Map<String, dynamic> json) {
@@ -36,11 +43,48 @@ class OfferMerchant extends Equatable {
       phone: json['phone']?.toString(),
       rating: (json['rating'] as num?)?.toDouble() ?? 0,
       reviewCount: (json['review_count'] as num?)?.toInt() ?? 0,
+      openingHours: _hours(json['opening_hours']),
     );
   }
 
+  static Map<String, String> _hours(dynamic raw) {
+    if (raw is! Map) return const {};
+    return {
+      for (final entry in raw.entries)
+        entry.key.toString(): entry.value?.toString() ?? '',
+    };
+  }
+
+  /// La ligne du jour, quand elle existe.
+  String? get todayHours {
+    const days = {
+      1: 'lundi',
+      2: 'mardi',
+      3: 'mercredi',
+      4: 'jeudi',
+      5: 'vendredi',
+      6: 'samedi',
+      7: 'dimanche',
+    };
+    final wanted = days[DateTime.now().weekday];
+    for (final entry in openingHours.entries) {
+      if (entry.key.trim().toLowerCase() == wanted) {
+        return entry.value.trim().isEmpty ? null : entry.value.trim();
+      }
+    }
+    return null;
+  }
+
   @override
-  List<Object?> get props => [id, name, image, address, phone, rating];
+  List<Object?> get props => [
+    id,
+    name,
+    image,
+    address,
+    phone,
+    rating,
+    openingHours,
+  ];
 }
 
 /// Tout ce qu'il faut pour décider devant une offre.

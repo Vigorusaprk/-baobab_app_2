@@ -40,6 +40,38 @@ class UIBusiness {
     }
   }
 
+  /// La catégorie en un mot, telle qu'on la dirait.
+  ///
+  /// La fiche affichait l'énumération brute (`BusinessType.fastFood`) ou
+  /// rien du tout. Le libellé vit ici, avec la couleur et l'icône : trois
+  /// façons de nommer la même catégorie, un seul endroit qui les décide.
+  String get categoryLabel {
+    switch (business.type) {
+      case BusinessType.restaurant:
+        return 'Restaurant';
+      case BusinessType.fastFood:
+        return 'Fast-food';
+      case BusinessType.shopping:
+        return 'Boutique';
+      case BusinessType.mall:
+        return 'Centre commercial';
+      case BusinessType.hotel:
+        return 'Hôtel';
+      case BusinessType.carRental:
+        return 'Location de véhicules';
+      case BusinessType.travelAgency:
+        return 'Agence de voyage';
+      case BusinessType.spa:
+        return 'Spa & bien-être';
+      case BusinessType.cinema:
+        return 'Cinéma';
+      case BusinessType.tourism:
+        return 'Tourisme';
+      default:
+        return 'Commerce';
+    }
+  }
+
   IconData get categoryIcon {
     switch (business.type) {
       case BusinessType.restaurant:

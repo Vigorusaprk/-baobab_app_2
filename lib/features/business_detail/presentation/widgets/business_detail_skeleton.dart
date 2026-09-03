@@ -1,14 +1,17 @@
+import 'package:baobabe_0_2/core/themes/app_diemens.dart';
+import 'package:baobabe_0_2/features/business_detail/presentation/widgets/business_cover.dart';
 import 'package:baobabe_0_2/features/business_detail/presentation/widgets/common/responsive_container.dart';
-import 'package:baobabe_0_2/features/home_page/presentation/widgets/offers_carousel_section.dart';
 import 'package:flutter/material.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
-/// Full mock of the business detail page, shown (wrapped in [Skeletonizer])
-/// while [BusinessDetailBloc] is still loading its first response.
+/// Le squelette de la fiche commerce.
 ///
-/// Il suit l'ordre réel de la page : à propos, catalogue, contact, horaires,
-/// commodités, avis. Un squelette qui annonce une rangée de boutons d'action
-/// alors que la page n'en a plus promet quelque chose qui n'arrivera pas.
+/// Il suit l'ordre réel de la page depuis la refonte : la photo, l'identité,
+/// le filtre, les offres en rangées, puis la présentation, les horaires, les
+/// commodités et les avis. Il imitait des carrousels d'offres et une photo
+/// encadrée de 280 px : la page ne les a plus, et un squelette d'une autre
+/// forme que son contenu fait sauter la page au moment où les données
+/// arrivent.
 class BusinessDetailSkeleton extends StatelessWidget {
   const BusinessDetailSkeleton({super.key});
 
@@ -16,7 +19,18 @@ class BusinessDetailSkeleton extends StatelessWidget {
   Widget build(BuildContext context) {
     return CustomScrollView(
       slivers: [
-        const _HeroSkeleton(),
+        const SliverToBoxAdapter(child: _CoverSkeleton()),
+        const SliverToBoxAdapter(child: _IdentitySkeleton()),
+        const SliverToBoxAdapter(child: _LensSkeleton()),
+        SliverToBoxAdapter(
+          child: Column(
+            children: const [
+              _OfferRowSkeleton(),
+              _OfferRowSkeleton(),
+              _OfferRowSkeleton(),
+            ],
+          ),
+        ),
         SliverToBoxAdapter(
           child: ResponsiveContainer(
             child: Column(
@@ -24,10 +38,6 @@ class BusinessDetailSkeleton extends StatelessWidget {
               children: const [
                 SizedBox(height: 24),
                 _AboutSectionSkeleton(),
-                SizedBox(height: 24),
-                OffersCarouselSkeleton(titleWidth: 140),
-                SizedBox(height: 24),
-                _BlockSkeleton(titleWidth: 150),
                 SizedBox(height: 24),
                 _BlockSkeleton(titleWidth: 170),
                 SizedBox(height: 24),
@@ -44,21 +54,121 @@ class BusinessDetailSkeleton extends StatelessWidget {
   }
 }
 
-/// Mirrors [BusinessDetailAppBar]'s expanded hero image + circular back
-/// and favorite buttons.
-class _HeroSkeleton extends StatelessWidget {
-  const _HeroSkeleton();
+/// La photo, pleine largeur et sans cadre : c'est ainsi qu'elle arrive.
+class _CoverSkeleton extends StatelessWidget {
+  const _CoverSkeleton();
 
   @override
   Widget build(BuildContext context) {
-    return SliverToBoxAdapter(
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 55, 16, 0),
-        child: Stack(
-          children: const [
-            Bone(width: double.infinity, height: 280, uniRadius: 28),
-            Positioned(top: 8, left: 8, child: Bone.circle(size: 36)),
-            Positioned(top: 8, right: 8, child: Bone.circle(size: 36)),
+    return Bone(
+      width: double.infinity,
+      height: BusinessCover.height + MediaQuery.paddingOf(context).top,
+    );
+  }
+}
+
+/// Le nom, la ligne de catégorie, l'étiquette d'horaire, les deux boutons.
+class _IdentitySkeleton extends StatelessWidget {
+  const _IdentitySkeleton();
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Container(
+      transform: Matrix4.translationValues(0, -14, 0),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surfaceContainerLowest,
+        borderRadius: const BorderRadius.vertical(
+          top: Radius.circular(AppDimens.radius16),
+        ),
+      ),
+      padding: const EdgeInsets.fromLTRB(20, 18, 20, 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Bone.text(width: 210, style: theme.textTheme.headlineSmall!),
+          AppDimens.spacerSmall,
+          Bone.text(width: 250, style: theme.textTheme.bodySmall!),
+          AppDimens.spacerMedium,
+          const Bone(width: 150, height: 26, uniRadius: 13),
+          AppDimens.spacerMedium,
+          const Row(
+            children: [
+              Expanded(child: Bone.button(height: AppDimens.touchTarget)),
+              AppDimens.spacerSmallWidth,
+              Expanded(child: Bone.button(height: AppDimens.touchTarget)),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// La rangée de filtres.
+class _LensSkeleton extends StatelessWidget {
+  const _LensSkeleton();
+
+  @override
+  Widget build(BuildContext context) {
+    return const Padding(
+      padding: EdgeInsets.fromLTRB(
+        AppDimens.appPaddingValue,
+        AppDimens.small,
+        AppDimens.appPaddingValue,
+        AppDimens.small,
+      ),
+      child: Row(
+        spacing: 6,
+        children: [
+          Bone(width: 86, height: 36, uniRadius: 18),
+          Bone(width: 108, height: 36, uniRadius: 18),
+          Bone(width: 92, height: 36, uniRadius: 18),
+        ],
+      ),
+    );
+  }
+}
+
+/// Une offre en rangée : vignette carrée, deux lignes, un prix.
+class _OfferRowSkeleton extends StatelessWidget {
+  const _OfferRowSkeleton();
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(
+        AppDimens.appPaddingValue,
+        0,
+        AppDimens.appPaddingValue,
+        AppDimens.small + 2,
+      ),
+      child: Container(
+        decoration: BoxDecoration(
+          color: theme.colorScheme.surfaceContainerLowest,
+          borderRadius: BorderRadius.circular(AppDimens.radius12),
+        ),
+        padding: const EdgeInsets.all(AppDimens.small + 2),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Bone(width: 74, height: 74, uniRadius: AppDimens.small),
+            AppDimens.spacerMediumWidth,
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Bone.text(width: 170, style: theme.textTheme.titleSmall!),
+                  AppDimens.spacerMini,
+                  Bone.text(width: 220, style: theme.textTheme.bodySmall!),
+                  AppDimens.spacerSmall,
+                  Bone.text(width: 70, style: theme.textTheme.labelLarge!),
+                ],
+              ),
+            ),
           ],
         ),
       ),

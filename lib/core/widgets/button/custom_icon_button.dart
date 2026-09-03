@@ -36,6 +36,7 @@ class CustomIconButton extends StatelessWidget {
     this.tone = IconButtonTone.surface,
     this.iconSize = 24,
     this.button,
+    this.circle = false,
   }) : assert(
          assetPath != null || icon != null,
          'Un bouton icône a besoin de son icône : assetPath ou icon.',
@@ -59,6 +60,13 @@ class CustomIconButton extends StatelessWidget {
   final double iconSize;
   final double? button;
 
+  /// Rond au lieu de carré-arrondi.
+  ///
+  /// Pour un bouton posé **sur une photo** : un carré blanc y découpe un
+  /// morceau d'image, le disque s'y pose. C'est la seule différence — le ton,
+  /// la cible tactile et l'ombre restent ceux du bouton carré.
+  final bool circle;
+
   bool get _isFilled => tone == IconButtonTone.filled;
   bool get _isGhost => tone == IconButtonTone.ghost;
 
@@ -71,8 +79,10 @@ class CustomIconButton extends StatelessWidget {
       IconButtonTone.ghost => Colors.transparent,
     };
     final foreground = _isFilled ? scheme.onPrimary : scheme.primary;
-    const radius = BorderRadius.all(
-      Radius.circular(AppDimens.borderRadiusSmallButton),
+    final radius = BorderRadius.all(
+      Radius.circular(
+        circle ? AppDimens.borderRadiusFull : AppDimens.borderRadiusSmallButton,
+      ),
     );
 
     return Tooltip(
