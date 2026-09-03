@@ -719,6 +719,73 @@ tenu par des **mesures** : `profile_skeleton_test.dart` compare la largeur du
 squelette à celle du contenu, `animation_test.dart` compare les positions
 avant et après une entrée. N'en réintroduisez pas.
 
+### L'écran d'activité : un flux, pas deux onglets
+
+Refonte à partir d'une maquette Claude Design (« Écran réservations et
+commandes »). Ce qui change, et pourquoi :
+
+- **un seul flux chronologique** au lieu de « Commandes » / « Réservations ».
+  Deux onglets obligent à savoir, avant de chercher, dans lequel ranger ce
+  qu'on cherche. Or on ne se souvient pas d'une catégorie : on se souvient
+  d'un commerce et d'un moment. La nature est devenue une mention dans la
+  ligne ;
+- des **lignes** et non des cartes. Six cartes ombrées font six boîtes à lire
+  séparément ; un filet vertical marque ce qui est en cours, un filet
+  horizontal sépare, l'œil descend sans obstacle ;
+- **ce qui est en cours d'abord**, l'historique ensuite. Le flux était
+  purement chronologique, et une commande de la semaine dernière que le
+  commerçant n'a pas honorée se retrouvait enterrée sous les repas d'hier —
+  or c'est exactement la ligne qu'on vient voir. `ActivityGroup.from` sort
+  donc les entrées `!isSettled` sous un repère « En cours », en tête, quelle
+  que soit leur date ; le reste garde « Hier », « Cette semaine ». Une ligne
+  annulée est réglée : elle n'attend rien, elle appartient à l'historique ;
+- toucher une ligne ouvre son reçu en **page entière** (`/activity`,
+  `ActivityDetailPage`, hors du shell). Il s'ouvrait d'abord dans l'onglet,
+  et la barre de navigation restait donc sous un reçu : elle proposait
+  d'aller ailleurs au moment précis où l'on montre un code au comptoir, et
+  le dernier bouton du reçu finissait dessous. La page rend `true` quand elle
+  a changé quelque chose — annulation, note — et c'est la seule chose qui
+  déclenche un rechargement du flux : revenir d'un reçu qu'on a seulement lu
+  ne coûte rien. Elle remplace `/order-detail` et `/reservation-detail`, qui
+  séparaient ce que le flux a réuni ;
+- l'action du reçu prend **toute la largeur**, et l'annulation est *tracée*
+  (`ActionButtonTone.dangerOutline`) : au pied d'une page entière un bouton
+  court flotte sans appui, mais un aplat rouge pleine largeur crierait plus
+  fort que ce qu'il propose — la confirmation qui suit porte déjà le poids du
+  geste.
+
+`ActivityEntry` est le seul endroit qui traduit un `Order` ou une
+`Reservation` en ce que la ligne affiche ; aucun widget ne connaît les deux.
+
+Deux règles d'affichage tirées de l'usage, pas de la maquette :
+
+- **la note ou la jauge, jamais les deux.** À elles deux elles ne tiennent
+  pas sur la ligne, et le libellé se faisait tronquer en « En attente — Le
+  comm… ». Une attente se dit en mots, une progression se montre ;
+- **cet onglet n'a pas d'app bar** : l'en-tête et la barre du reçu réservent
+  eux-mêmes `MediaQuery.paddingOf(context).top`. Le flux réserve en bas la
+  hauteur de la barre de navigation, qui flotte au-dessus du contenu ; le
+  reçu, qui est une page, ne réserve que `viewPadding.bottom` — la barre de
+  gestes du système, imposée par le bord à bord (cible API 35) ;
+- **un squelette remplit l'écran.** Quatre lignes en haut d'une page vide
+  laissaient un grand blanc en dessous, qui se remplissait d'un coup à
+  l'arrivée des données. `ActivityFlowSkeleton` déduit son nombre de lignes
+  de la hauteur disponible et dépasse d'une : un flux qui s'arrête pile au
+  bas de l'écran a l'air fini, alors qu'il charge.
+
+Une rangée en `CrossAxisAlignment.stretch` dans une liste défilante lève
+« BoxConstraints forces an infinite height » : le filet de gauche passe donc
+par `IntrinsicHeight`.
+
+**Ce que la maquette prévoyait et que les données ne permettent pas** : le
+bouton « Appeler ». `Order.customerPhone` et `Reservation.phoneNumber` sont
+ceux du *client* — le composer reviendrait à s'appeler soi-même. Le téléphone
+du commerce vit sur `business.phone`, qu'aucune des deux entités ne rapatrie.
+
+Le **code du reçu** est dérivé de l'identifiant, donc stable, et le QR encode
+`baobabe:order:<id>`. Rien ne le vérifie côté serveur : c'est une référence
+lisible, pas une preuve.
+
 ### Valider n'est pas lire
 
 `CheckoutCubit` (`features/order/presentation/cubit/`) porte la commande et la

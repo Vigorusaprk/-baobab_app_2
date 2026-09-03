@@ -37,8 +37,6 @@ class SessionService {
 
   static final SessionService instance = SessionService._();
 
-  SupabaseClient get _client => SupabaseClientWrapper.client;
-
   /// `null` tant que Supabase n'est pas initialisé — sous test, notamment.
   /// Demander qui est connecté ne doit jamais faire tomber un écran.
   SupabaseClient? get _clientOrNull => SupabaseClientWrapper.clientOrNull;

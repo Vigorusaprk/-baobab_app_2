@@ -13,9 +13,8 @@ import 'package:baobabe_0_2/app/main_shell.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/screens/home_page_screen.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/screens/search_page.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/screens/all_businesses_screen.dart';
-import 'package:baobabe_0_2/features/booking_page/presentation/screens/boking_detail_screen.dart';
 import 'package:baobabe_0_2/features/activity/presentation/screens/activity_screen.dart';
-import 'package:baobabe_0_2/features/order/presentation/screens/order_detail_page.dart';
+import 'package:baobabe_0_2/features/activity/presentation/screens/activity_detail_page.dart';
 import 'package:baobabe_0_2/features/settings/presentation/screens/settings_screen.dart';
 import 'package:baobabe_0_2/features/business_detail/presentation/screens/business_detail_screen.dart';
 import 'package:baobabe_0_2/features/business_detail/presentation/screens/offer_detail_screen.dart';
@@ -23,9 +22,8 @@ import 'package:baobabe_0_2/features/merchant/presentation/screens/merchant_shel
 import 'package:baobabe_0_2/features/merchant/presentation/screens/offer_form_page.dart';
 
 // Modèles/Entités
+import 'package:baobabe_0_2/features/activity/domain/activity_entry.dart';
 import 'package:baobabe_0_2/features/business_detail/domain/entities/offer.dart';
-import 'package:baobabe_0_2/features/business_detail/domain/entities/reservation.dart';
-import 'package:baobabe_0_2/features/order/domain/entities/order.dart';
 
 /// Convertit le flux Stream du AuthBloc en un ChangeNotifier pour GoRouter
 class GoRouterRefreshStream extends ChangeNotifier {
@@ -196,34 +194,28 @@ final GoRouter appRouter = GoRouter(
         );
       },
     ),
+    // Le détail d'une activité — commande ou réservation — est une page
+    // entière, **hors du shell** : sous un reçu, la barre de navigation
+    // proposait d'aller ailleurs au moment où l'on montre son code, et le
+    // dernier bouton du reçu finissait dessous.
+    //
+    // Elle remplace `/order-detail` et `/reservation-detail`, qui séparaient
+    // ce que le flux a réuni et que plus rien n'ouvrait depuis la refonte.
+    //
+    // L'entrée passe par `extra` : elle porte la commande ou la réservation
+    // déjà chargée par le flux, qu'un identifiant seul ne suffirait pas à
+    // reconstruire.
     GoRoute(
-      path: '/order-detail',
-      name: 'orderDetail',
+      path: '/activity',
+      name: 'activityDetail',
       pageBuilder: (context, state) {
-        final order = state.extra as Order?;
-        if (order == null) {
+        final entry = state.extra as ActivityEntry?;
+        if (entry == null) {
           return const MaterialPage(
-            child: Scaffold(body: Center(child: Text('Commande introuvable'))),
+            child: Scaffold(body: Center(child: Text('Activité introuvable'))),
           );
         }
-        return MaterialPage(child: OrderDetailPage(order: order));
-      },
-    ),
-    GoRoute(
-      path: '/reservation-detail',
-      name: 'reservationDetail',
-      pageBuilder: (context, state) {
-        final reservation = state.extra as Reservation?;
-        if (reservation == null) {
-          return const MaterialPage(
-            child: Scaffold(
-              body: Center(child: Text('Réservation introuvable')),
-            ),
-          );
-        }
-        return MaterialPage(
-          child: ReservationDetailPage(reservation: reservation),
-        );
+        return MaterialPage(child: ActivityDetailPage(entry: entry));
       },
     ),
     // --- ESPACE COMMERÇANT ---

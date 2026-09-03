@@ -1,314 +1,133 @@
-import 'package:baobabe_0_2/core/animation/animated_count.dart';
-import 'package:baobabe_0_2/core/widgets/custom_pop_up.dart';
+import 'package:baobabe_0_2/core/animation/fade_swap.dart';
 import 'package:baobabe_0_2/core/services/session_service.dart';
+import 'package:baobabe_0_2/core/widgets/custom_refresh.dart';
+import 'package:baobabe_0_2/features/activity/domain/activity_entry.dart';
+import 'package:baobabe_0_2/features/activity/presentation/widgets/activity_empty.dart';
+import 'package:baobabe_0_2/features/activity/presentation/widgets/activity_flow.dart';
 import 'package:baobabe_0_2/features/activity/presentation/widgets/activity_skeleton.dart';
-import 'package:baobabe_0_2/features/activity/presentation/widgets/rate_offer_sheet.dart';
 import 'package:baobabe_0_2/features/booking_page/data/models/reservation_service.dart';
 import 'package:baobabe_0_2/features/business_detail/domain/entities/reservation.dart';
 import 'package:baobabe_0_2/features/order/domain/entities/order.dart';
 import 'package:baobabe_0_2/features/order/presentation/widgets/order_service.dart';
-import 'package:baobabe_0_2/features/order/presentation/widgets/order_card.dart';
-import 'package:baobabe_0_2/features/order/presentation/widgets/order_empty_states.dart';
-import 'package:baobabe_0_2/features/booking_page/presentation/widgets/reservation_card.dart';
-import 'package:baobabe_0_2/features/booking_page/presentation/widgets/reservation_empty_state.dart';
-import 'package:baobabe_0_2/core/themes/other_theme.dart';
 import 'package:flutter/material.dart';
-import 'package:baobabe_0_2/core/widgets/custom_bottom_sheet.dart';
-import 'package:baobabe_0_2/core/widgets/custom_refresh.dart';
+import 'package:go_router/go_router.dart';
 
-/// Body-only content for the Orders/Activity tab. The Scaffold is owned by
-/// MainShell, which is the single Scaffold for the app's main navigation.
+/// L'onglet « Activités ».
+///
+/// **Un seul flux, chronologique.** Il y avait deux onglets — « Commandes »
+/// et « Réservations » — qui obligeaient à savoir, avant de chercher, dans
+/// lequel des deux ranger ce qu'on cherche. Or on ne se souvient pas d'une
+/// catégorie : on se souvient d'un commerce et d'un moment. La nature de la
+/// demande est devenue une mention dans la ligne.
+///
+/// Toucher une ligne ouvre son reçu **en page entière**, hors du shell : un
+/// détail n'est pas un onglet, et la barre de navigation n'a rien à proposer
+/// pendant qu'on regarde un code à présenter au comptoir. La page rend
+/// `true` quand elle a changé quelque chose, et c'est la seule chose qui
+/// déclenche un rechargement.
+///
+/// Le Scaffold appartient à `MainShell`, seul Scaffold de la navigation
+/// principale.
 class ActivityScreen extends StatefulWidget {
   const ActivityScreen({super.key});
+
   @override
   State<ActivityScreen> createState() => _ActivityScreenState();
 }
 
-class _ActivityScreenState extends State<ActivityScreen>
-    with SingleTickerProviderStateMixin {
-  late final TabController _tabCtrl;
+class _ActivityScreenState extends State<ActivityScreen> {
   final _orderApi = OrderApiService();
   final _resApi = ReservationApiService();
-  List<Order> _orders = [];
-  List<Reservation> _reservations = [];
+
+  List<ActivityEntry> _entries = [];
   bool _loading = true;
-  String _userId = "";
+  String _userId = '';
 
   @override
   void initState() {
     super.initState();
-    _tabCtrl = TabController(length: 2, vsync: this);
-    _loadUserId();
+    _start();
   }
 
-  @override
-  void dispose() {
-    _tabCtrl.dispose();
-    super.dispose();
-  }
-
-  Future<void> _loadUserId() async {
+  Future<void> _start() async {
     final user = SessionService.instance.currentUser;
-    if (user != null) {
-      _userId = user.id;
-      await _loadAll();
-    } else {
+    if (user == null) {
       setState(() => _loading = false);
+      return;
     }
+    _userId = user.id;
+    await _load();
   }
 
-  Future<void> _loadAll() async {
-    setState(() => _loading = true);
+  Future<void> _load() async {
+    if (_userId.isEmpty) return;
+    if (mounted) setState(() => _loading = true);
     try {
       final results = await Future.wait([
         _orderApi.getOrders(_userId),
         _resApi.getReservations(userId: _userId),
       ]);
+      if (!mounted) return;
+      final orders = results[0] as List<Order>;
+      final reservations = results[1] as List<Reservation>;
       setState(() {
-        _orders = results[0] as List<Order>;
-        _orders.sort((a, b) => b.orderDate.compareTo(a.orderDate));
-        _reservations = results[1] as List<Reservation>;
+        _entries = [
+          for (final order in orders) ActivityEntry.fromOrder(order),
+          for (final r in reservations) ActivityEntry.fromReservation(r),
+        ];
       });
-    } catch (_) {}
+    } catch (e) {
+      debugPrint('Activités — chargement impossible : $e');
+    }
     if (mounted) setState(() => _loading = false);
+  }
+
+  /// Ouvre le reçu et ne recharge que s'il a changé quelque chose.
+  Future<void> _open(ActivityEntry entry) async {
+    final changed = await context.push<bool>('/activity', extra: entry);
+    if (changed == true && mounted) await _load();
   }
 
   @override
   Widget build(BuildContext context) {
     return ColoredBox(
-      color: Theme.of(context).colorScheme.surface,
+      color: Theme.of(context).scaffoldBackgroundColor,
       child: Column(
+        // `stretch` : sans cela la colonne donne à l'en-tête sa largeur
+        // intrinsèque et le centre, alors que tout l'écran est aligné à
+        // gauche.
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(20, 55, 20, 10),
-            child: Row(
-              children: [
-                Icon(
-                  Icons.assignment,
-                  color: Theme.of(context).colorScheme.primary,
-                  size: 32,
-                ),
-                const SizedBox(width: 12),
-                Text(
-                  'Mes activités',
-                  style: Theme.of(context).textTheme.displaySmall!.copyWith(
-                    color: Theme.of(context).colorScheme.primary,
-                  ),
-                ),
-                const Spacer(),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 6,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.primary,
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: AnimatedCount(
-                    value: _orders.length + _reservations.length,
-                    style: Theme.of(context).textTheme.labelMedium!.copyWith(
-                      color: Theme.of(context).colorScheme.onPrimary,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Container(
-            margin: const EdgeInsets.symmetric(horizontal: 20),
-            decoration: BoxDecoration(
-              color: Theme.of(
-                context,
-              ).colorScheme.primary.withValues(alpha: 0.15),
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: TabBar(
-              controller: _tabCtrl,
-              indicatorPadding: EdgeInsetsGeometry.symmetric(horizontal: -55),
-              indicator: BoxDecoration(
-                color: Theme.of(context).colorScheme.primary,
-                borderRadius: BorderRadius.circular(16),
-              ),
-              labelColor: Theme.of(context).colorScheme.onPrimary,
-              unselectedLabelColor: Theme.of(context).colorScheme.primary,
-              dividerHeight: 0,
-              tabs: const [
-                Tab(text: 'Commandes'),
-                Tab(text: 'Réservations'),
-              ],
-            ),
-          ),
+          ActivityHeader(entries: _entries, loading: _loading),
           Expanded(
-            child: TabBarView(
-              controller: _tabCtrl,
-              children: [_buildOrdersList(), _buildReservationsList()],
+            child: FadeSwap(
+              child: _loading
+                  ? const ActivityFlowSkeleton(key: ValueKey('squelette'))
+                  : _entries.isEmpty
+                  ? CustomRefresh(
+                      key: const ValueKey('vide'),
+                      onRefresh: _load,
+                      // `ListView` et non `Center` : le geste de
+                      // rafraîchissement a besoin d'un défilement pour
+                      // atteindre son seuil, même sur une page vide.
+                      child: ListView(
+                        physics: const AlwaysScrollableScrollPhysics(),
+                        children: [
+                          SizedBox(
+                            height: MediaQuery.sizeOf(context).height * 0.55,
+                            child: const ActivityEmpty(),
+                          ),
+                        ],
+                      ),
+                    )
+                  : CustomRefresh(
+                      key: const ValueKey('flux'),
+                      onRefresh: _load,
+                      child: ActivityFlow(entries: _entries, onOpen: _open),
+                    ),
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  /// Demande confirmation avant une action irréversible, en nommant ce
-  /// qui va être annulé plutôt qu'un « Oui / Non » sans contexte.
-  Future<bool> _confirm(String question, String consequence) {
-    return showCustomPopUp(
-      context: context,
-      title: question,
-      message: consequence,
-    );
-  }
-
-  void _notify(String message, Color color) {
-    if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: color,
-        behavior: SnackBarBehavior.floating,
-      ),
-    );
-  }
-
-  Future<void> _cancelOrder(Order order) async {
-    if (!await _confirm(
-      'Voulez-vous vraiment annuler votre commande ?',
-      'Votre commande chez ${order.establishmentName} sera annulée. '
-          'Vous pourrez en passer une nouvelle quand vous voulez.',
-    )) {
-      return;
-    }
-    try {
-      await _orderApi.cancelOrder(order.id);
-      // L'écran a pu être quitté pendant la requête : lire le thème sur un
-      // élément démonté lève.
-      if (!mounted) return;
-      _notify('Commande annulée.', OtherTheme.of(context).onSuccessContainer);
-      await _loadAll();
-    } catch (e) {
-      debugPrint('Annulation de commande — échec : $e');
-      if (!mounted) return;
-      _notify(
-        "La commande n'a pas pu être annulée. Réessayez.",
-        Theme.of(context).colorScheme.error,
-      );
-    }
-  }
-
-  Future<void> _deleteReservation(Reservation reservation) async {
-    if (!await _confirm(
-      'Voulez-vous vraiment annuler votre réservation ?',
-      'Votre réservation chez ${reservation.establishmentName} sera '
-          'supprimée. Vous pourrez réserver à nouveau quand vous voulez.',
-    )) {
-      return;
-    }
-    try {
-      await _resApi.deleteReservation(reservation.id.toString());
-      if (!mounted) return;
-      _notify(
-        'Réservation supprimée.',
-        OtherTheme.of(context).onSuccessContainer,
-      );
-      await _loadAll();
-    } catch (e) {
-      debugPrint('Suppression de réservation — échec : $e');
-      if (!mounted) return;
-      _notify(
-        "La réservation n'a pas pu être supprimée. Réessayez.",
-        Theme.of(context).colorScheme.error,
-      );
-    }
-  }
-
-  /// Propose de noter ce qui a été livré.
-  ///
-  /// Une commande peut contenir plusieurs offres : on demande d'abord
-  /// laquelle, plutôt que d'attribuer arbitrairement la note à la première.
-  /// Seules les lignes rattachées à une offre sont notables — les commandes
-  /// passées avant le moule `offers` n'en portent pas.
-  Future<void> _rateOrder(Order order) async {
-    final rateable = order.items.where((i) => i.offerId != null).toList();
-    if (rateable.isEmpty) {
-      _notify(
-        'Cette commande ne peut pas être notée.',
-        Theme.of(context).colorScheme.error,
-      );
-      return;
-    }
-
-    var item = rateable.first;
-    if (rateable.length > 1) {
-      // La feuille partagée porte le cadre, le titre et la fermeture : cet
-      // écran n'a plus à les redessiner.
-      final chosen = await showCustomBottomSheet<OrderItem>(
-        context: context,
-        title: 'Que souhaitez-vous noter ?',
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            for (final line in rateable)
-              ListTile(
-                title: Text(line.name),
-                onTap: () => Navigator.of(context).pop(line),
-              ),
-          ],
-        ),
-      );
-      if (chosen == null || !mounted) return;
-      item = chosen;
-    }
-
-    final rated = await showRateOfferSheet(
-      context,
-      businessId: order.establishmentId,
-      offerId: item.offerId!,
-      offerName: item.name,
-    );
-    if (rated && mounted) await _loadAll();
-  }
-
-  Widget _buildOrdersList() {
-    if (_loading) {
-      return const ActivityListSkeleton(itemSkeleton: OrderCardSkeleton());
-    }
-    if (_orders.isEmpty) return const OrderEmptyState();
-    return CustomRefresh(
-      onRefresh: _loadAll,
-      child: ListView.builder(
-        padding: const EdgeInsets.all(16),
-        itemCount: _orders.length,
-        itemBuilder: (_, i) => OrderCard(
-          order: _orders[i],
-          onCancel: _orders[i].status.canBeCancelledByCustomer
-              ? () => _cancelOrder(_orders[i])
-              : null,
-          onRate: _orders[i].status == OrderStatus.delivered
-              ? () => _rateOrder(_orders[i])
-              : null,
-        ),
-      ),
-    );
-  }
-
-  Widget _buildReservationsList() {
-    if (_loading) {
-      return const ActivityListSkeleton(
-        itemSkeleton: ReservationCardSkeleton(),
-      );
-    }
-    if (_reservations.isEmpty) return const ReservationEmptyState();
-    return CustomRefresh(
-      onRefresh: _loadAll,
-      child: ListView.builder(
-        padding: const EdgeInsets.all(16),
-        itemCount: _reservations.length,
-        itemBuilder: (_, i) => ReservationCard(
-          reservation: _reservations[i],
-          onDelete: () => _deleteReservation(_reservations[i]),
-        ),
       ),
     );
   }

@@ -16,6 +16,13 @@ enum ActionButtonTone {
 
   /// Aplat rouge : « Refuser », « Retirer », ce qui ne se reprend pas.
   danger,
+
+  /// Contour rouge, fond transparent : « Annuler la commande ».
+  ///
+  /// Un aplat rouge pleine largeur en pied de reçu crie plus fort que ce
+  /// qu'il propose — annuler est possible, ce n'est pas ce qu'on vient
+  /// faire. Le contour dit la conséquence sans peindre un bandeau d'alerte.
+  dangerOutline,
 }
 
 /// Le bouton d'action **compact** de l'application.
@@ -77,30 +84,30 @@ class CustomActionButton extends StatelessWidget {
     final theme = Theme.of(context);
     final scheme = theme.colorScheme;
 
-    final (background, foreground) = switch (tone) {
-      ActionButtonTone.filled => (scheme.primary, scheme.onPrimary),
+    // `border` non nul : le bouton est trace au lieu d'etre rempli. Le
+    // libelle garde sa couleur deduite du ton, jamais celle de l'appelant.
+    final (background, foreground, border) = switch (tone) {
+      ActionButtonTone.filled => (scheme.primary, scheme.onPrimary, null),
       ActionButtonTone.tonal => (
         scheme.surfaceContainerHighest,
         scheme.primary,
+        null,
       ),
-      ActionButtonTone.danger => (scheme.error, scheme.onError),
+      ActionButtonTone.danger => (scheme.error, scheme.onError, null),
+      ActionButtonTone.dangerOutline => (
+        Colors.transparent,
+        scheme.error,
+        scheme.error,
+      ),
     };
 
-    final button = FilledButton(
-      onPressed: isLoading ? null : onPressed,
-      style: FilledButton.styleFrom(
-        backgroundColor: background,
-        foregroundColor: foreground,
-        padding: AppDimens.buttonPadding,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(
-            AppDimens.borderRadiusSmallButton,
-          ),
-        ),
-        // Jamais sous la cible qu'un doigt vise sans effort.
-        minimumSize: const Size(0, AppDimens.touchTarget),
-      ),
-      child: AnimatedSwitcher(
+    final shape = RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(AppDimens.borderRadiusSmallButton),
+    );
+    // Jamais sous la cible qu'un doigt vise sans effort.
+    const minimumSize = Size(0, AppDimens.touchTarget);
+
+    final content = AnimatedSwitcher(
         duration: AppMotion.duration(context, AppMotion.base),
         child: isLoading
             ? CustomLoadingButton(
@@ -135,8 +142,32 @@ class CustomActionButton extends StatelessWidget {
                   ),
                 ],
               ),
-      ),
     );
+
+    final button = border == null
+        ? FilledButton(
+            onPressed: isLoading ? null : onPressed,
+            style: FilledButton.styleFrom(
+              backgroundColor: background,
+              foregroundColor: foreground,
+              padding: AppDimens.buttonPadding,
+              shape: shape,
+              minimumSize: minimumSize,
+            ),
+            child: content,
+          )
+        : OutlinedButton(
+            onPressed: isLoading ? null : onPressed,
+            style: OutlinedButton.styleFrom(
+              backgroundColor: background,
+              foregroundColor: foreground,
+              side: BorderSide(color: border),
+              padding: AppDimens.buttonPadding,
+              shape: shape,
+              minimumSize: minimumSize,
+            ),
+            child: content,
+          );
 
     return PressEffect(
       child: expand ? SizedBox(width: double.infinity, child: button) : button,
