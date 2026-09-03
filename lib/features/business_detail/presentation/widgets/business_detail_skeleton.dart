@@ -252,98 +252,97 @@ class _SpecificSectionSkeleton extends StatelessWidget {
   }
 }
 
-/// Mirrors [RestaurantReview]: the rating summary bar + a couple of
-/// [ReviewListItem]-shaped rows (avatar, name, stars, comment). Public so
-/// [RestaurantReview] itself can reuse it while its own reviews future is
-/// still pending.
+/// La forme de la section d'avis : le bandeau de note, puis deux avis en
+/// rail. Publique pour que [RestaurantReview] la réutilise pendant que ses
+/// propres avis chargent.
+///
+/// Elle imitait des cartes à avatar rond : les avis suivent un rail depuis la
+/// refonte, et un squelette d'une autre forme que son contenu fait sauter la
+/// page.
 class ReviewSectionSkeleton extends StatelessWidget {
   const ReviewSectionSkeleton({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Container(
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(20),
-            color: Theme.of(context).colorScheme.surfaceContainerLowest,
+            borderRadius: BorderRadius.circular(AppDimens.radius20),
+            color: theme.colorScheme.surfaceContainerLowest,
           ),
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
               Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Bone.text(
-                    width: 30,
-                    style: Theme.of(context).textTheme.bodyLarge!,
-                  ),
-                  const SizedBox(height: 6),
-                  const Bone(width: 70, height: 14, uniRadius: 4),
+                  Bone.text(width: 34, style: theme.textTheme.headlineMedium!),
+                  const Bone(width: 84, height: 16, uniRadius: 4),
                 ],
               ),
               Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Bone.text(
-                    width: 24,
-                    style: Theme.of(context).textTheme.bodyMedium!,
-                  ),
-                  const SizedBox(height: 6),
-                  Bone.text(
-                    width: 30,
-                    style: Theme.of(context).textTheme.bodySmall!,
-                  ),
+                  Bone.text(width: 24, style: theme.textTheme.titleMedium!),
+                  Bone.text(width: 30, style: theme.textTheme.bodySmall!),
                 ],
               ),
-              const Bone.button(width: 120, height: 36, uniRadius: 20),
+              const Bone.button(
+                width: 140,
+                height: AppDimens.touchTarget,
+                uniRadius: AppDimens.borderRadiusSmallButton,
+              ),
             ],
           ),
         ),
-        const SizedBox(height: 16),
-        ...List.generate(
-          2,
-          (_) => Container(
-            decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.surfaceContainerLowest,
-              borderRadius: BorderRadius.circular(20),
-            ),
-            margin: const EdgeInsets.only(bottom: 12),
-            padding: const EdgeInsets.all(16),
+        AppDimens.spacerMedium,
+        const _ReviewRailSkeleton(),
+        const _ReviewRailSkeleton(),
+      ],
+    );
+  }
+}
+
+/// Un avis en rail : le filet, le nom, la note, la date, deux lignes.
+class _ReviewRailSkeleton extends StatelessWidget {
+  const _ReviewRailSkeleton();
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: AppDimens.medium),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Bone(width: 2, height: 54),
+          AppDimens.spacerMediumWidth,
+          Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
                   children: [
-                    const Bone.circle(size: 40),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Bone.text(
-                            width: 100,
-                            style: Theme.of(context).textTheme.bodyMedium!,
-                          ),
-                          const SizedBox(height: 6),
-                          const Bone(width: 90, height: 12, uniRadius: 4),
-                        ],
-                      ),
-                    ),
+                    Bone.text(width: 90, style: theme.textTheme.bodyMedium!),
+                    AppDimens.spacerSmallWidth,
+                    const Bone(width: 62, height: 12, uniRadius: 4),
+                    const Spacer(),
+                    Bone.text(width: 46, style: theme.textTheme.labelSmall!),
                   ],
                 ),
-                const SizedBox(height: 8),
-                Bone.multiText(
-                  lines: 2,
-                  style: Theme.of(context).textTheme.bodyMedium!,
-                ),
+                AppDimens.spacerMini,
+                Bone.multiText(lines: 2, style: theme.textTheme.bodySmall!),
               ],
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

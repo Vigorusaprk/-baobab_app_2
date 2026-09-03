@@ -99,6 +99,9 @@ class OffersCarouselSection extends StatelessWidget {
                   onTap: () => context.pushNamed(
                     'offerDetail',
                     pathParameters: {'id': offer.id},
+                    // Le mode voyage avec l'identifiant : le squelette prend
+                    // la forme de la fiche qui va s'afficher.
+                    extra: offer.fulfilment,
                   ),
                 ),
               );

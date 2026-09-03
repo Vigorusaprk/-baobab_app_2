@@ -91,7 +91,7 @@ class ActivityReceipt extends StatelessWidget {
                   note: _isLocked
                       ? 'Actif dès que la réservation est confirmée.'
                       : 'Le commerçant scanne le code, ou saisit les 8 '
-                            'caractères.',
+                            'chiffres.',
                 ),
                 AppDimens.spacerMedium,
 

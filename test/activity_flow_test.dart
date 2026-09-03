@@ -290,9 +290,20 @@ void main() {
       expect(a.code, b.code);
     });
 
+    test('ne contient que des chiffres', () {
+      // Il mêlait lettres et chiffres : au comptoir, il fallait l'épeler et
+      // distinguer un O d'un zéro.
+      final code = ActivityEntry.fromOrder(_order()).code;
+      expect(code.replaceAll(' ', ''), matches(RegExp(r'^[0-9]{8}$')));
+    });
+
     test('distingue une commande d\'une réservation', () {
-      expect(ActivityEntry.fromOrder(_order()).code, startsWith('C'));
-      expect(ActivityEntry.fromReservation(_booking()).code, startsWith('R'));
+      // Le même identifiant côté commande et côté réservation ne doit pas
+      // donner le même code à présenter.
+      expect(
+        ActivityEntry.fromOrder(_order(id: 'x1')).code,
+        isNot(ActivityEntry.fromReservation(_booking(id: 'x1')).code),
+      );
     });
 
     test('le QR encode un identifiant réel', () {

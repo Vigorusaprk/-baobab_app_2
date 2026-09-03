@@ -171,7 +171,15 @@ final GoRouter appRouter = GoRouter(
       path: '/offer/:id',
       name: 'offerDetail',
       pageBuilder: (context, state) => MaterialPage(
-        child: OfferDetailScreen(offerId: state.pathParameters['id']!),
+        child: OfferDetailScreen(
+          offerId: state.pathParameters['id']!,
+          // Ce que l'appelant sait déjà du mode de l'offre. Sans lui, le
+          // squelette devait deviner : celui d'une commande devant une
+          // réservation faisait sauter la page à l'arrivée des données.
+          expected: state.extra is Fulfilment
+              ? state.extra as Fulfilment
+              : null,
+        ),
       ),
     ),
     GoRoute(

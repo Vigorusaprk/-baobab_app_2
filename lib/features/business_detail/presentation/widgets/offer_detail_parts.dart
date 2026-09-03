@@ -6,7 +6,8 @@ import 'package:baobabe_0_2/core/widgets/dashed_rule.dart';
 import 'package:baobabe_0_2/core/widgets/remote_image.dart';
 import 'package:baobabe_0_2/features/business_detail/domain/entities/offer.dart';
 import 'package:baobabe_0_2/features/business_detail/domain/entities/offer_detail.dart';
-import 'package:baobabe_0_2/features/business_detail/presentation/widgets/review_list_item.dart';
+import 'package:baobabe_0_2/core/widgets/custom_review_item.dart';
+import 'package:baobabe_0_2/core/widgets/review_pager.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
@@ -54,14 +55,7 @@ class OfferTopBar extends StatelessWidget {
       ),
       child: Row(
         children: [
-          CustomIconButton(
-            onPressed: () => _back(context),
-            tooltip: 'Retour',
-            icon: Icons.arrow_back_rounded,
-            tone: onFloating ? IconButtonTone.surface : IconButtonTone.ghost,
-            circle: true,
-            iconSize: AppDimens.medium + 2,
-          ),
+          OfferBackButton(onPhoto: onFloating),
           if (!onFloating && name != null && name.isNotEmpty)
             Expanded(
               child: Padding(
@@ -80,30 +74,79 @@ class OfferTopBar extends StatelessWidget {
             )
           else
             const Spacer(),
-          CustomIconButton(
-            onPressed: () => _share(name),
-            tooltip: 'Partager cette offre',
-            icon: Icons.ios_share_rounded,
-            tone: onFloating ? IconButtonTone.surface : IconButtonTone.ghost,
-            circle: true,
-            iconSize: AppDimens.medium + 2,
+          OfferShareButton(
+            offer: offer,
+            merchantName: name,
+            onPhoto: onFloating,
           ),
         ],
       ),
     );
   }
+}
 
-  void _back(BuildContext context) {
-    final router = GoRouter.of(context);
-    if (router.canPop()) {
-      router.pop();
-    } else {
-      router.go('/home');
-    }
+/// Le retour, en disque.
+///
+/// Séparé de [OfferTopBar] parce que la fiche d'une réservation le pose dans
+/// une barre épinglée, et non dans une rangée : là-bas, la photo reste
+/// immobile pendant que le contenu passe par-dessus, et les deux gestes ne
+/// doivent pas partir avec elle.
+class OfferBackButton extends StatelessWidget {
+  const OfferBackButton({super.key, this.onPhoto = false});
+
+  /// Posé **sur la photo** : le bouton prend un disque blanc, sinon il se
+  /// perd dans l'image.
+  final bool onPhoto;
+
+  @override
+  Widget build(BuildContext context) {
+    return CustomIconButton(
+      onPressed: () {
+        final router = GoRouter.of(context);
+        if (router.canPop()) {
+          router.pop();
+        } else {
+          // On arrive ici par lien direct : reculer n'a pas de destination.
+          router.go('/home');
+        }
+      },
+      tooltip: 'Retour',
+      icon: Icons.arrow_back_rounded,
+      tone: onPhoto ? IconButtonTone.surface : IconButtonTone.ghost,
+      circle: true,
+      iconSize: AppDimens.medium + 2,
+    );
+  }
+}
+
+/// Le partage, en disque.
+class OfferShareButton extends StatelessWidget {
+  const OfferShareButton({
+    super.key,
+    required this.offer,
+    this.merchantName,
+    this.onPhoto = false,
+  });
+
+  final Offer offer;
+  final String? merchantName;
+  final bool onPhoto;
+
+  @override
+  Widget build(BuildContext context) {
+    return CustomIconButton(
+      onPressed: _share,
+      tooltip: 'Partager cette offre',
+      icon: Icons.ios_share_rounded,
+      tone: onPhoto ? IconButtonTone.surface : IconButtonTone.ghost,
+      circle: true,
+      iconSize: AppDimens.medium + 2,
+    );
   }
 
   /// Un partage **texte** : il n'existe pas d'adresse web par offre.
-  Future<void> _share(String? merchant) {
+  Future<void> _share() {
+    final merchant = merchantName ?? offer.businessName;
     final where = (merchant == null || merchant.isEmpty)
         ? ''
         : '\nChez $merchant';
@@ -395,9 +438,16 @@ class OfferPendingNotice extends StatelessWidget {
 /// fiche empilait les dix avis chargés, ce qui repoussait tout ce qui suit
 /// hors de l'écran.
 class OfferReviews extends StatelessWidget {
-  const OfferReviews({super.key, required this.detail});
+  const OfferReviews({super.key, required this.detail, this.paged = false});
 
   final OfferDetail detail;
+
+  /// Les avis se **feuillettent** par deux, au lieu de s'empiler.
+  ///
+  /// C'est le choix de la fiche de réservation : la page y est déjà longue —
+  /// la date, la jauge, le compteur, l'avertissement — et dix avis empilés
+  /// repoussaient la validation à plusieurs écrans du bas.
+  final bool paged;
 
   static const int _preview = 2;
 
@@ -447,9 +497,29 @@ class OfferReviews extends StatelessWidget {
           ],
         ),
         AppDimens.spacerMedium,
-        for (var i = 0; i < shown.length; i++)
-          ReviewListItem(review: shown[i], accent: i == 0),
-        if (reviews.length > _preview)
+        if (paged)
+          ReviewPager(
+            reviews: [
+              for (var i = 0; i < reviews.length; i++)
+                CustomReviewItem(
+                  author: reviews[i].userName,
+                  rating: reviews[i].rating.toDouble(),
+                  createdAt: reviews[i].createdAt,
+                  comment: reviews[i].comment,
+                  accent: i == 0,
+                ),
+            ],
+          )
+        else
+          for (var i = 0; i < shown.length; i++)
+            CustomReviewItem(
+              author: shown[i].userName,
+              rating: shown[i].rating.toDouble(),
+              createdAt: shown[i].createdAt,
+              comment: shown[i].comment,
+              accent: i == 0,
+            ),
+        if (!paged && reviews.length > _preview)
           Align(
             alignment: Alignment.centerLeft,
             child: TextButton(
@@ -487,7 +557,13 @@ class OfferReviews extends StatelessWidget {
             AppDimens.spacerMedium,
           ],
           for (var i = 0; i < reviews.length; i++)
-            ReviewListItem(review: reviews[i], accent: i == 0),
+            CustomReviewItem(
+              author: reviews[i].userName,
+              rating: reviews[i].rating.toDouble(),
+              createdAt: reviews[i].createdAt,
+              comment: reviews[i].comment,
+              accent: i == 0,
+            ),
         ],
       ),
     );

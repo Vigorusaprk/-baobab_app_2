@@ -6,6 +6,21 @@ import 'package:baobabe_0_2/features/home_page/domain/entities/business_entity.d
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+/// Le numéro, nettoyé, ou `null` s'il n'y a rien à composer.
+///
+/// Le champ `phone` est du texte libre : il contient parfois « N/A », un
+/// tiret, ou une note. Un bouton « Appeler » qui ouvre un composeur vide est
+/// pire que pas de bouton. On garde les chiffres, le `+` de tête et les
+/// séparateurs que le composeur accepte, et on exige **au moins six
+/// chiffres** — en dessous, ce n'est pas un numéro.
+String? dialablePhone(String? raw) {
+  if (raw == null) return null;
+  final digits = raw.replaceAll(RegExp(r'[^0-9]'), '');
+  if (digits.length < 6) return null;
+  final cleaned = raw.replaceAll(RegExp(r'[^0-9+#*]'), '');
+  return cleaned.isEmpty ? null : cleaned;
+}
+
 /// Qui est ce commerce, et les deux gestes qu'on a en le lisant.
 ///
 /// La feuille recouvre la photo de quelques pixels : elle dit que ce qui
@@ -34,6 +49,7 @@ class BusinessIdentity extends StatelessWidget {
     final theme = Theme.of(context);
     final scheme = theme.colorScheme;
     final hours = _hoursTag(business);
+    final phone = dialablePhone(business.phone);
 
     return Container(
       // Le recouvrement : la feuille monte sur la photo.
@@ -112,14 +128,18 @@ class BusinessIdentity extends StatelessWidget {
           AppDimens.spacerMedium,
           Row(
             children: [
-              if (business.phone.isNotEmpty) ...[
+              // « Appeler » n'apparaît que si le commerce a publié un
+              // numéro **composable**. Le champ est du texte libre : un
+              // « N/A » ou un tiret donnait un bouton qui ne pouvait mener
+              // à rien.
+              if (phone != null) ...[
                 Expanded(
                   child: CustomActionButton(
                     label: 'Appeler',
                     icon: Icons.phone_outlined,
                     tone: ActionButtonTone.tonal,
                     expand: true,
-                    onPressed: () => _launch('tel:${business.phone}'),
+                    onPressed: () => _call(phone),
                   ),
                 ),
                 AppDimens.spacerSmallWidth,
@@ -153,8 +173,24 @@ class BusinessIdentity extends StatelessWidget {
 
   static Future<void> _launch(String url) async {
     final uri = Uri.parse(url);
-    if (await canLaunchUrl(uri)) await launchUrl(uri);
+    // `canLaunchUrl` d'abord, mais l'échec n'arrête pas : sur certains
+    // appareils il répond faux alors qu'une application sait ouvrir le lien.
+    try {
+      if (await canLaunchUrl(uri)) {
+        await launchUrl(uri, mode: LaunchMode.externalApplication);
+        return;
+      }
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    } catch (e) {
+      debugPrint('Lien impossible à ouvrir ($url) : $e');
+    }
   }
+
+  /// Ouvre le composeur avec le numéro déjà saisi.
+  ///
+  /// `tel:` et non `ACTION_CALL` : la permission d'appeler sans confirmation
+  /// n'a pas à être demandée pour ça, et l'utilisateur voit ce qu'il compose.
+  static Future<void> _call(String phone) => _launch('tel:$phone');
 
   /// « Ouvert · jusqu'à 23:00 », quand les horaires du jour se lisent.
   ///

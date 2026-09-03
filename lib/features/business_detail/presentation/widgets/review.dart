@@ -2,8 +2,8 @@ import 'package:baobabe_0_2/core/themes/app_diemens.dart';
 import 'package:baobabe_0_2/features/business_detail/data/review_api_service.dart';
 import 'package:baobabe_0_2/features/business_detail/domain/entities/review.dart';
 import 'package:baobabe_0_2/features/business_detail/presentation/widgets/business_detail_skeleton.dart';
-import 'package:baobabe_0_2/features/business_detail/presentation/widgets/review_list_item.dart';
-import 'package:baobabe_0_2/features/business_detail/presentation/widgets/review_stars.dart';
+import 'package:baobabe_0_2/core/widgets/custom_review_item.dart';
+import 'package:baobabe_0_2/core/widgets/rating_stars.dart';
 import 'package:baobabe_0_2/features/business_detail/presentation/widgets/write_review_dialog.dart';
 import 'package:baobabe_0_2/features/home_page/domain/entities/business_entity.dart';
 import 'package:flutter/material.dart';
@@ -105,7 +105,7 @@ class _RestaurantReviewState extends State<RestaurantReview> {
                           avgRating.toStringAsFixed(1),
                           style: Theme.of(context).textTheme.headlineMedium,
                         ),
-                        Row(children: buildReviewStars(context, avgRating, 16)),
+                        ReadOnlyStars(rating: avgRating, size: 16),
                       ],
                     ),
                     Column(
@@ -142,7 +142,14 @@ class _RestaurantReviewState extends State<RestaurantReview> {
               physics: const NeverScrollableScrollPhysics(),
               itemCount: reviews.length,
               itemBuilder: (context, index) {
-                return ReviewListItem(review: reviews[index]);
+                final review = reviews[index];
+                return CustomReviewItem(
+                  author: review.userName,
+                  rating: review.rating.toDouble(),
+                  createdAt: review.createdAt,
+                  comment: review.comment,
+                  accent: index == 0,
+                );
               },
             ),
           ],

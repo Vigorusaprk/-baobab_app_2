@@ -79,21 +79,22 @@ class ActivityEntry {
 
   /// Le code à présenter au commerce.
   ///
+  /// **Huit chiffres**, groupés par quatre. Il mêlait lettres et chiffres, ce
+  /// qui obligeait à l'épeler au comptoir — et à distinguer un O d'un zéro.
+  /// Un nombre se dit, se retient et se saisit sur un pavé numérique.
+  ///
   /// Dérivé de l'identifiant, donc stable et reproductible d'un affichage à
-  /// l'autre. **Rien ne le vérifie côté serveur pour l'instant** : il tient
-  /// lieu de référence lisible, pas de preuve.
+  /// l'autre. La nature de la demande entre dans le calcul : une commande et
+  /// une réservation ne peuvent pas tomber sur le même code. **Rien ne le
+  /// vérifie côté serveur pour l'instant** : il tient lieu de référence
+  /// lisible, pas de preuve.
   String get code {
-    var hash = 0;
+    var hash = kind.isOrder ? 17 : 29;
     for (final unit in id.codeUnits) {
       hash = (hash * 31 + unit) & 0x7fffffff;
     }
-    const alphabet = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-    final buffer = StringBuffer(kind.isOrder ? 'C' : 'R');
-    for (var i = 0; i < 7; i++) {
-      if (i == 3) buffer.write('-');
-      buffer.write(alphabet[(hash >> (i * 3)) % alphabet.length]);
-    }
-    return buffer.toString();
+    final digits = (hash % 100000000).toString().padLeft(8, '0');
+    return '${digits.substring(0, 4)} ${digits.substring(4)}';
   }
 
   /// Ce que le QR encode. Un identifiant réel, pour qu'un scanner futur ait

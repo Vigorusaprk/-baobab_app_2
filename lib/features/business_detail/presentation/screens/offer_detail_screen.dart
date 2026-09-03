@@ -3,6 +3,7 @@ import 'package:baobabe_0_2/core/themes/other_theme.dart';
 import 'package:baobabe_0_2/core/widgets/auth_required_card.dart';
 import 'package:baobabe_0_2/core/widgets/button/custom_action_button.dart';
 import 'package:baobabe_0_2/core/widgets/custom_refresh.dart';
+import 'package:baobabe_0_2/features/business_detail/domain/entities/offer.dart';
 import 'package:baobabe_0_2/features/business_detail/presentation/bloc/offer_detail_cubit.dart';
 import 'package:baobabe_0_2/features/business_detail/presentation/widgets/offer_detail_skeleton.dart';
 import 'package:baobabe_0_2/features/business_detail/presentation/widgets/offer_detail_views.dart';
@@ -31,7 +32,12 @@ import 'package:skeletonizer/skeletonizer.dart';
 class OfferDetailScreen extends StatelessWidget {
   final String offerId;
 
-  const OfferDetailScreen({super.key, required this.offerId});
+  /// Ce que l'appelant sait déjà du mode de l'offre — il vient d'en toucher
+  /// la carte, qui le porte. Sert **uniquement** au squelette : le serveur
+  /// reste seul juge de ce que l'offre est vraiment.
+  final Fulfilment? expected;
+
+  const OfferDetailScreen({super.key, required this.offerId, this.expected});
 
   @override
   Widget build(BuildContext context) {
@@ -43,13 +49,15 @@ class OfferDetailScreen extends StatelessWidget {
         BlocProvider(create: (_) => OfferDetailCubit(offerId: offerId)..load()),
         BlocProvider(create: (_) => CheckoutCubit()),
       ],
-      child: const _OfferDetailView(),
+      child: _OfferDetailView(expected: expected),
     );
   }
 }
 
 class _OfferDetailView extends StatelessWidget {
-  const _OfferDetailView();
+  const _OfferDetailView({this.expected});
+
+  final Fulfilment? expected;
 
   /// Le jour touché dans les pastilles. L'heure est demandée aussitôt : une
   /// table sans heure n'est pas une réservation.
@@ -202,9 +210,9 @@ class _OfferDetailView extends StatelessWidget {
             return _Failure(message: state.message);
           }
           if (state is! OfferDetailLoaded) {
-            return const Skeletonizer(
+            return Skeletonizer(
               enabled: true,
-              child: OfferDetailSkeleton(),
+              child: OfferDetailSkeleton(expected: expected),
             );
           }
           // Le rafraîchissement relit la fiche **sans** repasser par le

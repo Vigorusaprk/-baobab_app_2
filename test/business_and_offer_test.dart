@@ -7,7 +7,7 @@ import 'package:baobabe_0_2/features/business_detail/presentation/widgets/busine
 import 'package:baobabe_0_2/features/business_detail/presentation/widgets/business_offer_board.dart';
 import 'package:baobabe_0_2/features/business_detail/presentation/widgets/offer_detail_views.dart';
 import 'package:baobabe_0_2/features/business_detail/presentation/widgets/offer_purchase_bar.dart';
-import 'package:baobabe_0_2/features/business_detail/presentation/widgets/review_list_item.dart';
+import 'package:baobabe_0_2/core/widgets/custom_review_item.dart';
 import 'package:baobabe_0_2/features/home_page/data/models/ui_business.dart';
 import 'package:baobabe_0_2/features/home_page/domain/entities/business_entity.dart';
 import 'package:flutter/material.dart';
@@ -470,8 +470,19 @@ void main() {
         _host(
           Column(
             children: [
-              ReviewListItem(review: _review(), accent: true),
-              ReviewListItem(review: _review(id: 2, name: 'Nadine T.')),
+              CustomReviewItem(
+                author: 'Josué B.',
+                rating: 5,
+                createdAt: DateTime.now().subtract(const Duration(days: 1)),
+                comment: 'La sauce est celle qu on cherche.',
+                accent: true,
+              ),
+              CustomReviewItem(
+                author: 'Nadine T.',
+                rating: 4,
+                createdAt: DateTime.now().subtract(const Duration(days: 1)),
+                comment: 'Trente minutes annoncées, tenues.',
+              ),
             ],
           ),
         ),
@@ -484,6 +495,48 @@ void main() {
       // Plus d avatar : souvent absent, il occupait la place du texte pour
       // n afficher qu une silhouette grise.
       expect(find.byType(CircleAvatar), findsNothing);
+    });
+
+    testWidgets('un propos court ne propose pas de voir plus', (tester) async {
+      await tester.pumpWidget(
+        _host(
+          CustomReviewItem(
+            author: 'Josué B.',
+            rating: 5,
+            createdAt: DateTime.now(),
+            comment: 'Parfait.',
+          ),
+        ),
+      );
+
+      expect(find.text('Voir plus'), findsNothing);
+    });
+
+    testWidgets('un propos long se coupe à deux lignes et s ouvre en entier', (
+      tester,
+    ) async {
+      final long = List.filled(60, 'la sauce est excellente').join(', ');
+
+      await tester.pumpWidget(
+        _host(
+          CustomReviewItem(
+            author: 'Nadine T.',
+            rating: 4,
+            createdAt: DateTime.now(),
+            comment: long,
+          ),
+        ),
+      );
+
+      // Un avis de dix lignes au milieu d une liste repousse les suivants
+      // hors de l écran et fait croire qu il n y en a qu un.
+      final text = tester.widget<Text>(find.text(long));
+      expect(text.maxLines, 2);
+
+      await tester.tap(find.text('Voir plus'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Avis de Nadine T.'), findsOneWidget);
     });
   });
 }

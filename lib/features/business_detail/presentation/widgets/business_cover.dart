@@ -50,20 +50,16 @@ class BusinessCover extends StatelessWidget {
       automaticallyImplyLeading: false,
       titleSpacing: 0,
       leadingWidth: AppDimens.touchTarget + AppDimens.medium,
-      leading: Padding(
-        padding: const EdgeInsets.only(left: AppDimens.appPaddingValue),
-        child: CustomIconButton(
-          onPressed: () => _back(context),
-          tooltip: 'Retour',
-          icon: Icons.arrow_back_rounded,
-          circle: true,
-          iconSize: AppDimens.medium + 2,
-        ),
+      // `_Round` est indispensable : une barre étire son `leading` sur toute
+      // la largeur qu'elle lui réserve, et le disque devenait un ovale.
+      leading: const _Round(
+        padding: EdgeInsets.only(left: AppDimens.appPaddingValue),
+        child: _BackButton(),
       ),
       // Pas de cœur : rien ne mémorise un favori côté serveur, et un cœur
       // qui ne retient rien est une promesse non tenue.
       actions: [
-        Padding(
+        _Round(
           padding: const EdgeInsets.only(right: AppDimens.appPaddingValue),
           child: CustomIconButton(
             onPressed: _share,
@@ -75,6 +71,10 @@ class BusinessCover extends StatelessWidget {
         ),
       ],
       flexibleSpace: FlexibleSpaceBar(
+        // `none` : la photo **ne bouge pas**. Le contenu passe par-dessus,
+        // ce qui donne le sentiment que la feuille glisse sur l'image plutôt
+        // que l'image ne s'échappe vers le haut.
+        collapseMode: CollapseMode.none,
         background: Stack(
           fit: StackFit.expand,
           children: [
@@ -114,16 +114,6 @@ class BusinessCover extends StatelessWidget {
     );
   }
 
-  void _back(BuildContext context) {
-    final router = GoRouter.of(context);
-    if (router.canPop()) {
-      router.pop();
-    } else {
-      // On arrive ici par lien direct : reculer n'a pas de destination.
-      router.go('/home');
-    }
-  }
-
   /// Un partage **texte**. Il n'existe pas d'adresse web par commerce : on
   /// partage donc ce qu'on sait — le nom et l'adresse — plutôt qu'un lien
   /// qui ne mènerait nulle part.
@@ -133,6 +123,55 @@ class BusinessCover extends StatelessWidget {
       subject: business.name,
     ),
   );
+}
+
+/// Un disque qui reste un disque.
+///
+/// Une barre d'application étire ce qu'on lui donne en `leading` et en
+/// `actions` : sans cette contrainte carrée, le bouton de retour s'affichait
+/// en ovale.
+class _Round extends StatelessWidget {
+  const _Round({required this.child, required this.padding});
+
+  final Widget child;
+  final EdgeInsets padding;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: padding,
+      child: Center(
+        child: SizedBox.square(
+          dimension: AppDimens.touchTarget,
+          child: child,
+        ),
+      ),
+    );
+  }
+}
+
+/// Le retour : la route parente, ou l'accueil quand on est arrivé par lien
+/// direct.
+class _BackButton extends StatelessWidget {
+  const _BackButton();
+
+  @override
+  Widget build(BuildContext context) {
+    return CustomIconButton(
+      onPressed: () {
+        final router = GoRouter.of(context);
+        if (router.canPop()) {
+          router.pop();
+        } else {
+          router.go('/home');
+        }
+      },
+      tooltip: 'Retour',
+      icon: Icons.arrow_back_rounded,
+      circle: true,
+      iconSize: AppDimens.medium + 2,
+    );
+  }
 }
 
 /// La couleur de la catégorie, quand il n'y a pas de photo — ou qu'elle ne

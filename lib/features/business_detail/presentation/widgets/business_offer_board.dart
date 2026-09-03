@@ -404,7 +404,10 @@ class BusinessOfferRow extends StatelessWidget {
     );
   }
 
-  void _open(BuildContext context) => context.push('/offer/${offer.id}');
+  /// Le mode voyage avec l'identifiant : la fiche connaît ainsi la forme de
+  /// son squelette avant que le serveur ait répondu.
+  void _open(BuildContext context) =>
+      context.push('/offer/${offer.id}', extra: offer.fulfilment);
 
   static String _money(double amount) =>
       '${amount.toStringAsFixed(2).replaceAll('.', ',')} \$';

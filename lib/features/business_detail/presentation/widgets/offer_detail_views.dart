@@ -122,6 +122,10 @@ class OfferOrderView extends StatelessWidget {
 ///
 /// La photo tient la tête : on choisit une soirée en terrasse sur ce qu'on en
 /// voit. La date arrive juste après, parce que c'est la première décision.
+///
+/// La photo **ne bouge pas** au défilement, et les deux gestes restent en
+/// haut : ils partaient avec elle, si bien qu'on ne pouvait plus revenir sans
+/// remonter toute la page. La feuille glisse par-dessus l'image.
 class OfferBookingView extends StatelessWidget {
   const OfferBookingView({
     super.key,
@@ -149,12 +153,38 @@ class OfferBookingView extends StatelessWidget {
     final remaining = detail.remainingCapacity;
     final height = photoHeight + MediaQuery.paddingOf(context).top;
 
-    return ListView(
-      padding: EdgeInsets.zero,
-      children: [
-        Stack(
-          children: [
-            OfferPhotoFallback(
+    return CustomScrollView(
+      slivers: [
+        SliverAppBar(
+          pinned: true,
+          expandedHeight: height,
+          backgroundColor: scheme.surfaceContainerLowest,
+          surfaceTintColor: Colors.transparent,
+          elevation: 0,
+          scrolledUnderElevation: 0,
+          automaticallyImplyLeading: false,
+          leadingWidth: AppDimens.touchTarget + AppDimens.medium,
+          // `_Round` : une barre étire ce qu'on lui donne en `leading`, et le
+          // disque devenait un ovale.
+          leading: const _Round(
+            padding: EdgeInsets.only(left: AppDimens.appPaddingValue),
+            child: OfferBackButton(onPhoto: true),
+          ),
+          actions: [
+            _Round(
+              padding: const EdgeInsets.only(right: AppDimens.appPaddingValue),
+              child: OfferShareButton(
+                offer: offer,
+                merchantName: detail.merchant?.name,
+                onPhoto: true,
+              ),
+            ),
+          ],
+          flexibleSpace: FlexibleSpaceBar(
+            // `none` : la photo reste où elle est. Le contenu passe
+            // par-dessus, au lieu que l'image s'échappe vers le haut.
+            collapseMode: CollapseMode.none,
+            background: OfferPhotoFallback(
               height: height,
               child: image == null
                   ? null
@@ -163,89 +193,107 @@ class OfferBookingView extends StatelessWidget {
                       fallback: OfferPhotoFallback(height: height),
                     ),
             ),
-            OfferTopBar(
-              offer: offer,
-              merchantName: detail.merchant?.name,
-              onFloating: true,
-            ),
-          ],
+          ),
         ),
-        Container(
-          transform: Matrix4.translationValues(0, -14, 0),
-          decoration: BoxDecoration(
-            color: scheme.surfaceContainerLowest,
-            borderRadius: const BorderRadius.vertical(
-              top: Radius.circular(AppDimens.radius16),
-            ),
-          ),
-          padding: const EdgeInsets.fromLTRB(
-            AppDimens.appPaddingValue + 4,
-            AppDimens.medium + 2,
-            AppDimens.appPaddingValue + 4,
-            AppDimens.large,
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _BookingTag(fixedDate: offer.startsAt),
-              AppDimens.spacerMedium,
-              OfferHeadline(
-                offer: offer,
-                priceSuffix: capacity != null ? 'par place' : null,
+        SliverToBoxAdapter(
+          child: Container(
+            transform: Matrix4.translationValues(0, -14, 0),
+            decoration: BoxDecoration(
+              color: scheme.surfaceContainerLowest,
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(AppDimens.radius16),
               ),
-              if (offer.description.isNotEmpty) ...[
+            ),
+            padding: const EdgeInsets.fromLTRB(
+              AppDimens.appPaddingValue + 4,
+              AppDimens.medium + 2,
+              AppDimens.appPaddingValue + 4,
+              AppDimens.large,
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _BookingTag(fixedDate: offer.startsAt),
                 AppDimens.spacerMedium,
-                Text(
-                  offer.description,
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    color: scheme.onSurfaceVariant,
-                    height: 1.6,
+                OfferHeadline(
+                  offer: offer,
+                  priceSuffix: capacity != null ? 'par place' : null,
+                ),
+                if (offer.description.isNotEmpty) ...[
+                  AppDimens.spacerMedium,
+                  Text(
+                    offer.description,
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: scheme.onSurfaceVariant,
+                      height: 1.6,
+                    ),
                   ),
-                ),
-              ],
-              AppDimens.spacerLarge,
-              // Une séance impose son heure ; une table, un soin ou une
-              // chambre laissent choisir.
-              if (state.needsDateChoice)
-                OfferDateChoice(
-                  chosen: state.chosenDate,
-                  onPickDay: onPickDay,
-                  onOpenCalendar: onOpenCalendar,
-                )
-              else if (offer.startsAt != null)
-                OfferFactLine(
-                  icon: Icons.event_outlined,
-                  text: DateFormat(
-                    'EEEE d MMMM à HH:mm',
-                    'fr_FR',
-                  ).format(offer.startsAt!.toLocal()),
-                ),
-              if (capacity != null && remaining != null) ...[
+                ],
                 AppDimens.spacerLarge,
-                OfferSeatsGauge(
-                  capacity: capacity,
-                  remaining: remaining,
-                  taken: state.quantity,
-                ),
-              ],
-              if (!detail.isSoldOut) ...[
+                // Une séance impose son heure ; une table, un soin ou une
+                // chambre laissent choisir.
+                if (state.needsDateChoice)
+                  OfferDateChoice(
+                    chosen: state.chosenDate,
+                    onPickDay: onPickDay,
+                    onOpenCalendar: onOpenCalendar,
+                  )
+                else if (offer.startsAt != null)
+                  OfferFactLine(
+                    icon: Icons.event_outlined,
+                    text: DateFormat(
+                      'EEEE d MMMM à HH:mm',
+                      'fr_FR',
+                    ).format(offer.startsAt!.toLocal()),
+                  ),
+                if (capacity != null && remaining != null) ...[
+                  AppDimens.spacerLarge,
+                  OfferSeatsGauge(
+                    capacity: capacity,
+                    remaining: remaining,
+                    taken: state.quantity,
+                  ),
+                ],
+                if (!detail.isSoldOut) ...[
+                  AppDimens.spacerLarge,
+                  OfferCounterRow(
+                    label: capacity != null ? 'Nombre de places' : 'Quantité',
+                    value: state.quantity,
+                    max: remaining,
+                    onChanged: onQuantityChanged,
+                  ),
+                ],
+                AppDimens.spacerMedium,
+                const OfferPendingNotice(),
                 AppDimens.spacerLarge,
-                OfferCounterRow(
-                  label: capacity != null ? 'Nombre de places' : 'Quantité',
-                  value: state.quantity,
-                  max: remaining,
-                  onChanged: onQuantityChanged,
-                ),
+                // Feuilletés par deux : la page porte déjà la date, la jauge,
+                // le compteur et l'avertissement.
+                OfferReviews(detail: detail, paged: true),
               ],
-              AppDimens.spacerMedium,
-              const OfferPendingNotice(),
-              AppDimens.spacerLarge,
-              OfferReviews(detail: detail),
-            ],
+            ),
           ),
         ),
-        if (detail.otherOffers.isNotEmpty) _MoreFrom(state: state),
+        if (detail.otherOffers.isNotEmpty)
+          SliverToBoxAdapter(child: _MoreFrom(state: state)),
       ],
+    );
+  }
+}
+
+/// Un disque qui reste un disque, dans une barre qui étire.
+class _Round extends StatelessWidget {
+  const _Round({required this.child, required this.padding});
+
+  final Widget child;
+  final EdgeInsets padding;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: padding,
+      child: Center(
+        child: SizedBox.square(dimension: AppDimens.touchTarget, child: child),
+      ),
     );
   }
 }

@@ -47,5 +47,16 @@
 		<true/>
 		<key>UIStatusBarHidden</key>
 		<false/>
+		<!-- Meme piege qu'Android : sans declaration, `canLaunchUrl` repond
+		     faux et les boutons « Appeler », « Itineraire » et les lignes de
+		     contact ne font rien. -->
+		<key>LSApplicationQueriesSchemes</key>
+		<array>
+			<string>tel</string>
+			<string>mailto</string>
+			<string>https</string>
+			<string>http</string>
+			<string>maps</string>
+		</array>
 	</dict>
 </plist>
