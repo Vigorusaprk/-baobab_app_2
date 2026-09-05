@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:baobabe_0_2/features/home_page/domain/entities/business_entity.dart';
 import 'package:baobabe_0_2/features/business_detail/domain/entities/offer.dart';
+import 'package:baobabe_0_2/features/home_page/domain/entities/home_feed.dart';
 import 'package:baobabe_0_2/features/home_page/domain/usecases/get_offers_page.dart';
 import 'package:baobabe_0_2/features/home_page/domain/usecases/get_home_feed.dart';
 import 'package:equatable/equatable.dart';
@@ -64,6 +65,7 @@ class BusinessBloc extends Bloc<BusinessEvent, BusinessState> {
           hasMoreNewOffers: feed.newOffers.hasMore,
           popularBusinesses: feed.popularBusinesses,
           discoverOffers: feed.discoverOffers.items,
+          sponsoredOffers: feed.sponsoredOffers,
           currentSlug: slug,
           page: 1,
           hasMore: feed.discoverOffers.hasMore,

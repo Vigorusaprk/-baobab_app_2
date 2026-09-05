@@ -11,6 +11,17 @@ class OffersPage {
   bool get isEmpty => items.isEmpty;
 }
 
+/// Une offre mise en avant, et la campagne qui la porte.
+///
+/// L'identifiant de campagne voyage avec l'offre : c'est lui qui permettra
+/// de rapporter le clic à la bonne campagne, et non à l'offre en général.
+class SponsoredOffer {
+  final Offer offer;
+  final String campaignId;
+
+  const SponsoredOffer({required this.offer, required this.campaignId});
+}
+
 /// Contenu de la page d'accueil pour une catégorie, renvoyé par l'Edge
 /// Function `get-home` en un seul appel.
 ///
@@ -30,9 +41,14 @@ class HomeFeed {
   /// « Quoi prendre ? » — les offres les mieux notées, paginées.
   final OffersPage discoverOffers;
 
+  /// « Qui a payé pour être là ? » — les campagnes en cours. À part des
+  /// autres sections, et étiquetées comme telles.
+  final List<SponsoredOffer> sponsoredOffers;
+
   const HomeFeed({
     this.newOffers = const OffersPage(),
     this.popularBusinesses = const [],
     this.discoverOffers = const OffersPage(),
+    this.sponsoredOffers = const [],
   });
 }

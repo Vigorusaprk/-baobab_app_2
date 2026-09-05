@@ -1,6 +1,8 @@
 import 'package:baobabe_0_2/core/themes/app_diemens.dart';
 import 'package:baobabe_0_2/core/widgets/button/custom_button.dart';
+import 'package:baobabe_0_2/core/services/media_upload_service.dart';
 import 'package:baobabe_0_2/core/widgets/custom_text_form_field.dart';
+import 'package:baobabe_0_2/core/widgets/image_upload_field.dart';
 import 'package:baobabe_0_2/features/business_detail/domain/entities/offer.dart';
 import 'package:baobabe_0_2/features/merchant/domain/repositories/merchant_repository.dart';
 import 'package:baobabe_0_2/features/merchant/presentation/cubit/merchant_cubit.dart';
@@ -34,7 +36,10 @@ class _OfferFormPageState extends State<OfferFormPage> {
   late final TextEditingController _price;
   late final TextEditingController _section;
   late final TextEditingController _capacity;
-  late final TextEditingController _imageUrl;
+  /// L'URL de la photo. Le champ texte a disparu au profit d'un
+  /// téléversement : un commerçant sans site n'avait aucun moyen d'en fournir
+  /// une, et plusieurs liens en base pointent vers des pages web.
+  String? _imageUrl;
 
   late Fulfilment _fulfilment;
   DateTime? _startsAt;
@@ -55,7 +60,7 @@ class _OfferFormPageState extends State<OfferFormPage> {
     );
     _section = TextEditingController(text: offer?.section ?? '');
     _capacity = TextEditingController(text: offer?.capacity?.toString() ?? '');
-    _imageUrl = TextEditingController(text: offer?.imageUrl ?? '');
+    _imageUrl = offer?.imageUrl;
     _fulfilment = offer?.fulfilment ?? Fulfilment.order;
     _startsAt = offer?.startsAt;
   }
@@ -68,7 +73,6 @@ class _OfferFormPageState extends State<OfferFormPage> {
       _price,
       _section,
       _capacity,
-      _imageUrl,
     ]) {
       controller.dispose();
     }
@@ -137,7 +141,7 @@ class _OfferFormPageState extends State<OfferFormPage> {
           ? int.tryParse(_capacity.text.trim())
           : null,
       startsAt: _fulfilment == Fulfilment.booking ? _startsAt : null,
-      imageUrl: _imageUrl.text.trim().isEmpty ? null : _imageUrl.text.trim(),
+      imageUrl: _imageUrl,
     );
 
     final error = _isEditing
@@ -160,6 +164,9 @@ class _OfferFormPageState extends State<OfferFormPage> {
   @override
   Widget build(BuildContext context) {
     final isBooking = _fulfilment == Fulfilment.booking;
+    // Le téléversement a besoin de savoir sous quel commerce ranger le
+    // fichier : le dossier de destination porte son identifiant.
+    final businessId = context.read<MerchantCubit>().businessId;
 
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
@@ -268,8 +275,15 @@ class _OfferFormPageState extends State<OfferFormPage> {
               ),
             ],
             AppDimens.spacerMedium,
-            FieldLabel('Lien de la photo (facultatif)'),
-            CustomTextFormField(controller: _imageUrl, hintText: 'https://…'),
+            if (businessId != null)
+              ImageUploadField(
+                businessId: businessId,
+                kind: MediaKind.offer,
+                value: _imageUrl,
+                label: "Photo de l'offre",
+                hint: "Une photo claire vaut mieux qu'une description.",
+                onChanged: (url) => setState(() => _imageUrl = url),
+              ),
             AppDimens.spacerLarge,
             CustomButton(
               text: _isEditing ? 'Enregistrer' : 'Publier l\'offre',

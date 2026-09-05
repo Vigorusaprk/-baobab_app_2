@@ -27,10 +27,20 @@ import 'package:skeletonizer/skeletonizer.dart';
 /// créerait une petite cible collée à un geste de défilement, et une offre en
 /// boutique n'a de toute façon aucune action à proposer.
 class OfferCard extends StatelessWidget {
-  const OfferCard({super.key, required this.offer, required this.onTap});
+  const OfferCard({
+    super.key,
+    required this.offer,
+    required this.onTap,
+    this.sponsored = false,
+  });
 
   final Offer offer;
   final VoidCallback onTap;
+
+  /// L'offre est-elle poussée par une campagne payée ? Le dire est une
+  /// obligation, pas une option : une mise en avant qui ne se distingue pas
+  /// d'un classement fait passer de la publicité pour du mérite.
+  final bool sponsored;
 
   /// La marge blanche autour de la photo.
   static const double _frame = AppDimens.tiny;
@@ -60,7 +70,7 @@ class OfferCard extends StatelessWidget {
               child: Column(
                 children: [
                   // La photo prend toute la place que le texte ne réclame pas.
-                  Expanded(child: _Photo(offer: offer)),
+                  Expanded(child: _Photo(offer: offer, sponsored: sponsored)),
                   ColoredBox(
                     color: scheme.surfaceContainerLowest,
                     child: _Content(offer: offer),
@@ -77,9 +87,10 @@ class OfferCard extends StatelessWidget {
 
 /// La photo, et les deux badges posés dessus.
 class _Photo extends StatelessWidget {
-  const _Photo({required this.offer});
+  const _Photo({required this.offer, this.sponsored = false});
 
   final Offer offer;
+  final bool sponsored;
 
   @override
   Widget build(BuildContext context) {
@@ -106,6 +117,17 @@ class _Photo extends StatelessWidget {
                   : OtherTheme.of(context).onWarningContainer,
             ),
           ),
+          // En haut à droite : les deux autres coins gauches portent déjà
+          // le mode de retrait et la date.
+          if (sponsored)
+            Positioned(
+              top: AppDimens.small,
+              right: AppDimens.small,
+              child: _Badge(
+                label: 'Sponsorisé',
+                color: Theme.of(context).colorScheme.onSurface,
+              ),
+            ),
           if (offer.startsAt != null)
             Positioned(
               bottom: AppDimens.small,

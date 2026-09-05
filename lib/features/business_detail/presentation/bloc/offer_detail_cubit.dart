@@ -1,3 +1,4 @@
+import 'package:baobabe_0_2/core/services/metrics_service.dart';
 import 'package:baobabe_0_2/features/business_detail/data/offer_detail_api_service.dart';
 import 'package:baobabe_0_2/features/business_detail/domain/entities/offer_detail.dart';
 import 'package:equatable/equatable.dart';
@@ -80,6 +81,17 @@ class OfferDetailCubit extends Cubit<OfferDetailState> {
       final detail = await _service.getDetail(offerId);
       if (isClosed) return;
       emit(OfferDetailLoaded(detail));
+
+      // Une fiche ouverte se compte, ici plutôt que dans l'écran : c'est la
+      // réponse du serveur qui porte le commerce, l'écran ne connaît que
+      // l'identifiant de l'offre. Rien n'est attendu.
+      final businessId = detail.offer.businessId;
+      if (businessId != null) {
+        MetricsService.instance.view(
+          businessId: businessId,
+          offerId: detail.offer.id,
+        );
+      }
     } on OfferDetailException catch (e) {
       if (!isClosed) emit(OfferDetailError(e.message));
     } catch (_) {

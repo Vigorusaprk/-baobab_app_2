@@ -8,7 +8,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:baobabe_0_2/core/widgets/custom_pop_up.dart';
 import 'package:baobabe_0_2/core/widgets/custom_refresh.dart';
+import 'package:baobabe_0_2/core/widgets/remote_image.dart';
 
 /// Le catalogue du commerçant : ce qu'il propose, en ligne ou retiré.
 ///
@@ -50,8 +52,10 @@ class MerchantOffersScreen extends StatelessWidget {
                 ),
                 itemCount: offers.length,
                 separatorBuilder: (_, _) => AppDimens.spacerSmall,
-                itemBuilder: (context, index) =>
-                    _OfferTile(offer: offers[index]),
+                itemBuilder: (context, index) => _OfferTile(
+                  offer: offers[index],
+                  slotCount: space.availability[offers[index].id] ?? 0,
+                ),
               ),
             ),
     );
@@ -61,7 +65,11 @@ class MerchantOffersScreen extends StatelessWidget {
 class _OfferTile extends StatelessWidget {
   final Offer offer;
 
-  const _OfferTile({required this.offer});
+  /// Combien de plages de rendez-vous cette offre déclare. Zéro sur une offre
+  /// réservable veut dire que le client propose encore la date qu'il veut.
+  final int slotCount;
+
+  const _OfferTile({required this.offer, this.slotCount = 0});
 
   @override
   Widget build(BuildContext context) {
@@ -72,18 +80,54 @@ class _OfferTile extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // La photo : c'est elle que le client voit, et un catalogue qui ne
+          // la montre pas laisse le commerçant découvrir ses cadres vides sur
+          // l'accueil.
+          ClipRRect(
+            borderRadius: BorderRadius.circular(AppDimens.small),
+            child: SizedBox(
+              width: 52,
+              height: 52,
+              child: offer.displayImage == null
+                  ? ColoredBox(
+                      color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                      child: Icon(
+                        Icons.image_outlined,
+                        size: AppDimens.medium,
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      ),
+                    )
+                  : RemoteImage(url: offer.displayImage),
+            ),
+          ),
+          AppDimens.spacerMediumWidth,
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                // Le nom occupe sa ligne entière. La pastille de mode
+                // partageait cette ligne, et « Chambre Executive » se
+                // réduisait à « Chambre Ex… » sur un écran de 1080 px :
+                // le commerçant ne reconnaissait plus ses propres offres.
+                // Elle est descendue d'une ligne, où elle borde un texte
+                // court.
+                Text(
+                  offer.name,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: Theme.of(context).textTheme.bodyLarge,
+                ),
+                AppDimens.spacerMini,
                 Row(
                   children: [
                     Flexible(
                       child: Text(
-                        offer.name,
+                        _subtitle(offer),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: Theme.of(context).textTheme.bodyLarge,
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        ),
                       ),
                     ),
                     AppDimens.spacerSmallWidth,
@@ -100,15 +144,6 @@ class _OfferTile extends StatelessWidget {
                     ),
                   ],
                 ),
-                AppDimens.spacerMini,
-                Text(
-                  _subtitle(offer),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
-                  ),
-                ),
                 if (!offer.isActive) ...[
                   AppDimens.spacerSmall,
                   StatusChip(
@@ -116,6 +151,12 @@ class _OfferTile extends StatelessWidget {
                     color: Theme.of(context).colorScheme.error,
                     surface: Theme.of(context).colorScheme.errorContainer,
                   ),
+                ],
+                // Les rendez-vous ne concernent que ce qui se réserve : les
+                // proposer ailleurs serait un réglage sans effet.
+                if (offer.isBookable && offer.isActive) ...[
+                  AppDimens.spacerSmall,
+                  _SlotsLink(offer: offer, slotCount: slotCount),
                 ],
               ],
             ),
@@ -159,7 +200,24 @@ class _OfferMenu extends StatelessWidget {
           context.pushNamed('offerForm', extra: offer);
           return;
         }
+        if (value == 'slots') {
+          context.push('/merchant/slots', extra: offer);
+          return;
+        }
         final messenger = ScaffoldMessenger.of(context);
+        // Retirer est irréversible du point de vue du client : son offre
+        // disparaît du catalogue à l'instant. On le nomme avant de le faire.
+        if (value == 'retire') {
+          final confirmed = await showCustomPopUp(
+            context: context,
+            title: 'Retirer « ${offer.name} » ?',
+            message:
+                'Elle disparaît du catalogue tout de suite. Les commandes '
+                'déjà passées la gardent, et vous pouvez la remettre en '
+                'ligne quand vous voulez.',
+          );
+          if (!confirmed) return;
+        }
         final error = await cubit.setOfferActive(offer.id, value == 'publish');
         messenger.showSnackBar(
           SnackBar(
@@ -174,6 +232,8 @@ class _OfferMenu extends StatelessWidget {
       },
       itemBuilder: (context) => [
         const PopupMenuItem(value: 'edit', child: Text('Modifier')),
+        if (offer.isBookable)
+          const PopupMenuItem(value: 'slots', child: Text('Rendez-vous')),
         if (offer.isActive)
           const PopupMenuItem(value: 'retire', child: Text('Retirer'))
         else
@@ -182,6 +242,49 @@ class _OfferMenu extends StatelessWidget {
             child: Text('Remettre en ligne'),
           ),
       ],
+    );
+  }
+}
+
+/// Ce que l'offre déclare comme rendez-vous, et le geste pour le changer.
+class _SlotsLink extends StatelessWidget {
+  const _SlotsLink({required this.offer, required this.slotCount});
+
+  final Offer offer;
+  final int slotCount;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+    final declared = slotCount > 0;
+
+    return InkWell(
+      onTap: () => context.push('/merchant/slots', extra: offer),
+      borderRadius: BorderRadius.circular(AppDimens.radius8),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 2),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              declared ? Icons.schedule_rounded : Icons.schedule_outlined,
+              size: 14,
+              color: declared ? scheme.primary : scheme.onSurfaceVariant,
+            ),
+            AppDimens.spacerMiniWidth,
+            Text(
+              declared
+                  ? '$slotCount plage${slotCount > 1 ? 's' : ''} de rendez-vous'
+                  : 'Aucun créneau déclaré',
+              style: theme.textTheme.labelSmall?.copyWith(
+                color: declared ? scheme.primary : scheme.onSurfaceVariant,
+                fontWeight: declared ? FontWeight.w600 : null,
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

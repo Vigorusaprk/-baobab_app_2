@@ -3,6 +3,7 @@ import 'package:baobabe_0_2/features/merchant/presentation/cubit/merchant_cubit.
 import 'package:baobabe_0_2/features/merchant/presentation/screens/merchant_dashboard_screen.dart';
 import 'package:baobabe_0_2/features/merchant/presentation/screens/merchant_inbox_screen.dart';
 import 'package:baobabe_0_2/features/merchant/presentation/screens/merchant_offers_screen.dart';
+import 'package:baobabe_0_2/features/merchant/presentation/screens/merchant_shop_screen.dart';
 import 'package:baobabe_0_2/features/merchant/presentation/widgets/merchant_space_skeleton.dart';
 import 'package:baobabe_0_2/features/merchant/presentation/widgets/merchant_widgets.dart';
 import 'package:baobabe_0_2/core/widgets/custom_app_bar.dart';
@@ -28,10 +29,15 @@ class MerchantShell extends StatefulWidget {
 class _MerchantShellState extends State<MerchantShell> {
   int _index = 0;
 
+  /// Quatre onglets, nommés par la question qu'ils répondent plutôt que par
+  /// leur contenu : « Aujourd'hui » avant « Tableau de bord », « Demandes »
+  /// avant « Reçu ». Un commerçant ouvre l'application pour savoir ce qu'il
+  /// a à faire, pas pour consulter un tableau.
   static const List<_MerchantTab> _tabs = [
-    _MerchantTab('Tableau de bord', Icons.insights_outlined, Icons.insights),
-    _MerchantTab('Mes offres', Icons.sell_outlined, Icons.sell),
-    _MerchantTab('Reçu', Icons.inbox_outlined, Icons.inbox),
+    _MerchantTab("Aujourd'hui", Icons.today_outlined, Icons.today),
+    _MerchantTab('Catalogue', Icons.sell_outlined, Icons.sell),
+    _MerchantTab('Demandes', Icons.inbox_outlined, Icons.inbox),
+    _MerchantTab('Boutique', Icons.storefront_outlined, Icons.storefront),
   ];
 
   @override
@@ -120,7 +126,7 @@ class _MerchantShellState extends State<MerchantShell> {
           IconButton(
             tooltip: 'Parcourir Baobabe',
             onPressed: () => context.go('/home'),
-            icon: const Icon(Icons.storefront_outlined),
+            icon: const Icon(Icons.explore_outlined),
           ),
         ],
       ),
@@ -134,6 +140,7 @@ class _MerchantShellState extends State<MerchantShell> {
           ),
           MerchantOffersScreen(space: state.space),
           MerchantInboxScreen(space: state.space),
+          MerchantShopScreen(space: state.space),
         ],
       ),
       bottomNavigationBar: _NavBar(

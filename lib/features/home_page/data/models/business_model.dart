@@ -23,6 +23,14 @@ class BusinessModel {
   final List<BusinessModel>? stores;
   final bool isSponsored;
   final DateTime createdAt;
+  final bool isPaused;
+  final String? pauseNote;
+  final String? province;
+  final String? ville;
+  final String? commune;
+  final String? quartier;
+  final String? avenue;
+  final String? numero;
 
   BusinessModel({
     required this.id,
@@ -47,6 +55,14 @@ class BusinessModel {
     this.stores,
     required this.isSponsored,
     required this.createdAt,
+    this.isPaused = false,
+    this.pauseNote,
+    this.province,
+    this.ville,
+    this.commune,
+    this.quartier,
+    this.avenue,
+    this.numero,
   });
 
   factory BusinessModel.fromJson(Map<String, dynamic> json) {
@@ -85,6 +101,14 @@ class BusinessModel {
                 .toList()
           : null,
       isSponsored: json['is_sponsored'] ?? json['isSponsored'] ?? false,
+      isPaused: json['is_paused'] ?? json['isPaused'] ?? false,
+      pauseNote: json['pause_note']?.toString(),
+      province: json['province']?.toString(),
+      ville: json['ville']?.toString(),
+      commune: json['commune']?.toString(),
+      quartier: json['quartier']?.toString(),
+      avenue: json['avenue']?.toString(),
+      numero: json['numero']?.toString(),
       createdAt: json['created_at'] != null
           ? DateTime.parse(json['created_at'])
           : (json['createdAt'] != null
@@ -117,6 +141,14 @@ class BusinessModel {
       'stores': stores?.map((store) => store.toJson()).toList(),
       'is_sponsored': isSponsored,
       'created_at': createdAt.toIso8601String(),
+      'is_paused': isPaused,
+      'pause_note': pauseNote,
+      'province': province,
+      'ville': ville,
+      'commune': commune,
+      'quartier': quartier,
+      'avenue': avenue,
+      'numero': numero,
     };
   }
 
@@ -144,6 +176,14 @@ class BusinessModel {
       stores: stores?.map((store) => store.toEntity()).toList(),
       isSponsored: isSponsored,
       createdAt: createdAt,
+      isPaused: isPaused,
+      pauseNote: pauseNote,
+      province: province,
+      ville: ville,
+      commune: commune,
+      quartier: quartier,
+      avenue: avenue,
+      numero: numero,
     );
   }
 }

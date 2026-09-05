@@ -50,6 +50,11 @@
 		<!-- Meme piege qu'Android : sans declaration, `canLaunchUrl` repond
 		     faux et les boutons « Appeler », « Itineraire » et les lignes de
 		     contact ne font rien. -->
+		<!-- Le commercant publie les photos de sa boutique et de ses offres. -->
+		<key>NSPhotoLibraryUsageDescription</key>
+		<string>Choisissez une photo pour votre commerce ou vos offres.</string>
+		<key>NSCameraUsageDescription</key>
+		<string>Prenez une photo de votre commerce ou de vos offres.</string>
 		<key>LSApplicationQueriesSchemes</key>
 		<array>
 			<string>tel</string>

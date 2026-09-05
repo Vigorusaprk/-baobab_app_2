@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:baobabe_0_2/core/services/session_service.dart';
 import 'package:baobabe_0_2/features/merchant/data/repositories/merchant_repository_impl.dart';
+import 'package:baobabe_0_2/features/business_detail/domain/entities/offer_availability.dart';
+import 'package:baobabe_0_2/features/merchant/domain/entities/merchant_extras.dart';
 import 'package:baobabe_0_2/features/merchant/domain/entities/merchant_space.dart';
 import 'package:baobabe_0_2/features/merchant/domain/repositories/merchant_repository.dart';
 import 'package:equatable/equatable.dart';
@@ -29,13 +31,18 @@ class MerchantLoading extends MerchantState {
 
 /// L'utilisateur n'est pas commerçant. [application] porte l'état de sa
 /// demande s'il en a déposé une.
+///
+/// [isAdmin] vit ici aussi : administrer la plateforme et tenir un commerce
+/// sont deux rôles indépendants, et le panneau d'administration doit rester
+/// atteignable par un compte qui ne vend rien.
 class NotAMerchant extends MerchantState {
   final MerchantApplication? application;
+  final bool isAdmin;
 
-  const NotAMerchant({this.application});
+  const NotAMerchant({this.application, this.isAdmin = false});
 
   @override
-  List<Object?> get props => [application];
+  List<Object?> get props => [application, isAdmin];
 }
 
 class MerchantReady extends MerchantState {
@@ -111,7 +118,10 @@ class MerchantCubit extends Cubit<MerchantState> {
       emit(
         space.isMerchant
             ? MerchantReady(space)
-            : NotAMerchant(application: space.application),
+            : NotAMerchant(
+                application: space.application,
+                isAdmin: space.isAdmin,
+              ),
       );
     } catch (e) {
       if (isClosed) return;
@@ -167,6 +177,80 @@ class MerchantCubit extends Cubit<MerchantState> {
 
   Future<String?> updateReservationStatus(String id, String status) =>
       _mutate(() => _repository.updateReservationStatus(id, status));
+
+  Future<String?> updateBusiness(BusinessDraft draft) {
+    final business = businessId;
+    if (business == null) return Future.value('Aucun commerce à modifier.');
+    return _mutate(() => _repository.updateBusiness(business, draft));
+  }
+
+  Future<String?> setAvailability({
+    required String offerId,
+    required int? durationMinutes,
+    required int? slotCapacity,
+    required List<AvailabilityRule> rules,
+    required List<AvailabilityException> exceptions,
+    int? leadTimeHours,
+    int? horizonDays,
+  }) => _mutate(
+    () => _repository.setAvailability(
+      offerId: offerId,
+      durationMinutes: durationMinutes,
+      slotCapacity: slotCapacity,
+      rules: rules,
+      exceptions: exceptions,
+      leadTimeHours: leadTimeHours,
+      horizonDays: horizonDays,
+    ),
+  );
+
+  Future<String?> createCampaign({
+    required AdPlacement placement,
+    required DateTime startsOn,
+    required DateTime endsOn,
+    String? offerId,
+  }) {
+    final business = businessId;
+    if (business == null) return Future.value('Aucun commerce.');
+    return _mutate(
+      () => _repository.createCampaign(
+        businessId: business,
+        placement: placement,
+        startsOn: startsOn,
+        endsOn: endsOn,
+        offerId: offerId,
+      ),
+    );
+  }
+
+  Future<String?> actOnCampaign(
+    String campaignId,
+    CampaignAction action, {
+    double? amount,
+    String? note,
+  }) => _mutate(
+    () => _repository.actOnCampaign(
+      campaignId,
+      action,
+      amount: amount,
+      note: note,
+    ),
+  );
+
+  /// La file d'examen et la grille tarifaire, lues à la demande.
+  ///
+  /// Hors de l'état : ces deux listes n'intéressent que deux écrans, et les
+  /// charger au lancement pour tout le monde serait payer un aller-retour
+  /// que personne ne regarde.
+  Future<AdBoard> loadAdBoard() =>
+      _repository.getCampaigns(businessId: businessId);
+
+  /// L'identifiant du commerce courant, ou `null` si l'utilisateur n'en
+  /// tient aucun.
+  String? get businessId {
+    final current = state;
+    return current is MerchantReady ? current.space.business?.id : null;
+  }
 
   /// Exécute une écriture puis relit l'espace.
   ///

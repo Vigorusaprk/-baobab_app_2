@@ -1,4 +1,5 @@
 import 'package:baobabe_0_2/core/themes/app_diemens.dart';
+import 'package:baobabe_0_2/features/merchant/domain/entities/merchant_extras.dart';
 import 'package:baobabe_0_2/features/merchant/domain/entities/merchant_space.dart';
 import 'package:baobabe_0_2/features/merchant/presentation/cubit/merchant_cubit.dart';
 import 'package:baobabe_0_2/features/merchant/presentation/widgets/merchant_widgets.dart';
@@ -76,6 +77,14 @@ class MerchantDashboardScreen extends StatelessWidget {
               ),
             ],
           ),
+          AppDimens.spacerMedium,
+          // L'audience : on ouvre une fiche cent fois pour une commande, et
+          // sans ces deux nombres une campagne n'a aucun résultat à montrer.
+          _Audience(stats: stats),
+          if (space.openCampaigns.isNotEmpty) ...[
+            AppDimens.spacerMedium,
+            _CampaignBanner(space: space),
+          ],
           AppDimens.spacerLarge,
           Text('Mon commerce', style: Theme.of(context).textTheme.titleMedium),
           AppDimens.spacerSmall,
@@ -161,9 +170,163 @@ class MerchantDashboardScreen extends StatelessWidget {
           ),
           AppDimens.spacerSmall,
           _ActionRow(
+            icon: Icons.campaign_outlined,
+            label: 'Mise en avant',
+            onTap: () => context.push('/merchant/ads'),
+          ),
+          if (space.isAdmin) ...[
+            AppDimens.spacerSmall,
+            _ActionRow(
+              icon: Icons.admin_panel_settings_outlined,
+              label: 'Administration de la plateforme',
+              onTap: () => context.push('/admin'),
+            ),
+          ],
+          AppDimens.spacerSmall,
+          _ActionRow(
             icon: Icons.storefront_outlined,
             label: 'Parcourir Baobabe en client',
             onTap: () => context.go('/home'),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Ce que les fiches ont fait, sur trente jours.
+///
+/// Les deux nombres vont ensemble : des vues sans clic disent que la carte
+/// n'accroche pas, des clics sans commande que la fiche déçoit.
+class _Audience extends StatelessWidget {
+  const _Audience({required this.stats});
+
+  final MerchantStats stats;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+
+    return MerchantCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'AUDIENCE · 30 JOURS',
+            style: theme.textTheme.labelSmall?.copyWith(
+              color: scheme.onSurfaceVariant,
+              letterSpacing: 1.1,
+            ),
+          ),
+          AppDimens.spacerSmall,
+          Row(
+            children: [
+              _Figure(value: '${stats.views}', label: 'fiches ouvertes'),
+              AppDimens.spacerLargeWidth,
+              _Figure(value: '${stats.clicks}', label: 'clics depuis une pub'),
+            ],
+          ),
+          if (stats.views == 0) ...[
+            AppDimens.spacerSmall,
+            Text(
+              'Le compteur démarre aujourd\'hui : il ne remonte pas dans le '
+              'passé.',
+              style: theme.textTheme.labelSmall?.copyWith(
+                color: scheme.onSurfaceVariant,
+                height: 1.4,
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class _Figure extends StatelessWidget {
+  const _Figure({required this.value, required this.label});
+
+  final String value;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          value,
+          style: theme.textTheme.titleLarge?.copyWith(
+            fontWeight: FontWeight.w700,
+            color: theme.colorScheme.primary,
+          ),
+        ),
+        Text(
+          label,
+          style: theme.textTheme.labelSmall?.copyWith(
+            color: theme.colorScheme.onSurfaceVariant,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+/// Une campagne qui attend quelque chose : validation, ou règlement.
+class _CampaignBanner extends StatelessWidget {
+  const _CampaignBanner({required this.space});
+
+  final MerchantSpace space;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final open = space.openCampaigns;
+    final toPay = open
+        .where((c) => c.status == CampaignStatus.approved)
+        .toList();
+    final live = open.where((c) => c.status.isLive).toList();
+
+    // Trois situations, trois phrases. Une seule les disait toutes — « N
+    // campagnes en cours » — et une demande encore en examen se lisait comme
+    // une diffusion en train de tourner, alors que rien n'était ni validé ni
+    // réglé.
+    final String message;
+    if (toPay.isNotEmpty) {
+      final many = toPay.length > 1;
+      message =
+          '${toPay.length} campagne${many ? 's' : ''} '
+          'validée${many ? 's' : ''}, à régler';
+    } else if (live.isNotEmpty) {
+      message =
+          '${live.length} campagne${live.length > 1 ? 's' : ''} '
+          'en diffusion';
+    } else {
+      final many = open.length > 1;
+      message =
+          '${open.length} demande${many ? 's' : ''} de mise en avant '
+          "en cours d'examen";
+    }
+
+    return MerchantCard(
+      onTap: () => context.push('/merchant/ads'),
+      child: Row(
+        children: [
+          Icon(
+            Icons.campaign_outlined,
+            color: toPay.isEmpty
+                ? theme.colorScheme.primary
+                : OtherTheme.of(context).onWarningContainer,
+          ),
+          AppDimens.spacerMediumWidth,
+          Expanded(
+            child: Text(message, style: theme.textTheme.bodyLarge),
+          ),
+          Icon(
+            Icons.chevron_right,
+            color: theme.colorScheme.onSurfaceVariant,
           ),
         ],
       ),

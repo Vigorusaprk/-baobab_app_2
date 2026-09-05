@@ -228,6 +228,18 @@ class AppTheme {
         ),
       ),
 
+      // Le bouton flottant : vert de marque, comme tout appel à l'action de
+      // l'application. Sans cette entrée, Material 3 le rend en
+      // `primaryContainer` — un vert pâle qui, sur l'écran du catalogue
+      // commerçant, faisait passer « Publier » pour une action secondaire.
+      floatingActionButtonTheme: FloatingActionButtonThemeData(
+        backgroundColor: scheme.primary,
+        foregroundColor: scheme.onPrimary,
+        extendedTextStyle: textTheme.labelLarge,
+        elevation: AppDimens.elevationDefault,
+        shape: const StadiumBorder(),
+      ),
+
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
           foregroundColor: scheme.primary,

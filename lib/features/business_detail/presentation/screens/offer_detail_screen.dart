@@ -253,6 +253,7 @@ class _OfferDetailView extends StatelessWidget {
       onQuantityChanged: setQuantity,
       onPickDay: (day) => _pickDay(context, day),
       onOpenCalendar: () => _openCalendar(context),
+      onPickSlot: context.read<OfferDetailCubit>().setDate,
     );
   }
 }

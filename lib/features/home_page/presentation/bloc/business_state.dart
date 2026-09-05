@@ -32,6 +32,10 @@ class BusinessLoaded extends BusinessState {
   /// « Quoi prendre ? » — les offres les mieux notées, en scroll infini.
   final List<Offer> discoverOffers;
 
+  /// Les mises en avant payées, tenues à part : elles ne se mêlent à aucune
+  /// autre section et portent leur étiquette.
+  final List<SponsoredOffer> sponsoredOffers;
+
   final String currentSlug;
 
   /// Dernière page chargée des nouveautés, et chargement en cours.
@@ -48,6 +52,7 @@ class BusinessLoaded extends BusinessState {
     this.hasMoreNewOffers = false,
     this.popularBusinesses = const [],
     this.discoverOffers = const [],
+    this.sponsoredOffers = const [],
     this.newOffersPage = 1,
     this.isLoadingMoreNewOffers = false,
     required this.currentSlug,
@@ -61,6 +66,7 @@ class BusinessLoaded extends BusinessState {
     bool? hasMoreNewOffers,
     List<Business>? popularBusinesses,
     List<Offer>? discoverOffers,
+    List<SponsoredOffer>? sponsoredOffers,
     int? newOffersPage,
     bool? isLoadingMoreNewOffers,
     String? currentSlug,
@@ -73,6 +79,7 @@ class BusinessLoaded extends BusinessState {
       hasMoreNewOffers: hasMoreNewOffers ?? this.hasMoreNewOffers,
       popularBusinesses: popularBusinesses ?? this.popularBusinesses,
       discoverOffers: discoverOffers ?? this.discoverOffers,
+      sponsoredOffers: sponsoredOffers ?? this.sponsoredOffers,
       newOffersPage: newOffersPage ?? this.newOffersPage,
       isLoadingMoreNewOffers:
           isLoadingMoreNewOffers ?? this.isLoadingMoreNewOffers,
@@ -89,6 +96,7 @@ class BusinessLoaded extends BusinessState {
     hasMoreNewOffers,
     popularBusinesses,
     discoverOffers,
+    sponsoredOffers,
     newOffersPage,
     isLoadingMoreNewOffers,
     currentSlug,

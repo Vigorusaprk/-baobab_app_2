@@ -1,5 +1,7 @@
 import 'package:baobabe_0_2/core/themes/app_theme.dart';
 import 'package:baobabe_0_2/features/business_detail/domain/entities/offer.dart';
+import 'package:baobabe_0_2/features/business_detail/data/offer_slots_api_service.dart';
+import 'package:baobabe_0_2/features/business_detail/domain/entities/offer_availability.dart';
 import 'package:baobabe_0_2/features/business_detail/domain/entities/offer_detail.dart';
 import 'package:baobabe_0_2/features/business_detail/domain/entities/review.dart';
 import 'package:baobabe_0_2/features/business_detail/presentation/bloc/offer_detail_cubit.dart';
@@ -111,6 +113,24 @@ Review _review({
   createdAt: DateTime.now().subtract(const Duration(days: 1)),
   userName: name,
 );
+
+/// Un service de créneaux qui ne parle à personne : la vue de réservation
+/// en lit un dès qu'elle se pose, et un test n'a pas de Supabase.
+class _Slots extends OfferSlotsApiService {
+  _Slots(this.availability);
+
+  final OfferAvailability availability;
+
+  @override
+  Future<OfferAvailability> getAvailability(
+    String offerId, {
+    DateTime? from,
+    DateTime? to,
+  }) async => availability;
+}
+
+/// Rien de déclaré : le client garde le choix libre de sa date.
+final _freeChoice = _Slots(const OfferAvailability());
 
 Widget _host(Widget child) => MaterialApp(
   theme: AppTheme.silvaTheme,
@@ -326,9 +346,14 @@ void main() {
             onQuantityChanged: (_) {},
             onPickDay: (_) {},
             onOpenCalendar: () {},
+            onPickSlot: (_) {},
+            slotsService: _freeChoice,
           ),
         ),
       );
+      // Le sélecteur lit d'abord ce que l'offre déclare : une image de plus
+      // pour laisser la réponse arriver.
+      await tester.pump();
 
       expect(find.text('DATE'), findsOneWidget);
       expect(find.text('PLACES'), findsOneWidget);
@@ -355,6 +380,8 @@ void main() {
             onQuantityChanged: (_) {},
             onPickDay: (_) {},
             onOpenCalendar: () {},
+            onPickSlot: (_) {},
+            slotsService: _freeChoice,
           ),
         ),
       );

@@ -1,6 +1,7 @@
 import 'package:baobabe_0_2/core/themes/app_diemens.dart';
 import 'package:baobabe_0_2/features/merchant/domain/entities/merchant_space.dart';
 import 'package:baobabe_0_2/features/merchant/presentation/cubit/merchant_cubit.dart';
+import 'package:baobabe_0_2/features/merchant/presentation/widgets/merchant_agenda.dart';
 import 'package:baobabe_0_2/features/merchant/presentation/widgets/merchant_widgets.dart';
 import 'package:baobabe_0_2/features/merchant/presentation/widgets/received_order_card.dart';
 import 'package:baobabe_0_2/features/merchant/presentation/widgets/received_reservation_card.dart';
@@ -8,9 +9,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:baobabe_0_2/core/widgets/custom_refresh.dart';
 
-/// Ce que le commerce a reçu : commandes d'un côté, réservations de
-/// l'autre. Les deux se traitent, mais pas avec les mêmes gestes — une
-/// commande se prépare, une réservation se confirme.
+/// Ce que le commerce a reçu : commandes, réservations, et l'agenda.
+///
+/// Les deux premières listes répondent à « qu'est-ce qui est arrivé ? ». La
+/// troisième répond à « qu'est-ce que je fais aujourd'hui ? » — la même
+/// matière, mais dans l'ordre du temps, ce qu'une liste par date d'arrivée ne
+/// donne jamais.
+///
+/// Une commande se prépare, une réservation se confirme : les gestes ne sont
+/// pas les mêmes, les onglets non plus.
 class MerchantInboxScreen extends StatelessWidget {
   final MerchantSpace space;
 
@@ -18,14 +25,29 @@ class MerchantInboxScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final pendingOrders = space.stats.pendingOrders;
+    final pendingReservations = space.stats.pendingReservations;
+
     return DefaultTabController(
-      length: 2,
+      length: 3,
       child: Column(
         children: [
           TabBar(
+            // Le nombre affiché est celui qui **attend une réponse**, pas la
+            // taille de la liste : un commerçant n'a rien à faire des
+            // cinquante commandes déjà livrées.
             tabs: [
-              Tab(text: 'Commandes (${space.orders.length})'),
-              Tab(text: 'Réservations (${space.reservations.length})'),
+              Tab(
+                text: pendingOrders > 0
+                    ? 'Commandes ($pendingOrders)'
+                    : 'Commandes',
+              ),
+              Tab(
+                text: pendingReservations > 0
+                    ? 'Réservations ($pendingReservations)'
+                    : 'Réservations',
+              ),
+              const Tab(text: 'Agenda'),
             ],
           ),
           Expanded(
@@ -33,6 +55,7 @@ class MerchantInboxScreen extends StatelessWidget {
               children: [
                 _OrdersTab(orders: space.orders),
                 _ReservationsTab(reservations: space.reservations),
+                MerchantAgenda(reservations: space.reservations),
               ],
             ),
           ),

@@ -8,6 +8,7 @@ import 'package:baobabe_0_2/features/home_page/presentation/widgets/offers_carou
 import 'package:baobabe_0_2/features/home_page/presentation/widgets/home_skeleton.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/widgets/home_sliver_header.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/widgets/popular_businesses_section.dart';
+import 'package:baobabe_0_2/features/home_page/presentation/widgets/sponsored_section.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -184,6 +185,11 @@ class _Sections extends StatelessWidget {
           onSeeMore: () => bloc.add(const LoadMoreNewOffers()),
         ),
         if (loaded.newOffers.isNotEmpty) AppDimens.spacerMedium,
+        // Après les nouveautés, avant les commerces : assez haut pour valoir
+        // ce qu'elle coûte, assez bas pour que l'accueil ne s'ouvre pas sur
+        // de la publicité.
+        SponsoredSection(offers: loaded.sponsoredOffers),
+        if (loaded.sponsoredOffers.isNotEmpty) AppDimens.spacerMedium,
         PopularBusinessesSection(onSeeAllTap: onSeeAllBusinesses),
         AppDimens.spacerMedium,
         OffersCarouselSection(

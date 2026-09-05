@@ -99,6 +99,21 @@ class Business extends Equatable {
   final bool isSponsored; // 👈 Ajouté pour filtrer les sponsorisés
   final DateTime createdAt; // 👈 Ajouté pour filtrer les nouveautés
 
+  /// Fermeture temporaire déclarée par le commerçant. Le commerce sort de la
+  /// découverte sans que rien ne soit supprimé.
+  final bool isPaused;
+  final String? pauseNote;
+
+  /// L'adresse en colonnes, du plus large au plus précis. [address] reste la
+  /// ligne lisible, recomposée par le serveur à chaque changement : elle et
+  /// ces six champs ne peuvent donc pas se contredire.
+  final String? province;
+  final String? ville;
+  final String? commune;
+  final String? quartier;
+  final String? avenue;
+  final String? numero;
+
   const Business({
     required this.id,
     required this.name,
@@ -122,6 +137,14 @@ class Business extends Equatable {
     this.stores,
     required this.isSponsored,
     required this.createdAt,
+    this.isPaused = false,
+    this.pauseNote,
+    this.province,
+    this.ville,
+    this.commune,
+    this.quartier,
+    this.avenue,
+    this.numero,
   });
 
   @override
@@ -148,5 +171,13 @@ class Business extends Equatable {
     stores,
     isSponsored,
     createdAt,
+    isPaused,
+    pauseNote,
+    province,
+    ville,
+    commune,
+    quartier,
+    avenue,
+    numero,
   ];
 }

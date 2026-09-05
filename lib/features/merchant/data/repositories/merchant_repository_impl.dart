@@ -1,5 +1,7 @@
 import 'package:baobabe_0_2/features/business_detail/domain/entities/offer.dart';
+import 'package:baobabe_0_2/features/business_detail/domain/entities/offer_availability.dart';
 import 'package:baobabe_0_2/features/home_page/data/models/business_model.dart';
+import 'package:baobabe_0_2/features/merchant/domain/entities/merchant_extras.dart';
 import 'package:baobabe_0_2/features/merchant/domain/entities/merchant_space.dart';
 import 'package:baobabe_0_2/features/merchant/domain/repositories/merchant_repository.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -79,6 +81,100 @@ class MerchantRepositoryImpl implements MerchantRepository {
         },
       );
 
+  @override
+  Future<void> updateBusiness(String businessId, BusinessDraft draft) =>
+      _invoke(
+        'update-business',
+        body: {'businessId': businessId, ...draft.toBody()},
+      );
+
+  @override
+  Future<void> setAvailability({
+    required String offerId,
+    required int? durationMinutes,
+    required int? slotCapacity,
+    required List<AvailabilityRule> rules,
+    required List<AvailabilityException> exceptions,
+    int? leadTimeHours,
+    int? horizonDays,
+  }) => _invoke(
+    'update-offer-availability',
+    body: {
+      'offerId': offerId,
+      'durationMinutes': durationMinutes,
+      'slotCapacity': slotCapacity,
+      'leadTimeHours': ?leadTimeHours,
+      'horizonDays': ?horizonDays,
+      'rules': rules.map((rule) => rule.toBody()).toList(),
+      'exceptions': exceptions.map((item) => item.toBody()).toList(),
+    },
+  );
+
+  @override
+  Future<AdBoard> getCampaigns({String? businessId}) async {
+    final json = await _invoke(
+      'get-ad-campaigns',
+      method: HttpMethod.get,
+      query: businessId == null ? null : {'businessId': businessId},
+    );
+
+    List<T> parse<T>(String key, T Function(Map<String, dynamic>) build) {
+      final list = (json[key] as List?) ?? const [];
+      return list
+          .map((e) => build(Map<String, dynamic>.from(e as Map)))
+          .toList();
+    }
+
+    return AdBoard(
+      isAdmin: json['isAdmin'] == true,
+      prices: parse('prices', AdPrice.fromJson),
+      campaigns: parse('campaigns', AdCampaign.fromJson),
+      queue: parse('queue', AdCampaign.fromJson),
+      applications: parse('applications', MerchantApplication.fromJson),
+    );
+  }
+
+  @override
+  Future<void> createCampaign({
+    required String businessId,
+    required AdPlacement placement,
+    required DateTime startsOn,
+    required DateTime endsOn,
+    String? offerId,
+  }) => _invoke(
+    'create-ad-campaign',
+    body: {
+      'businessId': businessId,
+      'placement': placement.asJson,
+      'startsOn': _day(startsOn),
+      'endsOn': _day(endsOn),
+      'offerId': offerId,
+    },
+  );
+
+  @override
+  Future<void> actOnCampaign(
+    String campaignId,
+    CampaignAction action, {
+    double? amount,
+    String? note,
+  }) => _invoke(
+    'update-ad-campaign',
+    body: {
+      'campaignId': campaignId,
+      'action': action.asJson,
+      'amount': ?amount,
+      'note': ?note,
+    },
+  );
+
+  /// Une date sans heure : une campagne se compte en jours entiers, et
+  /// envoyer un instant ferait dépendre le devis du fuseau de l'appareil.
+  static String _day(DateTime date) =>
+      '${date.year.toString().padLeft(4, '0')}-'
+      '${date.month.toString().padLeft(2, '0')}-'
+      '${date.day.toString().padLeft(2, '0')}';
+
   /// Appelle une Edge Function et remonte son message d'erreur tel quel.
   ///
   /// Les fonctions de l'espace commerçant répondent en français et parlent
@@ -87,6 +183,7 @@ class MerchantRepositoryImpl implements MerchantRepository {
   Future<Map<String, dynamic>> _invoke(
     String function, {
     Map<String, dynamic>? body,
+    Map<String, String>? query,
     HttpMethod method = HttpMethod.post,
   }) async {
     try {
@@ -94,6 +191,7 @@ class MerchantRepositoryImpl implements MerchantRepository {
         function,
         method: method,
         body: body,
+        queryParameters: query,
       );
       final data = response.data;
       if (data is Map<String, dynamic>) {
@@ -117,6 +215,9 @@ class MerchantRepositoryImpl implements MerchantRepository {
         application: application is Map<String, dynamic>
             ? MerchantApplication.fromJson(application)
             : null,
+        // Un administrateur de plateforme n'est pas forcément commerçant :
+        // sa réponse n'a pas de commerce, et son espace existe quand même.
+        isAdmin: json['isAdmin'] == true,
       );
     }
 
@@ -136,6 +237,14 @@ class MerchantRepositoryImpl implements MerchantRepository {
       stats: MerchantStats.fromJson(
         Map<String, dynamic>.from((json['stats'] as Map?) ?? const {}),
       ),
+      campaigns: parse('campaigns', AdCampaign.fromJson),
+      metrics: parse('metrics', DailyMetric.fromJson),
+      availability: {
+        for (final entry
+            in (json['availability'] as Map?)?.entries ?? const <dynamic, dynamic>{}.entries)
+          entry.key.toString(): (entry.value as num?)?.toInt() ?? 0,
+      },
+      isAdmin: json['isAdmin'] == true,
     );
   }
 }

@@ -229,7 +229,26 @@ class BusinessRemoteDataSourceImpl implements BusinessRemoteDataSource {
           .map((m) => m.toEntity())
           .toList(),
       discoverOffers: _decodeOffersPage(json['discoverOffers']),
+      sponsoredOffers: _decodeSponsored(json['sponsoredOffers']),
     );
+  }
+
+  /// Les mises en avant. Une entrée sans `campaignId` est écartée : sans lui
+  /// le clic ne pourrait être rapporté à aucune campagne, et une mise en
+  /// avant qu'on ne peut pas mesurer ne vaut pas d'être vendue.
+  List<SponsoredOffer> _decodeSponsored(Object? raw) {
+    if (raw is! List) return const [];
+    final result = <SponsoredOffer>[];
+    for (final entry in raw) {
+      if (entry is! Map) continue;
+      final map = Map<String, dynamic>.from(entry);
+      final campaignId = map['campaignId']?.toString();
+      if (campaignId == null || campaignId.isEmpty) continue;
+      result.add(
+        SponsoredOffer(offer: Offer.fromJson(map), campaignId: campaignId),
+      );
+    }
+    return result;
   }
 
   OffersPage _decodeOffersPage(Object? raw) {

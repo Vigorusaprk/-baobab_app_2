@@ -1,4 +1,3 @@
-import 'package:baobabe_0_2/core/themes/app_diemens.dart';
 import 'package:flutter/material.dart';
 
 /// Des avis **par deux**, qui se feuillettent horizontalement.

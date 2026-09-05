@@ -18,7 +18,10 @@ import 'package:baobabe_0_2/features/activity/presentation/screens/activity_deta
 import 'package:baobabe_0_2/features/settings/presentation/screens/settings_screen.dart';
 import 'package:baobabe_0_2/features/business_detail/presentation/screens/business_detail_screen.dart';
 import 'package:baobabe_0_2/features/business_detail/presentation/screens/offer_detail_screen.dart';
+import 'package:baobabe_0_2/features/merchant/presentation/screens/admin_screen.dart';
+import 'package:baobabe_0_2/features/merchant/presentation/screens/merchant_ads_screen.dart';
 import 'package:baobabe_0_2/features/merchant/presentation/screens/merchant_shell.dart';
+import 'package:baobabe_0_2/features/merchant/presentation/screens/offer_availability_page.dart';
 import 'package:baobabe_0_2/features/merchant/presentation/screens/offer_form_page.dart';
 
 // Modèles/Entités
@@ -243,7 +246,38 @@ final GoRouter appRouter = GoRouter(
           pageBuilder: (context, state) =>
               MaterialPage(child: OfferFormPage(offer: state.extra as Offer?)),
         ),
+        // Les créneaux d'une offre : hors du formulaire, parce qu'une
+        // semaine d'horaires n'a rien à faire au milieu d'un prix et d'une
+        // description, et qu'on y revient bien plus souvent qu'on ne
+        // modifie l'offre elle-même.
+        GoRoute(
+          path: 'slots',
+          name: 'offerSlots',
+          pageBuilder: (context, state) {
+            final offer = state.extra as Offer?;
+            if (offer == null) {
+              return const MaterialPage(
+                child: Scaffold(body: Center(child: Text('Offre introuvable'))),
+              );
+            }
+            return MaterialPage(child: OfferAvailabilityPage(offer: offer));
+          },
+        ),
+        GoRoute(
+          path: 'ads',
+          name: 'merchantAds',
+          pageBuilder: (context, state) =>
+              const MaterialPage(child: MerchantAdsScreen()),
+        ),
       ],
+    ),
+    // Le panneau d'administration. Hors de l'espace commerçant : on y entre
+    // avec une autre casquette, et l'accès ne tient pas au fait de gérer un
+    // commerce mais à une ligne dans `platform_admins`.
+    GoRoute(
+      path: '/admin',
+      name: 'admin',
+      pageBuilder: (context, state) => const MaterialPage(child: AdminScreen()),
     ),
   ],
 );

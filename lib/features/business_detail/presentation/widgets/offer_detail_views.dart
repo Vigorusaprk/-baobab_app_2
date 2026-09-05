@@ -3,6 +3,8 @@ import 'package:baobabe_0_2/core/widgets/dashed_rule.dart';
 import 'package:baobabe_0_2/core/widgets/remote_image.dart';
 import 'package:baobabe_0_2/features/business_detail/presentation/bloc/offer_detail_cubit.dart';
 import 'package:baobabe_0_2/features/business_detail/presentation/widgets/offer_detail_parts.dart';
+import 'package:baobabe_0_2/features/business_detail/data/offer_slots_api_service.dart';
+import 'package:baobabe_0_2/features/business_detail/presentation/widgets/offer_slot_picker.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/widgets/offers_carousel_section.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -133,12 +135,20 @@ class OfferBookingView extends StatelessWidget {
     required this.onQuantityChanged,
     required this.onPickDay,
     required this.onOpenCalendar,
+    required this.onPickSlot,
+    this.slotsService,
   });
 
   final OfferDetailLoaded state;
   final ValueChanged<int> onQuantityChanged;
   final ValueChanged<DateTime> onPickDay;
   final VoidCallback onOpenCalendar;
+
+  /// Un créneau déclaré : l'heure vient avec, on ne la redemande pas.
+  final ValueChanged<DateTime> onPickSlot;
+
+  /// Injectable pour les tests : la vue ne lit rien elle-même, elle passe.
+  final OfferSlotsApiService? slotsService;
 
   static const double photoHeight = 226;
 
@@ -233,10 +243,16 @@ class OfferBookingView extends StatelessWidget {
                 // Une séance impose son heure ; une table, un soin ou une
                 // chambre laissent choisir.
                 if (state.needsDateChoice)
-                  OfferDateChoice(
+                  // Le sélecteur lit d'abord ce que l'offre déclare : une
+                  // grille de créneaux si le commerçant en a posé, le choix
+                  // libre de la date sinon.
+                  OfferSlotPicker(
+                    offerId: offer.id,
                     chosen: state.chosenDate,
+                    onPickSlot: onPickSlot,
                     onPickDay: onPickDay,
                     onOpenCalendar: onOpenCalendar,
+                    service: slotsService,
                   )
                 else if (offer.startsAt != null)
                   OfferFactLine(

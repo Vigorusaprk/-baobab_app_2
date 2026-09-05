@@ -704,7 +704,7 @@ class OfferDateChoice extends StatelessWidget {
           children: [
             for (final day in days)
               Expanded(
-                child: _DayChip(
+                child: OfferDayChip(
                   day: day,
                   selected: _isSameDay(day, chosen),
                   onTap: () => onPickDay(day),
@@ -728,8 +728,11 @@ class OfferDateChoice extends StatelessWidget {
       b != null && a.year == b.year && a.month == b.month && a.day == b.day;
 }
 
-class _DayChip extends StatelessWidget {
-  const _DayChip({
+/// Une pastille de jour. Publique parce que le sélecteur de créneaux la
+/// reprend : deux dessins pour un même objet feraient deux applications.
+class OfferDayChip extends StatelessWidget {
+  const OfferDayChip({
+    super.key,
     required this.day,
     required this.selected,
     required this.onTap,

@@ -1,3 +1,4 @@
+import 'package:baobabe_0_2/core/services/metrics_service.dart';
 import 'package:baobabe_0_2/core/themes/app_diemens.dart';
 import 'package:baobabe_0_2/core/widgets/button/custom_action_button.dart';
 import 'package:baobabe_0_2/core/widgets/custom_refresh.dart';
@@ -40,6 +41,14 @@ class BusinessDetailScreen extends StatefulWidget {
 }
 
 class _BusinessDetailScreenState extends State<BusinessDetailScreen> {
+  @override
+  void initState() {
+    super.initState();
+    // Une fiche ouverte se compte. Rien n'est attendu : la mesure part et
+    // l'écran continue, qu'elle aboutisse ou non.
+    MetricsService.instance.view(businessId: widget.businessId);
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocProvider<BusinessDetailBloc>(
