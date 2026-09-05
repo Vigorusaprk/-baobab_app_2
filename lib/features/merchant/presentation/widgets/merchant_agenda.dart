@@ -1,4 +1,5 @@
 import 'package:baobabe_0_2/core/themes/app_diemens.dart';
+import 'package:baobabe_0_2/core/widgets/custom_pop_up.dart';
 import 'package:baobabe_0_2/core/themes/other_theme.dart';
 import 'package:baobabe_0_2/features/merchant/domain/entities/merchant_space.dart';
 import 'package:baobabe_0_2/features/merchant/presentation/cubit/merchant_cubit.dart';
@@ -342,12 +343,10 @@ class _AgendaRow extends StatelessWidget {
                         label: 'Refuser',
                         icon: Icons.close_rounded,
                         tint: scheme.error,
-                        onTap: () => context
-                            .read<MerchantCubit>()
-                            .updateReservationStatus(
-                              reservation.id,
-                              'cancelled',
-                            ),
+                        // Deux cibles de 14 px côte à côte : sans cette
+                        // question, un pouce mal posé annulait le
+                        // rendez-vous d'un client, sans retour.
+                        onTap: () => _refuse(context),
                       ),
                     ],
                   ),
@@ -366,6 +365,22 @@ class _AgendaRow extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  /// Refuser libère le créneau et prévient le client, sans retour. Les deux
+  /// pastilles se touchent du pouce : on pose la question avant d'agir.
+  Future<void> _refuse(BuildContext context) async {
+    final cubit = context.read<MerchantCubit>();
+    final confirmed = await showCustomPopUp(
+      context: context,
+      title: 'Refuser ce rendez-vous ?',
+      message:
+          'Le créneau est libéré tout de suite et le client en est '
+          'prévenu. Cela ne peut pas être défait.',
+      confirmLabel: 'Refuser',
+    );
+    if (!confirmed) return;
+    await cubit.updateReservationStatus(reservation.id, 'cancelled');
   }
 }
 

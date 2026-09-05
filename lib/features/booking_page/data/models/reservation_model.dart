@@ -47,7 +47,8 @@ class Reservation {
       'business_id': businessId,
       'user_id': userId,
       'type': type,
-      'reservation_date': reservationDate.toIso8601String(),
+      // En UTC explicite : voir `reservation_json_mapper.dart`.
+      'reservation_date': reservationDate.toUtc().toIso8601String(),
       'total_amount': totalAmount,
       'details': {...details, 'establishment_name': establishmentName},
       'created_at': createdAt.toIso8601String(),

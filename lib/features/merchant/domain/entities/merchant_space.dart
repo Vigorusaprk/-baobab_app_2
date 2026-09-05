@@ -29,6 +29,17 @@ enum ApplicationStatus {
 }
 
 /// Demande de compte commerçant déposée par l'utilisateur.
+/// Un instant venu du serveur, ramené à l'heure de l'appareil.
+///
+/// Postgres rend « 2026-09-07T10:00:00+00:00 » et `DateTime.tryParse` en fait
+/// un `DateTime` **en UTC** : formaté tel quel, un rendez-vous pris à 11 h à
+/// Kinshasa s'affichait 10 h dans l'agenda du commerçant, une heure avant
+/// l'heure que le client avait choisie. Le reste de l'application convertit
+/// à l'affichage ; ici on convertit à la lecture, une fois, pour que tous
+/// les écrans de l'espace commerçant parlent de la même heure.
+DateTime? _instant(Object? raw) =>
+    DateTime.tryParse(raw?.toString() ?? '')?.toLocal();
+
 class MerchantApplication extends Equatable {
   final String id;
   final String businessName;
@@ -53,7 +64,7 @@ class MerchantApplication extends Equatable {
       businessName: json['business_name']?.toString() ?? '',
       status: ApplicationStatus.fromJson(json['status']?.toString()),
       reviewNote: json['review_note']?.toString(),
-      createdAt: DateTime.tryParse(json['created_at']?.toString() ?? ''),
+      createdAt: _instant(json['created_at']),
     );
   }
 
@@ -135,7 +146,7 @@ class ReceivedOrder extends Equatable {
           (json['total_amount'] as num?)?.toDouble() ??
           (json['total_price'] as num?)?.toDouble() ??
           0,
-      createdAt: DateTime.tryParse(json['created_at']?.toString() ?? ''),
+      createdAt: _instant(json['created_at']),
       notes: json['notes']?.toString(),
       customer: Customer.fromJson(json['customer']),
       lines: items
@@ -211,7 +222,7 @@ class ReceivedReservation extends Equatable {
       itemName: json['item_name']?.toString() ?? 'Réservation',
       quantity: (json['quantity'] as num?)?.toInt() ?? 1,
       total: (json['total_amount'] as num?)?.toDouble() ?? 0,
-      date: DateTime.tryParse(json['reservation_date']?.toString() ?? ''),
+      date: _instant(json['reservation_date']),
       customer: Customer.fromJson(json['customer']),
     );
   }

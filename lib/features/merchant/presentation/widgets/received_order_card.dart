@@ -1,4 +1,5 @@
 import 'package:baobabe_0_2/core/themes/app_diemens.dart';
+import 'package:baobabe_0_2/core/widgets/custom_pop_up.dart';
 import 'package:baobabe_0_2/features/merchant/domain/entities/merchant_space.dart';
 import 'package:baobabe_0_2/features/merchant/presentation/cubit/merchant_cubit.dart';
 import 'package:baobabe_0_2/features/merchant/presentation/widgets/merchant_widgets.dart';
@@ -123,6 +124,21 @@ class ReceivedOrderCard extends StatelessWidget {
   }
 
   Future<void> _apply(BuildContext context, OrderStatus status) async {
+    // Refuser est sans retour pour le client : sa commande est annulée à
+    // l'instant, et il en est averti. On le nomme avant de le faire — le
+    // bouton borde « Préparer », et les deux se touchent du pouce.
+    if (status == OrderStatus.cancelled) {
+      final confirmed = await showCustomPopUp(
+        context: context,
+        title: 'Refuser cette commande ?',
+        message:
+            'Elle est annulée tout de suite et le client en est prévenu. '
+            'Cela ne peut pas être défait.',
+        confirmLabel: 'Refuser',
+      );
+      if (!confirmed || !context.mounted) return;
+    }
+
     final messenger = ScaffoldMessenger.of(context);
     final error = await context.read<MerchantCubit>().updateOrderStatus(
       order.id,

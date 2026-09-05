@@ -117,11 +117,14 @@ class _Photo extends StatelessWidget {
                   : OtherTheme.of(context).onWarningContainer,
             ),
           ),
-          // En haut à droite : les deux autres coins gauches portent déjà
-          // le mode de retrait et la date.
+          // En bas à droite. Essayé en haut à droite d'abord : sur une carte
+          // de rail de 190 px, « À réserver » et « Sponsorisé » se
+          // rejoignaient au milieu et les deux devenaient illisibles. Les
+          // trois coins occupés ne se touchent plus — mode en haut à gauche,
+          // date en bas à gauche, mention payée en bas à droite.
           if (sponsored)
             Positioned(
-              top: AppDimens.small,
+              bottom: AppDimens.small,
               right: AppDimens.small,
               child: _Badge(
                 label: 'Sponsorisé',

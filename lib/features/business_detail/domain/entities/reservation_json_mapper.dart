@@ -68,7 +68,9 @@ extension ReservationJsonMapper on Reservation {
       'business_id': businessId,
       'type': reservationType,
       'total_amount': totalAmount,
-      'reservation_date': reservationDate.toIso8601String(),
+      // En UTC explicite : une date locale sérialisée sans décalage est
+      // relue comme de l'UTC et décale le rendez-vous.
+      'reservation_date': reservationDate.toUtc().toIso8601String(),
       'details': {
         ...details,
         'establishment_name': establishmentName,

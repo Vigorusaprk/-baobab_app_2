@@ -105,6 +105,16 @@ class _OfferSlotPickerState extends State<OfferSlotPicker> {
     final day = _day ?? days.first;
     final slots = availability.slotsOn(day);
 
+    // La référence à laquelle « il reste peu » se mesure. Sans elle, une
+    // offre déclarée à une place affichait « dernière place » sous
+    // *chaque* créneau : la mention perdait tout sens, puisqu'un créneau à
+    // une place est soit libre, soit absent. On ne la montre donc que
+    // lorsqu'il reste moins que d'habitude — c'est-à-dire que quelqu'un a
+    // déjà pris quelque chose.
+    final reference =
+        availability.slotCapacity ??
+        slots.fold<int>(0, (best, slot) => slot.remaining > best ? slot.remaining : best);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -138,7 +148,9 @@ class _OfferSlotPickerState extends State<OfferSlotPicker> {
             for (final slot in slots)
               _SlotChip(
                 slot: slot,
-                selected: widget.chosen != null && _isSame(slot.at, widget.chosen!),
+                reference: reference,
+                selected:
+                    widget.chosen != null && _isSame(slot.at, widget.chosen!),
                 onTap: () => widget.onPickSlot(slot.at),
               ),
           ],
@@ -170,16 +182,22 @@ class _OfferSlotPickerState extends State<OfferSlotPicker> {
 }
 
 /// Une heure proposée. Le nombre de places restantes n'apparaît que lorsqu'il
-/// est bas : « 12 places » sous chaque créneau ne dit rien, « 2 places »
-/// décide.
+/// est **entamé et bas** : « 12 places » sous chaque créneau ne dit rien, et
+/// « dernière place » sous chacun d'eux, sur une offre qui n'en propose
+/// qu'une, ne dit rien non plus. « 2 places » décide.
 class _SlotChip extends StatelessWidget {
   const _SlotChip({
     required this.slot,
+    required this.reference,
     required this.selected,
     required this.onTap,
   });
 
   final OfferSlot slot;
+
+  /// Ce que le créneau offre quand personne n'a rien pris.
+  final int reference;
+
   final bool selected;
   final VoidCallback onTap;
 
@@ -187,7 +205,8 @@ class _SlotChip extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final scheme = theme.colorScheme;
-    final scarce = slot.remaining > 0 && slot.remaining <= 3;
+    final scarce =
+        slot.remaining > 0 && slot.remaining < reference && slot.remaining <= 3;
 
     return Material(
       color: selected

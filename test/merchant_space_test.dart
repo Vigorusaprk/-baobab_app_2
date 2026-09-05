@@ -3,9 +3,11 @@ import 'package:baobabe_0_2/core/widgets/offer_card.dart';
 import 'package:baobabe_0_2/features/business_detail/data/offer_slots_api_service.dart';
 import 'package:baobabe_0_2/features/business_detail/domain/entities/offer.dart';
 import 'package:baobabe_0_2/features/business_detail/domain/entities/offer_availability.dart';
+import 'package:baobabe_0_2/features/business_detail/domain/entities/reservation.dart';
 import 'package:baobabe_0_2/features/business_detail/presentation/widgets/offer_detail_parts.dart';
 import 'package:baobabe_0_2/features/business_detail/presentation/widgets/offer_slot_picker.dart';
 import 'package:baobabe_0_2/features/merchant/domain/entities/merchant_extras.dart';
+import 'package:baobabe_0_2/features/merchant/domain/entities/merchant_space.dart';
 import 'package:baobabe_0_2/features/merchant/presentation/widgets/opening_hours_editor.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -306,6 +308,51 @@ void main() {
 
       expect(find.textContaining('Lundi'), findsOneWidget);
       expect(saved, isNull);
+    });
+  });
+
+  group("L'heure envoyée au serveur", () {
+    test('un rendez-vous part en UTC, décalage compris', () {
+      // `toIso8601String()` d'une date locale sort sans décalage, et
+      // Postgres la relit comme de l'UTC : le créneau de 10 h à Kinshasa
+      // était enregistré à 11 h. Le serveur vérifiant désormais que la date
+      // tombe sur un créneau déclaré, il refusait l'heure que le client
+      // venait de toucher.
+      final reservation = Reservation(
+        id: 'r1',
+        establishmentName: 'Hôtel Memling',
+        reservationType: 'hotel',
+        customerName: 'Cliente',
+        phoneNumber: '+243900000000',
+        totalAmount: 210,
+        reservationDate: DateTime.fromMillisecondsSinceEpoch(
+          DateTime.utc(2026, 10, 14, 9).millisecondsSinceEpoch,
+        ),
+      );
+
+      final sent = reservation.toJson(isNew: true)['reservation_date'] as String;
+      expect(sent.endsWith('Z'), isTrue);
+      expect(DateTime.parse(sent), DateTime.utc(2026, 10, 14, 9));
+    });
+  });
+
+  group("L'heure lue du serveur", () {
+    test("un rendez-vous reçu passe à l'heure de l'appareil", () {
+      // `DateTime.tryParse` d'un instant en « +00:00 » rend un DateTime en
+      // UTC : formaté tel quel, l'agenda du commerçant affichait une heure
+      // de moins que celle choisie par le client à Kinshasa.
+      final received = ReceivedReservation.fromJson({
+        'id': 'r1',
+        'status': 'pending',
+        'item_name': 'Chambre Exécutive',
+        'quantity': 1,
+        'total_amount': 210,
+        'reservation_date': '2026-09-07T10:00:00+00:00',
+      });
+
+      expect(received.date, isNotNull);
+      expect(received.date!.isUtc, isFalse);
+      expect(received.date, DateTime.utc(2026, 9, 7, 10).toLocal());
     });
   });
 

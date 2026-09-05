@@ -52,8 +52,15 @@ class ReservationApiService {
         body: {
           'offerId': offerId,
           'quantity': quantity,
+          // `toUtc()` avant l'ISO, sans quoi `toIso8601String()` d'une date
+          // locale sort « 2026-09-07T10:00:00.000 » — sans décalage. Postgres
+          // la lit alors comme de l'UTC, et le rendez-vous se décale du
+          // fuseau de l'appareil : à Kinshasa, le créneau de 10 h était
+          // enregistré à 11 h. Le serveur vérifie désormais que la date
+          // tombe sur un créneau déclaré, et refusait donc une heure que le
+          // client venait de toucher.
           if (reservationDate != null)
-            'reservationDate': reservationDate.toIso8601String(),
+            'reservationDate': reservationDate.toUtc().toIso8601String(),
           'notes': ?notes,
           'details': ?details,
         },
