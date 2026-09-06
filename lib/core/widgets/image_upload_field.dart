@@ -164,10 +164,7 @@ class _ImageUploadFieldState extends State<ImageUploadField> {
                   if (url != null && url.isNotEmpty)
                     ClipRRect(
                       borderRadius: BorderRadius.circular(AppDimens.radius12),
-                      child: RemoteImage(
-                        url: url,
-                        fallback: const _Empty(),
-                      ),
+                      child: RemoteImage(url: url, fallback: const _Empty()),
                     )
                   else
                     const _Empty(),

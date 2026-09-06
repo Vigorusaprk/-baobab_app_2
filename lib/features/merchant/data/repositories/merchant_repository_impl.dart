@@ -241,7 +241,8 @@ class MerchantRepositoryImpl implements MerchantRepository {
       metrics: parse('metrics', DailyMetric.fromJson),
       availability: {
         for (final entry
-            in (json['availability'] as Map?)?.entries ?? const <dynamic, dynamic>{}.entries)
+            in (json['availability'] as Map?)?.entries ??
+                const <dynamic, dynamic>{}.entries)
           entry.key.toString(): (entry.value as num?)?.toInt() ?? 0,
       },
       isAdmin: json['isAdmin'] == true,

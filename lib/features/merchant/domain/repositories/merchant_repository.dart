@@ -126,11 +126,8 @@ class AdBoard {
   double perDay(AdPlacement placement) => prices
       .firstWhere(
         (price) => price.placement == placement,
-        orElse: () => AdPrice(
-          placement: placement,
-          label: placement.label,
-          usdPerDay: 0,
-        ),
+        orElse: () =>
+            AdPrice(placement: placement, label: placement.label, usdPerDay: 0),
       )
       .usdPerDay;
 }

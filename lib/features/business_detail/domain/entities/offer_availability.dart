@@ -91,12 +91,15 @@ class AvailabilityException extends Equatable {
   }
 
   Map<String, dynamic> toBody() => {
-    'day': '${day.year.toString().padLeft(4, '0')}-'
+    'day':
+        '${day.year.toString().padLeft(4, '0')}-'
         '${day.month.toString().padLeft(2, '0')}-'
         '${day.day.toString().padLeft(2, '0')}',
     'isClosed': isClosed,
-    if (!isClosed) 'startsAt': formatTime(startsAt ?? const TimeOfDay(hour: 9, minute: 0)),
-    if (!isClosed) 'endsAt': formatTime(endsAt ?? const TimeOfDay(hour: 17, minute: 0)),
+    if (!isClosed)
+      'startsAt': formatTime(startsAt ?? const TimeOfDay(hour: 9, minute: 0)),
+    if (!isClosed)
+      'endsAt': formatTime(endsAt ?? const TimeOfDay(hour: 17, minute: 0)),
     'reason': reason,
   };
 
@@ -153,7 +156,9 @@ class OfferAvailability extends Equatable {
   factory OfferAvailability.fromJson(Map<String, dynamic> json) {
     List<T> parse<T>(String key, T Function(Map<String, dynamic>) build) {
       final list = (json[key] as List?) ?? const [];
-      return list.map((e) => build(Map<String, dynamic>.from(e as Map))).toList();
+      return list
+          .map((e) => build(Map<String, dynamic>.from(e as Map)))
+          .toList();
     }
 
     return OfferAvailability(

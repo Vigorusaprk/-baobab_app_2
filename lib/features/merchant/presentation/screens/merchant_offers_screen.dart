@@ -90,7 +90,9 @@ class _OfferTile extends StatelessWidget {
               height: 52,
               child: offer.displayImage == null
                   ? ColoredBox(
-                      color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.surfaceContainerHighest,
                       child: Icon(
                         Icons.image_outlined,
                         size: AppDimens.medium,

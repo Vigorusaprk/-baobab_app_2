@@ -9,6 +9,13 @@ import 'package:baobabe_0_2/features/business_detail/presentation/widgets/offer_
 import 'package:baobabe_0_2/features/merchant/domain/entities/merchant_extras.dart';
 import 'package:baobabe_0_2/features/merchant/domain/entities/merchant_space.dart';
 import 'package:baobabe_0_2/features/merchant/presentation/widgets/opening_hours_editor.dart';
+import 'package:baobabe_0_2/features/merchant/domain/repositories/merchant_repository.dart';
+import 'package:baobabe_0_2/features/merchant/presentation/cubit/merchant_cubit.dart';
+import 'package:baobabe_0_2/features/merchant/presentation/widgets/merchant_agenda.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:baobabe_0_2/features/merchant/presentation/widgets/received_reservation_card.dart';
+import 'package:baobabe_0_2/features/merchant/presentation/widgets/received_order_card.dart';
+import 'package:baobabe_0_2/features/order/domain/entities/order_status.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -72,6 +79,39 @@ Offer _offer({String id = 'o1'}) => Offer(
   businessId: 'b1',
   businessName: 'Institut Kivu',
 );
+
+
+/// Un dépôt qui n'écrit nulle part : l'agenda n'a besoin d'un cubit que pour
+/// pouvoir le lire, et la question posée avant de refuser vient avant tout
+/// appel réseau.
+class _NoRepository implements MerchantRepository {
+  @override
+  noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
+
+/// Un rendez-vous en attente, aujourd'hui : l'agenda ouvre sur le jour
+/// courant, la ligne est donc visible sans toucher une pastille.
+ReceivedReservation _pending() {
+  final now = DateTime.now();
+  return ReceivedReservation(
+    id: 'r1',
+    status: ReservationStatus.pending,
+    itemName: 'Chambre Exécutive',
+    total: 210,
+    date: DateTime(now.year, now.month, now.day, 10),
+    customer: const Customer(name: 'Client'),
+  );
+}
+
+
+/// La zone réellement touchable d'une pastille d'action : son `InkWell`, et
+/// non la rangée de texte qu'elle contient.
+/// `.first` : `find.ancestor` remonte du plus proche au plus lointain, et la
+/// carte entière porte elle aussi un `InkWell`. Viser le sien mesurerait la
+/// carte, pas le bouton.
+Finder _target(String label) => find
+    .ancestor(of: find.text(label), matching: find.byType(InkWell))
+    .first;
 
 Widget _host(Widget child) => MaterialApp(
   theme: AppTheme.silvaTheme,
@@ -353,6 +393,143 @@ void main() {
       expect(received.date, isNotNull);
       expect(received.date!.isUtc, isFalse);
       expect(received.date, DateTime.utc(2026, 9, 7, 10).toLocal());
+    });
+  });
+
+  group("L'agenda du commerçant", () {
+    /// Le geste doit porter sur **toute** la pastille.
+    ///
+    /// Les deux actions vivaient dans la colonne du milieu de la carte :
+    /// la rangée dépassait de son `Expanded`, et Flutter n'envoie pas un
+    /// toucher hors des limites du parent. « Refuser » était peint en entier
+    /// mais ne répondait que sur sa moitié gauche. Le test touche le bord,
+    /// pas le centre — c'est là que le défaut se voyait.
+    Future<void> pumpAgenda(WidgetTester tester) async {
+      // La largeur d'un téléphone, et non les 800 px par défaut du banc de
+      // test : c'est l'étroitesse qui serrait la colonne du milieu et
+      // faisait déborder la rangée d'actions. Mesurer large ne montrait
+      // rien.
+      await tester.binding.setSurfaceSize(const Size(411, 900));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: AppTheme.silvaTheme,
+          home: BlocProvider<MerchantCubit>(
+            create: (_) => MerchantCubit.forTest(_NoRepository()),
+            child: Scaffold(
+              body: MerchantAgenda(reservations: [_pending()]),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+    }
+
+    testWidgets("« Refuser » répond jusqu'à son bord droit", (tester) async {
+      await pumpAgenda(tester);
+
+      final box = tester.getRect(_target('Refuser'));
+      await tester.tapAt(Offset(box.right - 4, box.center.dy));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Refuser ce rendez-vous ?'), findsOneWidget);
+    });
+
+    testWidgets('« Confirmer » aussi', (tester) async {
+      await pumpAgenda(tester);
+
+      final box = tester.getRect(_target('Confirmer'));
+      // Le toucher part : rien ne doit lever, et surtout la question de
+      // refus ne doit pas s'ouvrir sur le mauvais bouton.
+      await tester.tapAt(Offset(box.right - 4, box.center.dy));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Refuser ce rendez-vous ?'), findsNothing);
+    });
+
+    testWidgets("refuser demande confirmation, et « Retour » n'agit pas", (
+      tester,
+    ) async {
+      await pumpAgenda(tester);
+
+      await tester.tap(find.text('Refuser'));
+      await tester.pumpAndSettle();
+      expect(find.textContaining('libéré tout de suite'), findsOneWidget);
+
+      await tester.tap(find.text('Retour'));
+      await tester.pumpAndSettle();
+      // La ligne est toujours là : rien n'a été annulé.
+      expect(find.text('Chambre Exécutive'), findsOneWidget);
+    });
+  });
+
+  group("La carte d'une réservation reçue", () {
+    testWidgets('ses deux actions tiennent sur un téléphone', (tester) async {
+      await tester.binding.setSurfaceSize(const Size(411, 900));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: AppTheme.silvaTheme,
+          home: BlocProvider<MerchantCubit>(
+            create: (_) => MerchantCubit.forTest(_NoRepository()),
+            child: Scaffold(
+              body: ReceivedReservationCard(reservation: _pending()),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      // Une rangée qui déborde est peinte en entier mais ne répond plus au
+      // toucher au-delà de son parent : le bord droit du dernier bouton
+      // doit rester vivant.
+      final box = tester.getRect(_target('Refuser'));
+      await tester.tapAt(Offset(box.right - 4, box.center.dy));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Refuser cette réservation ?'), findsOneWidget);
+    });
+  });
+
+  group("La carte d'une commande reçue", () {
+    testWidgets('ses deux actions tiennent sur un téléphone', (tester) async {
+      await tester.binding.setSurfaceSize(const Size(411, 900));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: AppTheme.silvaTheme,
+          home: BlocProvider<MerchantCubit>(
+            create: (_) => MerchantCubit.forTest(_NoRepository()),
+            child: Scaffold(
+              body: ReceivedOrderCard(
+                order: const ReceivedOrder(
+                  id: 'c1',
+                  status: OrderStatus.pending,
+                  total: 24,
+                  customer: Customer(name: 'Client'),
+                  lines: [
+                    ReceivedOrderLine(
+                      name: 'Poulet moambe',
+                      quantity: 2,
+                      price: 12,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      final box = tester.getRect(_target('Refuser'));
+      await tester.tapAt(Offset(box.right - 4, box.center.dy));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Refuser cette commande ?'), findsOneWidget);
     });
   });
 

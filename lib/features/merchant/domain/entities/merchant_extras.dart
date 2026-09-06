@@ -219,4 +219,3 @@ class DailyMetric extends Equatable {
   @override
   List<Object?> get props => [day, offerId, views, clicks];
 }
-

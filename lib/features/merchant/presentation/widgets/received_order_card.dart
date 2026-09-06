@@ -82,33 +82,43 @@ class ReceivedOrderCard extends StatelessWidget {
             ),
           ],
           AppDimens.spacerSmall,
-          Row(
-            children: [
-              Text(
-                '${order.total.toStringAsFixed(2)} \$',
-                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                  fontWeight: FontWeight.w800,
-                  color: Theme.of(context).colorScheme.primary,
-                ),
-              ),
-              const Spacer(),
-              if (canRefuse) ...[
-                CustomActionButton(
-                  label: 'Refuser',
-                  tone: ActionButtonTone.danger,
-                  onPressed: busy
-                      ? null
-                      : () => _apply(context, OrderStatus.cancelled),
-                ),
-                AppDimens.spacerSmallWidth,
-              ],
-              if (next != null)
-                CustomActionButton(
-                  label: next.$2,
-                  onPressed: busy ? null : () => _apply(context, next.$1),
-                ),
-            ],
+          Text(
+            '${order.total.toStringAsFixed(2)} \$',
+            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+              fontWeight: FontWeight.w800,
+              color: Theme.of(context).colorScheme.primary,
+            ),
           ),
+          // Les actions sur leur propre ligne : à la suite du montant, deux
+          // boutons débordaient de la rangée sur un téléphone, et Flutter
+          // n'envoie pas les touchers au-delà des limites du parent — le
+          // dernier bouton était peint en entier mais mort sur sa droite.
+          if (canRefuse || next != null) ...[
+            AppDimens.spacerSmall,
+            Row(
+              children: [
+                if (canRefuse) ...[
+                  Expanded(
+                    child: CustomActionButton(
+                      label: 'Refuser',
+                      tone: ActionButtonTone.danger,
+                      onPressed: busy
+                          ? null
+                          : () => _apply(context, OrderStatus.cancelled),
+                    ),
+                  ),
+                  AppDimens.spacerSmallWidth,
+                ],
+                if (next != null)
+                  Expanded(
+                    child: CustomActionButton(
+                      label: next.$2,
+                      onPressed: busy ? null : () => _apply(context, next.$1),
+                    ),
+                  ),
+              ],
+            ),
+          ],
           if (order.customer?.phone != null) ...[
             AppDimens.spacerMini,
             Text(

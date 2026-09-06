@@ -76,7 +76,7 @@ All functions are deployed with `verify_jwt: true`.
 
 ### Current functions
 
-- `get-home` — bundle de l'accueil filtré par catégorie : `{newOffers, popularBusinesses, discoverOffers}`. `?section=new&page=N`, `?section=discover&page=N` et `?section=businesses` renvoient une liste paginée seule (voir « Les trois sections de l'accueil » ci-dessous).
+- `get-home` — bundle de l'accueil filtré par catégorie : `{newOffers, popularBusinesses, discoverOffers, sponsoredOffers}`. `?section=new&page=N`, `?section=discover&page=N` et `?section=businesses` renvoient une liste paginée seule (voir « Les trois sections de l'accueil » ci-dessous).
 - `get-categories` — catégories de la marketplace, mises en cache par l'app
 - `get-business-detail` — `?id=` → `{business, offers, capabilities, menuItems, rooms, vehicles, reviews}`
 - `get-offer-detail` — `?id=` → `{offer, business, reviews, otherOffers, remainingCapacity}` : tout ce qu'il faut pour décider devant une offre, sans être passé par la fiche du commerçant
@@ -94,6 +94,11 @@ All functions are deployed with `verify_jwt: true`.
 - `get-merchant-space` — tout l'espace commerçant en un appel, **et** la réponse à « cet utilisateur est-il commerçant ? » (`business: null` ⇒ non)
 - `create-merchant-application` — dépôt d'une demande de compte commerçant
 - `create-offer` / `update-offer` — publication et modification d'une offre par son commerçant
+- `update-business` — le commerçant met à jour sa boutique : identité, contact, adresse, horaires, photo de couverture, mise en pause. **Pas la catégorie** : elle décide du classement de toute la plateforme.
+- `update-offer-availability` — les créneaux d'une offre : durée, capacité, délai de prévenance, plages hebdomadaires et fermetures exceptionnelles
+- `get-offer-slots` — `?id=&from=&to=` → `{declaresSlots, durationMinutes, slotCapacity, leadTimeHours, horizonDays, slots, rules, exceptions}`. **Lisible sans compte** : on choisit son créneau avant de se connecter. Lu des deux côtés — une seule définition de ce qui est libre.
+- `create-ad-campaign` / `update-ad-campaign` / `get-ad-campaigns` — la mise en avant. `update-ad-campaign` porte la machine à états : `approve`/`reject` sont réservés à un administrateur, `pay`/`cancel` au commerçant. Régler une campagne la passe `running` et synchronise `business.is_sponsored` / `sponsored_until`.
+- `create-metric` — une fiche ouverte, un clic depuis une pub. Compté aussi pour un visiteur anonyme, et **jamais attendu** par l'écran.
 - `get-me` — merges `auth.users` + `public.users`, auto-creates the `public.users` row on first login. **Casing gotcha**: the supabase-js `User` object from `auth.users` uses **snake_case** properties (`user_metadata`, `email_confirmed_at`, `created_at`), not camelCase — a real bug hit and fixed while building this function.
 
 If a screen needs a new kind of server-side data (a new page's initial load, a new mutation), add a new Edge Function following the naming convention above rather than reaching for a direct `.from()` call, even for something that looks like a "simple" query.
@@ -217,6 +222,87 @@ vaut plus rien.
 
 Une réservation naît `pending` : le commerçant doit la confirmer. Les textes
 côté client disent donc « Demande envoyée », jamais « Réservation confirmée ».
+
+### Quatre onglets, nommés par la question qu'ils répondent
+
+`MerchantShell` porte **Aujourd'hui · Catalogue · Demandes · Boutique**. Les
+noms comptent : un commerçant ouvre l'application pour savoir ce qu'il a à
+faire, pas pour consulter un tableau — « Aujourd'hui » avant « Tableau de
+bord », « Demandes » avant « Reçu ». `Demandes` se subdivise en Commandes ·
+Réservations · **Agenda** ; l'agenda répond à « qu'est-ce que je fais
+aujourd'hui ? », que la liste des réservations reçues ne dit pas — il faut
+l'ordre du temps et les trous entre deux rendez-vous.
+
+### Les créneaux : déclarés par le commerçant, imposés au client
+
+Un rendez-vous pouvait être demandé à 3 h du matin, et le commerçant le
+découvrait en ouvrant sa boîte. Une offre réservable peut désormais déclarer
+sa **durée**, sa **capacité par créneau**, son **délai de prévenance** et ses
+**plages hebdomadaires** (`offer_availability`), avec des fermetures
+exceptionnelles (`offer_availability_exception`).
+
+`public.offer_free_slots(offer_id, from, to)` est la **seule** définition de
+ce qui est libre : elle compose les créneaux à l'heure de
+**`Africa/Kinshasa`**, retranche les réservations `pending`/`confirmed` et
+écarte ce qui tombe sous le délai de prévenance. `create_reservation_for_offer`
+refuse une date qui ne figure pas dans ce résultat. Côté client,
+`OfferSlotPicker` remplace le calendrier libre — mais **seulement** quand
+`declaresSlots` est vrai : une offre publiée avant les créneaux garde le choix
+libre de sa date, sans reprise.
+
+Deux pièges de fuseau, tous deux corrigés et couverts par des tests :
+
+- **à l'écriture**, `toIso8601String()` d'une date **locale** sort sans
+  décalage (« 2026-09-07T10:00:00.000 »), et Postgres la relit comme de
+  l'UTC : le créneau de 10 h à Kinshasa était enregistré à 11 h. Tout instant
+  destiné à un `timestamptz` part en `toUtc().toIso8601String()` ;
+- **à la lecture**, `DateTime.tryParse` d'un « +00:00 » rend un `DateTime`
+  **en UTC** : formaté tel quel, l'agenda du commerçant affichait une heure
+  de moins que celle choisie par le client. `merchant_space.dart` convertit
+  donc à la lecture (`_instant`), une fois, pour que tous les écrans de
+  l'espace parlent de la même heure.
+
+### La mise en avant : validée avant d'être payée
+
+Un commerçant demande un emplacement (`home`, `category`, `search`), une
+cible (le commerce ou une offre) et des dates ; le serveur calcule le devis
+depuis `ad_prices`. Un **administrateur** valide ou refuse et peut retenir un
+autre montant, puis le commerçant règle — le paiement en ligne n'existant pas,
+le bouton vaut engagement, et la feuille le dit. La machine à états vit dans
+`update-ad-campaign` : `inReview → approved → running → finished`, plus
+`rejected` et `cancelled`.
+
+Les campagnes en cours sont rendues **à part** sur l'accueil, dans une section
+« Mise en avant », et **chaque carte porte l'étiquette « Sponsorisé »**.
+Glisser une offre payée au milieu des mieux notées ferait passer de la
+publicité pour du mérite.
+
+`/admin` n'est visible que pour un compte inscrit dans `platform_admins`, une
+table que **rien dans l'application ne peut alimenter** : on n'ajoute un
+administrateur qu'en SQL.
+
+### Une rangée qui déborde ne répond plus au toucher
+
+Défaut rencontré trois fois dans l'espace commerçant, et la raison des tests
+de `merchant_space_test.dart` : deux boutons posés à la suite d'un prix ou
+d'une pastille d'état débordaient de leur rangée sur un téléphone de 411 px.
+Flutter les peint alors **en entier** mais ne dispatche pas les touchers
+au-delà des limites du parent : le dernier bouton était visible et mort sur sa
+droite. Les actions d'une carte vivent donc sur **leur propre ligne**, en
+`Expanded` moitié-moitié.
+
+**Un banc de test large ne montre rien** : la surface par défaut fait 800 px
+et le débordement n'apparaît pas. Tout test de ce genre appelle
+`tester.binding.setSurfaceSize(const Size(411, 900))`, et touche le **bord**
+du bouton, pas son centre.
+
+### Les photos entrent par téléversement, pas par URL
+
+Le formulaire d'offre et la fiche de la boutique demandaient une **URL** :
+autant dire à un commerçant de Matonge d'héberger ses images lui-même.
+`ImageUploadField` + `MediaUploadService` envoient le fichier dans le bucket
+`merchant-media`, rangé sous `<businessId>/<kind>/`. Les octets passent par
+`XFile.readAsBytes()` — un chemin de fichier ne veut rien dire sur le web.
 
 ## L'offre est une destination, la fiche commerçant une présentation
 
@@ -501,6 +587,8 @@ Be careful when editing these areas:
 - `lib/core/services/session_service.dart` — single source of truth for session/user identity app-wide.
 - `lib/features/business_detail/presentation/widgets/online_order/` — many type-specific reservation modals/pages share the same `BusinessDetailBloc` provided by an ancestor `business_detail_screen.dart`; don't add a second competing provider for it.
 - Supabase Edge Functions and migrations (remote, project `wrutwzbtnquxigxetxfx`) — no local source of truth in this repo, only reachable via the Supabase MCP tools; see "Backend Access" above before touching backend data access.
+- `public.platform_admins` — l'accès à `/admin`. Rien dans l'application ne doit pouvoir y insérer une ligne : on n'ajoute un administrateur qu'en SQL.
+- `public.offer_free_slots` et `create_reservation_for_offer` — la même définition de « ce qui est libre » sert au client, au commerçant et à la validation. En tenir une seconde version ailleurs, c'est garantir qu'un client sera refusé sur un créneau qu'il vient de toucher.
 
 ## File Size Rule
 

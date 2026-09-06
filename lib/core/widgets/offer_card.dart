@@ -70,7 +70,9 @@ class OfferCard extends StatelessWidget {
               child: Column(
                 children: [
                   // La photo prend toute la place que le texte ne réclame pas.
-                  Expanded(child: _Photo(offer: offer, sponsored: sponsored)),
+                  Expanded(
+                    child: _Photo(offer: offer, sponsored: sponsored),
+                  ),
                   ColoredBox(
                     color: scheme.surfaceContainerLowest,
                     child: _Content(offer: offer),

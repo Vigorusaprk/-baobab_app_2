@@ -77,41 +77,55 @@ class ReceivedReservationCard extends StatelessWidget {
               ),
             ),
           AppDimens.spacerSmall,
-          Row(
-            children: [
-              if (reservation.total > 0)
-                Text(
-                  '${reservation.total.toStringAsFixed(2)} \$',
-                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                    fontWeight: FontWeight.w800,
-                    color: Theme.of(context).colorScheme.primary,
+          if (reservation.total > 0)
+            Text(
+              '${reservation.total.toStringAsFixed(2)} \$',
+              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                fontWeight: FontWeight.w800,
+                color: Theme.of(context).colorScheme.primary,
+              ),
+            ),
+          // Les actions sur leur propre ligne, et non à droite du montant.
+          // Sur un téléphone de 411 px, « Refuser » et « Confirmer » à la
+          // suite du prix débordaient de 127 px : Flutter peignait les deux
+          // boutons en entier mais n'envoyait plus les touchers au-delà de
+          // la rangée, et le bord droit du dernier ne répondait pas.
+          if (status == ReservationStatus.pending) ...[
+            AppDimens.spacerSmall,
+            Row(
+              children: [
+                Expanded(
+                  child: CustomActionButton(
+                    label: 'Refuser',
+                    tone: ActionButtonTone.danger,
+                    onPressed: busy
+                        ? null
+                        : () => _apply(context, ReservationStatus.cancelled),
                   ),
                 ),
-              const Spacer(),
-              if (status == ReservationStatus.pending) ...[
-                CustomActionButton(
-                  label: 'Refuser',
-                  tone: ActionButtonTone.danger,
-                  onPressed: busy
-                      ? null
-                      : () => _apply(context, ReservationStatus.cancelled),
-                ),
                 AppDimens.spacerSmallWidth,
-                CustomActionButton(
-                  label: 'Confirmer',
-                  onPressed: busy
-                      ? null
-                      : () => _apply(context, ReservationStatus.confirmed),
+                Expanded(
+                  child: CustomActionButton(
+                    label: 'Confirmer',
+                    onPressed: busy
+                        ? null
+                        : () => _apply(context, ReservationStatus.confirmed),
+                  ),
                 ),
-              ] else if (status == ReservationStatus.confirmed)
-                CustomActionButton(
-                  label: 'Honorée',
-                  onPressed: busy
-                      ? null
-                      : () => _apply(context, ReservationStatus.completed),
-                ),
-            ],
-          ),
+              ],
+            ),
+          ] else if (status == ReservationStatus.confirmed) ...[
+            AppDimens.spacerSmall,
+            Align(
+              alignment: Alignment.centerRight,
+              child: CustomActionButton(
+                label: 'Honorée',
+                onPressed: busy
+                    ? null
+                    : () => _apply(context, ReservationStatus.completed),
+              ),
+            ),
+          ],
         ],
       ),
     );

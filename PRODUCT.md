@@ -101,17 +101,26 @@ possible et les boutons qui ne mènent nulle part.
   à partir de son rôle — jamais depuis la requête.
 - Terminologie : **offre** (ce qui est publié), **commerçant** (celui qui
   publie), **commerce** (l'enseigne), **activités** (l'historique du client).
+- **Les fiches ouvertes et les clics publicitaires sont comptés** par jour,
+  par commerce et par offre (`daily_metrics`). Le classement « Populaires »
+  reste fondé sur la note : la mesure sert d'abord à rendre des comptes au
+  commerçant sur sa mise en avant, pas encore à ordonner l'accueil.
+- **Un rendez-vous doit tomber sur un créneau déclaré** quand l'offre en
+  déclare. Le serveur refuse le reste, et le client ne voit que les heures
+  proposées — une offre qui ne déclare rien garde le choix libre de sa date.
 
 **Explicitement non décidé / absent**
 
-- **Le paiement en ligne n'existe pas** et a été volontairement reporté.
-- **Il n'y a pas de panneau d'administration.** Une demande de compte
-  commerçant est donc acceptée automatiquement, avec la mention
-  « Acceptation automatique en attendant le panneau d'administration ». Les
-  trois états (`pending`, `approved`, `rejected`) existent déjà côté client
-  pour que la modération n'impose aucune reprise d'interface.
-- Pas de critère de popularité mesuré (ni vues ni volume de commandes) : le
-  classement « Populaires » s'appuie sur la note, en attendant mieux.
+- **Le paiement en ligne n'existe pas** et a été volontairement reporté. Une
+  campagne publicitaire se règle donc par un bouton « Payer » qui vaut
+  engagement : la feuille le dit en clair au commerçant.
+- **Les demandes de compte commerçant ne sont pas modérées.** Elles sont
+  acceptées automatiquement, avec la mention « Acceptation automatique en
+  attendant le panneau d'administration ». Les trois états (`pending`,
+  `approved`, `rejected`) existent déjà côté client pour que la modération
+  n'impose aucune reprise d'interface. Le panneau d'administration existe
+  désormais (`/admin`) mais n'arbitre que les **campagnes publicitaires** ;
+  il ne fait que *montrer* les derniers commerces inscrits.
 - Pas de géolocalisation ni de distance affichée.
 - Un compte ne gère qu'un seul commerce.
 

@@ -36,6 +36,7 @@ class _OfferFormPageState extends State<OfferFormPage> {
   late final TextEditingController _price;
   late final TextEditingController _section;
   late final TextEditingController _capacity;
+
   /// L'URL de la photo. Le champ texte a disparu au profit d'un
   /// téléversement : un commerçant sans site n'avait aucun moyen d'en fournir
   /// une, et plusieurs liens en base pointent vers des pages web.
