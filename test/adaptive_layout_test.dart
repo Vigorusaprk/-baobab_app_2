@@ -6,6 +6,7 @@ import 'package:baobabe_0_2/features/home_page/domain/entities/category_entity.d
 import 'package:baobabe_0_2/features/home_page/domain/repositories/category_repository.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/bloc/category_bloc.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/widgets/home_sliver_header.dart';
+import 'package:baobabe_0_2/features/notification/presentation/cubit/notifications_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -121,8 +122,14 @@ void main() {
 
   group('En-tête de l\'accueil', () {
     Widget header() {
-      return BlocProvider<CategoryBloc>(
-        create: (_) => _IdleCategoryBloc(),
+      // L'en-tête dépend de deux choses qu'on ne mesure pas ici : les
+      // catégories, et le compte de notifications non lues qui coiffe la
+      // cloche.
+      return MultiBlocProvider(
+        providers: [
+          BlocProvider<CategoryBloc>(create: (_) => _IdleCategoryBloc()),
+          BlocProvider<NotificationsCubit>(create: (_) => NotificationsCubit()),
+        ],
         child: const Scaffold(
           body: CustomScrollView(slivers: [HomeSliverHeader()]),
         ),

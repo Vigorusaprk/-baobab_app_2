@@ -108,9 +108,19 @@ possible et les boutons qui ne mènent nulle part.
 - **Un rendez-vous doit tomber sur un créneau déclaré** quand l'offre en
   déclare. Le serveur refuse le reste, et le client ne voit que les heures
   proposées — une offre qui ne déclare rien garde le choix libre de sa date.
+- **Toute notification passe par une seule table.** `notifications` est le
+  passage obligé : les tables sources y déposent une ligne par trigger, et
+  c'est cette ligne qui déclenche l'envoi. Le fil de l'application lit la
+  même table — ce qui est annoncé et ce qui est envoyé ne peuvent donc pas
+  diverger, et « lu » se souvient d'une session à l'autre.
 
 **Explicitement non décidé / absent**
 
+- **Les notifications poussées ne partent pas encore.** Toute la chaîne
+  existe et est vérifiée jusqu'à la fonction d'envoi ; deux secrets restent à
+  poser — `FCM_SERVICE_ACCOUNT` côté fonctions edge, `service_role_key` dans
+  le coffre de la base. Sans eux la notification existe, s'affiche dans
+  l'application, et rien n'échoue : seul le push manque.
 - **Le paiement en ligne n'existe pas** et a été volontairement reporté. Une
   campagne publicitaire se règle donc par un bouton « Payer » qui vaut
   engagement : la feuille le dit en clair au commerçant.

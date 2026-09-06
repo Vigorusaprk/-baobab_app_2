@@ -59,7 +59,7 @@ class SearchResultSkeleton extends StatelessWidget {
   }
 }
 
-/// Mirrors [FeedItemCard] : icône, titre, corps, horodatage.
+/// Reprend la forme d'une notification : icône, titre, corps, horodatage.
 class FeedListSkeleton extends StatelessWidget {
   final int itemCount;
 

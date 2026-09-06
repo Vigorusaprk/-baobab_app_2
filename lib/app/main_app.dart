@@ -1,8 +1,12 @@
+import 'dart:async';
+
 import 'package:baobabe_0_2/core/bloc/settings_bloc.dart';
 import 'package:baobabe_0_2/core/constants/supabase_client.dart';
 import 'package:baobabe_0_2/core/routes/app_router.dart';
 import 'package:baobabe_0_2/core/widgets/adaptive_viewport.dart';
 import 'package:baobabe_0_2/core/themes/app_theme.dart';
+import 'package:baobabe_0_2/features/notification/data/push_navigation_service.dart';
+import 'package:baobabe_0_2/features/notification/presentation/cubit/notifications_cubit.dart';
 import 'package:baobabe_0_2/features/auth/data/data_sources/remote_datasource/auth_remote_datasource_impl.dart';
 import 'package:baobabe_0_2/features/auth/data/repositories/auth_repository_impl.dart';
 import 'package:baobabe_0_2/features/auth/presentation/bloc/auth_bloc.dart';
@@ -82,47 +86,89 @@ class _MainAppState extends State<MainApp> {
         // la commande et par celle du téléphone de la réservation. Chacun le
         // rechargeant de son côté aurait multiplié les appels.
         BlocProvider<ProfileCubit>(create: (_) => ProfileCubit()..load()),
+        // La pastille de l'accueil et l'écran du fil lisent le même compte
+        // de non-lues : une instance par écran les aurait fait diverger.
+        BlocProvider<NotificationsCubit>(
+          create: (_) => NotificationsCubit()..load(),
+        ),
         BlocProvider<SettingsCubit>(create: (_) => SettingsCubit()),
         BlocProvider<theme_settings.SettingsCubit>(
           create: (_) => theme_settings.SettingsCubit(),
         ),
       ],
-      child: MaterialApp.router(
-        debugShowCheckedModeBanner: false,
-        routerConfig: appRouter,
-        theme: AppTheme.silvaTheme,
-        // Une seule pose pour toute l'application : chaque route hérite de
-        // la colonne, y compris l'espace commerçant et les pages pleines.
-        builder: (context, child) =>
-            AdaptiveViewport(child: child ?? const SizedBox.shrink()),
-        localizationsDelegates: const [
-          GlobalMaterialLocalizations.delegate,
-          GlobalWidgetsLocalizations.delegate,
-          GlobalCupertinoLocalizations.delegate,
-        ],
-        supportedLocales: const [
-          Locale('fr', 'FR'),
-          Locale('en', 'US'),
-          Locale('ln', 'CD'),
-        ],
-        // Le lingala n'existe pas dans les locales de Flutter : un téléphone
-        // réglé dessus laissait l'application à moitié localisée — textes
-        // français, sélecteur de date en anglais. Tant que les traductions
-        // n'existent pas, toute locale que le socle ne sait pas rendre
-        // retombe sur le français, qui est la langue réellement écrite.
-        localeResolutionCallback: (deviceLocale, supported) {
-          const fallback = Locale('fr', 'FR');
-          if (deviceLocale == null) return fallback;
-          final localisable = GlobalMaterialLocalizations.delegate;
-          for (final locale in supported) {
-            if (locale.languageCode == deviceLocale.languageCode &&
-                localisable.isSupported(locale)) {
-              return locale;
+      // `_PushEntry` doit voir les fournisseurs ci-dessus : c'est lui qui
+      // relit le fil quand une notification arrive application ouverte.
+      child: _PushEntry(
+        child: MaterialApp.router(
+          debugShowCheckedModeBanner: false,
+          routerConfig: appRouter,
+          theme: AppTheme.silvaTheme,
+          // Une seule pose pour toute l'application : chaque route hérite de
+          // la colonne, y compris l'espace commerçant et les pages pleines.
+          builder: (context, child) =>
+              AdaptiveViewport(child: child ?? const SizedBox.shrink()),
+          localizationsDelegates: const [
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: const [
+            Locale('fr', 'FR'),
+            Locale('en', 'US'),
+            Locale('ln', 'CD'),
+          ],
+          // Le lingala n'existe pas dans les locales de Flutter : un téléphone
+          // réglé dessus laissait l'application à moitié localisée — textes
+          // français, sélecteur de date en anglais. Tant que les traductions
+          // n'existent pas, toute locale que le socle ne sait pas rendre
+          // retombe sur le français, qui est la langue réellement écrite.
+          localeResolutionCallback: (deviceLocale, supported) {
+            const fallback = Locale('fr', 'FR');
+            if (deviceLocale == null) return fallback;
+            final localisable = GlobalMaterialLocalizations.delegate;
+            for (final locale in supported) {
+              if (locale.languageCode == deviceLocale.languageCode &&
+                  localisable.isSupported(locale)) {
+                return locale;
+              }
             }
-          }
-          return fallback;
-        },
+            return fallback;
+          },
+        ),
       ),
     );
   }
+}
+
+/// Branche la navigation par notification, une fois, sous les fournisseurs.
+///
+/// Ici et pas dans `main.dart` : ouvrir la bonne page demande le routeur, et
+/// repeindre la pastille demande le cubit — deux choses qui n'existent qu'à
+/// l'intérieur de l'arbre.
+class _PushEntry extends StatefulWidget {
+  const _PushEntry({required this.child});
+
+  final Widget child;
+
+  @override
+  State<_PushEntry> createState() => _PushEntryState();
+}
+
+class _PushEntryState extends State<_PushEntry> {
+  @override
+  void initState() {
+    super.initState();
+    final notifications = context.read<NotificationsCubit>();
+    unawaited(
+      PushNavigationService.instance.start(
+        router: appRouter,
+        // Une notification reçue application ouverte ne s'affiche pas
+        // toujours par-dessus l'écran : la pastille, elle, doit changer.
+        onForeground: notifications.load,
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) => widget.child;
 }

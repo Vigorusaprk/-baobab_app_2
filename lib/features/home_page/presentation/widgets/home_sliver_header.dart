@@ -6,7 +6,9 @@ import 'package:baobabe_0_2/core/themes/app_diemens.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/widgets/Category_Icons.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/widgets/home_search_bar.dart';
 import 'package:baobabe_0_2/core/widgets/button/custom_icon_button.dart';
+import 'package:baobabe_0_2/features/notification/presentation/cubit/notifications_cubit.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 /// En-tête collant de l'accueil : salutation + barre de recherche +
@@ -338,12 +340,26 @@ class _GreetingRow extends StatelessWidget {
               ],
             ),
           ),
-          CustomIconButton(
-            onPressed: () => context.pushNamed('notifications'),
-            tooltip: 'Mes notifications',
-            assetPath: 'assets/icons/notifications.svg',
-            iconSize: AppDimens.medium,
-            button: AppDimens.large,
+          // La pastille dit qu'il y a quelque chose à lire. Sans elle, une
+          // notification arrivée pendant que l'application était fermée ne
+          // se voyait que si l'on pensait à ouvrir la cloche.
+          BlocBuilder<NotificationsCubit, NotificationsState>(
+            buildWhen: (previous, current) => previous.unread != current.unread,
+            builder: (context, state) => Badge.count(
+              count: state.unread,
+              isLabelVisible: state.unread > 0,
+              child: CustomIconButton(
+                onPressed: () => context.pushNamed('notifications'),
+                tooltip: state.unread > 0
+                    ? '${state.unread} notification'
+                          '${state.unread > 1 ? 's' : ''} non lue'
+                          '${state.unread > 1 ? 's' : ''}'
+                    : 'Mes notifications',
+                assetPath: 'assets/icons/notifications.svg',
+                iconSize: AppDimens.medium,
+                button: AppDimens.large,
+              ),
+            ),
           ),
         ],
       ),

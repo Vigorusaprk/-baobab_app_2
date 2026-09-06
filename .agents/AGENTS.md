@@ -98,6 +98,8 @@ All functions are deployed with `verify_jwt: true`.
 - `update-offer-availability` — les créneaux d'une offre : durée, capacité, délai de prévenance, plages hebdomadaires et fermetures exceptionnelles
 - `get-offer-slots` — `?id=&from=&to=` → `{declaresSlots, durationMinutes, slotCapacity, leadTimeHours, horizonDays, slots, rules, exceptions}`. **Lisible sans compte** : on choisit son créneau avant de se connecter. Lu des deux côtés — une seule définition de ce qui est libre.
 - `create-ad-campaign` / `update-ad-campaign` / `get-ad-campaigns` — la mise en avant. `update-ad-campaign` porte la machine à états : `approve`/`reject` sont réservés à un administrateur, `pay`/`cancel` au commerçant. Régler une campagne la passe `running` et synchronise `business.is_sponsored` / `sponsored_until`.
+- `get-notifications` — le fil de l'utilisateur et son nombre de non-lues, en un appel : la pastille et la liste sont deux vues d'une même lecture.
+- `update-notification` — `{id}` ou `{all:true}` : marquer comme lu, la seule modification qu'un compte puisse faire sur ses notifications.
 - `create-metric` — une fiche ouverte, un clic depuis une pub. Compté aussi pour un visiteur anonyme, et **jamais attendu** par l'écran.
 - `get-me` — merges `auth.users` + `public.users`, auto-creates the `public.users` row on first login. **Casing gotcha**: the supabase-js `User` object from `auth.users` uses **snake_case** properties (`user_metadata`, `email_confirmed_at`, `created_at`), not camelCase — a real bug hit and fixed while building this function.
 
@@ -587,6 +589,7 @@ Be careful when editing these areas:
 - `lib/core/services/session_service.dart` — single source of truth for session/user identity app-wide.
 - `lib/features/business_detail/presentation/widgets/online_order/` — many type-specific reservation modals/pages share the same `BusinessDetailBloc` provided by an ancestor `business_detail_screen.dart`; don't add a second competing provider for it.
 - Supabase Edge Functions and migrations (remote, project `wrutwzbtnquxigxetxfx`) — no local source of truth in this repo, only reachable via the Supabase MCP tools; see "Backend Access" above before touching backend data access.
+- `public.notifications` et `private.dispatch_notification()` — le passage obligé de toute notification. Ne jamais appeler Firebase depuis une autre fonction, ni insérer une notification autrement que par un trigger de table source : deux chemins finiraient par notifier deux fois, ou pas du tout.
 - `public.platform_admins` — l'accès à `/admin`. Rien dans l'application ne doit pouvoir y insérer une ligne : on n'ajoute un administrateur qu'en SQL.
 - `public.offer_free_slots` et `create_reservation_for_offer` — la même définition de « ce qui est libre » sert au client, au commerçant et à la validation. En tenir une seconde version ailleurs, c'est garantir qu'un client sera refusé sur un créneau qu'il vient de toucher.
 
@@ -1101,8 +1104,8 @@ une fin — avec un délai de garde pour que la roue s'arrête même si le bloc
 n'émet jamais.
 
 Restent sans geste, faute d'avoir quoi que ce soit à recharger :
-`notification_screen` (une ébauche), `order_detail_page` et
-`boking_detail_screen` (des vues construites sur des données reçues).
+`order_detail_page` et `boking_detail_screen` (des vues construites sur des
+données reçues).
 
 ### L'adresse d'un commerce, en colonnes
 
@@ -1173,6 +1176,67 @@ de la précédente.
 Le jeton est enregistré **dès la connexion, même sans permission accordée** :
 sur Android le jeton identifie l'appareil, la permission ne gouverne que
 l'affichage. L'accord devient donc effectif sans aller-retour.
+
+### `notifications` : le passage obligé
+
+**Rien ne notifie personne sans passer par `public.notifications`.** Une
+ligne = une notification **pour une personne** : un commerce tenu par trois
+personnes reçoit trois lignes, chacune avec son propre `read_at` — « lu par
+l'une » ne veut pas dire « lu par les trois ».
+
+Le chemin, dans l'ordre :
+
+```
+orders / reservations / reviews / ad_campaigns / merchant_applications
+   └─ trigger ──▶ private.notify(...) ──▶ INSERT dans notifications
+                                              └─ trigger notifications_dispatch_push
+                                                    └─ net.http_post ──▶ send-push ──▶ FCM
+```
+
+Ajouter une source, c'est donc écrire **un** trigger qui appelle
+`private.notify(...)` — jamais un appel réseau, jamais un second chemin vers
+Firebase.
+
+`private.notify` porte une règle qui vaut pour tous : **on ne prévient jamais
+celui qui vient d'agir.** `auth.uid()` dit qui écrit, et le destinataire qui
+s'y reconnaît est écarté. Sans cela le commerçant qui confirme une
+réservation apprendrait qu'elle est confirmée, et le client qui annule sa
+commande qu'elle est annulée. Quand l'écriture vient du service, `auth.uid()`
+est nul et personne n'est écarté.
+
+Les triggers de statut sont posés `after update of status ... when (old.status
+is distinct from new.status)` : une écriture qui ne change pas l'état ne
+notifie rien.
+
+`private.dispatch_notification()` poste via **`pg_net`**, qui est
+*asynchrone* et *transactionnel* : la requête est mise en file et rendue à la
+validation de la transaction. Une commande n'attend donc pas l'envoi, et une
+fonction edge en panne ne peut pas annuler la commande. Un appel synchrone
+(`http`) aurait fait les deux.
+
+Deux réglages vivent dans **le coffre** (`vault`), pas dans le code :
+`project_url` (posé) et `service_role_key`. **Sans la clé, rien ne part et
+rien n'échoue** : la ligne existe, l'application la montre, seul le push
+manque. Pour armer :
+
+```sql
+select vault.create_secret('<clé de service>', 'service_role_key');
+```
+
+Côté client, `notifications` n'a **aucune policy d'insertion** : personne
+n'écrit par l'API. La lecture est bornée à soi, et la seule modification
+permise est `read_at` — bornée non par la RLS, qui ne sait pas restreindre
+une colonne, mais par `grant update (read_at) on public.notifications to
+authenticated`.
+
+### Toucher une notification doit ouvrir quelque chose
+
+Le `route` posé par le trigger voyage jusque dans le `data` du message FCM, et
+`PushNavigationService` l'utilise aux trois moments qui existent :
+`getInitialMessage()` quand l'application était fermée — il n'arrive dans
+aucun flux, l'oublier perd le seul cas où la notification *était* la raison de
+l'ouverture —, `onMessageOpenedApp` en arrière-plan, et `onMessage` au premier
+plan, où il n'y a rien à ouvrir mais où la pastille doit changer.
 
 ### L'envoi : une seule fonction parle à Firebase
 
