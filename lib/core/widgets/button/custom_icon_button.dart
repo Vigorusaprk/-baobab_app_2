@@ -1,3 +1,4 @@
+import 'package:baobabe_0_2/core/animation/press_effect.dart';
 import 'package:baobabe_0_2/core/themes/app_diemens.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -85,34 +86,36 @@ class CustomIconButton extends StatelessWidget {
       ),
     );
 
-    return Tooltip(
-      message: tooltip,
-      child: Material(
-        color: background,
-        borderRadius: radius,
-        // L'ombre n'appartient qu'au ton `surface` : sur un aplat de couleur
-        // elle salit le bord sans rien apporter.
-        elevation: _isFilled || _isGhost ? 0 : AppDimens.elevationDefault,
-        shadowColor: scheme.onSurface.withValues(alpha: 0.10),
-        child: InkWell(
-          onTap: onPressed,
+    return PressEffect(
+      child: Tooltip(
+        message: tooltip,
+        child: Material(
+          color: background,
           borderRadius: radius,
-          child: ConstrainedBox(
-            // Carré, et jamais sous la cible qu'un doigt vise sans effort.
-            constraints: BoxConstraints(
-              minWidth: button ?? AppDimens.touchTarget,
-              minHeight: button ?? AppDimens.touchTarget,
-            ),
-            child: Center(
-              widthFactor: 1,
-              heightFactor: 1,
-              child: Padding(
-                padding: const EdgeInsets.all(AppDimens.small),
-                child: _Glyph(
-                  assetPath: assetPath,
-                  icon: icon,
-                  size: iconSize,
-                  color: foreground,
+          // L'ombre n'appartient qu'au ton `surface` : sur un aplat de couleur
+          // elle salit le bord sans rien apporter.
+          elevation: _isFilled || _isGhost ? 0 : AppDimens.elevationDefault,
+          shadowColor: scheme.onSurface.withValues(alpha: 0.10),
+          child: InkWell(
+            onTap: onPressed,
+            borderRadius: radius,
+            child: ConstrainedBox(
+              // Carré, et jamais sous la cible qu'un doigt vise sans effort.
+              constraints: BoxConstraints(
+                minWidth: button ?? AppDimens.touchTarget,
+                minHeight: button ?? AppDimens.touchTarget,
+              ),
+              child: Center(
+                widthFactor: 1,
+                heightFactor: 1,
+                child: Padding(
+                  padding: const EdgeInsets.all(AppDimens.small),
+                  child: _Glyph(
+                    assetPath: assetPath,
+                    icon: icon,
+                    size: iconSize,
+                    color: foreground,
+                  ),
                 ),
               ),
             ),

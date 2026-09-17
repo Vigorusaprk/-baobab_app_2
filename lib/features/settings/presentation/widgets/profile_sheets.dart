@@ -251,7 +251,6 @@ Future<void> showProfileDetailsSheet(BuildContext context) {
     context: context,
     // Assez haute d'emblée pour ne pas grandir d'un coup quand les données
     // remplacent le squelette.
-    minHeight: 0.72,
     child: BlocProvider.value(
       value: cubit,
       child: const ProfileDetails(title: 'Mon profil'),

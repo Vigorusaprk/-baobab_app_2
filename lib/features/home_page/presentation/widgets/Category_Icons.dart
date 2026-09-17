@@ -1,5 +1,6 @@
 import 'dart:ui' show lerpDouble;
 
+import 'package:baobabe_0_2/core/animation/press_effect.dart';
 import 'package:baobabe_0_2/core/themes/app_diemens.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/widgets/category_chip.dart';
 import 'package:baobabe_0_2/features/home_page/data/models/ui_category.dart';
@@ -110,21 +111,23 @@ class CategoryIcons extends StatelessWidget {
           final bool isActive =
               selectedCategory.slug == uiCategory.category.slug;
 
-          return GestureDetector(
-            onTap: () => _handleTap(context, uiCategory.category),
-            child: Padding(
-              padding: EdgeInsets.only(
-                left: index == 0 ? AppDimens.appPaddingValue : 4.0,
-                right: index == categories.length - 1
-                    ? AppDimens.appPaddingValue
-                    : 4.0,
-                //top: lerpDouble(8.0, 4.0, t)!,
-                //bottom: lerpDouble(8.0, 4.0, t)!,
-              ),
-              child: CategoryChip(
-                uiCategory: uiCategory,
-                isActive: isActive,
-                collapseProgress: t,
+          return PressEffect(
+            child: GestureDetector(
+              onTap: () => _handleTap(context, uiCategory.category),
+              child: Padding(
+                padding: EdgeInsets.only(
+                  left: index == 0 ? AppDimens.appPaddingValue : 4.0,
+                  right: index == categories.length - 1
+                      ? AppDimens.appPaddingValue
+                      : 4.0,
+                  //top: lerpDouble(8.0, 4.0, t)!,
+                  //bottom: lerpDouble(8.0, 4.0, t)!,
+                ),
+                child: CategoryChip(
+                  uiCategory: uiCategory,
+                  isActive: isActive,
+                  collapseProgress: t,
+                ),
               ),
             ),
           );

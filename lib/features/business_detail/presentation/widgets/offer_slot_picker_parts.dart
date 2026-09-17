@@ -27,47 +27,49 @@ class _SlotChip extends StatelessWidget {
     final scarce =
         slot.remaining > 0 && slot.remaining < reference && slot.remaining <= 3;
 
-    return Material(
-      color: selected
-          ? scheme.primaryContainer.withValues(alpha: 0.55)
-          : Colors.transparent,
-      borderRadius: BorderRadius.circular(AppDimens.radius12),
-      child: InkWell(
-        onTap: onTap,
+    return PressEffect(
+      child: Material(
+        color: selected
+            ? scheme.primaryContainer.withValues(alpha: 0.55)
+            : Colors.transparent,
         borderRadius: BorderRadius.circular(AppDimens.radius12),
-        child: Container(
-          padding: const EdgeInsets.symmetric(
-            horizontal: AppDimens.medium,
-            vertical: AppDimens.small + 2,
-          ),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(AppDimens.radius12),
-            border: Border.all(
-              color: selected ? scheme.primary : scheme.outlineVariant,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(AppDimens.radius12),
+          child: Container(
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppDimens.medium,
+              vertical: AppDimens.small + 2,
             ),
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                DateFormat('HH:mm').format(slot.at),
-                style: theme.textTheme.titleSmall?.copyWith(
-                  height: 1.1,
-                  fontWeight: FontWeight.w600,
-                  color: selected ? scheme.primary : scheme.onSurface,
-                ),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(AppDimens.radius12),
+              border: Border.all(
+                color: selected ? scheme.primary : scheme.outlineVariant,
               ),
-              if (scarce)
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
                 Text(
-                  slot.remaining == 1
-                      ? 'dernière place'
-                      : '${slot.remaining} places',
-                  style: theme.textTheme.labelSmall?.copyWith(
-                    height: 1.3,
-                    color: scheme.onSurfaceVariant,
+                  DateFormat('HH:mm').format(slot.at),
+                  style: theme.textTheme.titleSmall?.copyWith(
+                    height: 1.1,
+                    fontWeight: FontWeight.w600,
+                    color: selected ? scheme.primary : scheme.onSurface,
                   ),
                 ),
-            ],
+                if (scarce)
+                  Text(
+                    slot.remaining == 1
+                        ? 'dernière place'
+                        : '${slot.remaining} places',
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      height: 1.3,
+                      color: scheme.onSurfaceVariant,
+                    ),
+                  ),
+              ],
+            ),
           ),
         ),
       ),

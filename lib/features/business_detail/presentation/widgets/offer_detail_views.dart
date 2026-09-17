@@ -176,12 +176,12 @@ class OfferBookingView extends StatelessWidget {
           leadingWidth: AppDimens.touchTarget + AppDimens.medium,
           // `_Round` : une barre étire ce qu'on lui donne en `leading`, et le
           // disque devenait un ovale.
-          leading: const _Round(
+          leading: const _ButtonContainer(
             padding: EdgeInsets.only(left: AppDimens.appPaddingValue),
             child: OfferBackButton(onPhoto: true),
           ),
           actions: [
-            _Round(
+            _ButtonContainer(
               padding: const EdgeInsets.only(right: AppDimens.appPaddingValue),
               child: OfferShareButton(
                 offer: offer,
@@ -297,8 +297,8 @@ class OfferBookingView extends StatelessWidget {
 }
 
 /// Un disque qui reste un disque, dans une barre qui étire.
-class _Round extends StatelessWidget {
-  const _Round({required this.child, required this.padding});
+class _ButtonContainer extends StatelessWidget {
+  const _ButtonContainer({required this.child, required this.padding});
 
   final Widget child;
   final EdgeInsets padding;

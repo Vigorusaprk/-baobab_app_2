@@ -52,20 +52,19 @@ class BusinessCover extends StatelessWidget {
       leadingWidth: AppDimens.touchTarget + AppDimens.medium,
       // `_Round` est indispensable : une barre étire son `leading` sur toute
       // la largeur qu'elle lui réserve, et le disque devenait un ovale.
-      leading: const _Round(
+      leading: const _ButtonContainer(
         padding: EdgeInsets.only(left: AppDimens.appPaddingValue),
         child: _BackButton(),
       ),
       // Pas de cœur : rien ne mémorise un favori côté serveur, et un cœur
       // qui ne retient rien est une promesse non tenue.
       actions: [
-        _Round(
+        _ButtonContainer(
           padding: const EdgeInsets.only(right: AppDimens.appPaddingValue),
           child: CustomIconButton(
             onPressed: _share,
             tooltip: 'Partager ce commerce',
             icon: Icons.ios_share_rounded,
-            circle: true,
             iconSize: AppDimens.medium + 2,
           ),
         ),
@@ -133,8 +132,8 @@ class BusinessCover extends StatelessWidget {
 /// Une barre d'application étire ce qu'on lui donne en `leading` et en
 /// `actions` : sans cette contrainte carrée, le bouton de retour s'affichait
 /// en ovale.
-class _Round extends StatelessWidget {
-  const _Round({required this.child, required this.padding});
+class _ButtonContainer extends StatelessWidget {
+  const _ButtonContainer({required this.child, required this.padding});
 
   final Widget child;
   final EdgeInsets padding;
@@ -168,7 +167,6 @@ class _BackButton extends StatelessWidget {
       },
       tooltip: 'Retour',
       icon: Icons.arrow_back_rounded,
-      circle: true,
       iconSize: AppDimens.medium + 2,
     );
   }

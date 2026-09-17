@@ -119,7 +119,7 @@ class CategoryChip extends StatelessWidget {
             // Le rayon suit la forme : carte arrondie étendue, pastille repliée.
             lerpDouble(
               AppDimens.cardBorderRadius,
-              AppDimens.borderRadiusFull,
+              AppDimens.cardBorderRadius,
               t,
             )!,
           ),

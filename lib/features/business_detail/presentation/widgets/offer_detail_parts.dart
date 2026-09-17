@@ -1,3 +1,4 @@
+import 'package:baobabe_0_2/core/animation/press_effect.dart';
 import 'package:baobabe_0_2/core/themes/app_diemens.dart';
 import 'package:baobabe_0_2/core/themes/other_theme.dart';
 import 'package:baobabe_0_2/core/widgets/button/custom_icon_button.dart';
@@ -113,7 +114,6 @@ class OfferBackButton extends StatelessWidget {
       tooltip: 'Retour',
       icon: Icons.arrow_back_rounded,
       tone: onPhoto ? IconButtonTone.surface : IconButtonTone.ghost,
-      circle: true,
       iconSize: AppDimens.medium + 2,
     );
   }
@@ -139,7 +139,6 @@ class OfferShareButton extends StatelessWidget {
       tooltip: 'Partager cette offre',
       icon: Icons.ios_share_rounded,
       tone: onPhoto ? IconButtonTone.surface : IconButtonTone.ghost,
-      circle: true,
       iconSize: AppDimens.medium + 2,
     );
   }
@@ -748,50 +747,52 @@ class OfferDayChip extends StatelessWidget {
     final scheme = theme.colorScheme;
     final color = selected ? scheme.primary : scheme.onSurfaceVariant;
 
-    return Material(
-      color: selected
-          ? scheme.primaryContainer.withValues(alpha: 0.55)
-          : Colors.transparent,
-      borderRadius: BorderRadius.circular(AppDimens.radius12),
-      child: InkWell(
-        onTap: onTap,
+    return PressEffect(
+      child: Material(
+        color: selected
+            ? scheme.primaryContainer.withValues(alpha: 0.55)
+            : Colors.transparent,
         borderRadius: BorderRadius.circular(AppDimens.radius12),
-        child: Container(
-          height: OfferDateChoice.chipHeight,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(AppDimens.radius12),
-            border: Border.all(
-              color: selected ? scheme.primary : scheme.outlineVariant,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(AppDimens.radius12),
+          child: Container(
+            height: OfferDateChoice.chipHeight,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(AppDimens.radius12),
+              border: Border.all(
+                color: selected ? scheme.primary : scheme.outlineVariant,
+              ),
             ),
-          ),
-          // Trois lignes dans 64 px : les interlignes du thème débordaient
-          // de 3 px. Elles sont donc resserrées ici, et seulement ici.
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                DateFormat('EEE', 'fr_FR').format(day),
-                style: theme.textTheme.labelSmall?.copyWith(
-                  color: color,
-                  height: 1.1,
+            // Trois lignes dans 64 px : les interlignes du thème débordaient
+            // de 3 px. Elles sont donc resserrées ici, et seulement ici.
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  DateFormat('EEE', 'fr_FR').format(day),
+                  style: theme.textTheme.labelSmall?.copyWith(
+                    color: color,
+                    height: 1.1,
+                  ),
                 ),
-              ),
-              Text(
-                '${day.day}',
-                style: theme.textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w600,
-                  height: 1.1,
-                  color: selected ? scheme.primary : scheme.onSurface,
+                Text(
+                  '${day.day}',
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w600,
+                    height: 1.1,
+                    color: selected ? scheme.primary : scheme.onSurface,
+                  ),
                 ),
-              ),
-              Text(
-                DateFormat('MMM', 'fr_FR').format(day),
-                style: theme.textTheme.labelSmall?.copyWith(
-                  color: color,
-                  height: 1.1,
+                Text(
+                  DateFormat('MMM', 'fr_FR').format(day),
+                  style: theme.textTheme.labelSmall?.copyWith(
+                    color: color,
+                    height: 1.1,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

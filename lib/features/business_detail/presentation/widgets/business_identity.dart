@@ -53,7 +53,7 @@ class BusinessIdentity extends StatelessWidget {
 
     return Container(
       // Le recouvrement : la feuille monte sur la photo.
-      transform: Matrix4.translationValues(0, -14, 0),
+      transform: Matrix4.translationValues(0, 0, 0),
       decoration: BoxDecoration(
         color: scheme.surfaceContainerLowest,
         borderRadius: const BorderRadius.vertical(
