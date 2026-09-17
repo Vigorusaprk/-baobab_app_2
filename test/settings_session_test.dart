@@ -64,6 +64,14 @@ void main() {
     final session = _ControllableSession();
     addTearDown(session.close);
 
+    // La page s'est allongée (mentions légales) : le bouton de déconnexion
+    // est sous le pli d'un écran d'essai de 600 px, et une `ListView` ne
+    // construit pas ce qu'on ne voit pas. On lui donne la hauteur d'un
+    // téléphone entier — c'est la session qu'on teste, pas le défilement.
+    tester.view.physicalSize = const Size(1080, 2400);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+
     await tester.pumpWidget(
       MultiBlocProvider(
         providers: [

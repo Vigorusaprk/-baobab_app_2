@@ -6,6 +6,7 @@ import 'package:baobabe_0_2/core/widgets/custom_divider.dart';
 import 'package:baobabe_0_2/features/merchant/presentation/widgets/merchant_settings_tile.dart';
 import 'package:baobabe_0_2/features/settings/presentation/bloc/settings_bloc.dart';
 import 'package:baobabe_0_2/features/settings/presentation/widgets/language_picker_dialog.dart';
+import 'package:baobabe_0_2/features/settings/presentation/widgets/legal_settings_section.dart';
 import 'package:baobabe_0_2/features/settings/presentation/widgets/logout_confirmation_dialog.dart';
 import 'package:baobabe_0_2/features/settings/presentation/widgets/settings_tiles.dart';
 import 'package:baobabe_0_2/features/settings/presentation/widgets/profile_sheets.dart';
@@ -133,11 +134,12 @@ class _Content extends StatelessWidget {
                   ),
                 ],
               ),
-              // La section « Application » (Confidentialité, Conditions
-              // d'utilisation) a été retirée : les deux pages n'existent pas,
-              // et PRODUCT.md note que le cadre juridique n'est pas arrêté.
-              // Une entrée qui n'ouvre rien vaut moins qu'une entrée absente ;
-              // elles reviendront avec leur contenu.
+              AppDimens.spacerMedium,
+              // Les textes juridiques. Ils ont eu une section sans
+              // destination — deux entrées qui n'ouvraient rien — puis plus
+              // de section du tout. Ils reviennent avec leur contenu, lisible
+              // dans l'application.
+              const LegalSettingsSection(),
               if (isLoggedIn) ...[
                 AppDimens.spacerLarge,
                 SettingsLogoutButton(

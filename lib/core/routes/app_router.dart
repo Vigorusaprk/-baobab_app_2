@@ -13,6 +13,7 @@ import 'package:baobabe_0_2/app/main_shell.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/screens/home_page_screen.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/screens/search_page.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/screens/all_offers_screen.dart';
+import 'package:baobabe_0_2/features/settings/presentation/screens/legal_page.dart';
 import 'package:baobabe_0_2/features/activity/presentation/screens/activity_screen.dart';
 import 'package:baobabe_0_2/features/activity/presentation/screens/activity_detail_page.dart';
 import 'package:baobabe_0_2/features/settings/presentation/screens/settings_screen.dart';
@@ -190,6 +191,15 @@ final GoRouter appRouter = GoRouter(
       name: 'notifications',
       builder: (context, state) => const NotificationsPage(),
     ),
+    // Les textes juridiques, hors du shell : une page de lecture n'a pas
+    // besoin de la barre d'onglets, et une adresse par document permet de
+    // les partager.
+    GoRoute(
+      path: '/legal/:slug',
+      name: 'legal',
+      builder: (context, state) =>
+          LegalRoutePage(slug: state.pathParameters['slug'] ?? ''),
+    ),
     GoRoute(
       path: '/offers',
       name: 'allOffers',
@@ -199,7 +209,9 @@ final GoRouter appRouter = GoRouter(
         // corresponde exactement à ce que l'utilisateur voyait.
         final extra = state.extra as Map<String, dynamic>?;
         return MaterialPage(
-          child: AllOffersScreen(categorySlug: extra?['categorySlug'] as String?),
+          child: AllOffersScreen(
+            categorySlug: extra?['categorySlug'] as String?,
+          ),
         );
       },
     ),

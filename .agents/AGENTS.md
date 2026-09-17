@@ -1668,6 +1668,23 @@ La leçon qu'il avait laissée reste valable : un composant nommé d'après un
 (`HomeSearchBar` y servait, et le jour où cette barre est devenue une simple
 porte vers Explorer, taper dedans quittait la page).
 
+## Les mentions légales se lisent dans l'application
+
+Les paramètres ont une section « Mentions légales » : mentions légales,
+politique de confidentialité, conditions d'utilisation. Elle a existé sous
+le nom « Application » avec deux entrées qui n'ouvraient rien, puis a été
+retirée — une entrée sans destination vaut moins qu'une entrée absente.
+Elle revient **avec ses textes** (`lib/features/settings/domain/legal/`),
+lus dans l'application par `LegalPage` (route `/legal/:slug`), sans réseau
+et sans navigateur.
+
+Chaque texte décrit ce que l'application **fait réellement** : ce qu'elle
+collecte, à qui elle le montre, jusqu'à quand on peut annuler. Si une
+collecte ou une règle change, le texte change avec elle. Les crochets des
+mentions légales — raison sociale, RCCM, adresse, directeur de la
+publication — attendent les informations de l'entreprise : ils ne
+s'inventent pas. `legal_pages_test.dart` tient qu'aucune entrée n'est vide.
+
 ## Le profil est une feuille, pas une page
 
 Il rejoint les autres surfaces secondaires — filtres, confirmation, adresse de
