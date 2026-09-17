@@ -240,6 +240,39 @@ class AppTheme {
         shape: const StadiumBorder(),
       ),
 
+      // Le sélecteur « Commerces · Offres » d'Explorer. Sans cette entrée,
+      // Material 3 peint le segment choisi en `secondaryContainer`, un ton
+      // pâle qui ne dit pas clairement lequel est actif ; le vert de la
+      // marque le dit, comme la pastille de la barre de navigation.
+      segmentedButtonTheme: SegmentedButtonThemeData(
+        style: ButtonStyle(
+          backgroundColor: WidgetStateProperty.resolveWith(
+            (states) => states.contains(WidgetState.selected)
+                ? scheme.primary
+                : scheme.surfaceContainerLowest,
+          ),
+          foregroundColor: WidgetStateProperty.resolveWith(
+            (states) => states.contains(WidgetState.selected)
+                ? scheme.onPrimary
+                : scheme.onSurfaceVariant,
+          ),
+          iconColor: WidgetStateProperty.resolveWith(
+            (states) => states.contains(WidgetState.selected)
+                ? scheme.onPrimary
+                : scheme.onSurfaceVariant,
+          ),
+          textStyle: WidgetStatePropertyAll(textTheme.labelLarge),
+          side: WidgetStatePropertyAll(
+            BorderSide(color: scheme.outlineVariant),
+          ),
+          shape: WidgetStatePropertyAll(
+            RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(AppDimens.borderButton),
+            ),
+          ),
+        ),
+      ),
+
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
           foregroundColor: scheme.primary,
@@ -293,7 +326,21 @@ class AppTheme {
       chipTheme: ChipThemeData(
         backgroundColor: scheme.surfaceContainerLowest,
         selectedColor: scheme.primary,
-        labelStyle: textTheme.bodySmall,
+        // `labelStyle` sert aussi à la puce **sélectionnée** d'un
+        // `FilterChip` — `secondaryLabelStyle` ne vaut que pour `ChoiceChip`.
+        // Sans cette résolution, « Ouvert maintenant » restait écrit en gris
+        // sur l'aplat vert une fois choisi, et ne se lisait plus.
+        //
+        // C'est la **couleur** que la puce résout selon l'état, pas le style
+        // entier : un `WidgetStateTextStyle` ici laissait la puce non
+        // choisie sans couleur du tout — blanc sur blanc.
+        labelStyle: textTheme.bodySmall!.copyWith(
+          color: WidgetStateColor.resolveWith(
+            (states) => states.contains(WidgetState.selected)
+                ? scheme.onPrimary
+                : scheme.onSurface,
+          ),
+        ),
         // `secondaryLabelStyle` est celui de la puce sélectionnée : sans
         // lui, le libellé garde sa couleur de repos sur l'aplat vert.
         secondaryLabelStyle: textTheme.bodySmall?.copyWith(

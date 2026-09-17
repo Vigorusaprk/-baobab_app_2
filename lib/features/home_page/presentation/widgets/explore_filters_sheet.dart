@@ -3,6 +3,7 @@ import 'package:baobabe_0_2/core/widgets/button/custom_button.dart';
 import 'package:baobabe_0_2/core/widgets/custom_bottom_sheet.dart';
 import 'package:baobabe_0_2/features/business_detail/domain/entities/offer.dart';
 import 'package:baobabe_0_2/features/home_page/domain/entities/offer_search_filters.dart';
+import 'package:baobabe_0_2/features/home_page/presentation/widgets/filter_sheet_parts.dart';
 import 'package:flutter/material.dart';
 
 /// Une fourchette de prix proposée d'un geste.
@@ -61,43 +62,25 @@ class _ExploreFiltersState extends State<_ExploreFilters> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
-          children: [
-            Expanded(
-              child: Text(
-                'Filtrer les offres',
-                style: theme.textTheme.titleLarge,
-              ),
-            ),
-            if (_draft.hasFacets)
-              TextButton(
-                onPressed: () =>
-                    setState(() => _draft = _draft.clearedFacets()),
-                child: Text(
-                  'Tout effacer',
-                  style: theme.textTheme.labelMedium?.copyWith(
-                    color: theme.colorScheme.error,
-                  ),
-                ),
-              ),
-          ],
+        FilterSheetTitle(
+          title: 'Filtrer les offres',
+          canClear: _draft.hasFacets,
+          onClear: () => setState(() => _draft = _draft.clearedFacets()),
         ),
         AppDimens.spacerSmall,
 
-        _Section(
+        FilterSheetSection(
           title: 'Ce que je veux en faire',
           child: Wrap(
             spacing: AppDimens.small,
             runSpacing: AppDimens.small,
             children: [
               for (final f in Fulfilment.values)
-                _Chip(
+                FilterSheetChip(
                   label: f.badge,
                   selected: _draft.fulfilment == f,
                   onSelected: (on) => setState(() {
@@ -110,14 +93,14 @@ class _ExploreFiltersState extends State<_ExploreFilters> {
           ),
         ),
 
-        _Section(
+        FilterSheetSection(
           title: 'Budget',
           child: Wrap(
             spacing: AppDimens.small,
             runSpacing: AppDimens.small,
             children: [
               for (final band in _priceBands)
-                _Chip(
+                FilterSheetChip(
                   label: band.label,
                   selected: band.matches(_draft),
                   onSelected: (on) => setState(() {
@@ -132,14 +115,14 @@ class _ExploreFiltersState extends State<_ExploreFilters> {
           ),
         ),
 
-        _Section(
+        FilterSheetSection(
           title: 'Note minimale',
           child: Wrap(
             spacing: AppDimens.small,
             runSpacing: AppDimens.small,
             children: [
               for (final band in _ratingBands)
-                _Chip(
+                FilterSheetChip(
                   label: band.label,
                   icon: Icons.star_rounded,
                   selected: _draft.minRating == band.value,
@@ -153,14 +136,14 @@ class _ExploreFiltersState extends State<_ExploreFilters> {
           ),
         ),
 
-        _Section(
+        FilterSheetSection(
           title: 'Trier par',
           child: Wrap(
             spacing: AppDimens.small,
             runSpacing: AppDimens.small,
             children: [
               for (final sort in OfferSort.values)
-                _Chip(
+                FilterSheetChip(
                   label: sort.label,
                   selected: _draft.sort == sort,
                   // Un tri est toujours actif : le déselectionner n'a pas de
@@ -181,62 +164,6 @@ class _ExploreFiltersState extends State<_ExploreFilters> {
           onPressed: () => Navigator.pop(context, _draft),
         ),
       ],
-    );
-  }
-}
-
-class _Section extends StatelessWidget {
-  const _Section({required this.title, required this.child});
-
-  final String title;
-  final Widget child;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: AppDimens.medium),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(title, style: Theme.of(context).textTheme.titleSmall),
-          AppDimens.spacerSmall,
-          child,
-        ],
-      ),
-    );
-  }
-}
-
-class _Chip extends StatelessWidget {
-  const _Chip({
-    required this.label,
-    required this.selected,
-    required this.onSelected,
-    this.icon,
-  });
-
-  final String label;
-  final bool selected;
-  final ValueChanged<bool> onSelected;
-  final IconData? icon;
-
-  @override
-  Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    return ChoiceChip(
-      selected: selected,
-      onSelected: onSelected,
-      avatar: icon == null
-          ? null
-          : Icon(
-              icon,
-              size: 16,
-              color: selected ? scheme.onPrimary : scheme.onSurfaceVariant,
-            ),
-      label: Text(label),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(AppDimens.borderRadiusSmallButton),
-      ),
     );
   }
 }

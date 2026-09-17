@@ -1,5 +1,6 @@
 import 'package:baobabe_0_2/features/business_detail/domain/entities/offer.dart';
-import 'package:baobabe_0_2/features/home_page/presentation/widgets/business_list_row.dart';
+import 'package:baobabe_0_2/core/widgets/business_card.dart';
+import 'package:baobabe_0_2/features/home_page/presentation/widgets/business_sections.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/widgets/home_skeleton.dart';
 import 'package:baobabe_0_2/core/widgets/offer_card.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/widgets/offers_carousel_section.dart';
@@ -19,15 +20,17 @@ Widget _wrap(Widget child) => MaterialApp(
 void main() {
   group('HomeSkeleton', () {
     testWidgets(
-      'annonce le triptyque réel : deux rails d\'offres et des commerçants',
+      "annonce l'accueil réel : des commerçants, puis un rail d'offres",
       (tester) async {
         await tester.pumpWidget(_wrap(const HomeSkeleton()));
 
-        // Nouveautés et Découvrir sont deux rails d'offres ; Populaires est
-        // une liste de commerçants. C'est exactement ce que l'accueil
+        // Nouveaux (rail) et Les mieux notés (grille) sont des commerçants ;
+        // un seul rail d'offres, en bas. C'est exactement ce que l'accueil
         // affiche une fois chargé.
-        expect(find.byType(OffersCarouselSkeleton), findsNWidgets(2));
-        expect(find.byType(BusinessListRowSkeleton), findsNWidgets(3));
+        expect(find.byType(BusinessRailSkeleton), findsOneWidget);
+        expect(find.byType(BusinessGridSkeleton), findsOneWidget);
+        expect(find.byType(OffersCarouselSkeleton), findsOneWidget);
+        expect(find.byType(BusinessCardSkeleton), findsWidgets);
       },
     );
 

@@ -4,11 +4,11 @@ import 'package:baobabe_0_2/features/home_page/data/repositories/business_reposi
 import 'package:baobabe_0_2/features/home_page/domain/usecases/get_offers_page.dart';
 import 'package:baobabe_0_2/features/home_page/domain/usecases/get_home_feed.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/bloc/business_bloc.dart';
+import 'package:baobabe_0_2/features/home_page/presentation/bloc/explore_cubit.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/widgets/offers_carousel_section.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/widgets/home_skeleton.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/widgets/home_sliver_header.dart';
-import 'package:baobabe_0_2/features/home_page/presentation/widgets/popular_businesses_section.dart';
-import 'package:baobabe_0_2/features/home_page/presentation/widgets/sponsored_section.dart';
+import 'package:baobabe_0_2/features/home_page/presentation/widgets/business_sections.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -72,15 +72,29 @@ class _HomePageScreenState extends State<HomePageScreen> {
     return false;
   }
 
-  /// Ouvre la liste complète des commerçants de la catégorie affichée.
-  /// Réservé à « Populaires », la seule section qui parle de commerçants.
-  void _openAllBusinesses(BuildContext context) {
+  /// La catégorie affichée à l'accueil, pour que la page où l'on va
+  /// corresponde exactement à ce que l'utilisateur voyait.
+  String _currentSlug(BuildContext context) {
     final state = context.read<BusinessBloc>().state;
-    final slug = state is BusinessLoaded
-        ? state.currentSlug
-        : BusinessBloc.allSlug;
+    return state is BusinessLoaded ? state.currentSlug : BusinessBloc.allSlug;
+  }
 
-    context.pushNamed('allBusinesses', extra: {'categorySlug': slug});
+  /// « Offres du moment · Voir tout » : la page « Toutes les offres », avec
+  /// sa recherche et ses filtres, dans la catégorie affichée.
+  void _openOffers(BuildContext context) {
+    context.pushNamed(
+      'allOffers',
+      extra: {'categorySlug': _currentSlug(context)},
+    );
+  }
+
+  /// « Les mieux notés · Voir tout » : Explorer, qui montre **tous** les
+  /// commerces, dans la catégorie affichée. L'onglet existe déjà, on ne
+  /// pousse pas une page par-dessus le shell — l'ancienne page « Tous les
+  /// commerces » en était le doublon.
+  void _openAllBusinesses(BuildContext context) {
+    context.read<ExploreCubit>().categorySelected(_currentSlug(context));
+    context.goNamed('expolre');
   }
 
   @override
@@ -146,6 +160,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
                             state: state,
                             onSeeAllBusinesses: () =>
                                 _openAllBusinesses(context),
+                            onSeeAllOffers: () => _openOffers(context),
                           ),
                   ),
                 ],
@@ -158,47 +173,51 @@ class _HomePageScreenState extends State<HomePageScreen> {
   }
 }
 
-/// Les trois sections de l'accueil, dans l'ordre où elles répondent aux
-/// questions de l'utilisateur : quoi de neuf, chez qui aller, quoi prendre.
+/// Les sections de l'accueil. Il met en avant des **commerçants** : à la
+/// une, nouveaux, les mieux notés. Les offres n'y gardent qu'un rail en bas
+/// et ont leur page — Explorer, mode Offres.
 class _Sections extends StatelessWidget {
   final BusinessState state;
   final VoidCallback onSeeAllBusinesses;
+  final VoidCallback onSeeAllOffers;
 
-  const _Sections({required this.state, required this.onSeeAllBusinesses});
+  const _Sections({
+    required this.state,
+    required this.onSeeAllBusinesses,
+    required this.onSeeAllOffers,
+  });
 
   @override
   Widget build(BuildContext context) {
     if (state is! BusinessLoaded) return const SizedBox.shrink();
     final loaded = state as BusinessLoaded;
-    final bloc = context.read<BusinessBloc>();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Disparaît d'elle-même quand rien n'est récent : la section ne
-        // sait afficher que des offres, pas un vide.
-        OffersCarouselSection(
-          title: 'Nouveautés',
-          offers: loaded.newOffers,
-          hasMore: loaded.hasMoreNewOffers,
-          isLoadingMore: loaded.isLoadingMoreNewOffers,
-          onSeeMore: () => bloc.add(const LoadMoreNewOffers()),
+        // Section à part, en tête : les commerçants en campagne.
+        FeaturedBusinessesSection(featured: loaded.featuredBusinesses),
+        if (loaded.featuredBusinesses.isNotEmpty) AppDimens.spacerMedium,
+        BusinessRail(
+          title: 'Nouveaux sur Baobabe',
+          subtitle: "Ils viennent d'ouvrir leurs portes.",
+          businesses: loaded.newBusinesses,
+          width: RailWidth.wide,
         ),
-        if (loaded.newOffers.isNotEmpty) AppDimens.spacerMedium,
-        // Après les nouveautés, avant les commerces : assez haut pour valoir
-        // ce qu'elle coûte, assez bas pour que l'accueil ne s'ouvre pas sur
-        // de la publicité.
-        SponsoredSection(offers: loaded.sponsoredOffers),
-        if (loaded.sponsoredOffers.isNotEmpty) AppDimens.spacerMedium,
-        PopularBusinessesSection(onSeeAllTap: onSeeAllBusinesses),
-        AppDimens.spacerMedium,
+        if (loaded.newBusinesses.isNotEmpty) AppDimens.spacerMedium,
+        BusinessGrid(
+          title: 'Les mieux notés',
+          businesses: loaded.popularBusinesses,
+          onSeeAll: onSeeAllBusinesses,
+        ),
+        if (loaded.popularBusinesses.isNotEmpty) AppDimens.spacerMedium,
+        // Un seul rail d'offres, en bas : moins de place, pas zéro.
         OffersCarouselSection(
-          title: 'Offres les mieux notées',
-          offers: loaded.discoverOffers,
-          isLoadingMore: loaded.isLoadingMore,
-          // Scroll infini : la vue prévient seulement qu'on approche de la
-          // fin, le bloc décide s'il y a une page suivante.
-          onReachedEnd: () => bloc.add(const LoadMoreBusinesses()),
+          title: 'Offres du moment',
+          offers: loaded.newOffers,
+          hasMore: true,
+          onSeeMore: onSeeAllOffers,
+          onSeeAll: onSeeAllOffers,
         ),
       ],
     );

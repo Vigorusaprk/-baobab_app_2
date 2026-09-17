@@ -20,11 +20,6 @@ abstract class BusinessRemoteDataSource {
     String? category,
   });
 
-  Future<({List<BusinessModel> items, bool hasMore})> getBusinessesPage({
-    required int page,
-    String? category,
-    String? query,
-  });
   Future<List<MenuItem>> getMenuByBusiness(String businessId);
   Future<void> createReservation(Reservation reservation);
 }

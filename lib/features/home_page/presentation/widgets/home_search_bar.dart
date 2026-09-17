@@ -61,7 +61,7 @@ class HomeSearchBar extends StatelessWidget {
           CustomIconButton(
             onPressed: () =>
                 _goToExplore(context, intent: ExploreIntent.openFilters),
-            tooltip: 'Filtrer les offres',
+            tooltip: 'Filtrer les commerces',
             assetPath: 'assets/icons/filter.svg',
             tone: IconButtonTone.filled,
             iconSize: 20,

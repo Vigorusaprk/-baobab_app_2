@@ -1,9 +1,12 @@
 import 'package:baobabe_0_2/features/business_detail/domain/entities/offer.dart';
+import 'package:baobabe_0_2/features/home_page/data/models/business_model.dart';
+import 'package:baobabe_0_2/features/home_page/domain/entities/business_search_filters.dart';
+import 'package:baobabe_0_2/features/home_page/domain/entities/businesses_page.dart';
 import 'package:baobabe_0_2/features/home_page/domain/entities/home_feed.dart';
 import 'package:baobabe_0_2/features/home_page/domain/entities/offer_search_filters.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-/// La recherche d'offres d'Explorer.
+/// Les deux recherches d'Explorer : les commerces, et les offres.
 ///
 /// Elle s'appuie sur `get-home?section=discover`, qui accepte le texte
 /// cherché, la catégorie, une fourchette de prix, le mode de retrait, une
@@ -32,6 +35,41 @@ class ExploreApiService {
       throw Exception(json['error'].toString());
     }
     return _decode(json['discoverOffers']);
+  }
+
+  /// L'annuaire des commerces : `get-home?section=businesses`, avec les
+  /// critères qui parlent d'un commerce — ouvert maintenant, on peut y
+  /// commander, y réserver, y passer — tous appliqués en base.
+  Future<BusinessesPage> searchBusinesses(
+    BusinessSearchFilters filters, {
+    int page = 1,
+  }) async {
+    final response = await _supabase.functions.invoke(
+      'get-home',
+      method: HttpMethod.get,
+      queryParameters: {
+        'section': 'businesses',
+        'page': '$page',
+        ...filters.toQueryParameters(),
+      },
+    );
+    final json = Map<String, dynamic>.from(response.data as Map);
+    if (json['error'] != null) {
+      throw Exception(json['error'].toString());
+    }
+    final raw = json['businesses'];
+    if (raw is! Map) return const BusinessesPage(items: [], hasMore: false);
+    final map = Map<String, dynamic>.from(raw);
+    return BusinessesPage(
+      items: ((map['data'] as List?) ?? const [])
+          .map(
+            (e) => BusinessModel.fromJson(
+              Map<String, dynamic>.from(e as Map),
+            ).toEntity(),
+          )
+          .toList(),
+      hasMore: map['hasMore'] == true,
+    );
   }
 
   OffersPage _decode(Object? raw) {

@@ -1,6 +1,7 @@
 import 'package:baobabe_0_2/core/themes/app_diemens.dart';
 import 'package:baobabe_0_2/features/business_detail/domain/entities/offer.dart';
 import 'package:baobabe_0_2/core/widgets/offer_card.dart';
+import 'package:baobabe_0_2/core/widgets/section_header.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:skeletonizer/skeletonizer.dart';
@@ -21,6 +22,11 @@ class OffersCarouselSection extends StatelessWidget {
   /// Déclenché par la tuile de fin. Sans lui, elle n'est pas affichée.
   final VoidCallback? onSeeMore;
 
+  /// Le « Voir tout » du titre : la page qui montre **toutes** les offres.
+  /// La tuile de fin dit qu'il en reste ; le titre dit où on les trouve
+  /// toutes, sans avoir à faire défiler le rail jusqu'au bout.
+  final VoidCallback? onSeeAll;
+
   /// Tuile supplémentaire pendant le chargement d'une page suivante.
   final bool isLoadingMore;
 
@@ -34,6 +40,7 @@ class OffersCarouselSection extends StatelessWidget {
     required this.offers,
     this.hasMore = false,
     this.onSeeMore,
+    this.onSeeAll,
     this.isLoadingMore = false,
     this.onReachedEnd,
   });
@@ -58,10 +65,7 @@ class OffersCarouselSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Padding(
-          padding: AppDimens.appPadding,
-          child: Text(title, style: Theme.of(context).textTheme.titleSmall),
-        ),
+        SectionHeader(title: title, onSeeAll: onSeeAll),
         const SizedBox(height: 10),
         SizedBox(
           height: railHeight(context),

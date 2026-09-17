@@ -238,9 +238,7 @@ void main() {
       expect(find.textContaining('dès que la réservation'), findsNothing);
     });
 
-    testWidgets('une demande annulée ne présente plus de code', (
-      tester,
-    ) async {
+    testWidgets('une demande annulée ne présente plus de code', (tester) async {
       await tester.pumpWidget(
         _host(
           ActivityReceipt(

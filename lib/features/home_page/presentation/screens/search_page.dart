@@ -1,33 +1,37 @@
 import 'package:baobabe_0_2/core/animation/animated_count.dart';
 import 'package:baobabe_0_2/core/animation/fade_swap.dart';
 import 'package:baobabe_0_2/core/themes/app_diemens.dart';
+import 'package:baobabe_0_2/core/widgets/business_card.dart';
 import 'package:baobabe_0_2/core/widgets/button/custom_icon_button.dart';
+import 'package:baobabe_0_2/core/widgets/custom_refresh.dart';
 import 'package:baobabe_0_2/core/widgets/custom_search_field.dart';
-import 'package:baobabe_0_2/core/widgets/offer_card.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/bloc/explore_cubit.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/widgets/Category_Icons.dart';
-import 'package:baobabe_0_2/features/home_page/presentation/widgets/explore_filters_sheet.dart';
+import 'package:baobabe_0_2/features/home_page/presentation/widgets/business_filters_sheet.dart';
+import 'package:baobabe_0_2/features/home_page/presentation/widgets/business_sections.dart';
+import 'package:baobabe_0_2/features/home_page/presentation/widgets/search_message.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:go_router/go_router.dart';
 import 'package:skeletonizer/skeletonizer.dart';
-import 'package:baobabe_0_2/core/widgets/button/custom_action_button.dart';
-import 'package:baobabe_0_2/core/widgets/custom_refresh.dart';
 
-/// Explorer : toutes les offres, cherchables et filtrables.
+part 'search_page_results.dart';
+
+/// Explorer : l'annuaire des **commerces**.
 ///
-/// L'écran présentait auparavant des **commerces**, en chargeant les
-/// cinquante premiers puis en les filtrant en Dart. Il présente désormais des
-/// **offres**, cherchées en base par `get-home?section=discover` — le même
-/// objet que les carrousels de l'accueil, dans la même carte.
+/// C'est ce que la plateforme met en avant, et c'est tout ce que l'onglet
+/// montre — « Voir tout » des mieux notés arrive ici aussi. Les offres ont
+/// leur propre page, « Toutes les offres », derrière l'accueil.
+///
+/// Les critères d'un commerce — ouvert maintenant, on peut y commander, y
+/// réserver, y passer — vivent dans la feuille qu'ouvre le bouton de filtres,
+/// comme partout ailleurs. En rangée de puces sous le champ, ils
+/// surchargeaient l'écran avant même le premier résultat.
 ///
 /// La bande de catégories reste en permanence dans son état réduit : ici elle
 /// accompagne une grille qu'on fait défiler longuement, et une bande haute
 /// mangerait la place des résultats.
 class SearchPageBody extends StatefulWidget {
-  const SearchPageBody({super.key, this.showBackButton = false});
-
-  final bool showBackButton;
+  const SearchPageBody({super.key});
 
   @override
   State<SearchPageBody> createState() => _SearchPageBodyState();
@@ -39,9 +43,6 @@ class _SearchPageBodyState extends State<SearchPageBody> {
   final GlobalKey _searchFieldKey = GlobalKey();
   final ScrollController _scroll = ScrollController();
   late final ExploreCubit _explore;
-
-  /// Deux colonnes, dans les proportions du rail de l'accueil (190 x 285).
-  static const double _cardRatio = 0.67;
 
   @override
   void initState() {
@@ -122,7 +123,7 @@ class _SearchPageBodyState extends State<SearchPageBody> {
   }
 
   Future<void> _openFilters() async {
-    final chosen = await showExploreFiltersSheet(
+    final chosen = await showBusinessFiltersSheet(
       context,
       _explore.state.filters,
     );
@@ -146,7 +147,6 @@ class _SearchPageBodyState extends State<SearchPageBody> {
               key: _searchFieldKey,
               controller: _controller,
               focusNode: _searchFocus,
-              showBackButton: widget.showBackButton,
               onChanged: _explore.queryChanged,
               onFilters: _openFilters,
             ),
@@ -170,10 +170,9 @@ class _SearchPageBodyState extends State<SearchPageBody> {
                 listener: (context, state) =>
                     _handleIntent(state.pendingIntent),
                 builder: (context, state) => FadeSwap(
-                  child: _Results(
+                  child: _BusinessResults(
                     state: state,
                     scroll: _scroll,
-                    ratio: _cardRatio,
                     onRetry: _explore.retry,
                     onClearFilters: _explore.clearFacets,
                   ),
@@ -192,14 +191,12 @@ class _SearchRow extends StatelessWidget {
     super.key,
     required this.controller,
     required this.focusNode,
-    required this.showBackButton,
     required this.onChanged,
     required this.onFilters,
   });
 
   final TextEditingController controller;
   final FocusNode focusNode;
-  final bool showBackButton;
   final ValueChanged<String> onChanged;
   final VoidCallback onFilters;
 
@@ -209,15 +206,6 @@ class _SearchRow extends StatelessWidget {
       padding: AppDimens.appPadding,
       child: Row(
         children: [
-          if (showBackButton) ...[
-            CustomIconButton(
-              onPressed: () => Navigator.pop(context),
-              tooltip: 'Revenir en arrière',
-              icon: Icons.arrow_back_ios_new_rounded,
-              iconSize: 18,
-            ),
-            const SizedBox(width: AppDimens.small),
-          ],
           Expanded(
             child: CustomSearchField(
               controller: controller,
@@ -230,14 +218,14 @@ class _SearchRow extends StatelessWidget {
             buildWhen: (a, b) => a.filters.facetCount != b.filters.facetCount,
             builder: (context, state) => Badge(
               // La pastille dit combien de critères sont posés : sans elle,
-              // un filtre actif est invisible une fois le panneau refermé.
+              // un filtre actif est invisible une fois la feuille refermée.
               isLabelVisible: state.filters.facetCount > 0,
               // Le compte défile au lieu de sauter : on voit qu'il a bougé,
               // et dans quel sens.
               label: AnimatedCount(value: state.filters.facetCount),
               child: CustomIconButton(
                 onPressed: onFilters,
-                tooltip: 'Filtrer les offres',
+                tooltip: 'Filtrer les commerces',
                 assetPath: 'assets/icons/filter.svg',
                 tone: IconButtonTone.filled,
                 iconSize: 20,
@@ -245,155 +233,6 @@ class _SearchRow extends StatelessWidget {
             ),
           ),
         ],
-      ),
-    );
-  }
-}
-
-class _Results extends StatelessWidget {
-  const _Results({
-    required this.state,
-    required this.scroll,
-    required this.ratio,
-    required this.onRetry,
-    required this.onClearFilters,
-  });
-
-  final ExploreState state;
-  final ScrollController scroll;
-  final double ratio;
-  final VoidCallback onRetry;
-  final VoidCallback onClearFilters;
-
-  @override
-  Widget build(BuildContext context) {
-    if (state.status == ExploreStatus.failure) {
-      return _Message(
-        key: const ValueKey('echec'),
-        title: 'La recherche a échoué',
-        body: state.message ?? 'Réessayez dans un instant.',
-        actionLabel: 'Réessayer',
-        onAction: onRetry,
-      );
-    }
-
-    final loading =
-        state.status == ExploreStatus.loading ||
-        state.status == ExploreStatus.initial;
-
-    if (loading && state.offers.isEmpty) {
-      return Skeletonizer(
-        key: const ValueKey('squelette'),
-        enabled: true,
-        child: GridView.builder(
-          padding: AppDimens.appPadding,
-          physics: const NeverScrollableScrollPhysics(),
-          gridDelegate: _delegate,
-          itemCount: 6,
-          itemBuilder: (_, _) => const OfferCardSkeleton(),
-        ),
-      );
-    }
-
-    if (state.offers.isEmpty) {
-      return _Message(
-        key: const ValueKey('vide'),
-        title: 'Aucune offre ne correspond',
-        body: state.filters.hasFacets
-            ? 'Essayez d\'élargir vos filtres.'
-            : 'Essayez un autre mot.',
-        actionLabel: state.filters.hasFacets ? 'Effacer les filtres' : null,
-        onAction: state.filters.hasFacets ? onClearFilters : null,
-      );
-    }
-
-    return CustomRefresh(
-      key: const ValueKey('resultats'),
-      onRefresh: context.read<ExploreCubit>().retry,
-      child: GridView.builder(
-        controller: scroll,
-        padding: AppDimens.appPadding.copyWith(
-          top: AppDimens.small,
-          bottom: AppDimens.large,
-        ),
-        gridDelegate: _delegate,
-        itemCount: state.offers.length + (state.loadingMore ? 2 : 0),
-        itemBuilder: (context, index) {
-          if (index >= state.offers.length) {
-            return const Skeletonizer(
-              enabled: true,
-              child: OfferCardSkeleton(),
-            );
-          }
-          final offer = state.offers[index];
-          // Voir le carrousel de l'accueil : la carte remplace un squelette de
-          // même forme, elle n'a donc pas à entrer en scène.
-          return OfferCard(
-            offer: offer,
-            onTap: () => context.pushNamed(
-              'offerDetail',
-              pathParameters: {'id': offer.id},
-              // Le mode voyage avec l'identifiant : le squelette de la fiche
-              // prend la forme de la fiche qui va s'afficher.
-              extra: offer.fulfilment,
-            ),
-          );
-        },
-      ),
-    );
-  }
-
-  SliverGridDelegate get _delegate => SliverGridDelegateWithFixedCrossAxisCount(
-    crossAxisCount: 2,
-    childAspectRatio: ratio,
-    mainAxisSpacing: AppDimens.allPadding12Number,
-    crossAxisSpacing: AppDimens.allPadding12Number,
-  );
-}
-
-/// Un état vide ou en échec : ce qui s'est passé, et quoi faire ensuite.
-class _Message extends StatelessWidget {
-  const _Message({
-    super.key,
-    required this.title,
-    required this.body,
-    this.actionLabel,
-    this.onAction,
-  });
-
-  final String title;
-  final String body;
-  final String? actionLabel;
-  final VoidCallback? onAction;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(AppDimens.large),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              title,
-              textAlign: TextAlign.center,
-              style: theme.textTheme.titleMedium,
-            ),
-            AppDimens.spacerSmall,
-            Text(
-              body,
-              textAlign: TextAlign.center,
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
-              ),
-            ),
-            if (actionLabel != null && onAction != null) ...[
-              AppDimens.spacerMedium,
-              CustomActionButton(label: actionLabel!, onPressed: onAction),
-            ],
-          ],
-        ),
       ),
     );
   }

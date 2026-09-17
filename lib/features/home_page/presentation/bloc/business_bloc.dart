@@ -63,9 +63,10 @@ class BusinessBloc extends Bloc<BusinessEvent, BusinessState> {
         BusinessLoaded(
           newOffers: feed.newOffers.items,
           hasMoreNewOffers: feed.newOffers.hasMore,
+          featuredBusinesses: feed.featuredBusinesses,
+          newBusinesses: feed.newBusinesses,
           popularBusinesses: feed.popularBusinesses,
           discoverOffers: feed.discoverOffers.items,
-          sponsoredOffers: feed.sponsoredOffers,
           currentSlug: slug,
           page: 1,
           hasMore: feed.discoverOffers.hasMore,

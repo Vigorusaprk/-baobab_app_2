@@ -80,7 +80,6 @@ Offer _offer({String id = 'o1'}) => Offer(
   businessName: 'Institut Kivu',
 );
 
-
 /// Un dépôt qui n'écrit nulle part : l'agenda n'a besoin d'un cubit que pour
 /// pouvoir le lire, et la question posée avant de refuser vient avant tout
 /// appel réseau.
@@ -103,21 +102,17 @@ ReceivedReservation _pending() {
   );
 }
 
-
 /// La zone réellement touchable d'une pastille d'action : son `InkWell`, et
 /// non la rangée de texte qu'elle contient.
 /// `.first` : `find.ancestor` remonte du plus proche au plus lointain, et la
 /// carte entière porte elle aussi un `InkWell`. Viser le sien mesurerait la
 /// carte, pas le bouton.
-Finder _target(String label) => find
-    .ancestor(of: find.text(label), matching: find.byType(InkWell))
-    .first;
+Finder _target(String label) =>
+    find.ancestor(of: find.text(label), matching: find.byType(InkWell)).first;
 
 Widget _host(Widget child) => MaterialApp(
   theme: AppTheme.silvaTheme,
-  home: Scaffold(
-    body: SingleChildScrollView(child: child),
-  ),
+  home: Scaffold(body: SingleChildScrollView(child: child)),
 );
 
 void main() {
@@ -370,7 +365,8 @@ void main() {
         ),
       );
 
-      final sent = reservation.toJson(isNew: true)['reservation_date'] as String;
+      final sent =
+          reservation.toJson(isNew: true)['reservation_date'] as String;
       expect(sent.endsWith('Z'), isTrue);
       expect(DateTime.parse(sent), DateTime.utc(2026, 10, 14, 9));
     });
@@ -417,9 +413,7 @@ void main() {
           theme: AppTheme.silvaTheme,
           home: BlocProvider<MerchantCubit>(
             create: (_) => MerchantCubit.forTest(_NoRepository()),
-            child: Scaffold(
-              body: MerchantAgenda(reservations: [_pending()]),
-            ),
+            child: Scaffold(body: MerchantAgenda(reservations: [_pending()])),
           ),
         ),
       );

@@ -22,6 +22,13 @@ class BusinessModel {
   final double? longitude;
   final List<BusinessModel>? stores;
   final bool isSponsored;
+  final String categorySlug;
+  final bool canOrder;
+  final bool canBook;
+  final bool hasInStore;
+  final bool? isOpenNow;
+  final String? opensAt;
+  final String? closesAt;
   final DateTime createdAt;
   final bool isPaused;
   final String? pauseNote;
@@ -54,6 +61,13 @@ class BusinessModel {
     this.longitude,
     this.stores,
     required this.isSponsored,
+    this.categorySlug = '',
+    this.canOrder = false,
+    this.canBook = false,
+    this.hasInStore = false,
+    this.isOpenNow,
+    this.opensAt,
+    this.closesAt,
     required this.createdAt,
     this.isPaused = false,
     this.pauseNote,
@@ -114,6 +128,15 @@ class BusinessModel {
           : (json['createdAt'] != null
                 ? DateTime.parse(json['createdAt'])
                 : DateTime.now()),
+      categorySlug: json['type']?.toString() ?? '',
+      canOrder: json['can_order'] == true,
+      canBook: json['can_book'] == true,
+      hasInStore: json['has_in_store'] == true,
+      isOpenNow: json['is_open_now'] is bool
+          ? json['is_open_now'] as bool
+          : null,
+      opensAt: json['opens_at']?.toString(),
+      closesAt: json['closes_at']?.toString(),
     );
   }
 
@@ -140,6 +163,12 @@ class BusinessModel {
       'longitude': longitude,
       'stores': stores?.map((store) => store.toJson()).toList(),
       'is_sponsored': isSponsored,
+      'can_order': canOrder,
+      'can_book': canBook,
+      'has_in_store': hasInStore,
+      'is_open_now': isOpenNow,
+      'opens_at': opensAt,
+      'closes_at': closesAt,
       'created_at': createdAt.toIso8601String(),
       'is_paused': isPaused,
       'pause_note': pauseNote,
@@ -184,6 +213,13 @@ class BusinessModel {
       quartier: quartier,
       avenue: avenue,
       numero: numero,
+      categorySlug: categorySlug,
+      canOrder: canOrder,
+      canBook: canBook,
+      hasInStore: hasInStore,
+      isOpenNow: isOpenNow,
+      opensAt: opensAt,
+      closesAt: closesAt,
     );
   }
 }

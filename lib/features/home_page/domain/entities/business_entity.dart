@@ -114,6 +114,27 @@ class Business extends Equatable {
   final String? avenue;
   final String? numero;
 
+  /// Le slug de catégorie tel que le serveur le rend. [type] le replie sur
+  /// une énumération qui ne connaît pas toutes les catégories de la
+  /// plateforme (« cosmetics », « service », « event » deviennent `other`) :
+  /// c'est ce slug, et non l'énumération, qui permet de nommer la catégorie
+  /// d'après la table `categories`.
+  final String categorySlug;
+
+  /// Ce qu'on peut y faire — calculé par le serveur sur les offres actives
+  /// (vue `business_card`). C'est ce qui permet à une carte de dire
+  /// « Commander », « Réserver », « En boutique » sans ouvrir la fiche.
+  final bool canOrder;
+  final bool canBook;
+  final bool hasInStore;
+
+  /// Ouvert maintenant ?, à l'heure de Kinshasa, décidé par le serveur.
+  /// Nul quand la ligne vient d'un point de terminaison qui ne le calcule
+  /// pas : on n'affirme alors rien plutôt que de deviner.
+  final bool? isOpenNow;
+  final String? opensAt;
+  final String? closesAt;
+
   const Business({
     required this.id,
     required this.name,
@@ -145,7 +166,18 @@ class Business extends Equatable {
     this.quartier,
     this.avenue,
     this.numero,
+    this.categorySlug = '',
+    this.canOrder = false,
+    this.canBook = false,
+    this.hasInStore = false,
+    this.isOpenNow,
+    this.opensAt,
+    this.closesAt,
   });
+
+  /// Un commerce sans avis n'est pas un commerce mal noté : la carte dit
+  /// « Pas encore d'avis », jamais « 0,0 ».
+  bool get hasRating => reviewCount > 0;
 
   @override
   List<Object?> get props => [
@@ -179,5 +211,12 @@ class Business extends Equatable {
     quartier,
     avenue,
     numero,
+    categorySlug,
+    canOrder,
+    canBook,
+    hasInStore,
+    isOpenNow,
+    opensAt,
+    closesAt,
   ];
 }

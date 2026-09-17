@@ -73,9 +73,12 @@ possible et les boutons qui ne mènent nulle part.
 - Découverte sans compte : catalogue, fiches, offres et avis sont lisibles par
   un visiteur anonyme. La connexion est demandée au moment d'agir, jamais pour
   naviguer.
-- Trois sections d'accueil, filtrables par catégorie : Nouveautés (offres de
-  moins de 30 jours), Populaires (les 3 meilleurs commerçants), Découvrir (les
-  offres les mieux notées).
+- L'accueil met en avant des **commerçants**, filtrables par catégorie :
+  À la une (les commerces en campagne, sans mention de paiement), Nouveaux sur
+  Baobabe (moins de 30 jours), Les mieux notés, puis un seul rail « Offres du
+  moment ». Explorer ne montre que des commerces ; l'annuaire complet des
+  offres est une page à part, « Toutes les offres », derrière ce rail. Un
+  commerce en pause n'est montré nulle part.
 - Catégories servies par le back-end et mises en cache : en ajouter une ne
   demande pas de publier une version.
 - Commande (panier, quantités) et réservation (une offre, une quantité, une
@@ -102,8 +105,8 @@ possible et les boutons qui ne mènent nulle part.
 - Terminologie : **offre** (ce qui est publié), **commerçant** (celui qui
   publie), **commerce** (l'enseigne), **activités** (l'historique du client).
 - **Les fiches ouvertes et les clics publicitaires sont comptés** par jour,
-  par commerce et par offre (`daily_metrics`). Le classement « Populaires »
-  reste fondé sur la note : la mesure sert d'abord à rendre des comptes au
+  par commerce et par offre (`daily_metrics`). Le classement « Les mieux
+  notés » reste fondé sur la note : la mesure sert d'abord à rendre des comptes au
   commerçant sur sa mise en avant, pas encore à ordonner l'accueil.
 - **Un rendez-vous doit tomber sur un créneau déclaré** quand l'offre en
   déclare. Le serveur refuse le reste, et le client ne voit que les heures

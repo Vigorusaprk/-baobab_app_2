@@ -11,44 +11,59 @@ class OffersPage {
   bool get isEmpty => items.isEmpty;
 }
 
-/// Une offre mise en avant, et la campagne qui la porte.
-///
-/// L'identifiant de campagne voyage avec l'offre : c'est lui qui permettra
-/// de rapporter le clic à la bonne campagne, et non à l'offre en général.
-class SponsoredOffer {
-  final Offer offer;
-  final String campaignId;
+/// L'offre qu'une campagne visait, quand elle en visait une.
+class FeaturedOffer {
+  final String id;
+  final String name;
 
-  const SponsoredOffer({required this.offer, required this.campaignId});
+  const FeaturedOffer({required this.id, required this.name});
+}
+
+/// Un commerçant à la une, et la campagne qui l'y a mis.
+///
+/// C'est toujours le **commerce** qui est à la une. Si la campagne visait une
+/// offre précise, elle est nommée sur la carte et c'est elle que le toucher
+/// ouvre — mais la vedette reste le commerçant.
+class FeaturedBusiness {
+  final Business business;
+  final String campaignId;
+  final FeaturedOffer? offer;
+
+  const FeaturedBusiness({
+    required this.business,
+    required this.campaignId,
+    this.offer,
+  });
 }
 
 /// Contenu de la page d'accueil pour une catégorie, renvoyé par l'Edge
 /// Function `get-home` en un seul appel.
 ///
-/// Les trois sections répondent chacune à une question différente, et ne
-/// montrent délibérément pas la même chose : elles affichaient auparavant
-/// toutes les trois des commerçants, si bien qu'on ne pouvait pas les
-/// distinguer — sur une catégorie ne comptant qu'un commerçant, on voyait
-/// trois fois le même nom.
+/// L'accueil met en avant des **commerçants** : à la une, nouveaux, les
+/// mieux notés. Les offres n'y gardent qu'un rail en bas et ont leur propre
+/// page — Explorer, mode Offres.
 class HomeFeed {
-  /// « Quoi de neuf ? » — offres publiées récemment. [OffersPage.hasMore]
-  /// indique s'il en reste au-delà de ce que le carrousel montre.
-  final OffersPage newOffers;
+  /// « À la une » — les commerçants en campagne. Section à part, jamais
+  /// mêlée aux autres.
+  final List<FeaturedBusiness> featuredBusinesses;
 
-  /// « Chez qui aller ? » — les meilleurs commerçants.
+  /// « Nouveaux sur Baobabe » — inscrits depuis moins de 30 jours.
+  final List<Business> newBusinesses;
+
+  /// « Les mieux notés » — le corps de la page.
   final List<Business> popularBusinesses;
 
-  /// « Quoi prendre ? » — les offres les mieux notées, paginées.
+  /// « Offres du moment » — un rail, en bas. Les offres ont leur page.
+  final OffersPage newOffers;
+
+  /// La page des offres (Explorer, mode Offres), paginée.
   final OffersPage discoverOffers;
 
-  /// « Qui a payé pour être là ? » — les campagnes en cours. À part des
-  /// autres sections, et étiquetées comme telles.
-  final List<SponsoredOffer> sponsoredOffers;
-
   const HomeFeed({
-    this.newOffers = const OffersPage(),
+    this.featuredBusinesses = const [],
+    this.newBusinesses = const [],
     this.popularBusinesses = const [],
+    this.newOffers = const OffersPage(),
     this.discoverOffers = const OffersPage(),
-    this.sponsoredOffers = const [],
   });
 }

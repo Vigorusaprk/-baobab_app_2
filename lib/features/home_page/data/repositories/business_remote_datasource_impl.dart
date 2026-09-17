@@ -5,6 +5,7 @@ import 'package:baobabe_0_2/features/booking_page/data/models/reservation_model.
 import 'package:baobabe_0_2/features/home_page/data/data_sources/remote_datasource/business_remote_datasource.dart';
 import 'package:baobabe_0_2/features/business_detail/domain/entities/offer.dart';
 import 'package:baobabe_0_2/features/home_page/data/models/business_model.dart';
+import 'package:baobabe_0_2/features/home_page/domain/entities/business_entity.dart';
 import 'package:baobabe_0_2/features/home_page/domain/entities/home_feed.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -221,31 +222,45 @@ class BusinessRemoteDataSourceImpl implements BusinessRemoteDataSource {
   /// Convertit la charge utile `get-home` (réseau ou cache — même forme).
   HomeFeed _decodeHomeFeed(Map<String, dynamic> json) {
     return HomeFeed(
+      featuredBusinesses: _decodeFeatured(json['featuredBusinesses']),
+      newBusinesses: _decodeBusinesses(json['newBusinesses']),
+      popularBusinesses: _decodeBusinesses(json['popularBusinesses']),
       newOffers: _decodeOffersPage(json['newOffers']),
-      popularBusinesses: ((json['popularBusinesses'] as List?) ?? const [])
-          .map(
-            (e) => BusinessModel.fromJson(Map<String, dynamic>.from(e as Map)),
-          )
-          .map((m) => m.toEntity())
-          .toList(),
       discoverOffers: _decodeOffersPage(json['discoverOffers']),
-      sponsoredOffers: _decodeSponsored(json['sponsoredOffers']),
     );
   }
 
-  /// Les mises en avant. Une entrée sans `campaignId` est écartée : sans lui
-  /// le clic ne pourrait être rapporté à aucune campagne, et une mise en
-  /// avant qu'on ne peut pas mesurer ne vaut pas d'être vendue.
-  List<SponsoredOffer> _decodeSponsored(Object? raw) {
+  List<Business> _decodeBusinesses(Object? raw) {
     if (raw is! List) return const [];
-    final result = <SponsoredOffer>[];
+    return raw
+        .map((e) => BusinessModel.fromJson(Map<String, dynamic>.from(e as Map)))
+        .map((m) => m.toEntity())
+        .toList();
+  }
+
+  /// Une entrée sans `campaignId` est écartée : sans lui le clic ne pourrait
+  /// être rapporté à aucune campagne, et une mise en avant qu'on ne peut pas
+  /// mesurer ne vaut pas d'être vendue.
+  List<FeaturedBusiness> _decodeFeatured(Object? raw) {
+    if (raw is! List) return const [];
+    final result = <FeaturedBusiness>[];
     for (final entry in raw) {
       if (entry is! Map) continue;
       final map = Map<String, dynamic>.from(entry);
       final campaignId = map['campaignId']?.toString();
       if (campaignId == null || campaignId.isEmpty) continue;
+      final offer = map['featuredOffer'];
       result.add(
-        SponsoredOffer(offer: Offer.fromJson(map), campaignId: campaignId),
+        FeaturedBusiness(
+          business: BusinessModel.fromJson(map).toEntity(),
+          campaignId: campaignId,
+          offer: offer is Map && offer['id'] != null
+              ? FeaturedOffer(
+                  id: offer['id'].toString(),
+                  name: offer['name']?.toString() ?? '',
+                )
+              : null,
+        ),
       );
     }
     return result;
@@ -260,39 +275,6 @@ class BusinessRemoteDataSourceImpl implements BusinessRemoteDataSource {
           .toList(),
       hasMore: map['hasMore'] == true,
     );
-  }
-
-  @override
-  Future<({List<BusinessModel> items, bool hasMore})> getBusinessesPage({
-    required int page,
-    String? category,
-    String? query,
-  }) async {
-    // Pas de secours hors-ligne ici : la 1ère page (getHomeFeed) a déjà son
-    // cache, "charger plus" est un enrichissement progressif, pas le
-    // contenu principal de l'écran.
-    //
-    // `section=businesses` : cette pagination alimente l'écran « Voir tout »,
-    // qui liste des commerçants — pas les offres de l'accueil.
-    final response = await _supabase.functions.invoke(
-      'get-home',
-      method: HttpMethod.get,
-      queryParameters: {
-        'section': 'businesses',
-        'page': '$page',
-        if (category != null && category.isNotEmpty) 'category': category,
-        // La recherche est faite **en base**. La filtrer sur la page déjà
-        // reçue ne porterait que sur les vingt premiers commerces, ce qui est
-        // faux dès qu'on fait défiler.
-        if (query != null && query.trim().isNotEmpty) 'q': query.trim(),
-      },
-    );
-    final json = response.data as Map<String, dynamic>;
-    final page_ = json['businesses'] as Map<String, dynamic>?;
-    final items = _businessItems(json)
-        .map((item) => BusinessModel.fromJson(item as Map<String, dynamic>))
-        .toList();
-    return (items: items, hasMore: page_?['hasMore'] as bool? ?? false);
   }
 
   @override

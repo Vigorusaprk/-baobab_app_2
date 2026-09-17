@@ -76,7 +76,7 @@ All functions are deployed with `verify_jwt: true`.
 
 ### Current functions
 
-- `get-home` — bundle de l'accueil filtré par catégorie : `{newOffers, popularBusinesses, discoverOffers, sponsoredOffers}`. `?section=new&page=N`, `?section=discover&page=N` et `?section=businesses` renvoient une liste paginée seule (voir « Les trois sections de l'accueil » ci-dessous).
+- `get-home` — bundle de l'accueil filtré par catégorie : `{featuredBusinesses, newBusinesses, popularBusinesses, newOffers, discoverOffers}`. `?section=new&page=N`, `?section=discover&page=N` et `?section=businesses` (avec `q`, `category`, `openNow`, `canOrder`, `canBook`, `inStore`) renvoient une liste paginée seule (voir « L'accueil met en avant des commerçants » ci-dessous). Les commerces sont lus dans la vue `business_card`.
 - `get-categories` — catégories de la marketplace, mises en cache par l'app
 - `get-business-detail` — `?id=` → `{business, offers, capabilities, menuItems, rooms, vehicles, reviews}`
 - `get-offer-detail` — `?id=` → `{offer, business, reviews, otherOffers, remainingCapacity}` : tout ce qu'il faut pour décider devant une offre, sans être passé par la fiche du commerçant
@@ -166,22 +166,72 @@ Le catalogue (`business`, `offers`, `menu_items`, `rooms`, `vehicles`,
 `authenticated` vide la page de découverte pour un visiteur, ce qui contredit
 le principe de navigation libre documenté plus haut.
 
-### Les trois sections de l'accueil
+### L'accueil met en avant des commerçants
 
-Elles ne montrent délibérément **pas la même chose**. Quand les trois
-affichaient des commerçants, une catégorie n'en comptant qu'un faisait lire
-trois fois le même nom, et on ne savait pas si une carte était une offre ou
-une enseigne.
+La plateforme vend des **commerçants**, pas des offres : c'est l'enseigne
+qu'on retient, qu'on recommande, chez qui on revient. L'accueil et Explorer
+s'y conforment depuis septembre 2026. Avant, l'accueil était un triptyque
+d'offres (Nouveautés, Populaires, Découvrir) et Explorer une grille d'offres.
 
-- **Nouveautés** — les offres publiées depuis moins de `NEW_WINDOW_DAYS`
-  (30 jours). Section **entièrement masquée** quand il n'y a rien de récent :
-  un titre suivi du vide est pire qu'une absence. Limitée à `NEW_PAGE_SIZE`,
-  avec une tuile « Voir plus » en fin de liste s'il en reste.
-- **Populaires** — les 3 meilleurs **commerçants**.
-- **Découvrir** — les meilleures **offres**, en scroll infini.
+L'accueil, de haut en bas :
 
-Les cartes d'offre (`OfferCardWidget`) et de commerçant sont volontairement
-différentes : prix + « chez X » d'un côté, note + catégorie de l'autre.
+- **À la une** — les commerces qui ont une campagne `running` sur
+  l'emplacement `home`. Un commerce n'y figure qu'une fois, même avec deux
+  campagnes. Quand la campagne vise une offre, la tuile dit « Met en avant :
+  <offre> » et la toucher ouvre **cette offre** ; sinon elle ouvre la fiche.
+  Chaque toucher compte un clic (`MetricsService.click`) pour le compte-rendu
+  du commerçant. Section masquée quand elle est vide.
+- **Nouveaux sur Baobabe** — les commerces créés depuis moins de 30 jours,
+  en rail, badge « Nouveau » sur la photo. Masquée quand vide.
+- **Les mieux notés** — grille à deux colonnes, « Voir tout » mène à
+  **Explorer**, dans la catégorie affichée. L'ancienne page « Tous les
+  commerces » en était le doublon ; elle est supprimée, et tout ce qui y
+  menait pointe sur l'onglet.
+- **Offres du moment** — un seul rail d'offres, en bas ; « Voir tout » dans
+  le titre (et la tuile de fin du rail) ouvre la page **« Toutes les
+  offres »**. Les offres ont moins de place à l'accueil, elles gardent un
+  annuaire entier derrière ce lien.
+
+Le « Voir tout » d'un titre est le petit mot `SeeAll`, **sur la ligne du
+titre** (`SectionHeader`, `core/widgets`). Un `TextButton` posé en bout de
+colonne était plus gros que le titre et flottait entre les deux lignes.
+
+Le serveur **dédoublonne** dans cet ordre : un commerce à la une n'est pas
+répété dans Nouveaux, un nouveau n'est pas répété dans les mieux notés. Sur
+une catégorie qui n'a qu'un commerce, on ne lit son nom qu'une fois.
+
+**Un commerce en pause n'est jamais montré** (`business.is_active`, filtré
+dans la vue `business_card`). Afficher une enseigne où l'on ne peut rien
+faire frustre pour rien.
+
+### « À la une » ne parle pas d'argent
+
+La section des campagnes s'appelle **« À la une »**, sous-titre « Les
+adresses qu'il faut voir cette semaine. » Ni « Sponsorisé », ni « Mise en
+avant payée », ni aucune mention de la rémunération ou de la logique
+derrière : c'est du vocabulaire marketing, rien d'autre. Ce qui reste vrai :
+ces commerces sont rendus **à part**, dans leur propre section, jamais glissés
+au milieu des mieux notés — une campagne ne doit pas passer pour du mérite.
+
+### La carte d'un commerce vit dans `core/widgets`
+
+`BusinessCard` (`lib/core/widgets/business_card.dart`, deux `part`) est la
+seule carte de commerce : `.tile` (photo 16:9, accueil et grille d'Explorer)
+et `.row` (vignette 72 px, pour les listes longues). Elle répond dans l'ordre à :
+qui (nom), quoi et où (« Catégorie · Commune »), c'est bien ? (« 4,8 (32) »
+ou « Pas encore d'avis », jamais « 0,0 »), c'est ouvert ? (« Ouvert · jusqu'à
+22:00 » / « Fermé · ouvre à 08:00 »), je peux y faire quoi (pastilles
+Commander / Réserver / En boutique — seulement celles qui sont vraies).
+
+Tout ce qu'elle affirme vient de la vue **`business_card`** : `is_open_now`,
+`opens_at`, `closes_at` (calculés à l'heure de Kinshasa par
+`business_hours_today`), `can_order`, `can_book`, `has_in_store`. Quand le
+serveur n'a rien dit (`is_open_now` nul), la carte **se tait** : l'ancienne
+ligne disait « Ouvert » en dur. Le nom de la catégorie vient de la table
+`categories` (via `CategoryBloc`) par `categorySlug` ; l'énumération Dart ne
+connaît pas « cosmetics », « service » ni « event » et les appelait tous
+« Commerce ». `BusinessCardSkeleton` partage `tileAspectRatio` avec la carte
+pour que la page ne saute pas au remplacement.
 
 ### Les notes : on note une offre, pas un commerce
 
@@ -274,10 +324,11 @@ le bouton vaut engagement, et la feuille le dit. La machine à états vit dans
 `update-ad-campaign` : `inReview → approved → running → finished`, plus
 `rejected` et `cancelled`.
 
-Les campagnes en cours sont rendues **à part** sur l'accueil, dans une section
-« Mise en avant », et **chaque carte porte l'étiquette « Sponsorisé »**.
-Glisser une offre payée au milieu des mieux notées ferait passer de la
-publicité pour du mérite.
+Les campagnes en cours sont rendues **à part** sur l'accueil, dans la section
+« À la une » — voir « “À la une” ne parle pas d'argent » plus haut : le
+commerce est la vedette, la carte dit ce qu'il met en avant, et aucun mot ne
+mentionne le paiement. Glisser un commerce qui a payé au milieu des mieux
+notés ferait passer de la publicité pour du mérite.
 
 `/admin` n'est visible que pour un compte inscrit dans `platform_admins`, une
 table que **rien dans l'application ne peut alimenter** : on n'ajoute un
@@ -1435,31 +1486,63 @@ Pas de bouton dans la carte : la carte entière est le bouton. Un bouton
 créerait une petite cible collée à un geste de défilement, et une offre en
 boutique n'a aucune action à proposer.
 
-## Explorer cherche des offres, et le serveur fait le tri
+## Explorer montre des commerces, « Toutes les offres » montre des offres
 
-L'écran présentait des **commerces**, en chargeant les cinquante premiers puis
-en les filtrant en Dart. Deux défauts en un : ce n'était pas le bon objet, et
-au-delà de la première page le filtrage ne portait que sur ce qui était déjà
-reçu.
+Explorer est l'annuaire des **commerces** — c'est ce que la plateforme met
+en avant — et rien d'autre. Un sélecteur « Commerces · Offres » a existé
+un jour dans l'onglet : il brouillait la question posée à l'écran, et une
+rangée de puces de critères sous le champ surchargeait la page avant même le
+premier résultat. Les deux sont partis.
 
-Il s'appuie désormais sur `get-home?section=discover`, qui accepte `q`,
-`category`, `minPrice`, `maxPrice`, `fulfilment`, `minRating` et `sort` — tous
-appliqués **en base**. La règle : un critère qui coexiste avec du défilement
-infini se filtre au serveur, jamais sur la page déjà chargée.
+- **Explorer** (`SearchPageBody`, `ExploreCubit`) : champ de recherche,
+  bouton de filtres, bande de catégories, grille de `BusinessCard.tile`. Les
+  critères — Ouvert maintenant, Commander, Réserver, En boutique — vivent
+  dans la **feuille** qu'ouvre le bouton de filtres
+  (`business_filters_sheet.dart`), comme partout ailleurs ; la pastille du
+  bouton compte ceux qui sont posés. « Voir tout » des mieux notés arrive ici
+  avec la catégorie de l'accueil déjà posée (`categorySelected` avant
+  `goNamed`).
+- **Toutes les offres** (`AllOffersScreen`, route `allOffers`,
+  `OffersSearchCubit`) : l'ancien Explorer — recherche, feuille de filtres
+  d'offres (prix, mode de retrait, note, tri), catégories, grille. Page
+  poussée depuis « Offres du moment · Voir tout », avec **son propre cubit**
+  créé par la page : ce qu'on y tape ne doit pas resurgir dans l'onglet.
 
-Deux gardes dans `ExploreCubit` méritent d'être connus :
+Les deux feuilles partagent leurs pièces (`filter_sheet_parts.dart`) : un
+titre avec « Tout effacer », des sections, des puces. Deux feuilles, une
+seule façon de poser un critère.
+
+Les deux écrans interrogent le serveur : `get-home?section=businesses` (`q`,
+`category`, `openNow`, `canOrder`, `canBook`, `inStore`) et
+`get-home?section=discover` (`q`, `category`, `minPrice`, `maxPrice`,
+`fulfilment`, `minRating`, `sort`) — tous appliqués **en base**. La règle : un
+critère qui coexiste avec du défilement infini se filtre au serveur, jamais
+sur la page déjà chargée. Explorer a un jour chargé les cinquante premiers
+commerces pour les filtrer en Dart ; au-delà de la première page, le filtre
+ne portait que sur ce qui était déjà reçu.
+
+Deux gardes, dans les deux cubits, méritent d'être connus :
 
 1. **Une temporisation de 350 ms** sépare la frappe de l'appel, et un numéro
    de requête écarte les réponses arrivées dans le désordre — sans lui, une
    requête lente écrase le résultat de la recherche suivante.
 2. **Le numéro de page est suivi dans l'état**, jamais déduit du nombre
-   d'offres reçues. Une page n'est pleine que si le serveur avait de quoi la
+   d'éléments reçus. Une page n'est pleine que si le serveur avait de quoi la
    remplir ; la division redemandait la page déjà lue. Un test le tient.
 
 `copyWith` ne peut pas remettre un critère à zéro — passer `null` veut dire
 « ne change rien ». Les remises à zéro passent donc par des drapeaux
 explicites (`clearPrice`, `clearCategory`…), sans quoi « tous les prix »
 serait inexprimable.
+
+### Une puce de filtre résout sa couleur, pas son style
+
+Le thème a un jour donné aux puces un `WidgetStateTextStyle` — le style
+entier résolu selon l'état. La puce non choisie s'affichait **blanc sur
+blanc** : toute la feuille de filtres était illisible. `Chip` résout la
+**couleur** de l'étiquette selon l'état (`WidgetStateColor` dans
+`labelStyle.color`), pas le style. `filter_chips_test.dart` tient les deux
+couleurs.
 
 ## Un seul bouton icône, un seul champ de recherche
 
@@ -1560,34 +1643,21 @@ Le chercheur de budget est supprimé — sa fourchette de prix vit désormais da
 le panneau de filtres d'Explorer.
 
 
-## « Tous les commerces » cherche des commerces
+## « Tous les commerces » n'existe plus
 
-L'écran empruntait `HomeSearchBar`. Le nom disait « accueil », l'usage était
-double : le jour où cette barre est devenue une simple porte vers Explorer,
-taper dedans quittait la page — et le bouton de filtres qui l'accompagnait
-ouvrait des filtres d'**offres** sur une liste de **commerces**.
+L'écran listait les commerces d'une catégorie derrière le « Voir tout » de
+l'accueil, avec sa propre recherche et son propre cubit
+(`BusinessListCubit`). Depuis qu'Explorer montre tous les commerces avec les
+mêmes critères, c'était un doublon : deux écrans pour une même question, et
+deux endroits à faire évoluer à chaque changement de carte. Il est supprimé
+avec sa route `allBusinesses`, son cubit, son cas d'usage
+`GetBusinessesPage` et la pagination `getBusinessesPage` du dépôt ; tout ce
+qui y menait pointe sur l'onglet Explorer, catégorie posée.
 
-La leçon vaut au-delà de ce cas : un composant nommé d'après un écran mais
-utilisé par deux se casse en silence dès que l'un des deux évolue. L'écran
-utilise désormais `CustomSearchField` directement, le champ partagé, sans
-bouton à côté.
-
-**La recherche est faite en base**, via `get-home?section=businesses&q=`, avec
-la même temporisation de 350 ms qu'Explorer. Filtrer la page déjà reçue ne
-porterait que sur les vingt premiers commerces — faux dès qu'on fait défiler.
-La page suivante emporte **et** la catégorie **et** la recherche : une page qui
-oublierait l'une des deux collerait des commerces sans rapport à la suite de
-ceux affichés.
-
-Changer de catégorie **conserve** le texte tapé : l'utilisateur affine, il ne
-recommence pas.
-
-Deux détails de mise en page qui traînaient : la bande de catégories était en
-état étendu faute de `collapseProgress: 1`, et la liste avait des marges de 24
-là où tout ce qui la surmontait était à 16 — décalée de 8 px vers l'intérieur.
-Les marges de la liste et de son squelette vivent dans une seule constante,
-pour qu'ils se superposent exactement.
-
+La leçon qu'il avait laissée reste valable : un composant nommé d'après un
+écran mais utilisé par deux se casse en silence dès que l'un des deux évolue
+(`HomeSearchBar` y servait, et le jour où cette barre est devenue une simple
+porte vers Explorer, taper dedans quittait la page).
 
 ## Le profil est une feuille, pas une page
 
@@ -1605,7 +1675,7 @@ ouvrait.
 
 Le fichier s'appelait `profil_page.dart` alors qu'il ne contient plus de page ;
 il est devenu `profile_details.dart`. Un nom qui ment sur son contenu est
-exactement ce qui a cassé la barre de recherche de « Tous les commerces » —
+exactement ce qui a cassé la barre de recherche de l'ancien « Tous les commerces » —
 `HomeSearchBar` servait deux écrans, son nom n'en annonçait qu'un.
 
 
@@ -1628,7 +1698,7 @@ vestibulaires — et une animation « juste jolie » ne vaut pas leur inconfort.
 
 | moment | composant | où |
 |---|---|---|
-| un contenu en remplace un autre | `FadeSwap` | Explorer, Tous les commerces, profil |
+| un contenu en remplace un autre | `FadeSwap` | Explorer, Toutes les offres, profil |
 | un élément de liste arrive | `Appear` | grille d'Explorer, rails d'offres, liste de commerces |
 | un nombre change | `AnimatedCount` | pastille de filtres, compteur d'activités |
 | un texte change au même endroit | `SwappingText` | libellés et valeurs |

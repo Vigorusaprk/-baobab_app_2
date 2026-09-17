@@ -26,15 +26,17 @@ class BusinessLoaded extends BusinessState {
   /// Commande l'affichage du bouton « Voir plus » en fin de liste.
   final bool hasMoreNewOffers;
 
-  /// « Chez qui aller ? » — les meilleurs commerçants.
+  /// « À la une » — les commerçants en campagne, section à part.
+  final List<FeaturedBusiness> featuredBusinesses;
+
+  /// « Nouveaux sur Baobabe » — inscrits depuis moins de 30 jours.
+  final List<Business> newBusinesses;
+
+  /// « Les mieux notés » — le corps de l'accueil.
   final List<Business> popularBusinesses;
 
   /// « Quoi prendre ? » — les offres les mieux notées, en scroll infini.
   final List<Offer> discoverOffers;
-
-  /// Les mises en avant payées, tenues à part : elles ne se mêlent à aucune
-  /// autre section et portent leur étiquette.
-  final List<SponsoredOffer> sponsoredOffers;
 
   final String currentSlug;
 
@@ -50,9 +52,10 @@ class BusinessLoaded extends BusinessState {
   const BusinessLoaded({
     this.newOffers = const [],
     this.hasMoreNewOffers = false,
+    this.featuredBusinesses = const [],
+    this.newBusinesses = const [],
     this.popularBusinesses = const [],
     this.discoverOffers = const [],
-    this.sponsoredOffers = const [],
     this.newOffersPage = 1,
     this.isLoadingMoreNewOffers = false,
     required this.currentSlug,
@@ -64,9 +67,10 @@ class BusinessLoaded extends BusinessState {
   BusinessLoaded copyWith({
     List<Offer>? newOffers,
     bool? hasMoreNewOffers,
+    List<FeaturedBusiness>? featuredBusinesses,
+    List<Business>? newBusinesses,
     List<Business>? popularBusinesses,
     List<Offer>? discoverOffers,
-    List<SponsoredOffer>? sponsoredOffers,
     int? newOffersPage,
     bool? isLoadingMoreNewOffers,
     String? currentSlug,
@@ -77,9 +81,10 @@ class BusinessLoaded extends BusinessState {
     return BusinessLoaded(
       newOffers: newOffers ?? this.newOffers,
       hasMoreNewOffers: hasMoreNewOffers ?? this.hasMoreNewOffers,
+      featuredBusinesses: featuredBusinesses ?? this.featuredBusinesses,
+      newBusinesses: newBusinesses ?? this.newBusinesses,
       popularBusinesses: popularBusinesses ?? this.popularBusinesses,
       discoverOffers: discoverOffers ?? this.discoverOffers,
-      sponsoredOffers: sponsoredOffers ?? this.sponsoredOffers,
       newOffersPage: newOffersPage ?? this.newOffersPage,
       isLoadingMoreNewOffers:
           isLoadingMoreNewOffers ?? this.isLoadingMoreNewOffers,
@@ -94,9 +99,10 @@ class BusinessLoaded extends BusinessState {
   List<Object> get props => [
     newOffers,
     hasMoreNewOffers,
+    featuredBusinesses,
+    newBusinesses,
     popularBusinesses,
     discoverOffers,
-    sponsoredOffers,
     newOffersPage,
     isLoadingMoreNewOffers,
     currentSlug,

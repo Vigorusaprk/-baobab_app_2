@@ -55,7 +55,10 @@ class _FakeService extends NotificationsApiService {
   bool lastMarkedAll = false;
 
   @override
-  Future<NotificationPage> getPage({int page = 1, bool unreadOnly = false}) async {
+  Future<NotificationPage> getPage({
+    int page = 1,
+    bool unreadOnly = false,
+  }) async {
     reads++;
     final index = page - 1;
     return index < pages.length ? pages[index] : const NotificationPage();
@@ -126,10 +129,7 @@ void main() {
         MaterialApp(
           theme: AppTheme.silvaTheme,
           home: Scaffold(
-            body: NotificationTile(
-              notification: notification,
-              onTap: () {},
-            ),
+            body: NotificationTile(notification: notification, onTap: () {}),
           ),
         ),
       );
@@ -192,7 +192,11 @@ void main() {
 
     test('la première page arrive avec son compte de non-lues', () async {
       final cubit = _SignedInCubit(
-        _FakeService(pages: [page([_row(), _row(id: 'n2')], unread: 2)]),
+        _FakeService(
+          pages: [
+            page([_row(), _row(id: 'n2')], unread: 2),
+          ],
+        ),
       );
 
       await cubit.load();
@@ -206,7 +210,9 @@ void main() {
 
     test('marquer comme lu bascule sans attendre le réseau', () async {
       final service = _FakeService(
-        pages: [page([_row()], unread: 1)],
+        pages: [
+          page([_row()], unread: 1),
+        ],
       );
       final cubit = _SignedInCubit(service);
       await cubit.load();
@@ -221,7 +227,9 @@ void main() {
 
     test('une notification déjà lue ne se remarque pas', () async {
       final service = _FakeService(
-        pages: [page([_row(readAt: '2026-09-06T11:00:00+00:00')])],
+        pages: [
+          page([_row(readAt: '2026-09-06T11:00:00+00:00')]),
+        ],
       );
       final cubit = _SignedInCubit(service);
       await cubit.load();
@@ -234,7 +242,9 @@ void main() {
 
     test('un refus du serveur fait relire plutôt que mentir', () async {
       final service = _FakeService(
-        pages: [page([_row()], unread: 1)],
+        pages: [
+          page([_row()], unread: 1),
+        ],
         failMarkRead: true,
       );
       final cubit = _SignedInCubit(service);
@@ -269,7 +279,11 @@ void main() {
     });
 
     test('sans page suivante, on ne demande rien', () async {
-      final service = _FakeService(pages: [page([_row()])]);
+      final service = _FakeService(
+        pages: [
+          page([_row()]),
+        ],
+      );
       final cubit = _SignedInCubit(service);
       await cubit.load();
 
@@ -281,7 +295,9 @@ void main() {
 
     test('tout lire remet la pastille à zéro', () async {
       final service = _FakeService(
-        pages: [page([_row(), _row(id: 'n2')], unread: 2)],
+        pages: [
+          page([_row(), _row(id: 'n2')], unread: 2),
+        ],
       );
       final cubit = _SignedInCubit(service);
       await cubit.load();

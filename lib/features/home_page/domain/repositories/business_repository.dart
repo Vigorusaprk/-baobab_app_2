@@ -1,7 +1,6 @@
 import 'package:baobabe_0_2/features/business_detail/domain/entities/menu_restau.dart';
 import 'package:baobabe_0_2/features/booking_page/data/models/reservation_model.dart';
 import 'package:baobabe_0_2/features/home_page/domain/entities/business_entity.dart';
-import 'package:baobabe_0_2/features/home_page/domain/entities/businesses_page.dart';
 import 'package:baobabe_0_2/features/home_page/domain/entities/home_feed.dart';
 
 abstract class BusinessRepository {
@@ -19,11 +18,6 @@ abstract class BusinessRepository {
     String? category,
   });
 
-  Future<BusinessesPage> getBusinessesPage({
-    required int page,
-    String? category,
-    String? query,
-  });
   Future<Business> getBusinessDetail(String businessId);
   Future<List<BusinessReview>> getBusinessReviews(String businessId);
   Future<void> toggleFavorite(String businessId);
