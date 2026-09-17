@@ -1,3 +1,4 @@
+import 'package:baobabe_0_2/core/animation/press_effect.dart';
 import 'package:baobabe_0_2/core/themes/app_diemens.dart';
 import 'package:baobabe_0_2/features/business_detail/domain/entities/offer.dart';
 import 'package:baobabe_0_2/features/merchant/domain/entities/merchant_space.dart';
@@ -28,10 +29,15 @@ class MerchantOffersScreen extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => context.pushNamed('offerForm'),
-        icon: const Icon(Icons.add),
-        label: const Text('Publier'),
+      floatingActionButton: PressEffect(
+        child: FloatingActionButton.extended(
+          onPressed: () => context.pushNamed('offerForm'),
+          icon: const Icon(Icons.add),
+          label: const Text('Publier'),
+          shape: RoundedRectangleBorder(
+            borderRadius: AppDimens.cardBorderRadiusAll,
+          ),
+        ),
       ),
       body: offers.isEmpty
           ? const MerchantEmptyState(
