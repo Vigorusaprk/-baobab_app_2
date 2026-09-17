@@ -37,13 +37,25 @@ class LegalPage extends StatelessWidget {
               ),
             ),
             AppDimens.spacerMedium,
-            Text(document.intro, style: theme.textTheme.bodyMedium),
+            Text(
+              document.intro,
+              style: theme.textTheme.bodyMedium,
+              textAlign: TextAlign.justify,
+            ),
             for (final section in document.sections) ...[
               AppDimens.spacerLarge,
-              Text(section.title, style: theme.textTheme.titleSmall),
+              Text(
+                section.title,
+                style: theme.textTheme.titleSmall,
+                textAlign: TextAlign.justify,
+              ),
               for (final paragraph in section.paragraphs) ...[
                 AppDimens.spacerSmall,
-                Text(paragraph, style: theme.textTheme.bodyMedium),
+                Text(
+                  paragraph,
+                  style: theme.textTheme.bodyMedium,
+                  textAlign: TextAlign.justify,
+                ),
               ],
             ],
           ],

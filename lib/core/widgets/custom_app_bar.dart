@@ -57,7 +57,9 @@ class CustomOtherAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     return CustomAppBar(
-      leading: leading,
+      leading:
+          leading ??
+          BackButton(color: Theme.of(context).colorScheme.onSurfaceVariant),
       automaticallyImplyLeading: automaticallyImplyLeading,
       widget: Text(title, style: Theme.of(context).textTheme.titleSmall),
       actions: actions,

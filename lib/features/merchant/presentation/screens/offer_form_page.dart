@@ -188,20 +188,29 @@ class _OfferFormPageState extends State<OfferFormPage> {
             SegmentedButton<Fulfilment>(
               // Libellés courts : trois segments doivent tenir sur une
               // ligne, même sur un petit écran.
-              segments: const [
+              segments: [
                 ButtonSegment(
                   value: Fulfilment.order,
-                  label: Text('Commande'),
+                  label: Text(
+                    'Commande',
+                    style: Theme.of(context).textTheme.bodySmall,
+                  ),
                   icon: Icon(Icons.shopping_bag_outlined),
                 ),
                 ButtonSegment(
                   value: Fulfilment.booking,
-                  label: Text('Réservation'),
+                  label: Text(
+                    'Réservation',
+                    style: Theme.of(context).textTheme.bodySmall,
+                  ),
                   icon: Icon(Icons.event_available_outlined),
                 ),
                 ButtonSegment(
                   value: Fulfilment.inStore,
-                  label: Text('En boutique'),
+                  label: Text(
+                    'En boutique',
+                    style: Theme.of(context).textTheme.bodySmall,
+                  ),
                   icon: Icon(Icons.storefront_outlined),
                 ),
               ],

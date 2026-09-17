@@ -128,16 +128,7 @@ class _MainShellState extends State<MainShell> {
                     decoration: BoxDecoration(
                       color: Theme.of(context).scaffoldBackgroundColor,
                     ),
-                    child: Container(
-                      // La marge basse tient compte de la zone reservee
-                      // par le systeme. Elle valait 16 en dur : depuis que
-                      // le bord a bord est impose (cible API 35), la barre
-                      // de geste se posait par-dessus les onglets.
-                      margin: EdgeInsets.only(
-                        bottom:
-                            AppDimens.medium +
-                            MediaQuery.viewPaddingOf(context).bottom,
-                      ),
+                    child: SizedBox(
                       height: 70,
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
