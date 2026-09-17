@@ -159,6 +159,15 @@ la policy de lecture. Passer par `private.is_business_staff(...)`, une fonction
 `SECURITY DEFINER` hors du schéma exposé par l'API. Ne jamais remettre une
 fonction d'aide aux policies dans `public` : PostgREST l'exposerait.
 
+### Le jeu de démonstration a de vraies photos
+
+Les 33 commerces et 98 offres de démonstration portaient des images au hasard
+(picsum). Depuis septembre 2026, chacun a une photo Unsplash choisie d'après
+son nom — `seed/images_unsplash.sql`, à rejouer si la base est réinitialisée.
+Une carte qui promet un restaurant et montre un bateau ne permet pas de juger
+la carte ; et un commerce **a** une photo, la tuile colorée à l'initiale est
+l'exception.
+
 ### Découverte sans compte
 
 Le catalogue (`business`, `offers`, `menu_items`, `rooms`, `vehicles`,
