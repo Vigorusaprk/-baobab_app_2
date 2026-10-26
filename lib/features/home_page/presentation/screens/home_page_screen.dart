@@ -150,6 +150,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
                   // appel réseau — la puce qu'on vient de taper doit rester
                   // visible.
                   const HomeSliverHeader(),
+
                   SliverToBoxAdapter(
                     child: isLoading
                         ? const Skeletonizer(
@@ -161,7 +162,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
                             onSeeAllBusinesses: () =>
                                 _openAllBusinesses(context),
                             onSeeAllOffers: () => _openOffers(context),
-                          ),
+                        ),
                   ),
                 ],
               ),
@@ -214,7 +215,7 @@ class _Sections extends StatelessWidget {
         // Un seul rail d'offres, en bas : moins de place, pas zéro.
         OffersCarouselSection(
           title: 'Offres du moment',
-          offers: loaded.newOffers,
+          offers: loaded.discoverOffers,
           hasMore: true,
           onSeeMore: onSeeAllOffers,
           onSeeAll: onSeeAllOffers,

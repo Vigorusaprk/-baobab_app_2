@@ -14,30 +14,30 @@ dependencies:
   equatable: ^2.0.7
   flutter_bloc: ^9.1.1
   clean_structure: ^0.2.2
-  go_router: ^17.0.0
+  go_router: ^18.0.1
   dartz: ^0.10.1
   qr_flutter: ^4.1.0
   shared_preferences: ^2.5.3
   intl: ^0.20.2
   icons_launcher: ^3.1.0
-  package_info_plus: ^9.0.1
+  package_info_plus: ^10.2.1
   flutter_svg: ^2.2.2
-  flutter_localization: ^0.3.3
+  flutter_localization: ^0.4.1
   url_launcher: ^6.3.2
   flutter_native_splash: ^2.4.7
-  share_plus: ^12.0.1
+  share_plus: ^13.3.0
   visibility_detector: ^0.4.0+2
   jwt_decoder: ^2.0.1
   supabase_flutter: ^2.14.2
   app_links: ^7.0.0
-  connectivity_plus: ^6.1.1
+  connectivity_plus: ^7.3.1
   logger: ^2.5.0
   sign_in_with_apple: ^8.1.0
   google_sign_in: ^7.2.0
   loading_animation_widget: ^1.3.0
   firebase_core: ^4.12.1
   crypto: ^3.0.7
-  skeletonizer: ^2.1.3
+  skeletonizer: ^3.0.0
   geolocator: ^14.0.2
   google_maps_flutter: ^2.18.0
   hive_ce: ^2.19.3

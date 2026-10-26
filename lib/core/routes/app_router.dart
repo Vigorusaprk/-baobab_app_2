@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:baobabe_0_2/features/notification/presentation/screens/notifications_page.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -49,7 +50,7 @@ class GoRouterRefreshStream extends ChangeNotifier {
 /// du shell (0=home, 1=favorites, 2=orders, 3=settings).
 final List<ValueNotifier<int>> branchStackDepth = List.generate(
   4,
-  (_) => ValueNotifier(0),
+      (_) => ValueNotifier(0),
 );
 
 class _BranchDepthObserver extends NavigatorObserver {
@@ -72,8 +73,67 @@ class _BranchDepthObserver extends NavigatorObserver {
   }
 }
 
+/// Point d'entrée unique pour suivre la navigation de **toute** l'app —
+/// dans le shell (changement d'onglet) comme en dehors (fiche business,
+/// offre, espace commerçant, admin...).
+///
+/// `MetricsService` compte déjà les vues/clics d'une fiche précise pour les
+/// campagnes publicitaires (`daily_metrics`) — ce hub ne fait pas double
+/// emploi avec lui, il couvre un besoin différent : savoir quelles pages
+/// sont visitées en général (paramètres, notifications, espace commerçant,
+/// écrans de connexion...), utile pour un futur outil d'analytics produit.
+///
+/// Rien n'est envoyé nulle part pour l'instant : brancher un outil (ex.
+/// PostHog auto-hébergé) se fait en ajoutant un listener ici, sans toucher
+/// au reste du routeur.
+///
+/// ⚠️ Ce hub n'est PAS lui-même un NavigatorObserver : Flutter interdit
+/// qu'une même instance d'observer soit attachée à plusieurs Navigators en
+/// même temps (chaque branche du shell a le sien). Le hub centralise juste
+/// les listeners ; c'est [_NavigationHubRelay] — une instance différente
+/// par Navigator — qui lui transmet les événements.
+class AppNavigationObserver {
+  AppNavigationObserver._();
+  static final AppNavigationObserver instance = AppNavigationObserver._();
+
+  final List<void Function(String routeName)> _listeners = [];
+
+  void addListener(void Function(String routeName) listener) =>
+      _listeners.add(listener);
+
+  void trackRoute(Route route) {
+    // `settings.name` vient du `name:` de chaque GoRoute — les routes qui
+    // n'en déclarent pas (peu en ont) remontent 'unknown' plutôt que de
+    // faire échouer le suivi.
+    final name = route.settings.name ?? 'unknown';
+    if (kDebugMode) debugPrint('📍 Navigation: $name');
+    for (final listener in _listeners) {
+      listener(name);
+    }
+  }
+}
+
+/// Un relais léger par Navigator — à instancier à chaque endroit où un
+/// observer est nécessaire (racine + chaque branche du shell), jamais
+/// réutilisé. Se contente de transmettre au hub partagé.
+class _NavigationHubRelay extends NavigatorObserver {
+  @override
+  void didPush(Route route, Route? previousRoute) =>
+      AppNavigationObserver.instance.trackRoute(route);
+
+  @override
+  void didReplace({Route? newRoute, Route? oldRoute}) {
+    if (newRoute != null) AppNavigationObserver.instance.trackRoute(newRoute);
+  }
+}
+
 final GoRouter appRouter = GoRouter(
   initialLocation: '/home',
+  // Capte tout ce qui est hors shell (fiche business, offre, espace
+  // commerçant, admin, légal...). Les branches du shell ont leur propre
+  // Navigator imbriqué : le même hub est aussi passé à chacune d'elles
+  // ci-dessous pour capter les changements d'onglet.
+  observers: [_NavigationHubRelay()],
   // NOTE: no refreshListenable here on purpose. Closing the auth screen is
   // handled explicitly (see AuthForm / LoginPage BlocListeners) so the user
   // returns to the exact page they were on. Wiring Supabase's auth stream
@@ -84,8 +144,8 @@ final GoRouter appRouter = GoRouter(
     final isLoggedIn = SessionService.instance.isLoggedIn;
     final isAuthRoute =
         state.matchedLocation.startsWith('/login') ||
-        state.matchedLocation.startsWith('/register') ||
-        state.matchedLocation.startsWith('/forgot-password');
+            state.matchedLocation.startsWith('/register') ||
+            state.matchedLocation.startsWith('/forgot-password');
 
     if (isLoggedIn && isAuthRoute) return '/home';
 
@@ -111,46 +171,46 @@ final GoRouter appRouter = GoRouter(
       },
       branches: [
         StatefulShellBranch(
-          observers: [_BranchDepthObserver(branchStackDepth[0])],
+          observers: [_BranchDepthObserver(branchStackDepth[0]), _NavigationHubRelay()],
           routes: [
             GoRoute(
               path: '/home',
               name: 'home',
               pageBuilder: (context, state) =>
-                  const NoTransitionPage(child: HomePageScreen()),
+              const NoTransitionPage(child: HomePageScreen()),
             ),
           ],
         ),
         StatefulShellBranch(
-          observers: [_BranchDepthObserver(branchStackDepth[1])],
+          observers: [_BranchDepthObserver(branchStackDepth[1]), _NavigationHubRelay()],
           routes: [
             GoRoute(
               path: '/expolre',
               name: 'expolre',
               pageBuilder: (context, state) =>
-                  const NoTransitionPage(child: SearchPageBody()),
+              const NoTransitionPage(child: SearchPageBody()),
             ),
           ],
         ),
         StatefulShellBranch(
-          observers: [_BranchDepthObserver(branchStackDepth[2])],
+          observers: [_BranchDepthObserver(branchStackDepth[2]), _NavigationHubRelay()],
           routes: [
             GoRoute(
               path: '/orders',
               name: 'orders',
               pageBuilder: (context, state) =>
-                  const NoTransitionPage(child: ActivityScreen()),
+              const NoTransitionPage(child: ActivityScreen()),
             ),
           ],
         ),
         StatefulShellBranch(
-          observers: [_BranchDepthObserver(branchStackDepth[3])],
+          observers: [_BranchDepthObserver(branchStackDepth[3]), _NavigationHubRelay()],
           routes: [
             GoRoute(
               path: '/settings',
               name: 'settings',
               pageBuilder: (context, state) =>
-                  const NoTransitionPage(child: SettingsScreen()),
+              const NoTransitionPage(child: SettingsScreen()),
             ),
           ],
         ),
@@ -248,7 +308,7 @@ final GoRouter appRouter = GoRouter(
       path: '/merchant',
       name: 'merchant',
       pageBuilder: (context, state) =>
-          const NoTransitionPage(child: MerchantShell()),
+      const NoTransitionPage(child: MerchantShell()),
       routes: [
         GoRoute(
           path: 'offer',
@@ -277,7 +337,7 @@ final GoRouter appRouter = GoRouter(
           path: 'ads',
           name: 'merchantAds',
           pageBuilder: (context, state) =>
-              const MaterialPage(child: MerchantAdsScreen()),
+          const MaterialPage(child: MerchantAdsScreen()),
         ),
       ],
     ),
