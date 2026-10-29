@@ -1,4 +1,6 @@
 import 'package:baobabe_0_2/core/themes/app_diemens.dart';
+import 'package:baobabe_0_2/core/widgets/baobab_hero_banner.dart';
+import 'package:baobabe_0_2/features/home_page/presentation/widgets/dynamic_hero_banner_mapper.dart';
 import 'package:baobabe_0_2/features/home_page/data/repositories/business_remote_datasource_impl.dart';
 import 'package:baobabe_0_2/features/home_page/data/repositories/business_repository_impl.dart';
 import 'package:baobabe_0_2/features/home_page/domain/usecases/get_offers_page.dart';
@@ -196,9 +198,17 @@ class _Sections extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Section à part, en tête : les commerçants en campagne.
-        FeaturedBusinessesSection(featured: loaded.featuredBusinesses),
-        if (loaded.featuredBusinesses.isNotEmpty) AppDimens.spacerMedium,
+        // Bannière "À la une" : branchée à 100% sur Supabase.
+        // N'apparaît QUE si des campagnes publicitaires sont actives en base de données.
+        if (loaded.featuredBusinesses.isNotEmpty) ...[
+          BaobabHeroBannerCarousel(
+            banners: DynamicHeroBannerMapper.fromFeatured(
+              context: context,
+              featured: loaded.featuredBusinesses,
+            ),
+          ),
+          AppDimens.spacerMedium,
+        ],
         BusinessRail(
           title: 'Nouveaux sur Baobabe',
           subtitle: "Ils viennent d'ouvrir leurs portes.",
