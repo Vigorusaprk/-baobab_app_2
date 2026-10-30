@@ -12,20 +12,28 @@ class DiscoverAdScheduler {
   List<DiscoverEntry> insert(
     List<DiscoverEntry> organic,
     List<FeaturedBusiness> campaigns,
-    Set<String> skippedIds,
-  ) {
+    Set<String> skippedIds, {
+    bool previewAdvertisement = false,
+  }) {
     _setCampaignOrder(campaigns);
-    if (_campaignOrder.isEmpty || organic.length < 6) return organic;
+    if ((_campaignOrder.isEmpty && !previewAdvertisement) ||
+        organic.length < 6) {
+      return organic;
+    }
     final result = <DiscoverEntry>[];
     String? lastCampaignId;
+    var previewPending = previewAdvertisement && _campaignOrder.isEmpty;
     for (var index = 0; index < organic.length; index++) {
       result.add(organic[index]);
       final slot = index + 1;
       if (slot % 5 != 0 || slot == organic.length) continue;
-      final ad = _nextCampaign(skippedIds, result, lastCampaignId);
+      final ad = previewPending && !skippedIds.contains('ad-preview')
+          ? const DiscoverEntry.previewAdvertisement()
+          : _nextCampaign(skippedIds, result, lastCampaignId);
       if (ad != null) {
         result.add(ad);
         lastCampaignId = ad.campaign?.campaignId;
+        if (ad.isPreviewAdvertisement) previewPending = false;
       }
     }
     return result;

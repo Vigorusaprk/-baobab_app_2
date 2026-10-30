@@ -12,6 +12,7 @@ class DiscoverCarousel extends StatefulWidget {
     required this.savedIds,
     required this.skippedIds,
     required this.campaigns,
+    required this.showPreviewAd,
     required this.onLoadMore,
     required this.onSave,
     required this.onSkip,
@@ -22,6 +23,7 @@ class DiscoverCarousel extends StatefulWidget {
   final Set<String> savedIds;
   final Set<String> skippedIds;
   final List<FeaturedBusiness> campaigns;
+  final bool showPreviewAd;
   final VoidCallback onLoadMore;
   final ValueChanged<String> onSave;
   final ValueChanged<String> onSkip;
@@ -58,6 +60,7 @@ class _DiscoverCarouselState extends State<DiscoverCarousel> {
       widget.items,
       widget.campaigns,
       skippedIds: widget.skippedIds,
+      previewAdvertisement: widget.showPreviewAd,
     );
   }
 

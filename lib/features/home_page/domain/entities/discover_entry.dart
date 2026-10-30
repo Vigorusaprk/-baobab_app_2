@@ -9,23 +9,35 @@ class DiscoverEntry extends Equatable {
   const DiscoverEntry.offer(DiscoverOffer value) : this._(offer: value);
   factory DiscoverEntry.advertisement(FeaturedBusiness value) =>
       DiscoverEntry._(business: value.business, campaign: value);
+  const DiscoverEntry.previewAdvertisement()
+    : this._(previewAdvertisement: true);
 
-  const DiscoverEntry._({this.business, this.offer, this.campaign});
+  const DiscoverEntry._({
+    this.business,
+    this.offer,
+    this.campaign,
+    this.previewAdvertisement = false,
+  });
 
   final Business? business;
   final DiscoverOffer? offer;
   final FeaturedBusiness? campaign;
+  final bool previewAdvertisement;
 
-  String get id => campaign != null
+  String get id => previewAdvertisement
+      ? 'ad-preview'
+      : campaign != null
       ? 'ad:${campaign!.campaignId}'
       : business != null
       ? 'business:${business!.id}'
       : 'offer:${offer!.offer.id}';
 
-  String get businessId => business?.id ?? offer?.offer.businessId ?? '';
+  String get businessId =>
+      previewAdvertisement ? '' : business?.id ?? offer?.offer.businessId ?? '';
   String? get offerId => offer?.offer.id ?? campaign?.offer?.id;
-  bool get isAdvertisement => campaign != null;
+  bool get isAdvertisement => campaign != null || previewAdvertisement;
+  bool get isPreviewAdvertisement => previewAdvertisement;
 
   @override
-  List<Object?> get props => [business, offer, campaign];
+  List<Object?> get props => [business, offer, campaign, previewAdvertisement];
 }

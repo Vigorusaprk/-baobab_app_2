@@ -17,13 +17,19 @@ class DiscoverFeedComposer {
     List<DiscoverEntry> incoming,
     List<FeaturedBusiness> campaigns, {
     Set<String> skippedIds = const {},
+    bool previewAdvertisement = false,
   }) {
     final activeIds = incoming.map((item) => item.id).toSet();
     _ordered.removeWhere((item) => !activeIds.contains(item.id));
     final known = _ordered.map((item) => item.id).toSet();
     final fresh = incoming.where((item) => !known.contains(item.id)).toList();
     _ordered.addAll(_diversify(fresh, _recentIds));
-    return _adScheduler.insert(_ordered, campaigns, skippedIds);
+    return _adScheduler.insert(
+      _ordered,
+      campaigns,
+      skippedIds,
+      previewAdvertisement: previewAdvertisement,
+    );
   }
 
   List<String> get _recentIds => _ordered

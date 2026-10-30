@@ -21,7 +21,6 @@ class DiscoverPageController extends StatefulWidget {
 class _DiscoverPageControllerState extends State<DiscoverPageController> {
   late final ExploreCubit _search;
   late final DiscoverCubit _discover;
-
   @override
   void initState() {
     super.initState();
@@ -37,6 +36,7 @@ class _DiscoverPageControllerState extends State<DiscoverPageController> {
       if (mounted) unawaited(_pushSearch(intent));
     });
   }
+
   void _openSearch(ExploreIntent intent) {
     unawaited(_pushSearch(intent));
   }
@@ -46,7 +46,6 @@ class _DiscoverPageControllerState extends State<DiscoverPageController> {
       builder: (_) => SearchPageBody.search(initialIntent: intent),
     ),
   );
-
   Future<void> _openDiscoverFilters() async {
     final filters = await showDiscoverFiltersSheet(
       context,
@@ -74,6 +73,7 @@ class _DiscoverPageControllerState extends State<DiscoverPageController> {
         ),
       );
   Future<void> _openEntry(DiscoverEntry entry) async {
+    if (entry.isPreviewAdvertisement) return;
     final business = entry.business;
     if (business != null) {
       MetricsService.instance.click(

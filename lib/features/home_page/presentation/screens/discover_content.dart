@@ -4,6 +4,7 @@ import 'package:baobabe_0_2/features/business_detail/domain/entities/offer.dart'
 import 'package:baobabe_0_2/features/home_page/presentation/bloc/discover_state.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/widgets/search_message.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'discover_carousel.dart';
 
 /// Choisit le contenu de Découvrir selon l'état du flux.
@@ -60,6 +61,7 @@ class DiscoverContent extends StatelessWidget {
       savedIds: state.savedIds,
       skippedIds: state.skippedIds,
       campaigns: campaigns,
+      showPreviewAd: kDebugMode && campaigns.isEmpty,
       onLoadMore: onLoadMore,
       onSave: onSave,
       onSkip: onSkip,

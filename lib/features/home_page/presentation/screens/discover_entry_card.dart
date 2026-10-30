@@ -3,6 +3,7 @@ import 'package:baobabe_0_2/core/themes/app_diemens.dart';
 import 'package:baobabe_0_2/core/widgets/business_card.dart';
 import 'package:baobabe_0_2/features/home_page/domain/entities/discover_entry.dart';
 import 'package:flutter/material.dart';
+import 'discover_ad_preview_card.dart';
 import 'offer_card.dart';
 import 'offer_card_badge.dart';
 
@@ -27,6 +28,9 @@ class DiscoverEntryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (entry.isPreviewAdvertisement) {
+      return DiscoverAdPreviewCard(onSkip: () => onSkip(entry.id));
+    }
     final offer = entry.offer;
     if (offer != null) {
       return OfferCard(
