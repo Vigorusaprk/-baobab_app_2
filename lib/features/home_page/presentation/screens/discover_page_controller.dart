@@ -55,7 +55,6 @@ class _DiscoverPageControllerState extends State<DiscoverPageController> {
     child: DiscoverPageView(
       onSearch: () => _openSearch(ExploreIntent.focusSearch),
       onFilters: () => _openSearch(ExploreIntent.openFilters),
-      onCategorySelected: _discover.categorySelected,
       onRetry: _discover.retry,
       onClearCategory: () => _discover.categorySelected('all'),
       onLoadMore: _discover.loadMore,
