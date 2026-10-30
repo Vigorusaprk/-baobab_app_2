@@ -37,7 +37,6 @@ class _DiscoverPageControllerState extends State<DiscoverPageController> {
       if (mounted) unawaited(_pushSearch(intent));
     });
   }
-
   void _openSearch(ExploreIntent intent) {
     unawaited(_pushSearch(intent));
   }
@@ -49,37 +48,49 @@ class _DiscoverPageControllerState extends State<DiscoverPageController> {
   );
 
   Future<void> _openDiscoverFilters() async {
-    final filters = await showDiscoverFiltersSheet(context, _discover.state.filters);
+    final filters = await showDiscoverFiltersSheet(
+      context,
+      _discover.state.filters,
+    );
     if (filters != null) await _discover.filtersChanged(filters);
   }
 
   @override
-  Widget build(BuildContext context) => BlocListener<ExploreCubit, ExploreState>(
-    listenWhen: (before, after) =>
-        before.pendingIntent == null && after.pendingIntent != null,
-    listener: (context, state) => _openPending(state.pendingIntent),
-    child: DiscoverPageView(
-      onSearch: () => _openSearch(ExploreIntent.focusSearch),
-      onFilters: _openDiscoverFilters,
-      onCategorySelected: _discover.categorySelected,
-      onRetry: _discover.retry,
-      onClearCategory: _discover.resetFilters,
-      onLoadMore: _discover.loadMore,
-      onSave: _discover.toggleSaved,
-      onSkip: _discover.skip,
-      onOpenOffer: _openEntry,
-    ),
-  );
-
+  Widget build(BuildContext context) =>
+      BlocListener<ExploreCubit, ExploreState>(
+        listenWhen: (before, after) =>
+            before.pendingIntent == null && after.pendingIntent != null,
+        listener: (context, state) => _openPending(state.pendingIntent),
+        child: DiscoverPageView(
+          onSearch: () => _openSearch(ExploreIntent.focusSearch),
+          onFilters: _openDiscoverFilters,
+          onCategorySelected: _discover.categorySelected,
+          onRetry: _discover.retry,
+          onClearCategory: _discover.resetFilters,
+          onLoadMore: _discover.loadMore,
+          onSave: _discover.toggleSaved,
+          onSkip: _discover.skip,
+          onOpenOffer: _openEntry,
+        ),
+      );
   Future<void> _openEntry(DiscoverEntry entry) async {
     final business = entry.business;
     if (business != null) {
-      MetricsService.instance.click(businessId: business.id);
-      await context.pushNamed('businessDetail', pathParameters: {'id': business.id});
+      MetricsService.instance.click(
+        businessId: business.id,
+        offerId: entry.isAdvertisement ? entry.offerId : null,
+      );
+      await context.pushNamed(
+        'businessDetail',
+        pathParameters: {'id': business.id},
+      );
       return;
     }
     final offer = entry.offer!.offer;
-    MetricsService.instance.click(businessId: offer.businessId ?? '', offerId: offer.id);
+    MetricsService.instance.click(
+      businessId: offer.businessId ?? '',
+      offerId: offer.id,
+    );
     await context.pushNamed(
       'offerDetail',
       pathParameters: {'id': offer.id},

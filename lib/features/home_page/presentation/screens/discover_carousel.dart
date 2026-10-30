@@ -1,16 +1,27 @@
 import 'package:baobabe_0_2/features/home_page/domain/entities/discover_entry.dart';
-import 'package:baobabe_0_2/core/themes/app_diemens.dart';
+import 'package:baobabe_0_2/features/home_page/domain/entities/discover_feed_composer.dart';
+import 'package:baobabe_0_2/features/home_page/domain/entities/home_feed.dart';
 import 'package:flutter/material.dart';
-import 'discover_card_stage.dart';
-import 'discover_view_tracker.dart';
+import 'discover_carousel_deck.dart';
 
 /// Fait défiler trois cartes en profondeur par glissement horizontal.
 class DiscoverCarousel extends StatefulWidget {
-  const DiscoverCarousel({super.key, required this.items, required this.savedIds, required this.sponsoredBusinessIds, required this.onLoadMore, required this.onSave, required this.onSkip, required this.onOpenEntry});
+  const DiscoverCarousel({
+    super.key,
+    required this.items,
+    required this.savedIds,
+    required this.skippedIds,
+    required this.campaigns,
+    required this.onLoadMore,
+    required this.onSave,
+    required this.onSkip,
+    required this.onOpenEntry,
+  });
 
   final List<DiscoverEntry> items;
   final Set<String> savedIds;
-  final Set<String> sponsoredBusinessIds;
+  final Set<String> skippedIds;
+  final List<FeaturedBusiness> campaigns;
   final VoidCallback onLoadMore;
   final ValueChanged<String> onSave;
   final ValueChanged<String> onSkip;
@@ -21,24 +32,43 @@ class DiscoverCarousel extends StatefulWidget {
 }
 
 class _DiscoverCarouselState extends State<DiscoverCarousel> {
+  final _composer = DiscoverFeedComposer();
   int _index = 0;
+  List<DiscoverEntry> _displayItems = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _refreshItems();
+  }
 
   @override
   void didUpdateWidget(covariant DiscoverCarousel oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (_index >= widget.items.length && widget.items.isNotEmpty) {
-      _index = widget.items.length - 1;
-    }
+    final activeId = _displayItems.isEmpty ? null : _displayItems[_index].id;
+    _refreshItems();
+    final newIndex = _displayItems.indexWhere((item) => item.id == activeId);
+    _index = newIndex >= 0
+        ? newIndex
+        : _index.clamp(0, _displayItems.length - 1).toInt();
+  }
+
+  void _refreshItems() {
+    _displayItems = _composer.compose(
+      widget.items,
+      widget.campaigns,
+      skippedIds: widget.skippedIds,
+    );
   }
 
   void _showOffer(int index) {
-    if (index < 0 || index >= widget.items.length || index == _index) return;
+    if (index < 0 || index >= _displayItems.length || index == _index) return;
     setState(() => _index = index);
-    if (index >= widget.items.length - 2) widget.onLoadMore();
+    if (index >= _displayItems.length - 2) widget.onLoadMore();
   }
 
   void _selectEntry(DiscoverEntry entry) {
-    final index = widget.items.indexWhere((item) => item.id == entry.id);
+    final index = _displayItems.indexWhere((item) => item.id == entry.id);
     _showOffer(index);
   }
 
@@ -49,32 +79,16 @@ class _DiscoverCarouselState extends State<DiscoverCarousel> {
   }
 
   @override
-  Widget build(BuildContext context) => Column(children: [
-    Expanded(child: Semantics(
-      label: 'Découverte ${_index + 1} sur ${widget.items.length}',
-      onIncrease: () => _showOffer(_index + 1),
-      onDecrease: () => _showOffer(_index - 1),
-      child: GestureDetector(
-        onHorizontalDragEnd: _handleSwipe,
-        child: DiscoverCardStage(
-          previous: _index > 0 ? widget.items[_index - 1] : null,
-          active: widget.items[_index],
-          next: _index + 1 < widget.items.length ? widget.items[_index + 1] : null,
-          sponsoredIds: widget.sponsoredBusinessIds,
-          savedIds: widget.savedIds,
-          onSave: widget.onSave,
-          onSkip: widget.onSkip,
-          onOpen: widget.onOpenEntry,
-          onSelect: _selectEntry,
-        ),
-      ),
-    )),
-    DiscoverViewTracker(
-      trackingId: widget.items[_index].id,
-      offerId: widget.items[_index].offerId,
-      businessId: widget.items[_index].businessId,
-      visible: true,
-    ),
-    AppDimens.spacerSmall,
-  ]);
+  Widget build(BuildContext context) => DiscoverCarouselDeck(
+    items: _displayItems,
+    index: _index,
+    savedIds: widget.savedIds,
+    sponsoredIds: widget.campaigns.map((item) => item.business.id).toSet(),
+    onSave: widget.onSave,
+    onSkip: widget.onSkip,
+    onOpen: widget.onOpenEntry,
+    onSelect: _selectEntry,
+    onSwipe: _handleSwipe,
+    onMove: _showOffer,
+  );
 }
