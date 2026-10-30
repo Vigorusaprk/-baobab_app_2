@@ -1,29 +1,17 @@
-import 'package:baobabe_0_2/core/themes/app_diemens.dart';
-import 'package:baobabe_0_2/core/widgets/baobab_hero_banner.dart';
-import 'package:baobabe_0_2/features/home_page/presentation/widgets/dynamic_hero_banner_mapper.dart';
 import 'package:baobabe_0_2/features/home_page/data/repositories/business_remote_datasource_impl.dart';
 import 'package:baobabe_0_2/features/home_page/data/repositories/business_repository_impl.dart';
-import 'package:baobabe_0_2/features/home_page/domain/usecases/get_offers_page.dart';
+import 'package:baobabe_0_2/core/widgets/custom_refresh.dart';
 import 'package:baobabe_0_2/features/home_page/domain/usecases/get_home_feed.dart';
+import 'package:baobabe_0_2/features/home_page/domain/usecases/get_offers_page.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/bloc/business_bloc.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/bloc/explore_cubit.dart';
-import 'package:baobabe_0_2/features/home_page/presentation/widgets/offers_carousel_section.dart';
-import 'package:baobabe_0_2/features/home_page/presentation/widgets/home_skeleton.dart';
-import 'package:baobabe_0_2/features/home_page/presentation/widgets/home_sliver_header.dart';
-import 'package:baobabe_0_2/features/home_page/presentation/widgets/business_sections.dart';
+import 'package:baobabe_0_2/features/home_page/presentation/widgets/home_page_feed_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:skeletonizer/skeletonizer.dart';
-import 'package:baobabe_0_2/core/widgets/custom_refresh.dart';
 
-/// Body-only content for the Home tab. The Scaffold is owned by MainShell.
-///
-/// Cet écran n'a pas d'AppBar : [HomeSliverHeader] joue ce rôle. Il défile
-/// avec la page tant qu'on est en haut, puis reste épinglé sous forme
-/// compacte — c'est lui qui occupe la place de la barre d'application.
-/// Le scroll est aimanté pour que l'en-tête se stabilise toujours sur l'un
-/// de ses deux états, jamais à mi-transformation (voir [_snapHeader]).
+/// Corps de l'onglet Accueil; le shell fournit le Scaffold.
+/// La vue défilante garde son en-tête et son aimantation dédiés.
 class HomePageScreen extends StatefulWidget {
   const HomePageScreen({super.key});
 
@@ -34,44 +22,10 @@ class HomePageScreen extends StatefulWidget {
 class _HomePageScreenState extends State<HomePageScreen> {
   final ScrollController _scrollController = ScrollController();
 
-  static const Duration _snapDuration = Duration(milliseconds: 180);
-
   @override
   void dispose() {
     _scrollController.dispose();
     super.dispose();
-  }
-
-  /// Aimante l'en-tête sur l'un de ses deux états stables.
-  ///
-  /// Le repliement est une interpolation continue : à mi-course, la
-  /// vignette de catégorie n'est ni une colonne ni une ligne, et s'y
-  /// arrêter donne un rendu bancal. Plutôt que de compliquer la
-  /// transformation pour rendre présentable un état qui n'a pas vocation à
-  /// durer, on empêche le scroll de s'y immobiliser : au relâchement, on
-  /// rejoint l'état le plus proche.
-  bool _snapHeader(ScrollEndNotification notification) {
-    // Seul le défilement vertical de la page nous intéresse : les listes
-    // horizontales imbriquées (catégories, carrousels) remontent leurs
-    // propres notifications avec une profondeur supérieure.
-    if (notification.depth != 0) return false;
-
-    final range = HomeSliverHeaderMetrics.collapseRange(context);
-    final offset = notification.metrics.pixels;
-    if (offset <= 0 || offset >= range) return false;
-
-    final target = offset < range / 2 ? 0.0 : range;
-
-    // On ne peut pas modifier la position pendant la notification elle-même.
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!_scrollController.hasClients) return;
-      _scrollController.animateTo(
-        target,
-        duration: _snapDuration,
-        curve: Curves.easeOut,
-      );
-    });
-    return false;
   }
 
   /// La catégorie affichée à l'accueil, pour que la page où l'on va
@@ -99,6 +53,15 @@ class _HomePageScreenState extends State<HomePageScreen> {
     context.goNamed('expolre');
   }
 
+  Future<void> _refresh(BuildContext context) {
+    final bloc = context.read<BusinessBloc>();
+    bloc.add(LoadBusinesses());
+    return awaitSettled<BusinessState>(
+      bloc.stream,
+      (state) => state is BusinessLoaded || state is BusinessError,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
@@ -115,122 +78,18 @@ class _HomePageScreenState extends State<HomePageScreen> {
           },
         ),
       ],
-      // Pas de `buildWhen` ici. Il y en avait un — « reconstruire seulement
-      // si le type de l'état change » — et il figeait l'accueil sur son
-      // premier état chargé : ajouter des offres produit un `BusinessLoaded`
-      // après un autre `BusinessLoaded`, donc aucun rafraîchissement. Les
-      // deux paginations chargeaient sans jamais rien montrer.
-      //
-      // Filtrer n'est pas nécessaire : `BusinessState` est un Equatable, et
-      // un bloc n'émet pas deux états égaux à la suite. Un état identique ne
-      // reconstruit donc rien de toute façon.
+      // Les états paginés gardent le même type et doivent tous reconstruire l'accueil.
       child: BlocBuilder<BusinessBloc, BusinessState>(
         builder: (context, state) {
-          final isLoading =
-              state is BusinessInitial || state is BusinessLoading;
-
-          return CustomRefresh(
-            onRefresh: () {
-              final bloc = context.read<BusinessBloc>();
-              bloc.add(LoadBusinesses());
-              return awaitSettled<BusinessState>(
-                bloc.stream,
-                (s) => s is BusinessLoaded || s is BusinessError,
-              );
-            },
-            child: NotificationListener<ScrollEndNotification>(
-              onNotification: _snapHeader,
-              child: CustomScrollView(
-                controller: _scrollController,
-                physics: isLoading
-                    ? const NeverScrollableScrollPhysics()
-                    : const AlwaysScrollableScrollPhysics(),
-                slivers: [
-                  // Recherche + catégories : toujours montées, y compris
-                  // pendant le chargement. Leur contenu ne dépend d'aucune
-                  // requête, et changer de catégorie déclenche désormais un
-                  // appel réseau — la puce qu'on vient de taper doit rester
-                  // visible.
-                  const HomeSliverHeader(),
-
-                  SliverToBoxAdapter(
-                    child: isLoading
-                        ? const Skeletonizer(
-                            enabled: true,
-                            child: HomeSkeleton(),
-                          )
-                        : _Sections(
-                            state: state,
-                            onSeeAllBusinesses: () =>
-                                _openAllBusinesses(context),
-                            onSeeAllOffers: () => _openOffers(context),
-                        ),
-                  ),
-                ],
-              ),
-            ),
+          return HomePageFeedView(
+            state: state,
+            scrollController: _scrollController,
+            onRefresh: () => _refresh(context),
+            onSeeAllBusinesses: () => _openAllBusinesses(context),
+            onSeeAllOffers: () => _openOffers(context),
           );
         },
       ),
-    );
-  }
-}
-
-/// Les sections de l'accueil. Il met en avant des **commerçants** : à la
-/// une, nouveaux, les mieux notés. Les offres n'y gardent qu'un rail en bas
-/// et ont leur page — Explorer, mode Offres.
-class _Sections extends StatelessWidget {
-  final BusinessState state;
-  final VoidCallback onSeeAllBusinesses;
-  final VoidCallback onSeeAllOffers;
-
-  const _Sections({
-    required this.state,
-    required this.onSeeAllBusinesses,
-    required this.onSeeAllOffers,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    if (state is! BusinessLoaded) return const SizedBox.shrink();
-    final loaded = state as BusinessLoaded;
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // Bannière "À la une" : branchée à 100% sur Supabase.
-        // N'apparaît QUE si des campagnes publicitaires sont actives en base de données.
-        if (loaded.featuredBusinesses.isNotEmpty) ...[
-          BaobabHeroBannerCarousel(
-            banners: DynamicHeroBannerMapper.fromFeatured(
-              context: context,
-              featured: loaded.featuredBusinesses,
-            ),
-          ),
-          AppDimens.spacerMedium,
-        ],
-        BusinessRail(
-          title: 'Nouveaux sur Baobabe',
-          subtitle: "Ils viennent d'ouvrir leurs portes.",
-          businesses: loaded.newBusinesses,
-          width: RailWidth.wide,
-        ),
-        if (loaded.newBusinesses.isNotEmpty) AppDimens.spacerMedium,
-        BusinessGrid(
-          title: 'Les mieux notés',
-          businesses: loaded.popularBusinesses,
-          onSeeAll: onSeeAllBusinesses,
-        ),
-        if (loaded.popularBusinesses.isNotEmpty) AppDimens.spacerMedium,
-        // Un seul rail d'offres, en bas : moins de place, pas zéro.
-        OffersCarouselSection(
-          title: 'Offres du moment',
-          offers: loaded.discoverOffers,
-          hasMore: true,
-          onSeeMore: onSeeAllOffers,
-          onSeeAll: onSeeAllOffers,
-        ),
-      ],
     );
   }
 }
