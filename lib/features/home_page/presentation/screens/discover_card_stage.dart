@@ -1,6 +1,6 @@
-import 'package:baobabe_0_2/features/home_page/domain/entities/discover_offer.dart';
+import 'package:baobabe_0_2/features/home_page/domain/entities/discover_entry.dart';
 import 'package:flutter/material.dart';
-import 'offer_card.dart';
+import 'discover_entry_card.dart';
 
 /// Place l'offre active entre ses voisines pour rendre le défilement lisible.
 class DiscoverCardStage extends StatelessWidget {
@@ -17,15 +17,15 @@ class DiscoverCardStage extends StatelessWidget {
     required this.onSelect,
   });
 
-  final DiscoverOffer? previous;
-  final DiscoverOffer active;
-  final DiscoverOffer? next;
+  final DiscoverEntry? previous;
+  final DiscoverEntry active;
+  final DiscoverEntry? next;
   final Set<String> sponsoredIds;
   final Set<String> savedIds;
   final ValueChanged<String> onSave;
   final ValueChanged<String> onSkip;
-  final Future<void> Function(DiscoverOffer) onOpen;
-  final ValueChanged<DiscoverOffer> onSelect;
+  final Future<void> Function(DiscoverEntry) onOpen;
+  final ValueChanged<DiscoverEntry> onSelect;
 
   @override
   Widget build(BuildContext context) => LayoutBuilder(
@@ -47,13 +47,13 @@ class DiscoverCardStage extends StatelessWidget {
     },
   );
 
-  Widget _card(DiscoverOffer offer, {
+  Widget _card(DiscoverEntry entry, {
     required double left,
     required double width,
     required double top,
     required bool active,
   }) => AnimatedPositioned(
-    key: ValueKey('deck-${offer.offer.id}'),
+    key: ValueKey('deck-${entry.id}'),
     duration: const Duration(milliseconds: 420),
     curve: Curves.easeInOutCubic,
     left: left,
@@ -68,19 +68,19 @@ class DiscoverCardStage extends StatelessWidget {
         duration: const Duration(milliseconds: 350),
         opacity: active ? 1 : 0.62,
         child: GestureDetector(
-          onTap: active ? null : () => onSelect(offer),
+          onTap: active ? null : () => onSelect(entry),
           child: ExcludeSemantics(
             excluding: !active,
             child: IgnorePointer(
               ignoring: !active,
-              child: OfferCard(
-                key: ValueKey(offer.offer.id),
-                offer: offer,
-                sponsored: sponsoredIds.contains(offer.offer.businessId),
-                saved: savedIds.contains(offer.offer.id),
-                onSave: () => onSave(offer.offer.id),
-                onSkip: () => onSkip(offer.offer.id),
-                onOpen: () => onOpen(offer),
+          child: DiscoverEntryCard(
+            key: ValueKey(entry.id),
+            entry: entry,
+            sponsored: sponsoredIds.contains(entry.businessId),
+            saved: entry.offer != null && savedIds.contains(entry.offer!.offer.id),
+            onSave: onSave,
+            onSkip: onSkip,
+            onOpen: onOpen,
               ),
             ),
           ),

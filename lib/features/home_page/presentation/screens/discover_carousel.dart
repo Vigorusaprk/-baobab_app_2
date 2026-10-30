@@ -1,20 +1,20 @@
-import 'package:baobabe_0_2/features/home_page/domain/entities/discover_offer.dart';
+import 'package:baobabe_0_2/features/home_page/domain/entities/discover_entry.dart';
 import 'package:baobabe_0_2/core/themes/app_diemens.dart';
 import 'package:flutter/material.dart';
 import 'discover_card_stage.dart';
-import 'offer_view_tracker.dart';
+import 'discover_view_tracker.dart';
 
 /// Fait défiler trois cartes en profondeur par glissement horizontal.
 class DiscoverCarousel extends StatefulWidget {
-  const DiscoverCarousel({super.key, required this.offers, required this.savedIds, required this.sponsoredBusinessIds, required this.onLoadMore, required this.onSave, required this.onSkip, required this.onOpenOffer});
+  const DiscoverCarousel({super.key, required this.items, required this.savedIds, required this.sponsoredBusinessIds, required this.onLoadMore, required this.onSave, required this.onSkip, required this.onOpenEntry});
 
-  final List<DiscoverOffer> offers;
+  final List<DiscoverEntry> items;
   final Set<String> savedIds;
   final Set<String> sponsoredBusinessIds;
   final VoidCallback onLoadMore;
   final ValueChanged<String> onSave;
   final ValueChanged<String> onSkip;
-  final Future<void> Function(DiscoverOffer) onOpenOffer;
+  final Future<void> Function(DiscoverEntry) onOpenEntry;
 
   @override
   State<DiscoverCarousel> createState() => _DiscoverCarouselState();
@@ -26,19 +26,19 @@ class _DiscoverCarouselState extends State<DiscoverCarousel> {
   @override
   void didUpdateWidget(covariant DiscoverCarousel oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (_index >= widget.offers.length && widget.offers.isNotEmpty) {
-      _index = widget.offers.length - 1;
+    if (_index >= widget.items.length && widget.items.isNotEmpty) {
+      _index = widget.items.length - 1;
     }
   }
 
   void _showOffer(int index) {
-    if (index < 0 || index >= widget.offers.length || index == _index) return;
+    if (index < 0 || index >= widget.items.length || index == _index) return;
     setState(() => _index = index);
-    if (index >= widget.offers.length - 2) widget.onLoadMore();
+    if (index >= widget.items.length - 2) widget.onLoadMore();
   }
 
-  void _selectOffer(DiscoverOffer offer) {
-    final index = widget.offers.indexWhere((item) => item.offer.id == offer.offer.id);
+  void _selectEntry(DiscoverEntry entry) {
+    final index = widget.items.indexWhere((item) => item.id == entry.id);
     _showOffer(index);
   }
 
@@ -51,27 +51,28 @@ class _DiscoverCarouselState extends State<DiscoverCarousel> {
   @override
   Widget build(BuildContext context) => Column(children: [
     Expanded(child: Semantics(
-      label: 'Offre ${_index + 1} sur ${widget.offers.length}',
+      label: 'Découverte ${_index + 1} sur ${widget.items.length}',
       onIncrease: () => _showOffer(_index + 1),
       onDecrease: () => _showOffer(_index - 1),
       child: GestureDetector(
         onHorizontalDragEnd: _handleSwipe,
         child: DiscoverCardStage(
-          previous: _index > 0 ? widget.offers[_index - 1] : null,
-          active: widget.offers[_index],
-          next: _index + 1 < widget.offers.length ? widget.offers[_index + 1] : null,
+          previous: _index > 0 ? widget.items[_index - 1] : null,
+          active: widget.items[_index],
+          next: _index + 1 < widget.items.length ? widget.items[_index + 1] : null,
           sponsoredIds: widget.sponsoredBusinessIds,
           savedIds: widget.savedIds,
           onSave: widget.onSave,
           onSkip: widget.onSkip,
-          onOpen: widget.onOpenOffer,
-          onSelect: _selectOffer,
+          onOpen: widget.onOpenEntry,
+          onSelect: _selectEntry,
         ),
       ),
     )),
-    OfferViewTracker(
-      offerId: widget.offers[_index].offer.id,
-      businessId: widget.offers[_index].offer.businessId,
+    DiscoverViewTracker(
+      trackingId: widget.items[_index].id,
+      offerId: widget.items[_index].offerId,
+      businessId: widget.items[_index].businessId,
       visible: true,
     ),
     AppDimens.spacerSmall,

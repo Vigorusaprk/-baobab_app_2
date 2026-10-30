@@ -1,4 +1,4 @@
-import 'package:baobabe_0_2/features/home_page/domain/entities/discover_offer.dart';
+import 'package:baobabe_0_2/features/home_page/domain/entities/discover_entry.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/bloc/discover_state.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/widgets/search_message.dart';
 import 'package:flutter/material.dart';
@@ -15,7 +15,7 @@ class DiscoverContent extends StatelessWidget {
   final VoidCallback onLoadMore;
   final ValueChanged<String> onSave;
   final ValueChanged<String> onSkip;
-  final Future<void> Function(DiscoverOffer) onOpenOffer;
+  final Future<void> Function(DiscoverEntry) onOpenOffer;
 
   @override
   Widget build(BuildContext context) {
@@ -26,8 +26,9 @@ class DiscoverContent extends StatelessWidget {
       return const Center(child: CircularProgressIndicator());
     }
     if (state.visibleItems.isEmpty) {
-      return SearchMessage(title: 'Aucune offre à découvrir', body: state.categorySlug == null ? 'De nouvelles offres apparaîtront ici.' : 'Essayez une autre catégorie.', actionLabel: state.categorySlug == null ? null : 'Tout découvrir', onAction: state.categorySlug == null ? null : onClearCategory);
+      final canReset = state.categorySlug != null || state.filters.facetCount > 0;
+      return SearchMessage(title: 'Rien à découvrir pour ces critères', body: 'Essayez d’autres filtres ou catégories.', actionLabel: canReset ? 'Tout réinitialiser' : null, onAction: canReset ? onClearCategory : null);
     }
-    return DiscoverCarousel(key: ValueKey(state.categorySlug), offers: state.visibleItems, savedIds: state.savedIds, sponsoredBusinessIds: sponsoredBusinessIds, onLoadMore: onLoadMore, onSave: onSave, onSkip: onSkip, onOpenOffer: onOpenOffer);
+    return DiscoverCarousel(key: ValueKey(state.categorySlug), items: state.visibleItems, savedIds: state.savedIds, sponsoredBusinessIds: sponsoredBusinessIds, onLoadMore: onLoadMore, onSave: onSave, onSkip: onSkip, onOpenEntry: onOpenOffer);
   }
 }

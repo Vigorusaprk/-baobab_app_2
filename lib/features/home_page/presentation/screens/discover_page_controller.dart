@@ -2,7 +2,8 @@ import 'dart:async';
 import 'package:baobabe_0_2/features/home_page/presentation/bloc/discover_cubit.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/bloc/explore_cubit.dart';
 import 'package:baobabe_0_2/core/services/metrics_service.dart';
-import 'package:baobabe_0_2/features/home_page/domain/entities/discover_offer.dart';
+import 'package:baobabe_0_2/features/home_page/domain/entities/discover_entry.dart';
+import 'package:baobabe_0_2/features/home_page/presentation/widgets/discover_filters_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -47,6 +48,11 @@ class _DiscoverPageControllerState extends State<DiscoverPageController> {
     ),
   );
 
+  Future<void> _openDiscoverFilters() async {
+    final filters = await showDiscoverFiltersSheet(context, _discover.state.filters);
+    if (filters != null) await _discover.filtersChanged(filters);
+  }
+
   @override
   Widget build(BuildContext context) => BlocListener<ExploreCubit, ExploreState>(
     listenWhen: (before, after) =>
@@ -54,25 +60,30 @@ class _DiscoverPageControllerState extends State<DiscoverPageController> {
     listener: (context, state) => _openPending(state.pendingIntent),
     child: DiscoverPageView(
       onSearch: () => _openSearch(ExploreIntent.focusSearch),
-      onFilters: () => _openSearch(ExploreIntent.openFilters),
+      onFilters: _openDiscoverFilters,
+      onCategorySelected: _discover.categorySelected,
       onRetry: _discover.retry,
-      onClearCategory: () => _discover.categorySelected('all'),
+      onClearCategory: _discover.resetFilters,
       onLoadMore: _discover.loadMore,
       onSave: _discover.toggleSaved,
       onSkip: _discover.skip,
-      onOpenOffer: _openOffer,
+      onOpenOffer: _openEntry,
     ),
   );
 
-  Future<void> _openOffer(DiscoverOffer offer) async {
-    MetricsService.instance.click(
-      businessId: offer.offer.businessId ?? '',
-      offerId: offer.offer.id,
-    );
+  Future<void> _openEntry(DiscoverEntry entry) async {
+    final business = entry.business;
+    if (business != null) {
+      MetricsService.instance.click(businessId: business.id);
+      await context.pushNamed('businessDetail', pathParameters: {'id': business.id});
+      return;
+    }
+    final offer = entry.offer!.offer;
+    MetricsService.instance.click(businessId: offer.businessId ?? '', offerId: offer.id);
     await context.pushNamed(
       'offerDetail',
-      pathParameters: {'id': offer.offer.id},
-      extra: offer.offer.fulfilment,
+      pathParameters: {'id': offer.id},
+      extra: offer.fulfilment,
     );
   }
 }

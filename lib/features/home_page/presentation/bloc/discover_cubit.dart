@@ -1,5 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../data/discover_api_service.dart';
+import '../../domain/entities/discover_filters.dart';
 import 'discover_state.dart';
 
 /// Charge et fait défiler le flux d'offres sans écrire sur le serveur.
@@ -12,7 +13,6 @@ class DiscoverCubit extends Cubit<DiscoverState> {
   Future<void> start() => state.status == DiscoverStatus.initial
       ? _load(reset: true)
       : Future<void>.value();
-
   Future<void> categorySelected(String slug) {
     final clear = slug == 'all';
     emit(state.copyWith(
@@ -27,31 +27,56 @@ class DiscoverCubit extends Cubit<DiscoverState> {
     ));
     return _load(reset: true);
   }
-
+  Future<void> filtersChanged(DiscoverFilters filters) {
+    emit(state.copyWith(
+      status: DiscoverStatus.loading,
+      items: const [],
+      page: 1,
+      hasMore: false,
+      loadingMore: false,
+      filters: filters,
+      skippedIds: const {},
+      clearMessage: true,
+    ));
+    return _load(reset: true);
+  }
+  Future<void> resetFilters() {
+    emit(state.copyWith(
+      status: DiscoverStatus.loading,
+      items: const [],
+      page: 1,
+      hasMore: false,
+      filters: const DiscoverFilters(),
+      clearCategory: true,
+      skippedIds: const {},
+      clearMessage: true,
+    ));
+    return _load(reset: true);
+  }
   void toggleSaved(String id) {
     final saved = {...state.savedIds};
     saved.contains(id) ? saved.remove(id) : saved.add(id);
     // TODO : connecter un stockage local si les favoris Découvrir deviennent persistants.
     emit(state.copyWith(savedIds: saved));
   }
-
   Future<void> skip(String id) async {
     emit(state.copyWith(skippedIds: {...state.skippedIds, id}));
     if (state.visibleItems.isEmpty && state.hasMore) await loadMore();
   }
-
   Future<void> loadMore() async {
     if (!state.hasMore || state.loadingMore || state.status != DiscoverStatus.ready) return;
     emit(state.copyWith(loadingMore: true));
     await _load(reset: false);
   }
-
   Future<void> retry() => _load(reset: true);
-
   Future<void> _load({required bool reset}) async {
     final requestedPage = reset ? 1 : state.page + 1;
     try {
-      final result = await _api.page(categorySlug: state.categorySlug, page: requestedPage);
+      final result = await _api.page(
+        categorySlug: state.categorySlug,
+        page: requestedPage,
+        filters: state.filters,
+      );
       if (isClosed) return;
       emit(state.copyWith(
         status: DiscoverStatus.ready,

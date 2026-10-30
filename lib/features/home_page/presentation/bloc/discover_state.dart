@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
-import '../../domain/entities/discover_offer.dart';
+import '../../domain/entities/discover_entry.dart';
+import '../../domain/entities/discover_filters.dart';
 
 enum DiscoverStatus { initial, loading, ready, failure }
 
@@ -9,6 +10,7 @@ class DiscoverState extends Equatable {
     this.status = DiscoverStatus.initial,
     this.items = const [],
     this.categorySlug,
+    this.filters = const DiscoverFilters(),
     this.hasMore = false,
     this.loadingMore = false,
     this.page = 1,
@@ -18,8 +20,9 @@ class DiscoverState extends Equatable {
   });
 
   final DiscoverStatus status;
-  final List<DiscoverOffer> items;
+  final List<DiscoverEntry> items;
   final String? categorySlug;
+  final DiscoverFilters filters;
   final bool hasMore;
   final bool loadingMore;
   final int page;
@@ -27,14 +30,15 @@ class DiscoverState extends Equatable {
   final Set<String> savedIds;
   final Set<String> skippedIds;
 
-  List<DiscoverOffer> get visibleItems => items
-      .where((item) => !skippedIds.contains(item.offer.id))
+  List<DiscoverEntry> get visibleItems => items
+      .where((item) => !skippedIds.contains(item.id))
       .toList(growable: false);
 
   DiscoverState copyWith({
     DiscoverStatus? status,
-    List<DiscoverOffer>? items,
+    List<DiscoverEntry>? items,
     String? categorySlug,
+    DiscoverFilters? filters,
     bool clearCategory = false,
     bool? hasMore,
     bool? loadingMore,
@@ -47,6 +51,7 @@ class DiscoverState extends Equatable {
     status: status ?? this.status,
     items: items ?? this.items,
     categorySlug: clearCategory ? null : (categorySlug ?? this.categorySlug),
+    filters: filters ?? this.filters,
     hasMore: hasMore ?? this.hasMore,
     loadingMore: loadingMore ?? this.loadingMore,
     page: page ?? this.page,
@@ -56,5 +61,5 @@ class DiscoverState extends Equatable {
   );
 
   @override
-  List<Object?> get props => [status, items, categorySlug, hasMore, loadingMore, page, message, savedIds, skippedIds];
+  List<Object?> get props => [status, items, categorySlug, filters, hasMore, loadingMore, page, message, savedIds, skippedIds];
 }
