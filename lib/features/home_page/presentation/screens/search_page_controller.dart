@@ -8,7 +8,9 @@ import 'search_page_view.dart';
 
 /// Porte les contrôleurs et les intentions de l'écran de recherche.
 class SearchPageController extends StatefulWidget {
-  const SearchPageController({super.key});
+  const SearchPageController({super.key, this.initialIntent});
+
+  final ExploreIntent? initialIntent;
 
   @override
   State<SearchPageController> createState() => _SearchPageControllerState();
@@ -20,13 +22,22 @@ class _SearchPageControllerState extends State<SearchPageController> {
   final _fieldKey = GlobalKey();
   final _scroll = ScrollController();
   late final ExploreCubit _explore;
+  bool _intentRead = false;
 
   @override
   void initState() {
     super.initState();
     _explore = context.read<ExploreCubit>()..start();
     _scroll.addListener(_onScroll);
-    _handleIntent(_explore.state.pendingIntent);
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_intentRead) return;
+    _intentRead = true;
+    final intent = widget.initialIntent ?? _explore.state.pendingIntent;
+    _handleIntent(intent);
   }
 
   @override
@@ -40,7 +51,7 @@ class _SearchPageControllerState extends State<SearchPageController> {
 
   void _handleIntent(ExploreIntent? intent) {
     if (intent == null) return;
-    _explore.intentHandled();
+    if (_explore.state.pendingIntent == intent) _explore.intentHandled();
     if (intent == ExploreIntent.openFilters) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) _openFilters();
@@ -79,14 +90,9 @@ class _SearchPageControllerState extends State<SearchPageController> {
 
   @override
   Widget build(BuildContext context) => SearchPageView(
-    textController: _text,
-    focusNode: _focus,
-    fieldKey: _fieldKey,
-    scrollController: _scroll,
-    onQueryChanged: _explore.queryChanged,
-    onOpenFilters: _openFilters,
-    onIntent: _handleIntent,
-    onRetry: _explore.retry,
-    onClearFilters: _explore.clearFacets,
+    textController: _text, focusNode: _focus, fieldKey: _fieldKey,
+    scrollController: _scroll, onQueryChanged: _explore.queryChanged,
+    onOpenFilters: _openFilters, onIntent: _handleIntent,
+    onRetry: _explore.retry, onClearFilters: _explore.clearFacets,
   );
 }
