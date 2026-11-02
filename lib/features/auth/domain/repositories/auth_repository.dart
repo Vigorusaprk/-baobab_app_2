@@ -12,4 +12,8 @@ abstract class AuthRepository {
   Future<Either<Failure, AuthResponse>> authWithGoogle();
 
   Future<Either<Failure, void>> authWithApple();
+
+  Future<Either<Failure, void>> setPassword(String password);
+
+  Future<bool> hasPassword();
 }

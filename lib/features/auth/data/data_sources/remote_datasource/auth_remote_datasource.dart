@@ -12,4 +12,8 @@ abstract class AuthRemoteDataSource {
   Future<void> authWithApple();
 
   Future<Either<Failure, AuthResponse>> authWithGoogle();
+
+  Future<void> setPassword(String password);
+
+  Future<bool> hasPassword();
 }

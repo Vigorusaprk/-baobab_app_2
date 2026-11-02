@@ -4,11 +4,17 @@ import 'package:dartz/dartz.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../domain/repositories/auth_repository.dart';
 import 'package:baobabe_0_2/core/services/session_hooks.dart';
+import 'package:baobabe_0_2/features/auth/data/repositories/auth_social_repository.dart';
 
+/// Accès aux cas d'usage d'authentification : e-mail + code, mot de
+/// passe, déconnexion. Les connexions OAuth vivent dans
+/// [AuthSocialRepository].
 class AuthRepositoryImpl implements AuthRepository {
-  AuthRepositoryImpl(this.remoteDataSource);
+  AuthRepositoryImpl(this.remoteDataSource)
+    : _social = AuthSocialRepository(remoteDataSource);
 
   final AuthRemoteDataSource remoteDataSource;
+  final AuthSocialRepository _social;
 
   @override
   Future<Either<Failure, void>> requestEmailOtp(String email) async {
@@ -40,13 +46,12 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<Either<Failure, AuthResponse>> authWithGoogle() async {
+  Future<Either<Failure, void>> setPassword(String password) async {
     try {
-      final remoteResult = await remoteDataSource.authWithGoogle();
-      final authResponse = remoteResult.getOrElse(() => throw Exception());
-      return Right(authResponse);
+      await remoteDataSource.setPassword(password);
+      return const Right(null);
     } catch (e) {
-      if (e is AuthApiException) {
+      if (e is AuthException) {
         return Left(AuthFailure(message: e.message));
       }
       return Left(AuthFailure(message: e.toString()));
@@ -54,27 +59,18 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<Either<Failure, void>> authWithApple() async {
+  Future<bool> hasPassword() async {
     try {
-      await remoteDataSource.authWithApple();
-      return const Right(null);
+      return await remoteDataSource.hasPassword();
     } catch (e) {
-      if (e is AuthApiException) {
-        return Left(AuthFailure(message: e.message));
-      }
-      return Left(AuthFailure(message: e.toString()));
+      return false;
     }
   }
 
   @override
   Future<Either<Failure, void>> signOut() async {
     try {
-      // Avant de fermer la session, et non après : passé `signOut`, il n'y a
-      // plus de jeton à présenter au serveur, et l'appareil resterait
-      // rattaché à ce compte. La personne suivante à se connecter sur ce
-      // téléphone recevrait alors ses notifications.
       await SessionHooks.runBeforeSignOut();
-
       await remoteDataSource.signOut();
       return const Right(null);
     } catch (e) {
@@ -86,4 +82,11 @@ class AuthRepositoryImpl implements AuthRepository {
       return Left(AuthFailure(message: e.toString()));
     }
   }
+
+  @override
+  Future<Either<Failure, AuthResponse>> authWithGoogle() =>
+      _social.authWithGoogle();
+
+  @override
+  Future<Either<Failure, void>> authWithApple() => _social.authWithApple();
 }

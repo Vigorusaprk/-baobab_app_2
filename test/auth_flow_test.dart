@@ -50,6 +50,13 @@ class _FakeAuthRepository implements AuthRepository {
 
   @override
   Future<Either<Failure, void>> authWithApple() => throw UnimplementedError();
+
+  @override
+  Future<Either<Failure, void>> setPassword(String password) async =>
+      const Right(null);
+
+  @override
+  Future<bool> hasPassword() async => false;
 }
 
 Widget _host(AuthRepository repository) => MaterialApp(
