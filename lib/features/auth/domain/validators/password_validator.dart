@@ -19,23 +19,34 @@ class PasswordValidator {
     'football',
   ];
 
+  /// Vérifie la longueur minimale après trim.
+  static bool hasMinLength(String password) =>
+      password.trim().length >= minLength;
+
+  /// Vérifie la présence d'au moins une lettre et d'un chiffre.
+  static bool hasLetterAndDigit(String password) {
+    final value = password.trim();
+    return RegExp('[A-Za-z]').hasMatch(value) && RegExp('[0-9]').hasMatch(value);
+  }
+
+  /// Vérifie la différence avec l'e-mail (une contrainte absente vaut
+  /// comme une absence de contrainte).
+  static bool isDifferentFromEmail(String password, String? email) {
+    if (email == null) return true;
+    return password.trim().toLowerCase() != email.trim().toLowerCase();
+  }
+
+  /// Vérifie l'absence de mot de passe évident (insensible à la casse).
+  static bool isNotObvious(String password) =>
+      !_obviousPasswords.contains(password.trim().toLowerCase());
+
+  /// Verdict complet : toutes les règles doivent être satisfaites.
   static bool isValid(String password, {String? email}) {
     final trimmed = password.trim();
-    if (trimmed.length < minLength) {
-      return false;
-    }
-    final hasLetter = RegExp('[A-Za-z]').hasMatch(trimmed);
-    final hasDigit = RegExp('[0-9]').hasMatch(trimmed);
-    if (!hasLetter || !hasDigit) {
-      return false;
-    }
-    final normalized = trimmed.toLowerCase();
-    if (email != null && normalized == email.trim().toLowerCase()) {
-      return false;
-    }
-    if (_obviousPasswords.contains(normalized)) {
-      return false;
-    }
+    if (!hasMinLength(trimmed)) return false;
+    if (!hasLetterAndDigit(trimmed)) return false;
+    if (!isDifferentFromEmail(trimmed, email)) return false;
+    if (!isNotObvious(trimmed)) return false;
     return true;
   }
 }
