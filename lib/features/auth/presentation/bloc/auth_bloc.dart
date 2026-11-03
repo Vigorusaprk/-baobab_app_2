@@ -71,4 +71,17 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       (_) => emit(SignOutSuccess()),
     );
   }
+
+  /// Savoir si l'utilisateur courant possède déjà un mot de passe, pour ne
+  /// pas demander un second mot de passe à un commerçant déjà connecté.
+  Future<bool> executeHasPassword() async => authRepository.hasPassword();
+
+  /// Définir le mot de passe de l'utilisateur courant.
+  Future<String?> executeSetPassword(String password) async {
+    final result = await authRepository.setPassword(password);
+    return result.fold(
+      (failure) => failure.message,
+      (_) => null,
+    );
+  }
 }
