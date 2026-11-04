@@ -5,6 +5,7 @@ import 'package:baobabe_0_2/features/auth/data/data_sources/remote_datasource/au
 import 'package:baobabe_0_2/features/auth/data/data_sources/remote_datasource/auth_google_datasource.dart';
 import 'package:baobabe_0_2/features/auth/data/data_sources/remote_datasource/auth_otp_datasource.dart';
 import 'package:baobabe_0_2/features/auth/data/data_sources/remote_datasource/auth_remote_datasource.dart';
+import 'package:baobabe_0_2/features/auth/data/data_sources/remote_datasource/set_password_error.dart';
 
 /// Authentification Supabase : mot de passe, déconnexion, et les
 /// capacités spécialisées (e-mail + code, Google, Apple).
@@ -35,12 +36,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         'Le mot de passe est trop faible. Choisissez-en un d\'au moins 10 caractères comportant une lettre et un chiffre.',
       );
     } on AuthException catch (e) {
-      final message = e.code == 'same_password'
-          ? 'Le nouveau mot de passe doit être différent de l\'ancien.'
-          : e.code == 'session_expired'
-          ? 'Votre session a expiré. Reconnectez-vous puis réessayez de définir le mot de passe.'
-          : 'La définition du mot de passe a échoué. Vérifiez votre connexion puis réessayez.';
-      throw AuthException(message);
+      throw AuthException(mapSetPasswordError(e));
     } catch (e) {
       throw AuthException(
         'Pas de connexion. Vérifiez votre réseau et réessayez.',

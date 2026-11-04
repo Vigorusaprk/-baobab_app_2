@@ -23,6 +23,7 @@ import 'package:baobabe_0_2/features/settings/presentation/bloc/settings_bloc.da
     as theme_settings;
 import 'package:baobabe_0_2/features/home_page/presentation/bloc/explore_cubit.dart';
 import 'package:baobabe_0_2/features/settings/presentation/cubit/profile_cubit.dart';
+import 'package:baobabe_0_2/features/settings/presentation/cubit/security_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -54,15 +55,22 @@ class _MainAppState extends State<MainApp> {
     final businessRepository = BusinessRepositoryImpl(
       remoteDataSource: businessRemoteDataSource,
     );
+    // Partagé entre le bloc d'authentification et le cubit « Sécurité » :
+    // les deux parlent au même repository, il ne fallait pas le construire
+    // deux fois.
+    final authRepository = AuthRepositoryImpl(
+      AuthRemoteDataSourceImpl(SupabaseClientWrapper.client),
+    );
 
     return MultiBlocProvider(
       providers: [
         BlocProvider<AuthBloc>(
-          create: (_) => AuthBloc(
-            authRepository: AuthRepositoryImpl(
-              AuthRemoteDataSourceImpl(SupabaseClientWrapper.client),
-            ),
-          ),
+          create: (_) => AuthBloc(authRepository: authRepository),
+        ),
+        // L'état « ce compte a un mot de passe » est lu par l'écran des
+        // paramètres et par la page Sécurité : une instance les fait vivre.
+        BlocProvider<SecurityCubit>(
+          create: (_) => SecurityCubit(authRepository: authRepository)..load(),
         ),
         BlocProvider<AuthSessionCubit>(create: (_) => AuthSessionCubit()),
         BlocProvider<CategoryBloc>(

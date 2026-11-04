@@ -6,8 +6,10 @@ import 'package:baobabe_0_2/features/auth/presentation/widgets/password_rules_hi
 import 'package:flutter/material.dart';
 
 /// Le formulaire de définition de mot de passe : mot de passe, confirmation,
-/// règles en direct, et action. L'état (repos / chargement / erreur) est
-/// porté par le parent ; la saisie vit dans les contrôleurs, jamais vidée.
+/// règles en direct. L'état (repos / chargement / erreur) est porté par le
+/// parent ; la saisie vit dans les contrôleurs, jamais vidée.
+///
+/// [onSubmit] reçoit le mot de passe validé ; c'est le parent qui le consomme.
 class SetPasswordForm extends StatefulWidget {
   const SetPasswordForm({
     super.key,
@@ -17,7 +19,7 @@ class SetPasswordForm extends StatefulWidget {
     this.email,
   });
 
-  final VoidCallback onSubmit;
+  final ValueChanged<String> onSubmit;
   final bool isLoading;
   final String? error;
   final String? email;
@@ -52,7 +54,7 @@ class _SetPasswordFormState extends State<SetPasswordForm> {
 
   void _submit() {
     if (!_isValid) return;
-    widget.onSubmit();
+    widget.onSubmit(_passwordController.text);
   }
 
   @override

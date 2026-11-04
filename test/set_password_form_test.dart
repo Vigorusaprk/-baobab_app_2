@@ -29,9 +29,9 @@ void main() {
   testWidgets('le bouton s\'active et soumet quand le couple est valide', (
     tester,
   ) async {
-    var submitted = false;
+    var submittedPassword = '';
     await tester.pumpWidget(
-      _wrap(SetPasswordForm(onSubmit: () => submitted = true)),
+      _wrap(SetPasswordForm(onSubmit: (password) => submittedPassword = password)),
     );
     final fields = find.byType(TextField);
     await tester.enterText(fields.at(0), 'ab12cd34ef');
@@ -42,7 +42,7 @@ void main() {
     expect(button.isActive, isTrue);
     await tester.tap(find.byType(CustomButton));
     await tester.pump();
-    expect(submitted, isTrue);
+    expect(submittedPassword, 'ab12cd34ef');
   });
 
   testWidgets('affiche l\'erreur', (tester) async {
@@ -58,4 +58,4 @@ void main() {
   });
 }
 
-void _submit() {}
+void _submit(String _) {}

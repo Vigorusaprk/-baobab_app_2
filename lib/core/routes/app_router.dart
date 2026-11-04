@@ -15,6 +15,7 @@ import 'package:baobabe_0_2/features/home_page/presentation/screens/home_page_sc
 import 'package:baobabe_0_2/features/home_page/presentation/screens/search_page.dart';
 import 'package:baobabe_0_2/features/home_page/presentation/screens/all_offers_screen.dart';
 import 'package:baobabe_0_2/features/settings/presentation/screens/legal_page.dart';
+import 'package:baobabe_0_2/features/settings/presentation/screens/security_screen.dart';
 import 'package:baobabe_0_2/features/activity/presentation/screens/activity_screen.dart';
 import 'package:baobabe_0_2/features/activity/presentation/screens/activity_detail_page.dart';
 import 'package:baobabe_0_2/features/settings/presentation/screens/settings_screen.dart';
@@ -259,6 +260,14 @@ final GoRouter appRouter = GoRouter(
       name: 'legal',
       builder: (context, state) =>
           LegalRoutePage(slug: state.pathParameters['slug'] ?? ''),
+    ),
+    // Sécurité : définir ou changer le mot de passe du compte. Hors du
+    // shell — c'est une lecture-écriture d'un seul écran, pas une branche
+    // de navigation.
+    GoRoute(
+      path: '/settings/security',
+      name: 'settingsSecurity',
+      builder: (context, state) => const SecurityScreen(),
     ),
     GoRoute(
       path: '/offers',

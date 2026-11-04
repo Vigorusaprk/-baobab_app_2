@@ -1,4 +1,6 @@
 import 'package:baobabe_0_2/core/themes/app_theme.dart';
+import 'package:baobabe_0_2/core/errors/failure.dart';
+import 'package:baobabe_0_2/features/auth/domain/repositories/auth_repository.dart';
 import 'package:baobabe_0_2/features/auth/presentation/bloc/auth_session_cubit.dart';
 import 'package:baobabe_0_2/features/merchant/domain/entities/merchant_space.dart';
 import 'package:baobabe_0_2/features/merchant/domain/repositories/merchant_repository.dart';
@@ -7,10 +9,13 @@ import 'package:baobabe_0_2/features/settings/data/profile_api_service.dart';
 import 'package:baobabe_0_2/features/settings/domain/entities/user_address.dart';
 import 'package:baobabe_0_2/features/settings/presentation/bloc/settings_bloc.dart';
 import 'package:baobabe_0_2/features/settings/presentation/cubit/profile_cubit.dart';
+import 'package:baobabe_0_2/features/settings/presentation/cubit/security_cubit.dart';
 import 'package:baobabe_0_2/features/settings/presentation/screens/settings_screen.dart';
+import 'package:dartz/dartz.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 /// Les réglages doivent suivre la session.
 ///
@@ -52,6 +57,35 @@ class _FakeMerchantRepository implements MerchantRepository {
   noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
 
+/// Un mot de passe posé : l'écran « Sécurité » s'affiche alors avec le
+/// libellé « Changer » ; peu importe lequel pour ce test.
+class _FakeAuthRepository implements AuthRepository {
+  @override
+  Future<bool> hasPassword() async => true;
+
+  @override
+  Future<Either<Failure, void>> setPassword(String password) async =>
+      const Right(null);
+
+  @override
+  Future<Either<Failure, void>> requestEmailOtp(String email) async =>
+      const Right(null);
+
+  @override
+  Future<Either<Failure, void>> verifyEmailOtp(String email, String code) async =>
+      const Right(null);
+
+  @override
+  Future<Either<Failure, void>> signOut() async => const Right(null);
+
+  @override
+  Future<Either<Failure, AuthResponse>> authWithGoogle() async =>
+      throw UnimplementedError();
+
+  @override
+  Future<Either<Failure, void>> authWithApple() async => const Right(null);
+}
+
 class _TestableMerchantCubit extends MerchantCubit {
   _TestableMerchantCubit(super.repository) : super.forTest();
 
@@ -80,6 +114,10 @@ void main() {
           BlocProvider(create: (_) => ProfileCubit(api: _FakeProfileApi())),
           BlocProvider<MerchantCubit>(
             create: (_) => _TestableMerchantCubit(_FakeMerchantRepository()),
+          ),
+          BlocProvider<SecurityCubit>(
+            create: (_) =>
+                SecurityCubit(authRepository: _FakeAuthRepository())..load(),
           ),
         ],
         child: MaterialApp(
